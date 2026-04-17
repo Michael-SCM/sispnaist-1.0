@@ -1,0 +1,173 @@
+export interface IUser {
+  _id?: string;
+  cpf: string;
+  nome: string;
+  email: string;
+  matricula?: string;
+  dataNascimento?: string;
+  sexo?: 'M' | 'F';
+  telefone?: string;
+  endereco?: IEndereco;
+  empresa?: string;
+  unidade?: string;
+  departamento?: string;
+  cargo?: string;
+  dataAdmissao?: string;
+  perfil?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IEndereco {
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  cep?: string;
+}
+
+export interface IAuthResponse {
+  user: IUser;
+  token: string;
+}
+
+export interface IAcidente {
+  _id?: string;
+  dataAcidente: string;
+  horario?: string;
+  trabalhadorId: string;
+  tipoAcidente: string;
+  descricao: string;
+  local?: string;
+  lesoes?: string[];
+  feriado?: boolean;
+  comunicado?: boolean;
+  dataComunicacao?: string;
+  status?: 'Aberto' | 'Em Análise' | 'Fechado';
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IDoenca {
+  _id?: string;
+  dataInicio: string;
+  dataFim?: string;
+  trabalhadorId: string;
+  codigoDoenca: string;
+  nomeDoenca: string;
+  relatoClinico?: string;
+  profissionalSaude?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IVacinacao {
+  _id?: string;
+  trabalhadorId: string;
+  vacina: string;
+  dataVacinacao: string;
+  proximoDose?: string;
+  unidadeSaude?: string;
+  profissional?: string;
+  certificado?: string;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IEmpresa {
+  _id?: string;
+  razaoSocial: string;
+  nomeFantasia?: string;
+  cnpj: string;
+  email?: string;
+  telefone?: string;
+  endereco?: IEndereco;
+  ativa?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IUnidade {
+  _id?: string;
+  nome: string;
+  empresaId: string;
+  endereco?: IEndereco;
+  gestor?: string;
+  ativa?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITrabalhador {
+  _id?: string;
+  cpf: string;
+  nome: string;
+  nomeMae?: string;
+  matricula?: string;
+  cartaoSus?: string;
+  celular?: string;
+  telefoneContato?: string;
+  email?: string;
+  dataNascimento?: string;
+
+  // Vínculo com Empresa/Unidade
+  empresa?: string; // ObjectId da Empresa
+  unidade?: string; // ObjectId da Unidade
+
+  // Dados Pessoais/Diversos
+  sexo?: string;
+  raca?: string;
+  escolaridade?: string;
+  estadoCivil?: string;
+  
+  // Deficiência
+  deficiencia?: {
+    tipo?: string;
+    tempo?: string;
+    grau?: string;
+  };
+
+  // Vínculos e Situação
+  vinculo?: {
+    tipo?: string;
+    outro?: string;
+    turno?: string;
+    jornada?: string;
+    jornadaOutro?: string;
+    situacao?: string;
+  };
+
+  // Endereço
+  endereco?: IEndereco;
+
+  // Dados do Trabalho
+  trabalho?: {
+    dataPosse?: string;
+    empresaTerceirizada?: string;
+    dataEntrada?: string;
+    setor?: string;
+    cargo?: string;
+    funcao?: string;
+    ocupacao?: string;
+  };
+
+  // Histórico e Eventos
+  historico?: {
+    dataAposentadoria?: string;
+    dataObito?: string;
+    dataRemocao?: string;
+    novoServico?: string;
+    dataRetorno?: string;
+    dataRelotacao?: string;
+    dataDesligamento?: string;
+    dataAfastamento?: string;
+    tipoAfastamento?: string;
+  };
+
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}

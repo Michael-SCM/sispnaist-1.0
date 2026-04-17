@@ -1,0 +1,256 @@
+import Acidente, { IAcidenteDocument } from '../models/Acidente.js';
+import User from '../models/User.js';
+import Trabalhador from '../models/Trabalhador.js';
+import { AppError } from '../middleware/errorHandler.js';
+import { IAcidente } from '../types/index.js';
+import mongoose from 'mongoose';
+
+export class AcidenteService {
+  /**
+   * Resolve trabalhadorId de CPF para ObjectId
+   * Se o valor já for um ObjectId válido, retorna como está
+   * Se for um CPF, busca o usuário ou trabalhador e retorna seu ObjectId
+   */
+  private async resolverTrabalhadorId(identifier: string): Promise<string> {
+    // Se já for um ObjectId válido, retorna como está
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      return identifier;
+    }
+
+    // Tentar buscar na coleção de usuários primeiro
+    const usuario = await User.findOne({ cpf: identifier });
+    if (usuario) {
+      return usuario._id.toString();
+    }
+
+    // Se não encontrar em User, tentar em Trabalhador
+    const trabalhador = await Trabalhador.findOne({ cpf: identifier });
+    if (trabalhador) {
+      return trabalhador._id.toString();
+    }
+
+    throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
+  }
+
+  async criar(acidenteData: Partial<IAcidente>): Promise<IAcidente> {
+    // Resolver trabalhadorId se for CPF
+    if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
+      acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
+    }
+
+    const acidente = new Acidente(acidenteData);
+    await acidente.save();
+    return acidente.toObject() as IAcidente;
+  }
+
+  async obter(id: string): Promise<IAcidente> {
+    console.log(`[AcidenteService] Buscando acidente ID: ${id}`);
+    const acidente = await Acidente.findById(id)
+      .populate('trabalhadorId', 'nome cpf email empresa unidade')
+      .lean();
+
+    if (!acidente) {
+      throw new AppError('Acidente não encontrado', 404);
+    }
+
+    console.log(`[AcidenteService] Acidente retornado:`, JSON.stringify(acidente));
+    return acidente as unknown as IAcidente;
+  }
+
+  async listar(
+    page: number = 1,
+    limit: number = 10,
+    filtros?: {
+      tipoAcidente?: string;
+      status?: string;
+      trabalhadorId?: string;
+      dataInicio?: string;
+      dataFim?: string;
+    }
+  ): Promise<{ acidentes: IAcidente[]; total: number; pages: number }> {
+    const skip = (page - 1) * limit;
+    const query: any = {};
+
+    // Aplicar filtros se fornecidos
+    if (filtros?.tipoAcidente) {
+      query.tipoAcidente = filtros.tipoAcidente;
+    }
+
+    if (filtros?.status) {
+      query.status = filtros.status;
+    }
+
+    if (filtros?.trabalhadorId) {
+      query.trabalhadorId = filtros.trabalhadorId;
+    }
+
+    if (filtros?.dataInicio || filtros?.dataFim) {
+      query.dataAcidente = {};
+      if (filtros?.dataInicio) {
+        query.dataAcidente.$gte = new Date(filtros.dataInicio);
+      }
+      if (filtros?.dataFim) {
+        query.dataAcidente.$lte = new Date(filtros.dataFim);
+      }
+    }
+
+    const total = await Acidente.countDocuments(query);
+    const acidentes = await Acidente.find(query)
+      .populate('trabalhadorId', 'nome cpf email empresa unidade')
+      .sort({ dataAcidente: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const pages = Math.ceil(total / limit);
+
+    return {
+      acidentes: acidentes as IAcidente[],
+      total,
+      pages,
+    };
+  }
+
+  async atualizar(id: string, acidenteData: Partial<IAcidente>): Promise<IAcidente> {
+    console.log(`[AcidenteService] Atualizando acidente ID: ${id}, Payload:`, JSON.stringify(acidenteData));
+    
+    // Não permitir alterar data de criação
+    if ('dataCriacao' in acidenteData) {
+      delete acidenteData.dataCriacao;
+    }
+
+    // Resolver trabalhadorId se for CPF
+    if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
+      acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
+    }
+
+    // Garantir que lesões é um array, mas SOMENTE se ele foi enviado no payload
+    if (acidenteData.lesoes !== undefined && !Array.isArray(acidenteData.lesoes)) {
+      acidenteData.lesoes = [];
+    }
+
+    // Usar $set explicitamente para garantir que arrays (como lesoes) sejam substituídos corretamente
+    const acidente = await Acidente.findByIdAndUpdate(
+      id,
+      { $set: acidenteData },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate('trabalhadorId', 'nome cpf email empresa unidade').lean();
+
+    if (!acidente) {
+      throw new AppError('Acidente não encontrado', 404);
+    }
+
+    console.log(`[AcidenteService] Acidente APÓS atualização:`, JSON.stringify(acidente));
+    return acidente as unknown as IAcidente;
+  }
+
+  async deletar(id: string): Promise<void> {
+    const result = await Acidente.findByIdAndDelete(id);
+
+    if (!result) {
+      throw new AppError('Acidente não encontrado', 404);
+    }
+  }
+
+  async obterPorTrabalhador(
+    trabalhadorId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ acidentes: IAcidente[]; total: number; pages: number }> {
+    const skip = (page - 1) * limit;
+    const query = { trabalhadorId };
+
+    const total = await Acidente.countDocuments(query);
+    const acidentes = await Acidente.find(query)
+      .sort({ dataAcidente: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const pages = Math.ceil(total / limit);
+
+    return {
+      acidentes: acidentes as IAcidente[],
+      total,
+      pages,
+    };
+  }
+
+  async obterEstatisticas(): Promise<{
+    total: number;
+    porTipo: { [key: string]: number };
+    porStatus: { [key: string]: number };
+    ultimosMeses: { mes: string; quantidade: number }[];
+  }> {
+    const total = await Acidente.countDocuments();
+
+    const porTipo = await Acidente.aggregate([
+      {
+        $group: {
+          _id: '$tipoAcidente',
+          quantidade: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const porStatus = await Acidente.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          quantidade: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Últimos 6 meses
+    const seisMesesAtras = new Date();
+    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
+
+    const ultimosMeses = await Acidente.aggregate([
+      {
+        $match: {
+          dataAcidente: { $gte: seisMesesAtras },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            ano: { $year: '$dataAcidente' },
+            mes: { $month: '$dataAcidente' },
+          },
+          quantidade: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { '_id.ano': 1, '_id.mes': 1 },
+      },
+    ]);
+
+    return {
+      total,
+      porTipo: porTipo.reduce(
+        (acc: any, item: any) => {
+          acc[item._id || 'Não informado'] = item.quantidade;
+          return acc;
+        },
+        {}
+      ),
+      porStatus: porStatus.reduce(
+        (acc: any, item: any) => {
+          acc[item._id || 'Não informado'] = item.quantidade;
+          return acc;
+        },
+        {}
+      ),
+      ultimosMeses: ultimosMeses.map((item: any) => ({
+        mes: `${item._id.mes}/${item._id.ano}`,
+        quantidade: item.quantidade,
+      })),
+    };
+  }
+}
+
+export default new AcidenteService();
