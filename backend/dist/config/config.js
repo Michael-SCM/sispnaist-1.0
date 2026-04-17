@@ -1,0 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config();
+const config = {
+    port: process.env.PORT || 3001,
+    nodeEnv: process.env.NODE_ENV || 'development',
+    mongodbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/sispatnaist',
+    jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here',
+    jwtExpire: process.env.JWT_EXPIRE || '7d',
+    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10),
+    uploadDir: process.env.UPLOAD_DIR || './uploads',
+};
+export default config;
+//# sourceMappingURL=config.js.map
