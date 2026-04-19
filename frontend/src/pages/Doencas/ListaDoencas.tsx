@@ -70,18 +70,19 @@ export const ListaDoencas: React.FC = () => {
   };
 
   const columns = [
-    { key: 'dataInicio', label: 'Data Início', render: (value: string) => new Date(value).toLocaleDateString('pt-BR') },
-    { key: 'nomeDoenca', label: 'Doença' },
-    { key: 'codigoDoenca', label: 'Código' },
-    {
-      key: 'ativo',
-      label: 'Status',
-      render: (value: boolean) => (
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-          {value ? 'Ativa' : 'Inativa'}
-        </span>
-      ),
-    },
+  { key: 'dataInicio', header: 'Data Início', render: (value: string) => new Date(value).toLocaleDateString('pt-BR') },
+  { key: 'nomeDoenca', header: 'Doença' },
+  { key: 'codigoDoenca', header: 'Código' },
+  {
+    key: 'ativo',
+    header: 'Status',
+    render: (value: boolean) => (
+      <span className={`px-3 py-1 rounded-full text-sm font-medium ${value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+        {value ? 'Ativa' : 'Inativa'}
+      </span>
+    ),
+  },
+
   ];
 
   const actions = [
@@ -119,10 +120,12 @@ export const ListaDoencas: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <TextInput
               label="Nome da Doença"
+              name="nomeDoenca"
               value={localFiltros.nomeDoenca || ''}
               onChange={(e) => setLocalFiltros({ ...localFiltros, nomeDoenca: e.target.value })}
               placeholder="Buscar por nome..."
             />
+
 
             <Select
               label="Status"

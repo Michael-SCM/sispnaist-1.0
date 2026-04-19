@@ -11,7 +11,9 @@ interface RegisterFormData {
   cpf: string;
   senha: string;
   confirmaSenha: string;
+  [key: string]: string | undefined;
 }
+
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();

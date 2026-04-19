@@ -8,7 +8,9 @@ import toast from 'react-hot-toast';
 interface LoginFormData {
   email: string;
   senha: string;
+  [key: string]: string | undefined;
 }
+
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
