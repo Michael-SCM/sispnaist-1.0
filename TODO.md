@@ -1,17 +1,29 @@
-# Task: Start Frontend and Backend - COMPLETED ✅
+# TODO: Fix TypeScript Errors - SISPNAIST Frontend
 
-## Steps:
-- [x] Fix path in start-frontend.bat ✅
-- [x] Start backend server using start-backend.bat ✅ (http://localhost:3001 - MongoDB connection pending config)
-- [x] Start frontend server using start-frontend.bat ✅ (http://localhost:3000)
-- [x] Fixed import errors in controllers (AppError named import) ✅
-- [x] Killed stuck node processes ✅
-- [ ] Restarted both servers ✅
+## Progress: 1/13 steps complete
 
-## Status:
-- Backend: Running on port 3001 (API ready, DB connection needs .env config)
-- Frontend: Running on port 3000 (Vite dev server)
+### Etapa 1: Remove unused variables/imports (TS6133)
+- [✓] 1. App.tsx: Remove unused HealthCheck import
+- [ ] 2. useAsync.ts: Remove unused toast import
+- [ ] 3. EditarAcidente.tsx: Remove unused IAcidente import
+- [ ] 4. ListaAcidentes.tsx: Remove unused setPage
+- [ ] 5. Dashboard.tsx: Remove unused dadosAcidentes, carregarKPIs
+- [ ] 6. ListaUsuarios.tsx: Confirm/remove unused loading
 
-## Next:
-Configure .env with MongoDB credentials for full DB connection.
-Test: Open http://localhost:3000, register/login via /api/auth.
+### Etapa 2: Fix import paths (TS2307)
+- [ ] 7. AcidentesPorMes.tsx: Verify/clean import '../types/analytics'
+
+### Etapa 3: Fix invalid props (TS2322)
+- [ ] 8. FormFields.tsx: Add optional help?: string to all component interfaces (TextInput, DatePicker, etc.)
+- [ ] 9. Verify help props now type-safe in EditarAcidente/NovoAcidente/EditarDoenca
+
+### Etapa 4: Fix type incompat (TS2353)
+- [ ] 10. ListaUnidades.tsx: Improve empresaId handling (already safe w/ || fallback)
+
+### Final Steps
+- [ ] 11. Run `cd frontend && npx tsc --noEmit` to verify fixes
+- [ ] 12. Test key pages: /acidentes/editar, /doencas/editar, Dashboard
+- [ ] 13. Update this TODO with completion ✓
+
+**Next step: #3 EditarAcidente.tsx - Remove unused IAcidente**
+
