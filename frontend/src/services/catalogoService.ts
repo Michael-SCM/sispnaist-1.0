@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ICatalogoItem } from '../types/index.js';
+import { ICatalogoItem } from '../types';
 
 interface ListarCatalogosResponse {
   data: ICatalogoItem[];
