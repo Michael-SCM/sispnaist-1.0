@@ -9,7 +9,7 @@ import { useAuthStore } from '../../store/authStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import toast from 'react-hot-toast';
 
-interface FormData {
+
   trabalhadorId: string;
   dataAcidente: string;
   horario: string;
@@ -20,7 +20,7 @@ interface FormData {
   feriado: boolean;
   comunicado: boolean;
   dataComunicacao: string;
-  status: string;
+  status: 'Aberto' | 'Em Análise' | 'Fechado';
 }
 
 const INITIAL_FORM: FormData = {
@@ -34,7 +34,7 @@ const INITIAL_FORM: FormData = {
   feriado: false,
   comunicado: false,
   dataComunicacao: '',
-  status: 'Aberto',
+  status: 'Aberto' as const,
 };
 
 const TIPOS_ACIDENTE = [
