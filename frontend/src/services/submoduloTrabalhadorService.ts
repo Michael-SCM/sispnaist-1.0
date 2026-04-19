@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho } from '../types/index.js';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho } from '../types';
 
 const SUBMODULOS = {
   dependentes: 'dependentes',
