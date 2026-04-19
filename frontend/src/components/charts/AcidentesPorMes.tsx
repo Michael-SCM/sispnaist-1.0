@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { IMensalDados } from '../types/analytics.js';
+import { IMensalDados } from '../types/analytics';
 
 interface IAcidentesPorMesProps {
   dados: IMensalDados[];

@@ -11,13 +11,11 @@ export const Dashboard: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const userPerfil = user?.perfil || 'trabalhador';
 
-  const {
+const {
     kpis,
-    dadosAcidentes,
     dashboardAdmin,
     dashboardTrabalhador,
     isLoading,
-    carregarKPIs,
     carregarDadosAcidentes,
     carregarDashboardAdmin,
     carregarDashboardTrabalhador,

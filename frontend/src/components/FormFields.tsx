@@ -12,6 +12,7 @@ interface TextInputProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  help?: string;
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
@@ -24,6 +25,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   error,
   required,
   disabled,
+  help,
 }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
@@ -43,6 +45,7 @@ export const TextInput: React.FC<TextInputProps> = ({
       }`}
     />
     {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
   </div>
 );
 
@@ -277,6 +280,7 @@ interface MultiSelectProps {
   placeholder?: string;
   error?: string;
   required?: boolean;
+  help?: string;
 }
 
 export const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -288,6 +292,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   placeholder,
   error,
   required,
+  help,
 }) => {
   const [inputValue, setInputValue] = React.useState('');
 
@@ -338,6 +343,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         />
       </div>
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
     </div>
   );
 };
