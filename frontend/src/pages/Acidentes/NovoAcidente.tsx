@@ -10,6 +10,7 @@ import { trabalhadorService } from '../../services/trabalhadorService.js';
 import toast from 'react-hot-toast';
 
 
+interface FormData {
   trabalhadorId: string;
   dataAcidente: string;
   horario: string;
