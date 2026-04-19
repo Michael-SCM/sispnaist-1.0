@@ -1,5 +1,5 @@
 import api from './api.js';
-import { IVideoAula } from '../types/index.js';
+import { IVideoAula } from '../types';
 
 interface ListarVideoAulasResponse {
   data: IVideoAula[];
