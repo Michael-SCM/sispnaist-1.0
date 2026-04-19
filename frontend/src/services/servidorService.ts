@@ -1,5 +1,5 @@
 import api from './api.js';
-import { IServidorFuncionario } from '../types/index.js';
+import { IServidorFuncionario } from '../types';
 
 interface ListarServidoresResponse {
   data: IServidorFuncionario[];
