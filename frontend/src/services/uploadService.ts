@@ -1,5 +1,5 @@
 import api from './api.js';
-import { IArquivoUpload } from '../types/index.js';
+import { IArquivoUpload } from '../types';
 
 interface ListarUploadsResponse {
   data: IArquivoUpload[];
