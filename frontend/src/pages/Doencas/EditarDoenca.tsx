@@ -161,12 +161,14 @@ export const EditarDoenca: React.FC = () => {
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Trabalhador (Apenas Leitura) */}
-            <TextInput
-              label="CPF do Trabalhador"
-              value={formData.trabalhadorId}
-              disabled
-              help="Este campo não pode ser alterado"
-            />
+              <TextInput
+                label="CPF do Trabalhador"
+                name="trabalhadorId"
+                value={formData.trabalhadorId}
+                disabled
+                help="Este campo não pode ser alterado"
+              />
+
 
             {/* Código e Data */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -179,6 +181,7 @@ export const EditarDoenca: React.FC = () => {
                 error={errors.codigoDoenca}
                 required
               />
+
 
               <DatePicker
                 label="Data de Início"

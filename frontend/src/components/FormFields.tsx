@@ -90,9 +90,12 @@ export const TextArea: React.FC<TextAreaProps> = ({
         error ? 'border-red-500' : 'border-gray-300'
       }`}
     />
+
     {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
   </div>
 );
+
 
 // Select
 interface SelectOption {
@@ -160,7 +163,9 @@ interface DatePickerProps {
   disabled?: boolean;
   max?: string;
   min?: string;
+  help?: string;
 }
+
 
 export const DatePicker: React.FC<DatePickerProps> = ({
   label,
@@ -172,7 +177,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   disabled,
   max,
   min,
+  help,
 }) => (
+
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
