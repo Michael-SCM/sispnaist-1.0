@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold hover:text-blue-100 transition">
-            SISPATNAIST
+            SISPNAIST
           </Link>
 
           {/* Desktop Menu */}

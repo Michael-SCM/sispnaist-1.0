@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral da Migração
 
-Este documento descreve o processo de transformação do SISPATNAIST de uma arquitetura PHP/MySQL tradicional para uma arquitetura moderna com React, Node.js e MongoDB.
+Este documento descreve o processo de transformação do SISPNAIST de uma arquitetura PHP/MySQL tradicional para uma arquitetura moderna com React, Node.js e MongoDB.
 
 ## 🔄 Processo de Migração
 
@@ -256,11 +256,11 @@ npm run build
 npm start
 
 # Usando PM2
-pm2 start dist/server.js --name sispatnaist-api
+pm2 start dist/server.js --name sispnaist-api
 
 # Usando Docker
-docker build -t sispatnaist-api .
-docker run -p 3001:3001 sispatnaist-api
+docker build -t sispnaist-api .
+docker run -p 3001:3001 sispnaist-api
 ```
 
 ### Frontend (React)
@@ -273,8 +273,8 @@ npm run build
 # Fazer upload da pasta 'dist/' para host
 
 # Ou com Docker
-docker build -t sispatnaist-web .
-docker run -p 3000:3000 sispatnaist-web
+docker build -t sispnaist-web .
+docker run -p 3000:3000 sispnaist-web
 ```
 
 ## ⚡ Perfor Performance
@@ -348,7 +348,7 @@ docker run -p 3000:3000 sispatnaist-web
 Para dúvidas durante a migração:
 - Documentação: `./docs/`
 - Issues: `./issues/`
-- Email: support@sispatnaist.com
+- Email: support@sispnaist.com
 
 ---
 

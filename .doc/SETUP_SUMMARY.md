@@ -7,7 +7,7 @@ Olá! Criei uma **estrutura completa e moderna** para transformar seu SISPNAIST 
 ### 📁 Estrutura do Projeto
 
 ```
-sispatnaist-react-modern/
+sispnaist-react-modern/
 ├── backend/                 # Node.js + Express + MongoDB
 │   ├── src/
 │   │   ├── config/          ✓ Database config, env variables
