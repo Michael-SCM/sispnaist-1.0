@@ -1,6 +1,6 @@
-# 🎉 SISPATNAIST - Estrutura Criada
+# 🎉 SISPNAIST - Estrutura Criada
 
-Olá! Criei uma **estrutura completa e moderna** para transformar seu SISPATNAIST PHP em uma aplicação React/Node.js/MongoDB.
+Olá! Criei uma **estrutura completa e moderna** para transformar seu SISPNAIST PHP em uma aplicação React/Node.js/MongoDB.
 
 ## ✅ O que foi Entregue
 
@@ -91,15 +91,14 @@ npm install
 cp .env.example .env
 
 # Edite .env com:
-# MONGODB_URI=mongodb://localhost:27017/sispatnaist
+# MONGODB_URI=
 # JWT_SECRET=sua-chave-secreta-aqui
 # PORT=3001
 
 # 3. Inicie em desenvolvimento
 npm run dev
 
-# Servidor estará em http://localhost:3001
-# Teste com: curl http://localhost:3001/health
+
 ```
 
 ### Frontend
@@ -118,7 +117,7 @@ cp .env.example .env
 # 3. Inicie em desenvolvimento
 npm run dev
 
-# Aplicação estará em http://localhost:3000
+
 ```
 
 ## 📡 API Endpoints Já Implementados
@@ -295,7 +294,7 @@ Todos os 76+ entidades do sistema original foram **mapeadas e planejadas** para 
 mongod
 
 # Verifique .env
-MONGODB_URI=mongodb://localhost:27017/sispatnaist
+MONGODB_URI=
 ```
 
 ### Port Already in Use
@@ -306,8 +305,7 @@ PORT=3002
 
 ### CORS Error
 ```bash
-# Frontend deve estar em http://localhost:3000
-# Backend está em http://localhost:3001
+
 ```
 
 ## 📞 Próximos Passos
@@ -322,12 +320,12 @@ PORT=3002
 
 Seu projeto está em:
 ```
-c:\Users\aluno2025\Documents\sispatnaist-react-modern\
+
 ```
 
 Use VS Code para abrir:
 ```bash
-code c:\Users\aluno2025\Documents\sispatnaist-react-modern\
+code 
 ```
 
 ---
