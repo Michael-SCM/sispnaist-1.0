@@ -282,7 +282,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   </div>
 );
 
-// MultiSelect (Tags)
+// MultiSelect
 interface MultiSelectProps {
   label: string;
   name: string;
@@ -448,3 +448,235 @@ export const CNPJInput: React.FC<CNPJInputProps> = ({
       ...e,
       target: { ...e.target, name, value: formatted },
     };
+    onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  return (
+    <div className="form-group">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+        id={name}
+        name={name}
+        type="text"
+        value={value}
+        onChange={handleChange}
+        placeholder="12.345.678/0001-90"
+        disabled={disabled}
+        maxLength={18}
+        className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+      />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    </div>
+  );
+};
+
+// Telefone Input
+interface TelefoneInputProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  help?: string;
+}
+
+export const TelefoneInput: React.FC<TelefoneInputProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  error,
+  required,
+  disabled,
+  help,
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatTelefone(e.target.value);
+    const syntheticEvent = {
+      ...e,
+      target: { ...e.target, name, value: formatted },
+    };
+    onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+  };
+
+  return (
+    <div className="form-group">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <input
+        id={name}
+        name={name}
+        type="text"
+        value={value}
+        onChange={handleChange}
+        placeholder="(11) 99999-9999"
+        disabled={disabled}
+        maxLength={15}
+        className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+      />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    </div>
+  );
+};
+
+// CEP Input
+interface CEPInputProps {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onCEPFound?: (data: { logradouro: string; bairro: string; cidade: string; estado: string }) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  help?: string;
+}
+
+export const CEPInput: React.FC<CEPInputProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+  onCEPFound,
+  placeholder,
+  error,
+  required,
+  disabled,
+  help,
+}) => {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCEP(e.target.value);
+    const syntheticEvent = {
+      ...e,
+      target: { ...e.target, name, value: formatted },
+    };
+    onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
+
+    const numbers = formatted.replace(/\D/g, '');
+    if (numbers.length === 8 && onCEPFound) {
+      setLoading(true);
+      try {
+        const { buscarCEP } = await import('../utils/masks.js');
+        const data = await buscarCEP(numbers);
+        if (data) {
+          onCEPFound(data);
+        }
+      } catch (err) {
+        console.error('Erro ao buscar CEP:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div className="form-group">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <div className="relative">
+        <input
+          id={name}
+          name={name}
+          type="text"
+          value={value}
+          onChange={handleChange}
+          placeholder="12345-678"
+          disabled={disabled}
+          maxLength={9}
+          className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            error ? 'border-red-500' : 'border-gray-300'
+          } ${loading ? 'pr-10' : ''}`}
+        />
+        {loading && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          </div>
+        )}
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    </div>
+  );
+};
+
+// Search Input
+interface SearchInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  debounce?: number;
+  help?: string;
+}
+
+export const SearchInput: React.FC<SearchInputProps> = ({
+  value,
+  onChange,
+  placeholder = 'Buscar...',
+  debounce = 500,
+  help,
+}) => {
+  const [localValue, setLocalValue] = React.useState(value);
+
+  React.useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      onChange(localValue);
+    }, debounce);
+
+    return () => clearTimeout(timer);
+  }, [localValue, debounce, onChange]);
+
+  return (
+    <div className="form-group">
+      <div className="relative">
+        <input
+          type="text"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          placeholder={placeholder}
+          className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    </div>
+  );
+};
