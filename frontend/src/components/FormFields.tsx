@@ -89,10 +89,12 @@ export const TextArea: React.FC<TextAreaProps> = ({
         error ? 'border-red-500' : 'border-gray-300'
       }`}
     />
+
     {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {help && <small className="text-gray-500 text-xs mt-1">{help}</small>}
   </div>
 );
+
 
 
 
