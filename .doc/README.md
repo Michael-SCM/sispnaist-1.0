@@ -1,4 +1,4 @@
-# SISPATNAIST - React + Node.js + MongoDB
+# SISPNAIST - React + Node.js + MongoDB
 
 Sistema de Gerenciamento de Segurança e Saúde do Trabalhador - Versão Moderna com React, Node.js/Express e MongoDB.
 
@@ -87,10 +87,7 @@ sispatnaist-react-modern/
 
 ### 1. Clone o repositório
 
-```bash
-git clone https://github.com/seu-usuario/sispatnaist-react-modern.git
-cd sispatnaist-react-modern
-```
+
 
 ### 2. Backend Setup
 
@@ -103,11 +100,7 @@ npm install
 # Configure variáveis de ambiente
 cp .env.example .env
 
-# Edite .env com seus valores
-# MONGODB_URI=mongodb://localhost:27017/sispatnaist
-# JWT_SECRET=sua-chave-secreta
-# PORT=3001
-```
+
 
 ### 3. Frontend Setup
 
@@ -223,7 +216,7 @@ npm run migrate
 ### Backend (.env)
 
 ```
-MONGODB_URI=mongodb://localhost:27017/sispatnaist
+MONGODB_URI=
 JWT_SECRET=sua-chave-secreta-aqui
 JWT_EXPIRE=7d
 PORT=3001
