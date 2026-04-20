@@ -161,13 +161,16 @@ export const EditarDoenca: React.FC = () => {
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Trabalhador (Apenas Leitura) */}
+
               <TextInput
                 label="CPF do Trabalhador"
                 name="trabalhadorId"
                 value={formData.trabalhadorId}
+                onChange={() => {}}
                 disabled
                 help="Este campo não pode ser alterado"
               />
+
 
 
             {/* Código e Data */}
