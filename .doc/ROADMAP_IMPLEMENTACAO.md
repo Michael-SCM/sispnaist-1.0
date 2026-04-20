@@ -2,7 +2,7 @@
 
 ## 🎯 Visão Geral
 
-Este documento serve como guia prático passo-a-passo para implementar as funcionalidades ainda faltantes no SISPATNAIST.
+Este documento serve como guia prático passo-a-passo para implementar as funcionalidades ainda faltantes no SISPNAIST.
 
 **Tempo Estimado Total:** 4-6 semanas  
 **Equipe Recomendada:** 2-3 desenvolvedores  

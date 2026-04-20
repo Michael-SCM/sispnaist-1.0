@@ -1,7 +1,7 @@
 {
-  "name": "sispatnaist-frontend",
+  "name": "sispnaist-frontend",
   "version": "1.0.0",
-  "description": "SISPATNAIST Frontend - React + TypeScript",
+  "description": "SISPNAIST Frontend - React + TypeScript",
   "type": "module",
   "scripts": {
     "dev": "vite",
