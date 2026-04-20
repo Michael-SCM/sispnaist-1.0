@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'https://sispnaist-1-0.onrender.com',
         changeOrigin: true,
       },
     },
@@ -17,6 +17,6 @@ export default defineConfig({
     sourcemap: false,
   },
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'http://localhost:3001/api'),
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api'),
   },
 });
