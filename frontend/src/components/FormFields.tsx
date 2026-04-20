@@ -148,9 +148,8 @@ export const Select: React.FC<SelectProps> = ({
         </option>
       ))}
     </select>
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-  </div>
-);
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}\n    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}\n  </div>\n);
+
 
 // DatePicker
 interface DatePickerProps {

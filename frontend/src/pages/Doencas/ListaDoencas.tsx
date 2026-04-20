@@ -162,13 +162,15 @@ export const ListaDoencas: React.FC = () => {
 
         {/* Tabela */}
         <div className="card">
+
           <DataTable
             columns={columns}
             data={doencas}
-            loading={isLoading}
+            isLoading={isLoading}
             actions={actions}
             onRowClick={(item) => navigate(`/doencas/${item._id}/editar`)}
           />
+
 
           {/* Paginação */}
           {pages > 1 && (

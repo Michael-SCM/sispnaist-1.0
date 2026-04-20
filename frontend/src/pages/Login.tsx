@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 interface LoginFormData {
   email: string;
   senha: string;
-  [key: string]: string | undefined;
+  [key: string]: string | number | boolean;
 }
+
+
 
 
 export const Login: React.FC = () => {

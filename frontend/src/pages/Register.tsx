@@ -11,8 +11,9 @@ interface RegisterFormData {
   cpf: string;
   senha: string;
   confirmaSenha: string;
-  [key: string]: string | undefined;
+  [key: string]: string | number | boolean;
 }
+
 
 
 export const Register: React.FC = () => {
