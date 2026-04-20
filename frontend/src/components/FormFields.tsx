@@ -44,10 +44,8 @@ export const TextInput: React.FC<TextInputProps> = ({
         error ? 'border-red-500' : 'border-gray-300'
       }`}
     />
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
-  </div>
-);
+{error && <p className="text-red-500 text-xs mt-1">{error}</p>}\n    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}\n  </div>\n);
+
 
 // TextArea
 interface TextAreaProps {
@@ -72,6 +70,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
   required,
   disabled,
   rows = 4,
+  help,
 }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
@@ -90,11 +89,11 @@ export const TextArea: React.FC<TextAreaProps> = ({
         error ? 'border-red-500' : 'border-gray-300'
       }`}
     />
-
     {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
   </div>
 );
+
 
 
 // Select
