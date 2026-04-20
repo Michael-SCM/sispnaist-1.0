@@ -450,7 +450,7 @@ const {
           </h3>
           <p className="text-gray-600 mt-2">
             Olá, <span className="font-bold">{user?.nome}</span>! Você está no painel do{' '}
-            <span className="text-blue-600 font-bold">SISPATNAIST</span>.
+            <span className="text-blue-600 font-bold">SISPNAIST</span>.
           </p>
         </div>
 

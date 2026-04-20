@@ -46,7 +46,7 @@ connectDB();
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
-    message: 'SISPATNAIST Backend API',
+    message: 'SISPNAIST Backend API',
     version: '1.0.0',
     documentation: {
       auth: {

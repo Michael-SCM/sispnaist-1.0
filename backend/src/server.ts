@@ -8,7 +8,7 @@ const PORT = config.port;
 const server = app.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════╗
-║   SISPATNAIST Backend Server Started   ║
+║    SISPNAIST Backend Server Started    ║
 ╚════════════════════════════════════════╝
 
 🚀 Server running on: http://localhost:${PORT}

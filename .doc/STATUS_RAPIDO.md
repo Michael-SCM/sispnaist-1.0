@@ -215,7 +215,7 @@
 ## 🎁 DOCUMENTOS QUE VOCÊ TEM
 
 ```
-/sispatnaist-react-modern/
+/sispnaist-react-modern/
 
 ANALISE_COMPLETA_DO_PROJETO.md
 ├─ Models MongoDB detalhados
@@ -267,7 +267,7 @@ MIGRATION_GUIDE.md
 
 1. **Abrir o projeto React em VS Code**
    ```bash
-   code C:\Users\aluno2025\Documents\sispatnaist-react-modern
+   code 
    ```
 
 2. **Instalar dependências**
@@ -279,7 +279,7 @@ MIGRATION_GUIDE.md
 3. **Configurar .env**
    ```bash
    # backend/.env
-   MONGODB_URI=mongodb://localhost:27017/sispatnaist
+   MONGODB_URI=
    JWT_SECRET=sua-chave-secreta
    PORT=3001
    
@@ -311,4 +311,4 @@ MIGRATION_GUIDE.md
 - **Status:** ~50% pronto, ~50% em desenvolvimento
 - **Timeline:** 4-6 semanas com 2-3 devs
 
-**Documentação de referência:** Ver `COMPARACAO_SISPATNAIST_PHP_vs_REACT.md` para análise completa.
+**Documentação de referência:** Ver `COMPARACAO_SISPNAIST_PHP_vs_REACT.md` para análise completa.
