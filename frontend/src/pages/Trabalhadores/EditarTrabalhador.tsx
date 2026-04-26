@@ -130,31 +130,6 @@ export const EditarTrabalhador: React.FC = () => {
               </div>
               <TextInput label="CPF" name="cpf" value={formData.cpf} onChange={handleChange} required disabled help="CPF não pode ser alterado diretamente" />
 
-              <div className="lg:col-span-2">
-                <Select
-                  label="Empresa"
-                  name="empresa"
-                  value={formData.empresa || ''}
-                  onChange={handleChange}
-                  options={empresas.map((emp) => ({
-                    value: emp._id || '',
-                    label: `${emp.razaoSocial} - ${emp.cnpj}`,
-                  }))}
-                  placeholder="Selecione uma empresa..."
-                />
-              </div>
-              <Select
-                label="Unidade"
-                name="unidade"
-                value={formData.unidade || ''}
-                onChange={handleChange}
-                options={unidades.map((uni) => ({
-                  value: uni._id || '',
-                  label: uni.nome,
-                }))}
-                placeholder="Selecione uma unidade..."
-              />
-
               <TextInput label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
               <TextInput label="Matrícula" name="matricula" value={formData.matricula} onChange={handleChange} />
               <DatePicker label="Data de Nascimento" name="dataNascimento" value={formData.dataNascimento?.split('T')[0]} onChange={handleChange} />
@@ -167,7 +142,6 @@ export const EditarTrabalhador: React.FC = () => {
                 options={[{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Feminino' }, { value: 'O', label: 'Outro' }]}
               />
               <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
-              <TextInput label="Setor" name="trabalho.setor" value={formData.trabalho?.setor} onChange={handleChange} />
             </div>
           </section>
 
@@ -192,7 +166,31 @@ export const EditarTrabalhador: React.FC = () => {
             <h2 className="text-xl font-bold mb-6 text-purple-600 border-b pb-2 flex items-center gap-2">
               <span>📄</span> Vínculo e Contrato
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <Select
+                  label="Empresa"
+                  name="empresa"
+                  value={formData.empresa || ''}
+                  onChange={handleChange}
+                  options={empresas.map((emp) => ({
+                    value: emp._id || '',
+                    label: `${emp.razaoSocial} - ${emp.cnpj}`,
+                  }))}
+                  placeholder="Selecione uma empresa..."
+                />
+              </div>
+              <Select
+                label="Unidade"
+                name="unidade"
+                value={formData.unidade || ''}
+                onChange={handleChange}
+                options={unidades.map((uni) => ({
+                  value: uni._id || '',
+                  label: uni.nome,
+                }))}
+                placeholder="Selecione uma unidade..."
+              />
               <Select 
                 label="Situação" 
                 name="vinculo.situacao" 
@@ -207,6 +205,7 @@ export const EditarTrabalhador: React.FC = () => {
               />
               <TextInput label="Tipo de Vínculo" name="vinculo.tipo" value={formData.vinculo?.tipo} onChange={handleChange} />
               <DatePicker label="Data de Entrada" name="trabalho.dataEntrada" value={formData.trabalho?.dataEntrada?.split('T')[0]} onChange={handleChange} />
+              <TextInput label="Setor" name="trabalho.setor" value={formData.trabalho?.setor} onChange={handleChange} />
             </div>
           </section>
 
