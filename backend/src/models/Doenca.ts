@@ -12,7 +12,7 @@ const DoencaSchema = new Schema<IDoencaDocument>(
     dataFim: Date,
     trabalhadorId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },
     codigoDoenca: {

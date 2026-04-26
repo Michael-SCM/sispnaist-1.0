@@ -1,5 +1,5 @@
 import Doenca, { IDoencaDocument } from '../models/Doenca.js';
-import User from '../models/User.js';
+import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IDoenca } from '../types/index.js';
 import mongoose from 'mongoose';
@@ -13,12 +13,12 @@ export class DoencaService {
       return identifier;
     }
 
-    const usuario = await User.findOne({ cpf: identifier });
-    if (!usuario) {
+    const trabalhador = await Trabalhador.findOne({ cpf: identifier });
+    if (!trabalhador) {
       throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
     }
 
-    return usuario._id.toString();
+    return trabalhador._id.toString();
   }
 
   async criar(doencaData: Partial<IDoenca>): Promise<IDoenca> {

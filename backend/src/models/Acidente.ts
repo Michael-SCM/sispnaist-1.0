@@ -12,7 +12,7 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
     horario: String,
     trabalhadorId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },
     tipoAcidente: {

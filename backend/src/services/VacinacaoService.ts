@@ -1,5 +1,5 @@
 import Vacinacao from '../models/Vacinacao.js';
-import User from '../models/User.js';
+import Trabalhador from '../models/Trabalhador.js';
 import { IVacinacao } from '../types/index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { Types } from 'mongoose';
@@ -166,12 +166,12 @@ export class VacinacaoService {
     }
 
     // Tentar buscar por CPF
-    const user = await User.findOne({ cpf: trabalhadorId });
-    if (!user) {
+    const trabalhador = await Trabalhador.findOne({ cpf: trabalhadorId });
+    if (!trabalhador) {
       throw new AppError('Trabalhador não encontrado', 404);
     }
 
-    return user._id.toString();
+    return trabalhador._id.toString();
   }
 }
 
