@@ -222,8 +222,8 @@ export class AnalyticsService {
     const ultimosAcidentes = await this.obterUltimosAcidentes(5);
 
     // Trabalhadores por empresa
-    const trabalhadoresPorEmpresa = await User.aggregate([
-      { $match: { perfil: 'trabalhador', ativo: true } },
+    const trabalhadoresPorEmpresa = await Trabalhador.aggregate([
+      { $match: { empresa: { $exists: true, $ne: null } } },
       {
         $lookup: {
           from: 'empresas',
@@ -232,6 +232,7 @@ export class AnalyticsService {
           as: 'empresaData',
         },
       },
+      { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: '$empresaData.razaoSocial',
@@ -243,7 +244,7 @@ export class AnalyticsService {
     ]);
 
     const empresasFormatadas = trabalhadoresPorEmpresa.map((item: any) => ({
-      nome: item._id?.[0] || 'Sem empresa',
+      nome: item._id || 'Sem empresa',
       total: item.total,
     }));
 

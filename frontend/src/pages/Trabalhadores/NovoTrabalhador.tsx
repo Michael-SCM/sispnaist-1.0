@@ -115,7 +115,6 @@ export const NovoTrabalhador: React.FC = () => {
               <TextInput label="CPF" name="cpf" value={formData.cpf} onChange={handleChange} placeholder="000.000.000-00" required />
 
               <TextInput label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
-              <TextInput label="Matrícula" name="matricula" value={formData.matricula} onChange={handleChange} />
               <DatePicker label="Data de Nascimento" name="dataNascimento" value={formData.dataNascimento} onChange={handleChange} />
 
               <Select
@@ -186,6 +185,7 @@ export const NovoTrabalhador: React.FC = () => {
                   { value: 'Aposentado', label: 'Aposentado' }
                 ]}
               />
+              <TextInput label="Matrícula" name="matricula" value={formData.matricula} onChange={handleChange} />
               <TextInput label="Tipo de Vínculo" name="vinculo.tipo" value={formData.vinculo?.tipo} onChange={handleChange} placeholder="ex: Efetivo, CLT, Estágio" />
               <DatePicker label="Data de Entrada" name="trabalho.dataEntrada" value={formData.trabalho?.dataEntrada} onChange={handleChange} />
               <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
