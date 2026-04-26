@@ -125,7 +125,6 @@ export const NovoTrabalhador: React.FC = () => {
                 onChange={handleChange}
                 options={[{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Feminino' }, { value: 'O', label: 'Outro' }]}
               />
-              <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
             </div>
           </section>
 
@@ -189,6 +188,7 @@ export const NovoTrabalhador: React.FC = () => {
               />
               <TextInput label="Tipo de Vínculo" name="vinculo.tipo" value={formData.vinculo?.tipo} onChange={handleChange} placeholder="ex: Efetivo, CLT, Estágio" />
               <DatePicker label="Data de Entrada" name="trabalho.dataEntrada" value={formData.trabalho?.dataEntrada} onChange={handleChange} />
+              <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
               <TextInput label="Setor" name="trabalho.setor" value={formData.trabalho?.setor} onChange={handleChange} />
             </div>
           </section>

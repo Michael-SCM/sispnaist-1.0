@@ -141,7 +141,6 @@ export const EditarTrabalhador: React.FC = () => {
                 onChange={handleChange}
                 options={[{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Feminino' }, { value: 'O', label: 'Outro' }]}
               />
-              <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
             </div>
           </section>
 
@@ -205,6 +204,7 @@ export const EditarTrabalhador: React.FC = () => {
               />
               <TextInput label="Tipo de Vínculo" name="vinculo.tipo" value={formData.vinculo?.tipo} onChange={handleChange} />
               <DatePicker label="Data de Entrada" name="trabalho.dataEntrada" value={formData.trabalho?.dataEntrada?.split('T')[0]} onChange={handleChange} />
+              <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
               <TextInput label="Setor" name="trabalho.setor" value={formData.trabalho?.setor} onChange={handleChange} />
             </div>
           </section>

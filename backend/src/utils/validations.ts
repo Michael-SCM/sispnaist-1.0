@@ -332,6 +332,8 @@ export const criarTrabalhadorSchema = Joi.object({
     tempo: Joi.string().trim().allow('', null),
     grau: Joi.string().trim().allow('', null),
   }).optional(),
+  empresa: Joi.string().trim().allow('', null),
+  unidade: Joi.string().trim().allow('', null),
   vinculo: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     outro: Joi.string().trim().allow('', null),
@@ -396,6 +398,8 @@ export const atualizarTrabalhadorSchema = Joi.object({
     tempo: Joi.string().trim().allow('', null),
     grau: Joi.string().trim().allow('', null),
   }).optional(),
+  empresa: Joi.string().trim().allow('', null),
+  unidade: Joi.string().trim().allow('', null),
   vinculo: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     outro: Joi.string().trim().allow('', null),
