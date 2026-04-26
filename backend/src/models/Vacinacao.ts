@@ -7,7 +7,7 @@ const VacinacaoSchema = new Schema<IVacinacaoDocument>(
   {
     trabalhadorId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },
     vacina: {
