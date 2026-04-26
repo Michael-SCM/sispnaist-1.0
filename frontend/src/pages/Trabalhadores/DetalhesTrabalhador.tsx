@@ -154,6 +154,23 @@ export const DetalhesTrabalhador: React.FC = () => {
                 <p className="text-xs text-green-600 font-bold uppercase">CEP: {trabalhador.endereco?.cep}</p>
               </div>
             </section>
+
+            <section className="card p-8 bg-blue-50/30 border-blue-100">
+              <h3 className="text-lg font-black text-blue-800 mb-4 tracking-tight">Submódulos</h3>
+              <div className="space-y-3">
+                <Link
+                  to={`/trabalhadores/${trabalhador._id}/afastamentos`}
+                  className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 hover:shadow-sm transition group"
+                >
+                  <span className="text-2xl">🏥</span>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-800 group-hover:text-blue-700 transition">Afastamentos</p>
+                    <p className="text-xs text-gray-500">Gerenciar afastamentos médicos</p>
+                  </div>
+                  <span className="text-blue-400 group-hover:text-blue-600 transition">→</span>
+                </Link>
+              </div>
+            </section>
           </div>
         </div>
       </div>
