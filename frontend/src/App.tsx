@@ -10,7 +10,7 @@ import { Home } from './pages/Home.js';
 import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
-import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador } from './pages/Trabalhadores/index.js';
+import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento } from './pages/Trabalhadores/index.js';
 import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
 import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
 import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
@@ -159,6 +159,30 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditarTrabalhador />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/afastamentos"
+          element={
+            <ProtectedRoute>
+              <ListaAfastamentos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/afastamentos/novo"
+          element={
+            <ProtectedRoute>
+              <FormAfastamento />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/afastamentos/:afastamentoId/editar"
+          element={
+            <ProtectedRoute>
+              <FormAfastamento />
             </ProtectedRoute>
           }
         />

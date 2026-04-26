@@ -1,3 +1,65 @@
+export interface ITrabalhadorAfastamento {
+  _id?: string;
+  trabalhadorId: string;
+  tipoAfastamento: string;
+  motivoAfastamento: string;
+  cid?: string;
+  dataInicio: string;
+  dataFim?: string;
+  dataRetorno?: string;
+  laudoMedico?: string;
+  observacoes?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITrabalhadorDependente {
+  _id?: string;
+  trabalhadorId: string;
+  nome: string;
+  dataNascimento?: string;
+  cpf?: string;
+  parentesco?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITrabalhadorOcorrenciaViolencia {
+  _id?: string;
+  trabalhadorId: string;
+  dataOcorrencia: string;
+  tipoViolencia?: string;
+  descricao?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITrabalhadorReadaptacao {
+  _id?: string;
+  trabalhadorId: string;
+  dataInicio: string;
+  dataFim?: string;
+  motivo?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITrabalhadorProcessoTrabalho {
+  _id?: string;
+  trabalhadorId: string;
+  numeroProcesso?: string;
+  dataInicio?: string;
+  dataFim?: string;
+  descricao?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface IUser {
   _id?: string;
   cpf: string;

@@ -44,26 +44,26 @@ export const submoduloTrabalhadorService = {
   listarAfastamentos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorAfastamento[]> => {
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
-    const response = await api.get<{ data: ITrabalhadorAfastamento[] }>(
+    const response = await api.get<ITrabalhadorAfastamento[]>(
       `/trabalhadores/${trabalhadorId}/afastamentos?${params.toString()}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   criarAfastamento: async (trabalhadorId: string, data: Partial<ITrabalhadorAfastamento>): Promise<ITrabalhadorAfastamento> => {
-    const response = await api.post<{ data: ITrabalhadorAfastamento }>(
+    const response = await api.post<ITrabalhadorAfastamento>(
       `/trabalhadores/${trabalhadorId}/afastamentos`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   atualizarAfastamento: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorAfastamento>): Promise<ITrabalhadorAfastamento> => {
-    const response = await api.put<{ data: ITrabalhadorAfastamento }>(
+    const response = await api.put<ITrabalhadorAfastamento>(
       `/trabalhadores/${trabalhadorId}/afastamentos/${itemId}`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   deletarAfastamento: async (trabalhadorId: string, itemId: string): Promise<void> => {
