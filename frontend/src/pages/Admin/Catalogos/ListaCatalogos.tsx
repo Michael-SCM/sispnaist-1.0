@@ -57,7 +57,7 @@ export const ListaCatalogos: React.FC = () => {
   };
 
   const getStats = (key: string) => {
-    const found = entidades.find((e) => e.entidade === key);
+    const found = (entidades || []).find((e) => e.entidade === key);
     return found || { total: 0, ativos: 0 };
   };
 
