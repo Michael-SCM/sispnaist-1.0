@@ -12,8 +12,8 @@ interface ListarCatalogosResponse {
 export const catalogoService = {
   // Lista todas as entidades com contagem
   listarEntidades: async (): Promise<{ entidade: string; total: number; ativos: number }[]> => {
-    const response = await api.get<{ data: { entidade: string; total: number; ativos: number }[] }>('/catalogos/listar-todos');
-    return response.data.data;
+    const response = await api.get<{ entidade: string; total: number; ativos: number }[]>('/catalogos/listar-todos');
+    return response.data || [];
   },
 
   // Lista itens de uma entidade com paginação
