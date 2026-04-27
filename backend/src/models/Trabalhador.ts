@@ -45,6 +45,7 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
     raca: String,
     escolaridade: String,
     estadoCivil: String,
+    tipoSanguineo: String,
 
     // Deficiência
     deficiencia: {

@@ -42,6 +42,7 @@ export interface ITrabalhador {
   raca?: string;
   escolaridade?: string;
   estadoCivil?: string;
+  tipoSanguineo?: string;
   
   // Deficiência
   deficiencia?: {
