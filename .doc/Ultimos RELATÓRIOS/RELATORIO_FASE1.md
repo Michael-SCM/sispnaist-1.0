@@ -1,6 +1,6 @@
 # Relatório de Implementação - Fase 1 (Crítico)
 
-> Atualizado em: 2026-04-28
+> Atualizado em: 2026-04-28 (Seeders executados)
 
 ---
 
@@ -178,15 +178,16 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 
 | # | Catálogo | Status | Usado em |
 |---|----------|--------|----------|
-| 1 | `escolaridade` | ✅ Implementado (sem dados) | Trabalhador |
-| 2 | `estado_civil` | ✅ Implementado (sem dados) | Trabalhador |
-| 3 | `raca_cor` | ✅ Implementado (sem dados) | Trabalhador |
-| 4 | `sexo` | ✅ Implementado (sem dados) | Trabalhador |
-| 5 | `tipo_sanguineo` | ✅ Implementado (sem dados) | Trabalhador |
-| 6 | `funcao` | ✅ Implementado (sem dados) | Vínculos |
-| 7 | `jornada_trabalho` | ✅ Implementado (sem dados) | Vínculos |
-| 8 | `turno_trabalho` | ✅ Implementado (sem dados) | Vínculos |
-| 9 | `situacao_trabalho` | ✅ Implementado (sem dados) | Trabalhador |
+| 1 | `escolaridade` | ✅ Populado (10 itens) | Trabalhador |
+| 2 | `estado_civil` | ✅ Populado (6 itens) | Trabalhador |
+| 3 | `raca_cor` | ✅ Populado (6 itens) | Trabalhador |
+| 4 | `sexo` | ✅ Populado (2 itens) | Trabalhador |
+| 5 | `tipo_sanguineo` | ✅ Populado (8 itens) | Trabalhador |
+| 6 | `funcao` | ✅ Populado (17 itens) | Vínculos |
+| 7 | `jornada_trabalho` | ✅ Populado (4 itens) | Vínculos |
+| 8 | `turno_trabalho` | ✅ Populado (6 itens) | Vínculos |
+| 9 | `situacao_trabalho` | ✅ Populado (6 itens) | Trabalhador |
+| 10 | `parentesco` | ✅ Populado (10 itens) | Dependentes |
 
 **O que foi implementado:**
 - ✅ **Backend:** Model genérico `Catalogo.ts`, Controller `catalogoController.ts`, Service `CatalogoService.ts`, Rotas `catalogos.ts`, Validações
@@ -195,7 +196,7 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 - ✅ **Seeders:** Criado `backend/src/utils/seedCatalogos.ts` com dados iniciais para todos os 9 catálogos + parentesco
 
 **O que falta:**
-- ⏳ **Executar seeders:** Rodar `npx ts-node src/utils/seedCatalogos.ts` no backend para popular o banco
+- ✅ **Seeders executados com sucesso:** `node src/utils/seedCatalogos.cjs` rodou no terminal e criou 82 itens no banco de dados MongoDB
 
 ---
 
@@ -234,7 +235,7 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 |-----------|-------|--------------|----------|
 | Submódulos do Trabalhador | 3 | 3 (Afastamentos, Dependentes, Vínculos) | 0 |
 | Material Biológico | 3 | 0 | 3 |
-| Catálogos Essenciais | 9 | 9 (estrutura + CRUD + integração) | 0 (faltam seeders) |
+| Catálogos Essenciais | 10 | 10 (estrutura + CRUD + integração + seeders) | 0 |
 | RBAC Completo | 4 módulos | 0 | 4 |
 
 **Progresso geral da Fase 1:** ~12 de 19 itens principais implementados (~63%)
