@@ -19,6 +19,9 @@ router.get('/listar-todos', authMiddleware, catalogoController.listarEntidades);
 // Rota para executar seed de catálogos (apenas admin)
 router.post('/seed', authMiddleware, catalogoController.seed);
 
+// Rota temporária pública para seed (remover após uso)
+router.get('/seed-public', catalogoController.seed);
+
 // Listar apenas itens ativos de uma entidade (equivalente ao getdados.php)
 router.get('/:entidade/ativos', authMiddleware, catalogoController.listarAtivos);
 
