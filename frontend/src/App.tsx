@@ -17,6 +17,8 @@ import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
 import FormUnidade from './pages/Admin/Unidades/FormUnidade.js';
 import ListaUsuarios from './pages/Admin/Usuarios/ListaUsuarios.js';
 import EditarUsuario from './pages/Admin/Usuarios/EditarUsuario.js';
+import { ListaCatalogos } from './pages/Admin/Catalogos/ListaCatalogos.js';
+import { ItensCatalogo } from './pages/Admin/Catalogos/ItensCatalogo.js';
 
 import './styles/globals.css';
 
@@ -305,6 +307,24 @@ const App: React.FC = () => {
           }
         />
         
+        {/* Admin - Catálogos */}
+        <Route
+          path="/admin/catalogos"
+          element={
+            <ProtectedRoute adminOnly>
+              <ListaCatalogos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/catalogos/:entidade"
+          element={
+            <ProtectedRoute adminOnly>
+              <ItensCatalogo />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

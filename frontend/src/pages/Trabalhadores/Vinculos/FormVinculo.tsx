@@ -5,6 +5,7 @@ import { TextInput, TextArea, DatePicker, Select } from '../../../components/For
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorVinculo, ITrabalhador } from '../../../types/index.js';
+import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
 
 interface FormData {
@@ -44,38 +45,7 @@ const INITIAL_FORM: FormData = {
 };
 
 // Opções temporárias até os catálogos serem implementados
-const TIPOS_VINCULO = [
-  { value: 'Estatutário', label: 'Estatutário' },
-  { value: 'CLT', label: 'CLT' },
-  { value: 'Temporário', label: 'Temporário' },
-  { value: 'Terceirizado', label: 'Terceirizado' },
-  { value: 'Comissionado', label: 'Comissionado' },
-  { value: 'Outro', label: 'Outro' },
-];
-
-const JORNADAS = [
-  { value: '20h', label: '20 horas/semana' },
-  { value: '30h', label: '30 horas/semana' },
-  { value: '40h', label: '40 horas/semana' },
-  { value: '44h', label: '44 horas/semana' },
-  { value: 'Outra', label: 'Outra' },
-];
-
-const TURNOS = [
-  { value: 'Manhã', label: 'Manhã' },
-  { value: 'Tarde', label: 'Tarde' },
-  { value: 'Noite', label: 'Noite' },
-  { value: 'Madrugada', label: 'Madrugada' },
-  { value: 'Integral', label: 'Integral' },
-  { value: 'Rodízio', label: 'Rodízio' },
-];
-
-const SITUACOES = [
-  { value: 'Ativo', label: 'Ativo' },
-  { value: 'Afastado', label: 'Afastado' },
-  { value: 'Desligado', label: 'Desligado' },
-  { value: 'Licenciado', label: 'Licenciado' },
-];
+// Catálogos carregados dinamicamente
 
 export const FormVinculo: React.FC = () => {
   const { id, vinculoId } = useParams<{ id: string; vinculoId: string }>();
@@ -87,6 +57,13 @@ export const FormVinculo: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+
+  // Catálogos
+  const { itens: tiposVinculo } = useCatalogo('tipoVinculo');
+  const { itens: funcoes } = useCatalogo('funcao');
+  const { itens: jornadas } = useCatalogo('jornadaTrabalho');
+  const { itens: turnos } = useCatalogo('turnoTrabalho');
+  const { itens: situacoes } = useCatalogo('situacaoTrabalho');
 
   useEffect(() => {
     if (id) {
@@ -259,7 +236,7 @@ export const FormVinculo: React.FC = () => {
                 name="tipoVinculo"
                 value={formData.tipoVinculo}
                 onChange={handleChange}
-                options={TIPOS_VINCULO}
+                options={tiposVinculo.map((t) => ({ value: t.nome, label: t.nome }))}
                 placeholder="Selecione..."
                 error={errors.tipoVinculo}
                 required
@@ -270,7 +247,7 @@ export const FormVinculo: React.FC = () => {
                 name="situacao"
                 value={formData.situacao}
                 onChange={handleChange}
-                options={SITUACOES}
+                options={situacoes.map((s) => ({ value: s.nome, label: s.nome }))}
                 placeholder="Selecione..."
               />
             </div>
@@ -320,7 +297,7 @@ export const FormVinculo: React.FC = () => {
                 name="jornadaTrabalho"
                 value={formData.jornadaTrabalho}
                 onChange={handleChange}
-                options={JORNADAS}
+                options={jornadas.map((j) => ({ value: j.nome, label: j.nome }))}
                 placeholder="Selecione..."
               />
 
@@ -329,7 +306,7 @@ export const FormVinculo: React.FC = () => {
                 name="turnoTrabalho"
                 value={formData.turnoTrabalho}
                 onChange={handleChange}
-                options={TURNOS}
+                options={turnos.map((t) => ({ value: t.nome, label: t.nome }))}
                 placeholder="Selecione..."
               />
             </div>

@@ -187,6 +187,18 @@ export interface IUnidade {
   dataAtualizacao?: string;
 }
 
+export interface ICatalogoItem {
+  _id?: string;
+  entidade: string;
+  nome: string;
+  sigla?: string;
+  descricao?: string;
+  ativo: boolean;
+  ordem?: number;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface ITrabalhador {
   _id?: string;
   cpf: string;

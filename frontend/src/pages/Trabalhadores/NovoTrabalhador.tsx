@@ -6,6 +6,7 @@ import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
+import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import toast from 'react-hot-toast';
 
@@ -15,6 +16,13 @@ export const NovoTrabalhador: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
+
+  // Catálogos
+  const { itens: sexos } = useCatalogo('sexo');
+  const { itens: racas } = useCatalogo('racaCor');
+  const { itens: escolaridades } = useCatalogo('escolaridade');
+  const { itens: estadosCivis } = useCatalogo('estadoCivil');
+  const { itens: tiposSanguineos } = useCatalogo('tipoSanguineo');
 
   // Carregar empresas ao montar o componente
   useEffect(() => {
@@ -122,7 +130,44 @@ export const NovoTrabalhador: React.FC = () => {
                 name="sexo"
                 value={formData.sexo}
                 onChange={handleChange}
-                options={[{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Feminino' }, { value: 'O', label: 'Outro' }]}
+                options={sexos.map((s) => ({ value: s.sigla || s.nome, label: s.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Raça/Cor"
+                name="raca"
+                value={formData.raca || ''}
+                onChange={handleChange}
+                options={racas.map((r) => ({ value: r.nome, label: r.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Escolaridade"
+                name="escolaridade"
+                value={formData.escolaridade || ''}
+                onChange={handleChange}
+                options={escolaridades.map((e) => ({ value: e.nome, label: e.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Estado Civil"
+                name="estadoCivil"
+                value={formData.estadoCivil || ''}
+                onChange={handleChange}
+                options={estadosCivis.map((e) => ({ value: e.nome, label: e.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Tipo Sanguíneo"
+                name="tipoSanguineo"
+                value={formData.tipoSanguineo || ''}
+                onChange={handleChange}
+                options={tiposSanguineos.map((t) => ({ value: t.sigla || t.nome, label: t.nome }))}
+                placeholder="Selecione..."
               />
             </div>
           </section>
