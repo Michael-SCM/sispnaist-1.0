@@ -104,6 +104,16 @@ class CatalogoController {
       next(error);
     }
   }
+  // POST /api/catalogos/seed - Executa seed de catálogos essenciais
+  async seed(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { seedCatalogos } = await import('../utils/seedCatalogos.js');
+      await seedCatalogos();
+      return res.status(200).json({ message: 'Seed de catálogos executado com sucesso!' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new CatalogoController();

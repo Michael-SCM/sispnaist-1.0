@@ -16,6 +16,9 @@ const router = Router();
 // Rota especial: listar todas as entidades disponíveis
 router.get('/listar-todos', authMiddleware, catalogoController.listarEntidades);
 
+// Rota para executar seed de catálogos (apenas admin)
+router.post('/seed', authMiddleware, catalogoController.seed);
+
 // Listar apenas itens ativos de uma entidade (equivalente ao getdados.php)
 router.get('/:entidade/ativos', authMiddleware, catalogoController.listarAtivos);
 

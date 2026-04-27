@@ -244,7 +244,7 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 
 ## Próximos passos recomendados
 
-1. **Catálogos essenciais** — escolaridade, estado civil, raça/cor, sexo, tipo sanguíneo (podem ser feitos em lote)
+1. ✅ **Catálogos essenciais** — COMPLETOS! Todos populados com dados via seeders.
 2. **Material Biológico** — requer decisão arquitetural (coleção separada vs extensão)
 3. **RBAC** — requer planejamento mais detalhado de permissões
 
