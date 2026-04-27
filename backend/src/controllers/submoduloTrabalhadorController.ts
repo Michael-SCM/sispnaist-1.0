@@ -4,6 +4,7 @@ import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento';
 import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViolencia';
 import TrabalhadorReadaptacao from '../models/TrabalhadorReadaptacao';
 import TrabalhadorProcessoTrabalho from '../models/TrabalhadorProcessoTrabalho';
+import TrabalhadorVinculo from '../models/TrabalhadorVinculo';
 import { AppError } from '../middleware/errorHandler';
 
 /**
@@ -18,7 +19,8 @@ const SUBMODULO_MODELS: any = {
   afastamentos: TrabalhadorAfastamento,
   ocorrenciasViolencia: TrabalhadorOcorrenciaViolencia,
   readaptacoes: TrabalhadorReadaptacao,
-  processosTrabalho: TrabalhadorProcessoTrabalho
+  processosTrabalho: TrabalhadorProcessoTrabalho,
+  vinculos: TrabalhadorVinculo
 };
 
 class SubmoduloTrabalhadorController {

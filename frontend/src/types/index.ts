@@ -27,6 +27,28 @@ export interface ITrabalhadorDependente {
   dataAtualizacao?: string;
 }
 
+export interface ITrabalhadorVinculo {
+  _id?: string;
+  trabalhadorId: string;
+  tipoVinculo: string;
+  funcao?: string;
+  jornadaTrabalho?: string;
+  turnoTrabalho?: string;
+  dataInicio: string;
+  dataFim?: string;
+  situacao?: string;
+  empresaTerceirizada?: string;
+  setor?: string;
+  cargo?: string;
+  ocupacao?: string;
+  cargaHoraria?: number;
+  salario?: number;
+  observacoes?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface ITrabalhadorOcorrenciaViolencia {
   _id?: string;
   trabalhadorId: string;
