@@ -5,6 +5,7 @@ import { TextInput, DatePicker, Select } from '../../../components/FormFields.js
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorDependente, ITrabalhador } from '../../../types/index.js';
+import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
 
 interface FormData {
@@ -25,15 +26,7 @@ const INITIAL_FORM: FormData = {
   ativo: true,
 };
 
-const PARENTESCOS = [
-  { value: 'conjuge', label: 'Cônjuge' },
-  { value: 'filho', label: 'Filho(a)' },
-  { value: 'enteado', label: 'Enteado(a)' },
-  { value: 'irmao', label: 'Irmão(ã)' },
-  { value: 'mae', label: 'Mãe' },
-  { value: 'pai', label: 'Pai' },
-  { value: 'outro', label: 'Outro' },
-];
+// Catálogos carregados dinamicamente
 
 export const FormDependente: React.FC = () => {
   const { id, dependenteId } = useParams<{ id: string; dependenteId: string }>();
@@ -45,6 +38,9 @@ export const FormDependente: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+
+  // Catálogos
+  const { itens: parentescos } = useCatalogo('parentesco');
 
   useEffect(() => {
     if (id) {
@@ -225,7 +221,7 @@ export const FormDependente: React.FC = () => {
                 name="parentesco"
                 value={formData.parentesco}
                 onChange={handleChange}
-                options={PARENTESCOS}
+                options={parentescos.map((p: any) => ({ value: p.sigla || p.nome, label: p.nome }))}
                 placeholder="Selecione..."
                 error={errors.parentesco}
                 required

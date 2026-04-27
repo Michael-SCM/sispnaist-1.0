@@ -5,6 +5,7 @@ import { TextInput, TextArea, DatePicker, Select } from '../../../components/For
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorAfastamento, ITrabalhador } from '../../../types/index.js';
+import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
 
 interface FormData {
@@ -31,26 +32,7 @@ const INITIAL_FORM: FormData = {
   ativo: true,
 };
 
-// Opções temporárias até os catálogos serem implementados
-const TIPOS_AFASTAMENTO = [
-  { value: 'Licença Médica', label: 'Licença Médica' },
-  { value: 'Licença Maternidade', label: 'Licença Maternidade' },
-  { value: 'Licença Paternidade', label: 'Licença Paternidade' },
-  { value: 'Acidente de Trabalho', label: 'Acidente de Trabalho' },
-  { value: 'Doença Ocupacional', label: 'Doença Ocupacional' },
-  { value: 'Afastamento Preventivo', label: 'Afastamento Preventivo' },
-  { value: 'Outro', label: 'Outro' },
-];
-
-const MOTIVOS_AFASTAMENTO = [
-  { value: 'Doença', label: 'Doença' },
-  { value: 'Acidente', label: 'Acidente' },
-  { value: 'Cirurgia', label: 'Cirurgia' },
-  { value: 'Tratamento Médico', label: 'Tratamento Médico' },
-  { value: 'Repouso Médico', label: 'Repouso Médico' },
-  { value: 'COVID-19', label: 'COVID-19' },
-  { value: 'Outro', label: 'Outro' },
-];
+// Catálogos carregados dinamicamente
 
 export const FormAfastamento: React.FC = () => {
   const { id, afastamentoId } = useParams<{ id: string; afastamentoId: string }>();
@@ -62,6 +44,10 @@ export const FormAfastamento: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+
+  // Catálogos
+  const { itens: tiposAfastamento } = useCatalogo('tipoAfastamento');
+  const { itens: motivosAfastamento } = useCatalogo('motivoAfastamento');
 
   useEffect(() => {
     if (id) {
@@ -230,7 +216,7 @@ export const FormAfastamento: React.FC = () => {
                 name="tipoAfastamento"
                 value={formData.tipoAfastamento}
                 onChange={handleChange}
-                options={TIPOS_AFASTAMENTO}
+                options={tiposAfastamento.map((t) => ({ value: t.nome, label: t.nome }))}
                 placeholder="Selecione..."
                 error={errors.tipoAfastamento}
                 required
@@ -241,7 +227,7 @@ export const FormAfastamento: React.FC = () => {
                 name="motivoAfastamento"
                 value={formData.motivoAfastamento}
                 onChange={handleChange}
-                options={MOTIVOS_AFASTAMENTO}
+                options={motivosAfastamento.map((m) => ({ value: m.nome, label: m.nome }))}
                 placeholder="Selecione..."
                 error={errors.motivoAfastamento}
                 required

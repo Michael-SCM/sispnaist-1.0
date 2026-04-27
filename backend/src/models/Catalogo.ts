@@ -37,7 +37,7 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'situacaoTrabalho', 'tipoAfastamento', 'motivoAfastamento',
         'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
         'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
-        'padraoEmail', 'parametro'
+        'padraoEmail', 'parametro', 'parentesco'
       ]
     },
     nome: { type: String, required: true, trim: true },
@@ -58,3 +58,4 @@ CatalogoSchema.index({ entidade: 1, ativo: 1 });
 CatalogoSchema.index({ entidade: 1, ordem: 1 });
 
 export default mongoose.model<ICatalogoItem>('Catalogo', CatalogoSchema);
+
