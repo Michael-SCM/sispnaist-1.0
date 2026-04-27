@@ -169,6 +169,17 @@ export const DetalhesTrabalhador: React.FC = () => {
                   </div>
                   <span className="text-blue-400 group-hover:text-blue-600 transition">→</span>
                 </Link>
+                <Link
+                  to={`/trabalhadores/${trabalhador._id}/dependentes`}
+                  className="flex items-center gap-3 p-3 bg-white rounded-lg border border-blue-100 hover:border-blue-300 hover:shadow-sm transition group"
+                >
+                  <span className="text-2xl">👨‍👩‍👧</span>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-800 group-hover:text-blue-700 transition">Dependentes</p>
+                    <p className="text-xs text-gray-500">Gerenciar dependentes do trabalhador</p>
+                  </div>
+                  <span className="text-blue-400 group-hover:text-blue-600 transition">→</span>
+                </Link>
               </div>
             </section>
           </div>

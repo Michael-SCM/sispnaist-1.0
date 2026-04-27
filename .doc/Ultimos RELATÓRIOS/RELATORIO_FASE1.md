@@ -1,6 +1,6 @@
 # Relatório de Implementação - Fase 1 (Crítico)
 
-> Atualizado em: 2026-04-26
+> Atualizado em: 2026-04-27
 
 ---
 
@@ -41,6 +41,42 @@ Foi implementado o submódulo de **Afastamentos do Trabalhador** (`trabalhador_a
 
 ---
 
+## Parte 1.2: O que foi implementado (Dependentes do Trabalhador)
+
+### Resumo
+Foi implementado o submódulo de **Dependentes do Trabalhador** (`trabalhador_dependentes`), correspondente à tabela `tb_trabalhador_dependentes` do sistema PHP original. Este é o segundo dos 3 submódulos críticos da Fase 1.
+
+### Backend (já existia, ajustes mínimos)
+| Arquivo | Status | Descrição |
+|---------|--------|-----------|
+| `backend/src/models/TrabalhadorDependente.ts` | ✅ | Model MongoDB com campos: nome, CPF, data nascimento, parentesco, dependente IR, ativo |
+| `backend/src/controllers/submoduloTrabalhadorController.ts` | ✅ | Controller unificado — já suportava `dependentes` via mapeamento |
+| `backend/src/routes/submodulosTrabalhador.ts` | ✅ | Rotas RESTful já existentes: `GET/POST/PUT/DELETE /api/trabalhadores/:id/dependentes` |
+
+### Frontend (implementado nesta tarefa)
+| Arquivo | Status | Descrição |
+|---------|--------|-----------|
+| `frontend/src/types/index.ts` | ✅ | Atualizada interface `ITrabalhadorDependente` com `dependentIR` e `parentesco` obrigatório |
+| `frontend/src/services/submoduloTrabalhadorService.ts` | ✅ | Corrigido acesso à API para resposta direta; métodos CRUD para dependentes |
+| `frontend/src/pages/Trabalhadores/Dependentes/ListaDependentes.tsx` | ✅ | Listagem com DataTable, filtros, colunas (nome, CPF, nascimento, parentesco, dependente IR, status), ações (editar/remover) |
+| `frontend/src/pages/Trabalhadores/Dependentes/FormDependente.tsx` | ✅ | Formulário completo de criação/edição com validação e campos: nome, CPF, data nascimento, parentesco (select), dependente IR (checkbox), ativo |
+| `frontend/src/pages/Trabalhadores/index.ts` | ✅ | Exportações dos novos componentes |
+| `frontend/src/App.tsx` | ✅ | Adicionadas 3 novas rotas para dependentes |
+| `frontend/src/pages/Trabalhadores/DetalhesTrabalhador.tsx` | ✅ | Seção "Submódulos" com link para Dependentes |
+
+### Funcionalidades implementadas
+- [x] Listar dependentes por trabalhador (com status ativo/inativo)
+- [x] Cadastrar novo dependente (nome, CPF, data nascimento, parentesco, dependente IR)
+- [x] Editar dependente existente
+- [x] Remover dependente (soft delete — marca como inativo)
+- [x] Navegação integrada na página de detalhes do trabalhador
+
+### Observações técnicas
+- O service de dependentes foi corrigido para refletir o formato de resposta direta do backend (igual aos afastamentos).
+- As opções de "Parentesco" estão hardcoded temporariamente. Deverão ser substituídas por catálogo quando implementado.
+
+---
+
 ## Parte 2: Relatório completo da Fase 1 — O que falta implementar
 
 > Baseado no RELATÓRIO DE IMPLEMENTAÇÃO original
@@ -51,15 +87,15 @@ Foi implementado o submódulo de **Afastamentos do Trabalhador** (`trabalhador_a
 - [x] Backend: Model, Controller, Rotas
 - [x] Frontend: Tipos, Service, Páginas (Listar, Criar, Editar), Rotas, Integração
 
-#### 1.2 Dependentes do Trabalhador (`trabalhador_dependentes`) — ⏳ PENDENTE
-- [ ] Backend: Verificar model `TrabalhadorDependente.ts`
-- [ ] Backend: Controller já existe (submoduloTrabalhadorController)
-- [ ] Backend: Rotas já existem
-- [ ] Frontend: Tipos (`ITrabalhadorDependente` já existe)
-- [ ] Frontend: Service já existe (métodos de dependente)
-- [ ] Frontend: Criar páginas: `ListaDependentes`, `FormDependente`
-- [ ] Frontend: Adicionar rotas em `App.tsx`
-- [ ] Frontend: Adicionar link em `DetalhesTrabalhador.tsx`
+#### 1.2 Dependentes do Trabalhador (`trabalhador_dependentes`) — ✅ IMPLEMENTADO
+- [x] Backend: Verificar model `TrabalhadorDependente.ts`
+- [x] Backend: Controller já existe (submoduloTrabalhadorController)
+- [x] Backend: Rotas já existem
+- [x] Frontend: Tipos (`ITrabalhadorDependente` atualizado)
+- [x] Frontend: Service corrigido (resposta direta do backend)
+- [x] Frontend: Criar páginas: `ListaDependentes`, `FormDependente`
+- [x] Frontend: Adicionar rotas em `App.tsx`
+- [x] Frontend: Adicionar link em `DetalhesTrabalhador.tsx`
 
 #### 1.3 Vínculos Empregatícios Detalhados (`trabalhador_vinculos`) — ⏳ PENDENTE
 - [ ] Backend: Criar model `TrabalhadorVinculo.ts`
@@ -153,20 +189,19 @@ Tarefas por catálogo:
 
 | Categoria | Total | Implementado | Pendente |
 |-----------|-------|--------------|----------|
-| Submódulos do Trabalhador | 3 | 1 (Afastamentos) | 2 (Dependentes, Vínculos) |
+| Submódulos do Trabalhador | 3 | 2 (Afastamentos, Dependentes) | 1 (Vínculos) |
 | Material Biológico | 3 | 0 | 3 |
 | Catálogos Essenciais | 9 | 0 | 9 |
 | RBAC Completo | 4 módulos | 0 | 4 |
 
-**Progresso geral da Fase 1:** ~1 de 19 itens principais implementados (~5%)
+**Progresso geral da Fase 1:** ~2 de 19 itens principais implementados (~11%)
 
 ---
 
 ## Próximos passos recomendados
 
-1. **Dependentes do Trabalhador** — reaproveita a mesma estrutura do afastamentos (controller e rotas já existem)
-2. **Vínculos do Trabalhador** — requer criação do model e integração com catálogos
-3. **Catálogos essenciais** — escolaridade, estado civil, raça/cor, sexo, tipo sanguíneo (podem ser feitos em lote)
-4. **Material Biológico** — requer decisão arquitetural (coleção separada vs extensão)
-5. **RBAC** — requer planejamento mais detalhado de permissões
+1. **Vínculos do Trabalhador** — último submódulo pendente; requer criação do model e integração com catálogos
+2. **Catálogos essenciais** — escolaridade, estado civil, raça/cor, sexo, tipo sanguíneo (podem ser feitos em lote)
+3. **Material Biológico** — requer decisão arquitetural (coleção separada vs extensão)
+4. **RBAC** — requer planejamento mais detalhado de permissões
 

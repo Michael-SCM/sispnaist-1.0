@@ -10,7 +10,7 @@ import { Home } from './pages/Home.js';
 import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
-import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento } from './pages/Trabalhadores/index.js';
+import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente } from './pages/Trabalhadores/index.js';
 import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
 import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
 import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
@@ -178,11 +178,35 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route
+<Route
           path="/trabalhadores/:id/afastamentos/:afastamentoId/editar"
           element={
             <ProtectedRoute>
               <FormAfastamento />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/dependentes"
+          element={
+            <ProtectedRoute>
+              <ListaDependentes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/dependentes/novo"
+          element={
+            <ProtectedRoute>
+              <FormDependente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/dependentes/:dependenteId/editar"
+          element={
+            <ProtectedRoute>
+              <FormDependente />
             </ProtectedRoute>
           }
         />

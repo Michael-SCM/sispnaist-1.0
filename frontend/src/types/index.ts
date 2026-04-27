@@ -20,7 +20,8 @@ export interface ITrabalhadorDependente {
   nome: string;
   dataNascimento?: string;
   cpf?: string;
-  parentesco?: string;
+  parentesco: string;      // 'conjuge', 'filho', 'enteado', 'irmao', 'mae', 'pai', 'outro'
+  dependentIR?: boolean;   // dependente para imposto de renda
   ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;

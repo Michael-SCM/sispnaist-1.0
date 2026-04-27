@@ -14,26 +14,26 @@ export const submoduloTrabalhadorService = {
   listarDependentes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorDependente[]> => {
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
-    const response = await api.get<{ data: ITrabalhadorDependente[] }>(
+    const response = await api.get<ITrabalhadorDependente[]>(
       `/trabalhadores/${trabalhadorId}/dependentes?${params.toString()}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   criarDependente: async (trabalhadorId: string, data: Partial<ITrabalhadorDependente>): Promise<ITrabalhadorDependente> => {
-    const response = await api.post<{ data: ITrabalhadorDependente }>(
+    const response = await api.post<ITrabalhadorDependente>(
       `/trabalhadores/${trabalhadorId}/dependentes`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   atualizarDependente: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorDependente>): Promise<ITrabalhadorDependente> => {
-    const response = await api.put<{ data: ITrabalhadorDependente }>(
+    const response = await api.put<ITrabalhadorDependente>(
       `/trabalhadores/${trabalhadorId}/dependentes/${itemId}`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   deletarDependente: async (trabalhadorId: string, itemId: string): Promise<void> => {
