@@ -4,3 +4,5 @@ export { EditarTrabalhador } from './EditarTrabalhador.js';
 export { DetalhesTrabalhador } from './DetalhesTrabalhador.js';
 export { ListaAfastamentos } from './Afastamentos/ListaAfastamentos.js';
 export { FormAfastamento } from './Afastamentos/FormAfastamento.js';
+export { ListaDependentes } from './Dependentes/ListaDependentes.js';
+export { FormDependente } from './Dependentes/FormDependente.js';
