@@ -111,8 +111,8 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 - [x] Navegação integrada na página de detalhes do trabalhador
 
 ### Observações técnicas
-- As opções de "Tipo", "Jornada", "Turno" e "Situação" estão **hardcoded temporariamente**.
-- ⏳ **Pendente:** Integração com catálogos (`tipo_vinculo`, `funcao`, `jornada_trabalho`, `turno_trabalho`, `situacao_trabalho`). Só poderá ser feita **após a implementação dos catálogos** (Fase 3 — Catálogos Essenciais).
+- As opções de "Tipo", "Jornada", "Turno" e "Situação" agora usam o hook `useCatalogo` para carregar dinamicamente do backend.
+- ✅ **Integração com catálogos concluída:** O `FormVinculo.tsx` já utiliza os catálogos `tipoVinculo`, `funcao`, `jornadaTrabalho`, `turnoTrabalho` e `situacaoTrabalho` via hook `useCatalogo`.
 - O model inclui campos avançados como `cargaHoraria` (semanal) e `salario` para suportar regras de negócio futuras.
 
 ---
@@ -146,7 +146,7 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 - [x] Frontend: Criar páginas: `ListaVinculos`, `FormVinculo`
 - [x] Frontend: Adicionar rotas
 - [x] Frontend: Adicionar link em detalhes do trabalhador
-- [ ] Integrar com catálogos: `tipo_vinculo`, `funcao`, `jornada_trabalho`, `turno_trabalho`
+- [x] Integrar com catálogos: `tipoVinculo`, `funcao`, `jornadaTrabalho`, `turnoTrabalho`, `situacaoTrabalho`
 
 ---
 
@@ -178,21 +178,24 @@ Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`traba
 
 | # | Catálogo | Status | Usado em |
 |---|----------|--------|----------|
-| 1 | `escolaridade` | ⏳ Pendente | Trabalhador |
-| 2 | `estado_civil` | ⏳ Pendente | Trabalhador |
-| 3 | `raca_cor` | ⏳ Pendente | Trabalhador |
-| 4 | `sexo` | ⏳ Pendente | Trabalhador |
-| 5 | `tipo_sanguineo` | ⏳ Pendente | Trabalhador |
-| 6 | `funcao` | ⏳ Pendente | Vínculos |
-| 7 | `jornada_trabalho` | ⏳ Pendente | Vínculos |
-| 8 | `turno_trabalho` | ⏳ Pendente | Vínculos |
-| 9 | `situacao_trabalho` | ⏳ Pendente | Trabalhador |
+| 1 | `escolaridade` | ✅ Implementado (sem dados) | Trabalhador |
+| 2 | `estado_civil` | ✅ Implementado (sem dados) | Trabalhador |
+| 3 | `raca_cor` | ✅ Implementado (sem dados) | Trabalhador |
+| 4 | `sexo` | ✅ Implementado (sem dados) | Trabalhador |
+| 5 | `tipo_sanguineo` | ✅ Implementado (sem dados) | Trabalhador |
+| 6 | `funcao` | ✅ Implementado (sem dados) | Vínculos |
+| 7 | `jornada_trabalho` | ✅ Implementado (sem dados) | Vínculos |
+| 8 | `turno_trabalho` | ✅ Implementado (sem dados) | Vínculos |
+| 9 | `situacao_trabalho` | ✅ Implementado (sem dados) | Trabalhador |
 
-Tarefas por catálogo:
-- [ ] Criar model/seeder no backend
-- [ ] Criar rotas de CRUD
-- [ ] Criar service no frontend
-- [ ] Substituir campo hardcoded no formulário de Trabalhador
+**O que foi implementado:**
+- ✅ **Backend:** Model genérico `Catalogo.ts`, Controller `catalogoController.ts`, Service `CatalogoService.ts`, Rotas `catalogos.ts`, Validações
+- ✅ **Frontend:** Service `catalogoService.ts`, Hook `useCatalogo.ts`, Páginas `ListaCatalogos.tsx` e `ItensCatalogo.tsx`, Rotas em `App.tsx`
+- ✅ **Integração:** Formulários `NovoTrabalhador.tsx`, `EditarTrabalhador.tsx`, `FormDependente.tsx` e `FormVinculo.tsx` já usam `useCatalogo`
+- ✅ **Seeders:** Criado `backend/src/utils/seedCatalogos.ts` com dados iniciais para todos os 9 catálogos + parentesco
+
+**O que falta:**
+- ⏳ **Executar seeders:** Rodar `npx ts-node src/utils/seedCatalogos.ts` no backend para popular o banco
 
 ---
 
@@ -231,10 +234,10 @@ Tarefas por catálogo:
 |-----------|-------|--------------|----------|
 | Submódulos do Trabalhador | 3 | 3 (Afastamentos, Dependentes, Vínculos) | 0 |
 | Material Biológico | 3 | 0 | 3 |
-| Catálogos Essenciais | 9 | 0 | 9 |
+| Catálogos Essenciais | 9 | 9 (estrutura + CRUD + integração) | 0 (faltam seeders) |
 | RBAC Completo | 4 módulos | 0 | 4 |
 
-**Progresso geral da Fase 1:** ~3 de 19 itens principais implementados (~16%)
+**Progresso geral da Fase 1:** ~12 de 19 itens principais implementados (~63%)
 
 ---
 
