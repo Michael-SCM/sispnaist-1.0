@@ -65,6 +65,12 @@ export const Header: React.FC = () => {
                     >
                       Usuários
                     </Link>
+                    <Link
+                      to="/admin/catalogos"
+                      className="hover:text-amber-200 transition text-sm font-semibold"
+                    >
+                      Catálogos
+                    </Link>
                   </>
                 )}
                 <div className="flex items-center gap-4">
@@ -182,6 +188,13 @@ export const Header: React.FC = () => {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Usuários
+                  </Link>
+                  <Link
+                    to="/admin/catalogos"
+                    className="block py-2 hover:text-amber-200 transition font-semibold"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Catálogos
                   </Link>
                 </div>
               </>
