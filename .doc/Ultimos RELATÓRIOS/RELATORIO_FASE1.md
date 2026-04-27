@@ -1,6 +1,6 @@
 # Relatório de Implementação - Fase 1 (Crítico)
 
-> Atualizado em: 2026-04-27
+> Atualizado em: 2026-04-28
 
 ---
 
@@ -73,7 +73,7 @@ Foi implementado o submódulo de **Dependentes do Trabalhador** (`trabalhador_de
 
 ### Observações técnicas
 - O service de dependentes foi corrigido para refletir o formato de resposta direta do backend (igual aos afastamentos).
-- As opções de "Parentesco" estão hardcoded temporariamente. Deverão ser substituídas por catálogo quando implementado.
+- ✅ **Integração com catálogos iniciada:** O catálogo `parentesco` foi adicionado ao enum do modelo `Catalogo.ts` e o hook `useCatalogo` foi integrado ao `FormDependente.tsx` para carregar os parentescos dinamicamente.
 
 ---
 
