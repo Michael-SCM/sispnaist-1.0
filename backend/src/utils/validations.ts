@@ -327,6 +327,7 @@ export const criarTrabalhadorSchema = Joi.object({
   raca: Joi.string().trim().allow('', null),
   escolaridade: Joi.string().trim().allow('', null),
   estadoCivil: Joi.string().trim().allow('', null),
+  tipoSanguineo: Joi.string().trim().allow('', null),
   deficiencia: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     tempo: Joi.string().trim().allow('', null),
@@ -393,6 +394,7 @@ export const atualizarTrabalhadorSchema = Joi.object({
   raca: Joi.string().trim().allow('', null),
   escolaridade: Joi.string().trim().allow('', null),
   estadoCivil: Joi.string().trim().allow('', null),
+  tipoSanguineo: Joi.string().trim().allow('', null),
   deficiencia: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     tempo: Joi.string().trim().allow('', null),
