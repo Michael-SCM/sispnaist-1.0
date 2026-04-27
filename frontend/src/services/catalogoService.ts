@@ -62,4 +62,10 @@ export const catalogoService = {
   deletar: async (entidade: string, id: string): Promise<void> => {
     await api.delete(`/catalogos/${entidade}/${id}`);
   },
+
+  // Executar seed de catálogos essenciais
+  executarSeed: async (): Promise<{ message: string }> => {
+    const response = await api.post<{ message: string }>('/catalogos/seed');
+    return response.data;
+  },
 };

@@ -20,6 +20,7 @@ export const ListaCatalogos: React.FC = () => {
   const navigate = useNavigate();
   const [entidades, setEntidades] = useState<{ entidade: string; total: number; ativos: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
     carregarEntidades();
@@ -38,6 +39,23 @@ export const ListaCatalogos: React.FC = () => {
     }
   };
 
+  const executarSeed = async () => {
+    if (!window.confirm('Isso irá popular os catálogos essenciais com dados iniciais. Deseja continuar?')) {
+      return;
+    }
+    try {
+      setIsSeeding(true);
+      const result = await catalogoService.executarSeed();
+      toast.success(result.message);
+      await carregarEntidades();
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Erro ao executar seed');
+      console.error(error);
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   const getStats = (key: string) => {
     const found = entidades.find((e) => e.entidade === key);
     return found || { total: 0, ativos: 0 };
@@ -53,6 +71,13 @@ export const ListaCatalogos: React.FC = () => {
               Gerencie os catálogos utilizados nos cadastros de trabalhadores e vínculos.
             </p>
           </div>
+          <button
+            onClick={executarSeed}
+            disabled={isSeeding}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-medium shadow-md transition flex items-center gap-2"
+          >
+            {isSeeding ? 'Executando...' : '🌱 Executar Seed'}
+          </button>
         </div>
 
         {isLoading ? (
@@ -95,4 +120,3 @@ export const ListaCatalogos: React.FC = () => {
     </MainLayout>
   );
 };
-
