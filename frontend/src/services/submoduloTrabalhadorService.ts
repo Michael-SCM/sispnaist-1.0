@@ -1,12 +1,13 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho } from '../types';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho } from '../types';
 
 const SUBMODULOS = {
   dependentes: 'dependentes',
   afastamentos: 'afastamentos',
   ocorrenciasViolencia: 'ocorrenciasViolencia',
   readaptacoes: 'readaptacoes',
-  processosTrabalho: 'processosTrabalho'
+  processosTrabalho: 'processosTrabalho',
+  vinculos: 'vinculos'
 } as const;
 
 export const submoduloTrabalhadorService = {
@@ -68,6 +69,36 @@ export const submoduloTrabalhadorService = {
 
   deletarAfastamento: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/afastamentos/${itemId}`);
+  },
+
+  // VÍNCULOS
+  listarVinculos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorVinculo[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorVinculo[]>(
+      `/trabalhadores/${trabalhadorId}/vinculos?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  criarVinculo: async (trabalhadorId: string, data: Partial<ITrabalhadorVinculo>): Promise<ITrabalhadorVinculo> => {
+    const response = await api.post<ITrabalhadorVinculo>(
+      `/trabalhadores/${trabalhadorId}/vinculos`,
+      data
+    );
+    return response.data;
+  },
+
+  atualizarVinculo: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorVinculo>): Promise<ITrabalhadorVinculo> => {
+    const response = await api.put<ITrabalhadorVinculo>(
+      `/trabalhadores/${trabalhadorId}/vinculos/${itemId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deletarVinculo: async (trabalhadorId: string, itemId: string): Promise<void> => {
+    await api.delete(`/trabalhadores/${trabalhadorId}/vinculos/${itemId}`);
   },
 
   // OCORRÊNCIAS DE VIOLÊNCIA

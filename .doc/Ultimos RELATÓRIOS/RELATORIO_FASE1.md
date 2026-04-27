@@ -77,7 +77,47 @@ Foi implementado o submódulo de **Dependentes do Trabalhador** (`trabalhador_de
 
 ---
 
-## Parte 2: Relatório completo da Fase 1 — O que falta implementar
+## Parte 2: O que foi implementado (Vínculos Empregatícios Detalhados)
+
+> **Status:** ✅ IMPLEMENTADO em 2026-04-27
+
+### Resumo
+Foi implementado o submódulo de **Vínculos Empregatícios Detalhados** (`trabalhador_vinculos`), correspondente à tabela `tb_trabalhador_vinculos` do sistema PHP original. Este é o último dos 3 submódulos críticos da Fase 1.
+
+### Backend
+| Arquivo | Status | Descrição |
+|---------|--------|-----------|
+| `backend/src/models/TrabalhadorVinculo.ts` | ✅ Criado | Model MongoDB com campos: tipo, função, jornada, turno, datas, situação, salário, carga horária, observações, ativo |
+| `backend/src/controllers/submoduloTrabalhadorController.ts` | ✅ Atualizado | Adicionado `TrabalhadorVinculo` ao mapeamento de submódulos |
+| `backend/src/routes/submodulosTrabalhador.ts` | ✅ Já existia | Rotas RESTful genéricas já suportam `vinculos` |
+
+### Frontend
+| Arquivo | Status | Descrição |
+|---------|--------|-----------|
+| `frontend/src/types/index.ts` | ✅ Atualizado | Adicionada interface `ITrabalhadorVinculo` |
+| `frontend/src/services/submoduloTrabalhadorService.ts` | ✅ Atualizado | Métodos CRUD para vínculos (listar, criar, atualizar, deletar) |
+| `frontend/src/pages/Trabalhadores/Vinculos/ListaVinculos.tsx` | ✅ Criado | Listagem com DataTable, filtros, ações (editar/remover) |
+| `frontend/src/pages/Trabalhadores/Vinculos/FormVinculo.tsx` | ✅ Criado | Formulário completo de criação/edição com validação |
+| `frontend/src/pages/Trabalhadores/index.ts` | ✅ Atualizado | Exportações dos novos componentes |
+| `frontend/src/App.tsx` | ✅ Atualizado | Adicionadas 3 novas rotas para vínculos |
+| `frontend/src/pages/Trabalhadores/DetalhesTrabalhador.tsx` | ✅ Atualizado | Seção "Submódulos" com link para Vínculos |
+
+### Funcionalidades implementadas
+- [x] Listar vínculos por trabalhador (com status ativo/inativo)
+- [x] Cadastrar novo vínculo (tipo, cargo, função, setor, jornada, turno, datas, salário, carga horária)
+- [x] Editar vínculo existente
+- [x] Remover vínculo (soft delete — marca como inativo)
+- [x] Validação de datas (fim não pode ser anterior ao início)
+- [x] Navegação integrada na página de detalhes do trabalhador
+
+### Observações técnicas
+- As opções de "Tipo", "Jornada", "Turno" e "Situação" estão **hardcoded temporariamente**.
+- ⏳ **Pendente:** Integração com catálogos (`tipo_vinculo`, `funcao`, `jornada_trabalho`, `turno_trabalho`, `situacao_trabalho`). Só poderá ser feita **após a implementação dos catálogos** (Fase 3 — Catálogos Essenciais).
+- O model inclui campos avançados como `cargaHoraria` (semanal) e `salario` para suportar regras de negócio futuras.
+
+---
+
+## Parte 3: Relatório completo da Fase 1 — O que falta implementar
 
 > Baseado no RELATÓRIO DE IMPLEMENTAÇÃO original
 
@@ -97,15 +137,15 @@ Foi implementado o submódulo de **Dependentes do Trabalhador** (`trabalhador_de
 - [x] Frontend: Adicionar rotas em `App.tsx`
 - [x] Frontend: Adicionar link em `DetalhesTrabalhador.tsx`
 
-#### 1.3 Vínculos Empregatícios Detalhados (`trabalhador_vinculos`) — ⏳ PENDENTE
-- [ ] Backend: Criar model `TrabalhadorVinculo.ts`
-- [ ] Backend: Adicionar ao controller unificado
-- [ ] Backend: Adicionar ao mapeamento de rotas
-- [ ] Frontend: Criar tipos `ITrabalhadorVinculo`
-- [ ] Frontend: Criar service/métodos
-- [ ] Frontend: Criar páginas: `ListaVinculos`, `FormVinculo`
-- [ ] Frontend: Adicionar rotas
-- [ ] Frontend: Adicionar link em detalhes do trabalhador
+#### 1.3 Vínculos Empregatícios Detalhados (`trabalhador_vinculos`) — ✅ IMPLEMENTADO
+- [x] Backend: Criar model `TrabalhadorVinculo.ts`
+- [x] Backend: Adicionar ao controller unificado
+- [x] Backend: Adicionar ao mapeamento de rotas
+- [x] Frontend: Criar tipos `ITrabalhadorVinculo`
+- [x] Frontend: Criar service/métodos
+- [x] Frontend: Criar páginas: `ListaVinculos`, `FormVinculo`
+- [x] Frontend: Adicionar rotas
+- [x] Frontend: Adicionar link em detalhes do trabalhador
 - [ ] Integrar com catálogos: `tipo_vinculo`, `funcao`, `jornada_trabalho`, `turno_trabalho`
 
 ---
@@ -189,19 +229,18 @@ Tarefas por catálogo:
 
 | Categoria | Total | Implementado | Pendente |
 |-----------|-------|--------------|----------|
-| Submódulos do Trabalhador | 3 | 2 (Afastamentos, Dependentes) | 1 (Vínculos) |
+| Submódulos do Trabalhador | 3 | 3 (Afastamentos, Dependentes, Vínculos) | 0 |
 | Material Biológico | 3 | 0 | 3 |
 | Catálogos Essenciais | 9 | 0 | 9 |
 | RBAC Completo | 4 módulos | 0 | 4 |
 
-**Progresso geral da Fase 1:** ~2 de 19 itens principais implementados (~11%)
+**Progresso geral da Fase 1:** ~3 de 19 itens principais implementados (~16%)
 
 ---
 
 ## Próximos passos recomendados
 
-1. **Vínculos do Trabalhador** — último submódulo pendente; requer criação do model e integração com catálogos
-2. **Catálogos essenciais** — escolaridade, estado civil, raça/cor, sexo, tipo sanguíneo (podem ser feitos em lote)
-3. **Material Biológico** — requer decisão arquitetural (coleção separada vs extensão)
-4. **RBAC** — requer planejamento mais detalhado de permissões
+1. **Catálogos essenciais** — escolaridade, estado civil, raça/cor, sexo, tipo sanguíneo (podem ser feitos em lote)
+2. **Material Biológico** — requer decisão arquitetural (coleção separada vs extensão)
+3. **RBAC** — requer planejamento mais detalhado de permissões
 
