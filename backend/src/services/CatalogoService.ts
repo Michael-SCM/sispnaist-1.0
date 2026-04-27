@@ -179,7 +179,7 @@ class CatalogoService {
       'situacaoTrabalho', 'tipoAfastamento', 'motivoAfastamento',
       'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
       'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
-      'padraoEmail', 'parametro'
+      'padraoEmail', 'parametro', 'parentesco'
     ];
 
     if (!entidadesValidas.includes(entidade)) {

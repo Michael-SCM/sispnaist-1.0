@@ -36,8 +36,8 @@ export const catalogoService = {
 
   // Lista apenas itens ativos (equivale ao getdados.php)
   listarAtivos: async (entidade: string): Promise<ICatalogoItem[]> => {
-    const response = await api.get<{ data: ICatalogoItem[] }>(`/catalogos/${entidade}/ativos`);
-    return response.data.data;
+    const response = await api.get<ICatalogoItem[]>(`/catalogos/${entidade}/ativos`);
+    return response.data;
   },
 
   // Obter item específico
