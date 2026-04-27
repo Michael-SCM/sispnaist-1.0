@@ -6,6 +6,7 @@ import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
+import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import toast from 'react-hot-toast';
 
@@ -19,6 +20,15 @@ export const EditarTrabalhador: React.FC = () => {
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
 
   const [formData, setFormData] = useState<Partial<ITrabalhador>>({});
+
+  // Catálogos
+  const { itens: sexos } = useCatalogo('sexo');
+  const { itens: racas } = useCatalogo('racaCor');
+  const { itens: escolaridades } = useCatalogo('escolaridade');
+  const { itens: estadosCivis } = useCatalogo('estadoCivil');
+  const { itens: tiposSanguineos } = useCatalogo('tipoSanguineo');
+  const { itens: situacoesTrabalho } = useCatalogo('situacaoTrabalho');
+  const { itens: tiposVinculo } = useCatalogo('tipoVinculo');
 
   // Carregar empresas
   useEffect(() => {
@@ -138,7 +148,44 @@ export const EditarTrabalhador: React.FC = () => {
                 name="sexo"
                 value={formData.sexo}
                 onChange={handleChange}
-                options={[{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Feminino' }, { value: 'O', label: 'Outro' }]}
+                options={sexos.map((s) => ({ value: s.sigla || s.nome, label: s.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Raça/Cor"
+                name="raca"
+                value={formData.raca || ''}
+                onChange={handleChange}
+                options={racas.map((r) => ({ value: r.nome, label: r.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Escolaridade"
+                name="escolaridade"
+                value={formData.escolaridade || ''}
+                onChange={handleChange}
+                options={escolaridades.map((e) => ({ value: e.nome, label: e.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Estado Civil"
+                name="estadoCivil"
+                value={formData.estadoCivil || ''}
+                onChange={handleChange}
+                options={estadosCivis.map((e) => ({ value: e.nome, label: e.nome }))}
+                placeholder="Selecione..."
+              />
+
+              <Select
+                label="Tipo Sanguíneo"
+                name="tipoSanguineo"
+                value={formData.tipoSanguineo || ''}
+                onChange={handleChange}
+                options={tiposSanguineos.map((t) => ({ value: t.sigla || t.nome, label: t.nome }))}
+                placeholder="Selecione..."
               />
             </div>
           </section>
@@ -189,20 +236,23 @@ export const EditarTrabalhador: React.FC = () => {
                 }))}
                 placeholder="Selecione uma unidade..."
               />
-              <Select 
-                label="Situação" 
-                name="vinculo.situacao" 
-                value={formData.vinculo?.situacao} 
+              <Select
+                label="Situação"
+                name="vinculo.situacao"
+                value={formData.vinculo?.situacao}
                 onChange={handleChange}
-                options={[
-                  { value: 'Ativo', label: 'Ativo' }, 
-                  { value: 'Afastado', label: 'Afastado' }, 
-                  { value: 'Desligado', label: 'Desligado' },
-                  { value: 'Aposentado', label: 'Aposentado' }
-                ]}
+                options={situacoesTrabalho.map((s) => ({ value: s.nome, label: s.nome }))}
+                placeholder="Selecione..."
               />
               <TextInput label="Matrícula" name="matricula" value={formData.matricula} onChange={handleChange} />
-              <TextInput label="Tipo de Vínculo" name="vinculo.tipo" value={formData.vinculo?.tipo} onChange={handleChange} />
+              <Select
+                label="Tipo de Vínculo"
+                name="vinculo.tipo"
+                value={formData.vinculo?.tipo}
+                onChange={handleChange}
+                options={tiposVinculo.map((t) => ({ value: t.nome, label: t.nome }))}
+                placeholder="Selecione..."
+              />
               <DatePicker label="Data de Entrada" name="trabalho.dataEntrada" value={formData.trabalho?.dataEntrada?.split('T')[0]} onChange={handleChange} />
               <TextInput label="Cargo" name="trabalho.cargo" value={formData.trabalho?.cargo} onChange={handleChange} />
               <TextInput label="Setor" name="trabalho.setor" value={formData.trabalho?.setor} onChange={handleChange} />
