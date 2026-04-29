@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import useAcidenteMaterialBiologicoStore from '../../../store/acidenteMaterialBiologicoStore';
-import DataTable from '../../../components/DataTable';
-import FormFields from '../../../components/FormFields';
+import { DataTable } from '../../../components/DataTable';
+import { FormFields } from '../../../components/FormFields';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR } from '../../../utils/formHelpers';
 

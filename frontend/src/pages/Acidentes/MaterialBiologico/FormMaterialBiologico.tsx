@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAcidenteMaterialBiologicoStore from '../../../store/acidenteMaterialBiologicoStore';
-import FormFields from '../../../components/FormFields';
+import { FormFields } from '../../../components/FormFields';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR, parseDateBR } from '../../../utils/formHelpers';
 
