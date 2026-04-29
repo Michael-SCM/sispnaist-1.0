@@ -170,22 +170,6 @@ export const DetalhesAcidente: React.FC = () => {
             </div>
           </section>
 
-          {/* Material Biológico */}
-          <section className="mt-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-900">Material Biológico</h3>
-              <Link
-                to={`/acidentes/${acidente._id}/material-biologico`}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition-colors"
-              >
-                Adicionar/Editar
-              </Link>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-              <p className="text-gray-500 italic">Clique em "Adicionar/Editar" para gerenciar informações de material biológico deste acidente.</p>
-            </div>
-          </section>
-
           {/* Audit */}
           <section className="bg-gray-50 p-4 rounded-md text-xs text-gray-500 grid grid-cols-2 gap-4">
             <div>

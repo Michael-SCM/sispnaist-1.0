@@ -83,32 +83,6 @@ export interface ITrabalhadorProcessoTrabalho {
   dataAtualizacao?: string;
 }
 
-// Acidente Material Biológico
-export interface IAcidenteMaterialBiologico {
-  _id?: string;
-  acidenteId: string;                    
-  tipoExposicao?: string;
-  materialOrganico?: string;
-  circunstanciaAcidente?: string;
-  agente?: string;
-  equipamentoProtecao?: string;
-  sorologiaPaciente?: string;            
-  sorologiaAcidentado?: string;          
-  conduta?: string;
-  evolucao?: string;
-  usoEpi?: boolean;
-  sorologiaFonte?: boolean;
-  acompanhamentoPrep?: boolean;
-  descricaoAcompanhamentoPrep?: string;
-  encaminhamento?: string;
-  dataReavaliacao?: string;
-  efeitoColateralPermanece?: boolean;
-  descricaoEfeitoColateral?: string;
-  ativo?: boolean;
-  dataCriacao?: string;
-  dataAtualizacao?: string;
-}
-
 export interface IUser {
   _id?: string;
   cpf: string;
