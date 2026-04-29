@@ -16,12 +16,6 @@ const router = Router();
 router.use(authMiddleware);
 
 
-// CRUD
-router.post('/', criar);
-router.get('/', listar);
-router.get('/acidente/:acidenteId', obterPorAcidente);
-router.get('/:id', obter);
-router.put('/:id', atualizar);
-router.delete('/:id', deletar);
+router.post('/seed', seedData);
 
 export default router;
