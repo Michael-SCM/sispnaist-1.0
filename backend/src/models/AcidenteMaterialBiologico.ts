@@ -88,8 +88,8 @@ const AcidenteMaterialBiologicoSchema = new Schema<IAcidenteMaterialBiologicoDoc
   { collection: 'acidentes_material_biologico', timestamps: true }
 );
 
-// Índice composto para busca por acidente
-AcidenteMaterialBiologicoSchema.index({ acidenteId: 1 });
+// Duplicate index removed: field-level index: true is sufficient
+
 // Índice para listagem ativa
 AcidenteMaterialBiologicoSchema.index({ ativo: 1, createdAt: -1 });
 
