@@ -1,4 +1,23 @@
 /**
+ * Utilitários compartilhados para formulários
+ */
+export const formatDateBR = (dataString?: string | Date): string => {
+  if (!dataString) return '';
+  const date = new Date(dataString);
+  if (isNaN(date.getTime())) return '';
+  const dia = date.getDate().toString().padStart(2, '0');
+  const mes = (date.getMonth() + 1).toString().padStart(2, '0');
+  const ano = date.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+};
+
+export const parseDateBR = (dataBR: string): string => {
+  if (!dataBR) return '';
+  const [dia, mes, ano] = dataBR.split('/');
+  return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+};
+
+/**
  * Utilitários compartilhados para páginas de formulários
  */
 import React from 'react';
