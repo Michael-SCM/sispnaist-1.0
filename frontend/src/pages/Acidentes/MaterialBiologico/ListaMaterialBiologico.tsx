@@ -136,5 +136,6 @@ const ListaMaterialBiologico: React.FC = () => {
   );
 };
 
+export { ListaMaterialBiologico };
 export default ListaMaterialBiologico;
 
