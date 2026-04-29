@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useAcidenteMaterialBiologicoStore from '../../../store/acidenteMaterialBiologicoStore';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR } from '../../../utils/formHelpers';
-import FormFields from '../../../components/FormFields';
+import { FormFields } from '../../../components/FormFields';
 
 const DetalhesMaterialBiologico = () => {
   const { id } = useParams<{ id: string }>();
