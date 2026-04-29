@@ -6,7 +6,9 @@ import connectDB from './config/database.js';
 import config from './config/config.js';
 import authRoutes from './routes/auth.js';
 import acidentesRoutes from './routes/acidentes.js';
+import acidentesMaterialBiologicoRoutes from './routes/acidentesMaterialBiologico.js';
 import doencasRoutes from './routes/doencas.js';
+
 import vacinacoesRoutes from './routes/vacinacoes.js';
 import trabalhadoresRoutes from './routes/trabalhadores.js';
 import empresasRoutes from './routes/empresas.js';
@@ -177,7 +179,9 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/acidentes', acidentesRoutes);
+app.use('/api/acidentes-material-biologico', acidentesMaterialBiologicoRoutes);
 app.use('/api/doencas', doencasRoutes);
+
 app.use('/api/vacinacoes', vacinacoesRoutes);
 app.use('/api/trabalhadores', trabalhadoresRoutes);
 app.use('/api/empresas', empresasRoutes);
