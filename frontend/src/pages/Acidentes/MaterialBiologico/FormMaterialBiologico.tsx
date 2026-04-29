@@ -47,7 +47,9 @@ const FormMaterialBiologico = () => {
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Fix t.map is not a function - ensure value is string for select/text
+    const safeValue = typeof value === 'boolean' ? value : String(value || '');
+    setFormData(prev => ({ ...prev, [field]: safeValue }));
   };
 
   return (
