@@ -46,11 +46,7 @@ const FormMaterialBiologico = () => {
     navigate('/acidentes/material-biologico');
   };
 
-  const handleChange = (field: string, value: any) => {
-    // Fix t.map is not a function - ensure value is string for select/text
-    const safeValue = typeof value === 'boolean' ? value : String(value || '');
-    setFormData(prev => ({ ...prev, [field]: safeValue }));
-  };
+  const handleChange = (field: string, value: any) => {\n    // ✅ Fixed: Preserve native types (boolean for checkboxes, string for text/select/date)\n    setFormData(prev => ({ ...prev, [field]: value }));\n  };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
