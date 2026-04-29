@@ -1,12 +1,5 @@
 import { Router } from 'express';
-import {
-  criar,
-  obter,
-  obterPorAcidente,
-  listar,
-  atualizar,
-  deletar,
-} from '../controllers/acidenteMaterialBiologicoController.js';
+import {\n  criar,\n  obter,\n  obterPorAcidente,\n  listar,\n  atualizar,\n  deletar,\n  seedData,\n} from '../controllers/acidenteMaterialBiologicoController.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 
