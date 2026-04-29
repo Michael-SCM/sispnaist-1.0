@@ -24,7 +24,6 @@ import parametrosRoutes from './routes/parametros.js';
 import preferenciasRoutes from './routes/preferencias.js';
 import servidoresRoutes from './routes/servidores.js';
 import videoAulasRoutes from './routes/videoAulas.js';
-import acidenteMaterialBiologicoRoutes from './routes/acidenteMaterialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -37,11 +36,7 @@ app.use(cors({
 }));
 
 // Parser de requisições
-app.use(express.json({ limit: '10mb', strict: false }));
-app.use((req, res, next) => { 
-  if (req.body) console.log('Body:', JSON.stringify(req.body)); 
-  next(); 
-});
+app.use(express.json({ limit: '10mb', strict: false })); app.use((req, res, next) => { if (req.body) console.log('Body:', JSON.stringify(req.body)); next(); });
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Conectar ao MongoDB
@@ -174,7 +169,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Health check com /api prefix
+// Health check com /api prefix (para ser consistente com outras rotas)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
@@ -200,7 +195,6 @@ app.use('/api/parametros', parametrosRoutes);
 app.use('/api/preferencias', preferenciasRoutes);
 app.use('/api/servidores', servidoresRoutes);
 app.use('/api/video-aulas', videoAulasRoutes);
-app.use('/api/acidentes-material-biologicos', acidenteMaterialBiologicoRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

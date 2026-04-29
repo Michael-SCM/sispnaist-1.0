@@ -20,8 +20,8 @@ export interface ITrabalhadorDependente {
   nome: string;
   dataNascimento?: string;
   cpf?: string;
-  parentesco: string;
-  dependentIR?: boolean;
+  parentesco: string;      // 'conjuge', 'filho', 'enteado', 'irmao', 'mae', 'pai', 'outro'
+  dependentIR?: boolean;   // dependente para imposto de renda
   ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
@@ -134,7 +134,6 @@ export interface IAcidente {
   status?: 'Aberto' | 'Em Análise' | 'Fechado';
   dataCriacao?: string;
   dataAtualizacao?: string;
-  acidenteMaterialBiologicoId?: string;
 }
 
 export interface IDoenca {
@@ -211,18 +210,25 @@ export interface ITrabalhador {
   telefoneContato?: string;
   email?: string;
   dataNascimento?: string;
-  // ... resto igual
-  empresa?: string;
-  unidade?: string;
+
+  // Vínculo com Empresa/Unidade
+  empresa?: string; // ObjectId da Empresa
+  unidade?: string; // ObjectId da Unidade
+
+  // Dados Pessoais/Diversos
   sexo?: string;
   raca?: string;
   escolaridade?: string;
   estadoCivil?: string;
+  
+  // Deficiência
   deficiencia?: {
     tipo?: string;
     tempo?: string;
     grau?: string;
   };
+
+  // Vínculos e Situação
   vinculo?: {
     tipo?: string;
     outro?: string;
@@ -231,7 +237,11 @@ export interface ITrabalhador {
     jornadaOutro?: string;
     situacao?: string;
   };
+
+  // Endereço
   endereco?: IEndereco;
+
+  // Dados do Trabalho
   trabalho?: {
     dataPosse?: string;
     empresaTerceirizada?: string;
@@ -241,6 +251,8 @@ export interface ITrabalhador {
     funcao?: string;
     ocupacao?: string;
   };
+
+  // Histórico e Eventos
   historico?: {
     dataAposentadoria?: string;
     dataObito?: string;
@@ -252,82 +264,7 @@ export interface ITrabalhador {
     dataAfastamento?: string;
     tipoAfastamento?: string;
   };
+
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
-
-// NOVOS TIPOS - Acidente Material Biológico
-export interface IAcidenteMaterialBiologico {
-  _id?: string;
-  acidenteId: string;
-  tipoExposicaoId: string;
-  materialOrganicoId: string;
-  circunstanciaAcidenteId: string;
-  agenteId: string;
-  equipamentoProtecaoId?: string;
-  sorologiaPacienteId?: string;
-  sorologiaAcidentadoId?: string;
-  condutaId?: string;
-  evolucaoId?: string;
-  usoEpi: boolean;
-  sorologiaFonte: boolean;
-  acompanhamentoPrep: boolean;
-  dsAcompanhamentoPrep?: string;
-  dsEncaminhamento?: string;
-  dtReavaliacao?: string;
-  efeitoColateralPermanece: boolean;
-  dsEfeitoColateralPermanece?: string;
-  ativo: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  // Populated
-  acidente?: Pick<IAcidente, '_id' | 'dataAcidente' | 'tipoAcidente'>;
-  tipoExposicao?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  materialOrganico?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  circunstanciaAcidente?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  agente?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  equipamentoProtecao?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  conduta?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  evolucao?: Pick<ICatalogoItem, '_id' | 'nome'>;
-  sorologiaPaciente?: ISorologiaPaciente;
-  sorologiaAcidentado?: ISorologiaAcidentado;
-}
-
-export interface ISorologiaPaciente {
-  _id?: string;
-  acidenteMaterialBiologicoId: string;
-  pacienteFonteNome?: string;
-  pacienteFonteCpf?: string;
-  hiv: string;
-  hbsAg: string;
-  antiHbc: string;
-  antiHcv: string;
-  vdrl: string;
-  dataColeta: string;
-  dataResultado?: string;
-  observacoes?: string;
-  ativo: boolean;
-}
-
-export interface ISorologiaAcidentado {
-  _id?: string;
-  acidenteMaterialBiologicoId: string;
-  trabalhadorId: string;
-  hivBasal: string;
-  hbsAgBasal: string;
-  antiHbcBasal: string;
-  antiHcvBasal: string;
-  vdrlBasal: string;
-  hivProfilaxia?: string;
-  hbsAgProfilaxia?: string;
-  antiHbcProfilaxia?: string;
-  antiHcvProfilaxia?: string;
-  vdrlProfilaxia?: string;
-  dataColetaBasal: string;
-  dataResultadoBasal?: string;
-  dataColetaProfilaxia?: string;
-  dataResultadoProfilaxia?: string;
-  observacoes?: string;
-  ativo: boolean;
-}
-
