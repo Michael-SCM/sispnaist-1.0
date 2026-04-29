@@ -106,7 +106,7 @@ export const useAcidenteMaterialBiologicoStore = create<AcidenteMaterialBiologic
       },
 
       deletar: async (id: string) => {
-        if (!confirm('Confirmar exclusão do registro?')) return;
+        if (!window.confirm('Confirmar exclusão do registro?')) return;
         set({ carregando: true, erro: null });
         try {
           await acidenteMaterialBiologicoService.deletar(id);
