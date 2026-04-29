@@ -440,3 +440,90 @@ export const atualizarTrabalhadorSchema = Joi.object({
     tipoAfastamento: Joi.string().trim().allow('', null),
   }).optional(),
 }).min(1);
+
+// =========== SCHEMAS PARA ACIDENTE MATERIAL BIOLÓGICO ===========
+
+export const criarAcidenteMaterialBiologicoSchema = Joi.object({
+  acidenteId: Joi.string().required().messages({
+    'any.required': 'Acidente é obrigatório',
+  }),
+  tipoExposicaoId: Joi.string().required().messages({
+    'any.required': 'Tipo de exposição é obrigatório',
+  }),
+  materialOrganicoId: Joi.string().required().messages({
+    'any.required': 'Material orgânico é obrigatório',
+  }),
+  circunstanciaAcidenteId: Joi.string().required().messages({
+    'any.required': 'Circunstância é obrigatória',
+  }),
+  agenteId: Joi.string().required().messages({
+    'any.required': 'Agente é obrigatório',
+  }),
+  equipamentoProtecaoId: Joi.string().optional(),
+  usoEpi: Joi.boolean().required().default(false),
+  sorologiaFonte: Joi.boolean().required().default(false),
+  acompanhamentoPrep: Joi.boolean().required().default(false),
+  dsAcompanhamentoPrep: Joi.string().when('acompanhamentoPrep', {
+    is: true,
+    then: Joi.string().trim().max(500).required(),
+    otherwise: Joi.string().optional().allow('')
+  }),
+  dsEncaminhamento: Joi.string().trim().max(500).optional(),
+  dtReavaliacao: Joi.date().optional(),
+  efeitoColateralPermanece: Joi.boolean().default(false),
+  dsEfeitoColateralPermanece: Joi.string().when('efeitoColateralPermanece', {
+    is: true,
+    then: Joi.string().trim().max(500).required(),
+    otherwise: Joi.string().optional().allow('')
+  }),
+});
+
+export const atualizarAcidenteMaterialBiologicoSchema = Joi.object({
+  tipoExposicaoId: Joi.string().optional(),
+  materialOrganicoId: Joi.string().optional(),
+  circunstanciaAcidenteId: Joi.string().optional(),
+  agenteId: Joi.string().optional(),
+  equipamentoProtecaoId: Joi.string().optional(),
+  usoEpi: Joi.boolean().optional(),
+  sorologiaFonte: Joi.boolean().optional(),
+  acompanhamentoPrep: Joi.boolean().optional(),
+  dsAcompanhamentoPrep: Joi.string().optional(),
+  dsEncaminhamento: Joi.string().optional(),
+  dtReavaliacao: Joi.date().optional(),
+  efeitoColateralPermanece: Joi.boolean().optional(),
+  dsEfeitoColateralPermanece: Joi.string().optional(),
+}).min(1);
+
+export const sorologiaPacienteSchema = Joi.object({
+  acidenteMaterialBiologicoId: Joi.string().required(),
+  pacienteFonteNome: Joi.string().trim().optional(),
+  pacienteFonteCpf: Joi.string().optional(),
+  hiv: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente').required(),
+  hbsAg: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente').required(),
+  antiHbc: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente').required(),
+  antiHcv: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente').required(),
+  vdrl: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente').required(),
+  dataColeta: Joi.date().required(),
+  dataResultado: Joi.date().optional(),
+  observacoes: Joi.string().optional(),
+});
+
+export const sorologiaAcidentadoSchema = Joi.object({
+  acidenteMaterialBiologicoId: Joi.string().required(),
+  trabalhadorId: Joi.string().required(),
+  hivBasal: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').required(),
+  hbsAgBasal: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').required(),
+  antiHbcBasal: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').required(),
+  antiHcvBasal: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').required(),
+  vdrlBasal: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').required(),
+  dataColetaBasal: Joi.date().required(),
+  dataResultadoBasal: Joi.date().optional(),
+  hivProfilaxia: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').optional(),
+  hbsAgProfilaxia: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').optional(),
+  antiHbcProfilaxia: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').optional(),
+  antiHcvProfilaxia: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').optional(),
+  vdrlProfilaxia: Joi.string().valid('Negativo', 'Positivo', 'Reagente', 'Indeterminado', 'Pendente', 'Não Realizado').optional(),
+  dataColetaProfilaxia: Joi.date().optional(),
+  dataResultadoProfilaxia: Joi.date().optional(),
+  observacoes: Joi.string().optional(),
+});

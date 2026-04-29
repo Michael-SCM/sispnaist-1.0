@@ -113,7 +113,7 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Plantão 24h', ordem: 5 },
     { nome: 'Rodízio', ordem: 6 },
   ]},
-  // Parentesco (para dependentes)
+// Parentesco (para dependentes)
   { entidade: 'parentesco', itens: [
     { nome: 'Cônjuge', sigla: 'conjuge', ordem: 1 },
     { nome: 'Filho(a)', sigla: 'filho', ordem: 2 },
@@ -125,6 +125,50 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Sobrinho(a)', sigla: 'sobrinho', ordem: 8 },
     { nome: 'Tutor(a)', sigla: 'tutor', ordem: 9 },
     { nome: 'Outro', sigla: 'outro', ordem: 99 },
+  ]},
+  // Catálogos para Acidente Material Biológico
+  { entidade: 'tipoExposicao', itens: [
+    { nome: 'Percutânea', ordem: 1 },
+    { nome: 'Mucosa', ordem: 2 },
+    { nome: 'Pele Íntegra', ordem: 3 },
+    { nome: 'Sexual', ordem: 4 },
+    { nome: 'Mordida', ordem: 5 },
+  ]},
+  { entidade: 'materialOrganico', itens: [
+    { nome: 'Sangue', ordem: 1 },
+    { nome: 'Plasma', ordem: 2 },
+    { nome: 'Soro', ordem: 3 },
+    { nome: 'Líquido Sinovial', ordem: 4 },
+    { nome: 'Líquido Pleural', ordem: 5 },
+    { nome: 'Líquido Peritoneal', ordem: 6 },
+    { nome: 'Líquido Amniótico', ordem: 7 },
+    { nome: 'Sêmen', ordem: 8 },
+    { nome: 'Secreção Vaginal', ordem: 9 },
+    { nome: 'Cérebro Medula Espinhal', ordem: 10 },
+  ]},
+  { entidade: 'circunstanciaAcidente', itens: [
+    { nome: 'Agulha Oca Usada', ordem: 1 },
+    { nome: 'Agulha Aguçada', ordem: 2 },
+    { nome: 'Lâmina', ordem: 3 },
+    { nome: 'Vidro', ordem: 4 },
+    { nome: 'Outros Objetos Contundentes', ordem: 5 },
+    { nome: 'Mordida', ordem: 6 },
+    { nome: 'Contato Mucoso', ordem: 7 },
+  ]},
+  { entidade: 'agente', itens: [
+    { nome: 'Paciente Conhecido HIV+', ordem: 1 },
+    { nome: 'Paciente HBsAg+', ordem: 2 },
+    { nome: 'Paciente HCV+', ordem: 3 },
+    { nome: 'Paciente Sífilis', ordem: 4 },
+    { nome: 'Desconhecido', ordem: 5 },
+    { nome: 'Fonte Descartada', ordem: 6 },
+  ]},
+  { entidade: 'equipamentoProtecao', itens: [
+    { nome: 'Luvas', ordem: 1 },
+    { nome: 'Óculos', ordem: 2 },
+    { nome: 'Máscara', ordem: 3 },
+    { nome: 'Avental', ordem: 4 },
+    { nome: 'Nenhum', ordem: 5 },
   ]},
 ];
 
