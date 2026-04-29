@@ -82,13 +82,7 @@ const ListaMaterialBiologico = () => {
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Acidentes Material Biológico</h2>
-        <button
-          onClick={() => navigate('/acidentes/material-biologico/novo')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Novo Registro
-        </button>
-      </div>
+        <div className="flex gap-2">\n          <button\n            onClick={() => navigate('/acidentes/material-biologico/novo')}\n            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"\n          >\n            Novo Registro\n          </button>\n          <button\n            onClick={async () => {\n              if (window.confirm('Criar dados de teste no banco?')) {\n                try {\n                  await fetch('/api/acidentes-material-biologico/seed', {\n                    method: 'POST',\n                    headers: {\n                      'Content-Type': 'application/json',\n                      'Authorization': `Bearer ${localStorage.getItem('token')}`,\n                    },\n                  });\n                  alert('✅ Dados de teste criados! Refresh página.');\n                  window.location.reload();\n                } catch (error) {\n                  alert('❌ Erro: ' + error);\n                }\n              }\n            }}\n            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"\n          >\n            🧪 Seed DB\n          </button>\n        </div>\n      </div>
 
       {/* Filtros */}
       <div className="bg-white p-4 rounded-lg shadow">

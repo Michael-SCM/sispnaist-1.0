@@ -31,8 +31,5 @@ export const acidenteMaterialBiologicoService = {
     api.put(`${BASE_URL}/${id}`, data),
 
   // Deletar (soft delete)
-  deletar: (id: string) => api.delete(`${BASE_URL}/${id}`),
-};
-
-export default acidenteMaterialBiologicoService;
+  deletar: (id: string) => api.delete(`${BASE_URL}/${id}`),\n  seed: () => api.post(`${BASE_URL}/seed`),\n};\n\nexport default acidenteMaterialBiologicoService;
 
