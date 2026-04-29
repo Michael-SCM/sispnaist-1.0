@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useAcidenteMaterialBiologicoStore } from '../../store/acidenteMaterialBiologicoStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
-import DataTable from '../../components/DataTable.js';
+import { DataTable } from '../../components/DataTable.js';
 import { Header } from '../../components/Header.js';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { 
