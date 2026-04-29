@@ -6,7 +6,7 @@ import FormFields from '../../../components/FormFields';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR } from '../../../utils/formHelpers';
 
-const ListaMaterialBiologico: React.FC = () => {
+const ListaMaterialBiologico = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { 

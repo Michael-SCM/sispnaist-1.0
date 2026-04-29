@@ -5,7 +5,7 @@ import FormFields from '../../../components/FormFields';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR, parseDateBR } from '../../../utils/formHelpers';
 
-const FormMaterialBiologico: React.FC = () => {
+const FormMaterialBiologico = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { 
