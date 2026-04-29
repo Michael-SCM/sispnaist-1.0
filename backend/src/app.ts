@@ -37,7 +37,11 @@ app.use(cors({
 }));
 
 // Parser de requisições
-app.use(express.json({ limit: '10mb', strict: false })); app.use((req, res, next) => { if (req.body) console.log('Body:', JSON.stringify(req.body)); next(); });
+app.use(express.json({ limit: '10mb', strict: false }));
+app.use((req, res, next) => { 
+  if (req.body) console.log('Body:', JSON.stringify(req.body)); 
+  next(); 
+});
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Conectar ao MongoDB
@@ -170,7 +174,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Health check com /api prefix (para ser consistente com outras rotas)
+// Health check com /api prefix
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
