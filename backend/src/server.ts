@@ -3,9 +3,7 @@ import app from './app.js';
 import config from './config/config.js';
 
 
-const PORT = config.port;
-
-const server = app.listen(PORT, () => {
+const PORT = process.env.PORT || config.port || 10000;\n\nconst server = app.listen(PORT, '0.0.0.0', () => {\n  console.log(`Server listening on 0.0.0.0:${PORT}`);
   console.log(`
 ╔════════════════════════════════════════╗
 ║    SISPNAIST Backend Server Started    ║
