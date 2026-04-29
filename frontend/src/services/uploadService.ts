@@ -55,7 +55,7 @@ export const uploadService = {
 
   // Download
   download: async (id: string): Promise<void> => {
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/download`, '_blank');
+window.open(`${import.meta.env.VITE_API_URL}/uploads/${id}/download`, '_blank');
   },
 
   deletar: async (id: string): Promise<void> => {
