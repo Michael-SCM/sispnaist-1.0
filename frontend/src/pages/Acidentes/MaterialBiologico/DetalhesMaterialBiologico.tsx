@@ -5,7 +5,7 @@ import { IAcidenteMaterialBiologico } from '../../../types/index';
 import { formatDateBR } from '../../../utils/formHelpers';
 import FormFields from '../../../components/FormFields';
 
-const DetalhesMaterialBiologico: React.FC = () => {
+const DetalhesMaterialBiologico = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { atual, obter, carregando, erro } = useAcidenteMaterialBiologicoStore();
