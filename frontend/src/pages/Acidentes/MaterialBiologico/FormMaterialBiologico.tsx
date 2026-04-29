@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useAcidenteMaterialBiologicoStore from '../../../store/acidenteMaterialBiologicoStore';
 import { FormFields } from '../../../components/FormFields';
 import { IAcidenteMaterialBiologico } from '../../../types/index';
-import { formatDateBR, parseDateBR } from '../../../utils/formHelpers';
 
 const FormMaterialBiologico = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +45,9 @@ const FormMaterialBiologico = () => {
     navigate('/acidentes/material-biologico');
   };
 
-  const handleChange = (field: string, value: any) => {\n    // ✅ Fixed: Preserve native types (boolean for checkboxes, string for text/select/date)\n    setFormData(prev => ({ ...prev, [field]: value }));\n  };
+  const handleChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
@@ -69,7 +70,6 @@ const FormMaterialBiologico = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Dados do Acidente (readonly se souber) */}
         <div>
           <FormFields
             label="Acidente ID *"
