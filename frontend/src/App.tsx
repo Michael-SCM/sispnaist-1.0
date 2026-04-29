@@ -19,6 +19,7 @@ import ListaUsuarios from './pages/Admin/Usuarios/ListaUsuarios.js';
 import EditarUsuario from './pages/Admin/Usuarios/EditarUsuario.js';
 import { ListaCatalogos } from './pages/Admin/Catalogos/ListaCatalogos.js';
 import { ItensCatalogo } from './pages/Admin/Catalogos/ItensCatalogo.js';
+import { ListaAcidentesMaterialBiologico, FormAcidenteMaterialBiologico } from './pages/AcidentesMaterialBiologico/index.js';
 
 import './styles/globals.css';
 
@@ -321,6 +322,40 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <ItensCatalogo />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Acidentes Material Biológico */}
+        <Route
+          path="/acidentes-material-biologicos"
+          element={
+            <ProtectedRoute>
+              <ListaAcidentesMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes-material-biologicos/novo"
+          element={
+            <ProtectedRoute>
+              <FormAcidenteMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes-material-biologicos/:id/editar"
+          element={
+            <ProtectedRoute>
+              <FormAcidenteMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes-material-biologicos/:id"
+          element={
+            <ProtectedRoute>
+              <ListaAcidentesMaterialBiologico />
             </ProtectedRoute>
           }
         />

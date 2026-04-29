@@ -50,14 +50,20 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
       type: Date,
       default: Date.now,
     },
-    dataAtualizacao: {
+  dataAtualizacao: {
       type: Date,
       default: Date.now,
+    },
+    acidenteMaterialBiologicoId: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcidenteMaterialBiologico',
+      default: null,
     },
   },
   { collection: 'acidentes', timestamps: true }
 );
 
 AcidenteSchema.index({ trabalhadorId: 1, dataAcidente: -1 });
+AcidenteSchema.index({ acidenteMaterialBiologicoId: 1 });
 
 export default mongoose.model<IAcidenteDocument>('Acidente', AcidenteSchema);

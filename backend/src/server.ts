@@ -5,7 +5,7 @@ import config from './config/config.js';
 
 const PORT = config.port;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`
 ╔════════════════════════════════════════╗
 ║    SISPNAIST Backend Server Started    ║
@@ -15,7 +15,21 @@ const server = app.listen(PORT, () => {
 🗄️  Database: ${config.mongodbUri}
 🌍 Environment: ${config.nodeEnv}
 🔐 CORS enabled for: ${config.corsOrigin}
+`);
 
+  // Executar seeders apenas em development ou se variável definida
+  if (config.nodeEnv === 'development' || process.env.RUN_SEEDERS === 'true') {
+    try {
+      console.log('🌱 Executando seeders iniciais...');
+      const { seedCatalogos } = await import('./utils/seedCatalogos.js');
+      await seedCatalogos();
+      console.log('✅ Seeders executados com sucesso!');
+    } catch (error) {
+      console.error('⚠️ Erro nos seeders:', error);
+    }
+  }
+
+  console.log(`
 API Documentation:
   POST   /api/auth/register    - Criar conta
   POST   /api/auth/login       - Fazer login

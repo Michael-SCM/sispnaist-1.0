@@ -24,6 +24,7 @@ import parametrosRoutes from './routes/parametros.js';
 import preferenciasRoutes from './routes/preferencias.js';
 import servidoresRoutes from './routes/servidores.js';
 import videoAulasRoutes from './routes/videoAulas.js';
+import acidenteMaterialBiologicoRoutes from './routes/acidenteMaterialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -195,6 +196,7 @@ app.use('/api/parametros', parametrosRoutes);
 app.use('/api/preferencias', preferenciasRoutes);
 app.use('/api/servidores', servidoresRoutes);
 app.use('/api/video-aulas', videoAulasRoutes);
+app.use('/api/acidentes-material-biologicos', acidenteMaterialBiologicoRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
