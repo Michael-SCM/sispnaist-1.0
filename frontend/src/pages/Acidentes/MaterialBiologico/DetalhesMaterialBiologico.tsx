@@ -191,5 +191,6 @@ const DetalhesMaterialBiologico: React.FC = () => {
   );
 };
 
+export { DetalhesMaterialBiologico };
 export default DetalhesMaterialBiologico;
 

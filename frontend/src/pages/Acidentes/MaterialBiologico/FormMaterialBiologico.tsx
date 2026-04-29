@@ -247,5 +247,6 @@ const FormMaterialBiologico: React.FC = () => {
   );
 };
 
+export { FormMaterialBiologico };
 export default FormMaterialBiologico;
 
