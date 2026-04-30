@@ -13,7 +13,7 @@ import {
   MoreVertical
 } from 'lucide-react';
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
-import { useToast } from '../../hooks/useToast';
+import toast from 'react-hot-toast';
 
 const ListaAtos: React.FC = () => {
   const [atos, setAtos] = useState<AtoMunicipalInovacao[]>([]);
@@ -24,7 +24,6 @@ const ListaAtos: React.FC = () => {
   const [searchAno, setSearchAno] = useState<number | ''>('');
   
   const navigate = useNavigate();
-  const { showToast } = useToast();
 
   const carregarAtos = async () => {
     setLoading(true);
@@ -37,7 +36,7 @@ const ListaAtos: React.FC = () => {
       setAtos(response.items);
       setTotalPages(response.pages);
     } catch (error) {
-      showToast('Erro ao carregar atos municipais', 'error');
+      toast.error('Erro ao carregar atos municipais');
     } finally {
       setLoading(false);
     }
@@ -57,10 +56,10 @@ const ListaAtos: React.FC = () => {
     if (window.confirm('Deseja realmente excluir este ato?')) {
       try {
         await atosService.deletar(id);
-        showToast('Ato excluído com sucesso', 'success');
+        toast.success('Ato excluído com sucesso');
         carregarAtos();
       } catch (error) {
-        showToast('Erro ao excluir ato', 'error');
+        toast.error('Erro ao excluir ato');
       }
     }
   };
