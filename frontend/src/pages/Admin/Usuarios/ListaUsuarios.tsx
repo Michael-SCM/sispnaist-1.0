@@ -1,150 +1,185 @@
 import React, { useEffect, useState } from 'react';
-import { useUserStore } from '../../../store/userStore.js';
-import { Users, Shield, UserX, UserCheck, Edit, Trash2, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import api from '../../../services/api.js';
+import { User, Shield, Mail, Edit, Trash2, UserPlus, Search, Building2, BadgeCheck } from 'lucide-react';
+import { MainLayout } from '../../../layouts/MainLayout.js';
+import toast from 'react-hot-toast';
+
+interface Usuario {
+  _id: string;
+  nome: string;
+  email: string;
+  perfil: string;
+  empresa?: string;
+  unidade?: string;
+  ativo: boolean;
+}
 
 const ListaUsuarios: React.FC = () => {
-  const { usuarios, loading, error, fetchUsers, updateUser, deleteUser } = useUserStore();
-  const [filtros, setFiltros] = useState({ nome: '', email: '', perfil: '' });
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchUsers(1, 20, filtros);
-  }, [fetchUsers, filtros]);
+    carregarUsuarios();
+  }, []);
 
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    if (window.confirm(`Tem certeza que deseja ${currentStatus ? 'desativar' : 'ativar'} este usuário?`)) {
-      await updateUser(id, { ativo: !currentStatus });
-      fetchUsers(1, 20, filtros);
+  const carregarUsuarios = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/usuarios');
+      setUsuarios(response.data.data.usuarios);
+    } catch (error) {
+      toast.error('Erro ao carregar usuários');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string, nome: string) => {
-    if (window.confirm(`ATENÇÃO: Deseja realmente EXCLUIR permanentemente o usuário ${nome}?`)) {
-      await deleteUser(id);
+  const handleDeletar = async (id: string, nome: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o usuário ${nome}?`)) {
+      try {
+        await api.delete(`/usuarios/${id}`);
+        toast.success('Usuário excluído com sucesso');
+        carregarUsuarios();
+      } catch (error) {
+        toast.error('Erro ao excluir usuário');
+      }
     }
-  };
-
-  const getPerfilBadge = (perfil: string) => {
-    const styles: any = {
-      admin: 'bg-purple-100 text-purple-700 border-purple-200',
-      saude: 'bg-blue-100 text-blue-700 border-blue-200',
-      gestor: 'bg-green-100 text-green-700 border-green-200',
-      trabalhador: 'bg-gray-100 text-gray-700 border-gray-200',
-    };
-    return styles[perfil] || styles.trabalhador;
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestão de Usuários</h1>
-          <p className="text-gray-600">Administre as contas e permissões do sistema</p>
-        </div>
-      </div>
-
-      {/* Filtros */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar por nome..."
-            value={filtros.nome}
-            onChange={(e) => setFiltros({ ...filtros, nome: e.target.value })}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-        </div>
-        <select
-          value={filtros.perfil}
-          onChange={(e) => setFiltros({ ...filtros, perfil: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-        >
-          <option value="">Todos os Perfis</option>
-          <option value="admin">Administrador</option>
-          <option value="saude">Saúde</option>
-          <option value="gestor">Gestor</option>
-          <option value="trabalhador">Trabalhador</option>
-        </select>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      )}
-
-      <div className="bg-white shadow-sm rounded-xl overflow-hidden border border-gray-100">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuário</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Perfil</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cadastro</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {usuarios.map((user) => (
-              <li key={user._id} className="table-row hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-700 font-bold">{user.nome.charAt(0)}</span>
-                    </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{user.nome}</div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${getPerfilBadge(user.perfil || '')}`}>
-                    {user.perfil?.toUpperCase()}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {user.ativo ? <UserCheck className="h-3 w-3 mr-1" /> : <UserX className="h-3 w-3 mr-1" />}
-                    {user.ativo ? 'Ativo' : 'Inativo'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {user.dataCriacao ? new Date(user.dataCriacao).toLocaleDateString() : '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
-                    <Link to={`/admin/usuarios/editar/${user._id}`} className="text-blue-600 hover:text-blue-900 p-1">
-                      <Edit className="h-5 w-5" />
-                    </Link>
-                    <button 
-                      onClick={() => handleToggleStatus(user._id!, user.ativo || false)}
-                      className={`${user.ativo ? 'text-orange-600' : 'text-green-600'} hover:opacity-75 p-1`}
-                      title={user.ativo ? 'Desativar' : 'Ativar'}
-                    >
-                      {user.ativo ? <UserX className="h-5 w-5" /> : <UserCheck className="h-5 w-5" />}
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(user._id!, user.nome)}
-                      className="text-red-600 hover:text-red-900 p-1"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </div>
-                </td>
-              </li>
-            ))}
-          </tbody>
-        </table>
-        {usuarios.length === 0 && (
-          <div className="py-12 text-center text-gray-500">
-            <Users className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-            <p>Nenhum usuário encontrado.</p>
+    <MainLayout>
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-slate-900 text-white rounded-2xl shadow-lg shadow-slate-200">
+              <User size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Usuários</h1>
+              <p className="text-slate-500 font-medium">Controle de acesso e permissões do sistema</p>
+            </div>
           </div>
-        )}
+          <button
+            onClick={() => navigate('/admin/usuarios/novo')}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-all shadow-lg shadow-slate-100 active:scale-95"
+          >
+            <UserPlus size={20} />
+            Novo Usuário
+          </button>
+        </div>
+
+        {/* Search & Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Buscar por nome ou e-mail..."
+              className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+            />
+          </div>
+          <div className="bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100 flex items-center justify-between">
+            <span className="text-slate-500 font-bold uppercase text-xs">Total</span>
+            <span className="text-2xl font-black text-slate-900">{usuarios.length}</span>
+          </div>
+        </div>
+
+        {/* List Content */}
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-100">
+                <tr>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Usuário</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Perfil</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Empresa / Unidade</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={4} className="px-8 py-6 h-20 bg-slate-50/20"></td>
+                    </tr>
+                  ))
+                ) : usuarios.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-8 py-12 text-center text-slate-400">
+                      <User className="mx-auto h-12 w-12 text-slate-200 mb-4" />
+                      <p className="text-lg font-medium">Nenhum usuário cadastrado</p>
+                    </td>
+                  </tr>
+                ) : (
+                  usuarios.map((usuario) => (
+                    <tr key={usuario._id} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 font-bold">
+                            {usuario.nome.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-700 block text-lg">{usuario.nome}</span>
+                            <div className="flex items-center gap-2 text-slate-400 text-sm mt-0.5">
+                              <Mail size={14} />
+                              <span>{usuario.email}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            usuario.perfil === 'admin' ? 'bg-red-100 text-red-700' :
+                            usuario.perfil === 'gestor' ? 'bg-amber-100 text-amber-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {usuario.perfil}
+                          </span>
+                          {!usuario.ativo && (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-400 text-[10px] font-bold rounded uppercase">Inativo</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
+                            <Building2 size={14} className="text-slate-400" />
+                            {usuario.empresa || 'Sem Empresa'}
+                          </div>
+                          {usuario.unidade && (
+                            <span className="text-xs text-slate-400 pl-5">{usuario.unidade}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => navigate(`/admin/usuarios/editar/${usuario._id}`)}
+                            className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+                          >
+                            <Edit size={20} />
+                          </button>
+                          <button
+                            onClick={() => handleDeletar(usuario._id, usuario.nome)}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

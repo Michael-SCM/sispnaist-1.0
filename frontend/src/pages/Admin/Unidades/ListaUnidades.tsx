@@ -1,128 +1,139 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUnidadeStore } from '../../../store/unidadeStore.js';
 import { useEmpresaStore } from '../../../store/empresaStore.js';
-import { Plus, Edit, Trash2, MapPin, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Home, MapPin, Building2, Search } from 'lucide-react';
+import { MainLayout } from '../../../layouts/MainLayout.js';
+import toast from 'react-hot-toast';
 
 const ListaUnidades: React.FC = () => {
-  const { unidades, loading, error, fetchUnidades, deleteUnidade } = useUnidadeStore();
+  const navigate = useNavigate();
+  const { unidades, loading, fetchUnidades, deleteUnidade } = useUnidadeStore();
   const { empresas, fetchEmpresas } = useEmpresaStore();
-  const [empresaFiltro, setEmpresaFiltro] = useState('');
 
   useEffect(() => {
-    fetchUnidades(1, 50, empresaFiltro ? { empresaId: empresaFiltro } : {});
-    fetchEmpresas(1, 100);
-  }, [fetchUnidades, fetchEmpresas, empresaFiltro]);
+    fetchUnidades();
+    fetchEmpresas();
+  }, [fetchUnidades, fetchEmpresas]);
 
   const handleDelete = async (id: string, nome: string) => {
     if (window.confirm(`Tem certeza que deseja excluir a unidade "${nome}"?`)) {
-      await deleteUnidade(id);
+      try {
+        await deleteUnidade(id);
+        toast.success('Unidade excluída com sucesso');
+      } catch (err) {
+        toast.error('Erro ao excluir unidade');
+      }
     }
   };
 
-  if (loading && unidades.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  const getEmpresaNome = (empresaId: any) => {
+    const id = typeof empresaId === 'object' ? empresaId._id : empresaId;
+    const empresa = empresas.find(e => e._id === id);
+    return empresa ? empresa.razaoSocial : 'Empresa não encontrada';
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Unidades / Setores</h1>
-          <p className="text-gray-600">Gerencie as unidades físicas e departamentos</p>
-        </div>
-        <Link
-          to="/admin/unidades/nova"
-          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Unidade
-        </Link>
-      </div>
-
-      {/* Filtros */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4">
-        <Filter className="h-5 w-5 text-gray-400" />
-        <select
-          value={empresaFiltro}
-          onChange={(e) => setEmpresaFiltro(e.target.value)}
-          className="block w-full max-w-xs pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-        >
-          <option value="">Todas as Empresas</option>
-          {empresas.map((e) => (
-            <option key={e._id} value={e._id}>
-              {e.razaoSocial}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {unidades.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-lg shadow-sm">
-            <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p>Nenhuma unidade encontrada.</p>
-          </div>
-        ) : (
-          unidades.map((unidade) => (
-            <div key={unidade._id} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow overflow-hidden">
-              <div className="p-5">
-                <div className="flex justify-between items-start">
-                  <div className="flex-shrink-0 h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <MapPin className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="flex space-x-1">
-                    <Link
-                      to={`/admin/unidades/editar/${unidade._id}`}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(unidade._id, unidade.nome)}
-                      className="p-1.5 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{unidade.nome}</h3>
-                  <div className="mt-1 flex items-center text-sm text-gray-500">
-                    <span className="font-medium text-blue-600">
-                      {(unidade.empresaId as any)?.razaoSocial || 'Empresa desconhecida'}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600 italic">
-                    Gestor: {unidade.gestor || 'Não informado'}
-                  </div>
-                  <div className="mt-3 text-xs text-gray-400 flex items-center">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {unidade.endereco?.cidade ? `${unidade.endereco.cidade} - ${unidade.endereco.estado}` : 'Sem endereço'}
-                  </div>
-                </div>
-              </div>
-              <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-xs">
-                <span className={`px-2 py-0.5 rounded-full ${unidade.ativa ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {unidade.ativa ? 'Ativa' : 'Inativa'}
-                </span>
-                <span className="text-gray-400">ID: {unidade._id?.substring(0, 8)}...</span>
-              </div>
+    <MainLayout>
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-200">
+              <Home size={28} />
             </div>
-          ))
-        )}
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Unidades</h1>
+              <p className="text-slate-500 font-medium">Gestão de locais físicos e departamentos</p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/admin/unidades/nova')}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-100 active:scale-95"
+          >
+            <Plus size={20} />
+            Nova Unidade
+          </button>
+        </div>
+
+        {/* List Content */}
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-100">
+                <tr>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Unidade / Empresa</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Localização</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={3} className="px-8 py-6 h-20 bg-slate-50/20"></td>
+                    </tr>
+                  ))
+                ) : unidades.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-8 py-12 text-center text-slate-400">
+                      <Home className="mx-auto h-12 w-12 text-slate-200 mb-4" />
+                      <p className="text-lg font-medium">Nenhuma unidade encontrada</p>
+                    </td>
+                  </tr>
+                ) : (
+                  unidades.map((unidade) => (
+                    <tr key={unidade._id} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
+                            <Home size={20} />
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-700 block text-lg">{unidade.nome}</span>
+                            <div className="flex items-center gap-2 text-slate-400 text-sm mt-0.5">
+                              <Building2 size={14} />
+                              <span>{getEmpresaNome(unidade.empresaId)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
+                            <MapPin size={14} className="text-slate-400" />
+                            {unidade.endereco?.cidade || 'N/A'} - {unidade.endereco?.estado || ''}
+                          </div>
+                          <span className="text-xs text-slate-400 pl-6">
+                            {unidade.endereco?.logradouro ? `${unidade.endereco.logradouro}, ${unidade.endereco.numero}` : 'Endereço não informado'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => navigate(`/admin/unidades/editar/${unidade._id}`)}
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                          >
+                            <Edit size={20} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(unidade._id, unidade.nome)}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUnidadeStore } from '../../../store/unidadeStore.js';
 import { useEmpresaStore } from '../../../store/empresaStore.js';
-import { ArrowLeft, Save, MapPin } from 'lucide-react';
+import { ArrowLeft, Save, Home, MapPin, Building2, Info } from 'lucide-react';
+import { MainLayout } from '../../../layouts/MainLayout.js';
+import toast from 'react-hot-toast';
 
 const FormUnidade: React.FC = () => {
   const { id } = useParams();
@@ -13,7 +15,7 @@ const FormUnidade: React.FC = () => {
   const [formData, setFormData] = useState({
     nome: '',
     empresaId: '',
-    gestor: '',
+    tipo: 'Própria',
     ativa: true,
     endereco: {
       logradouro: '',
@@ -28,7 +30,7 @@ const FormUnidade: React.FC = () => {
 
   useEffect(() => {
     limparErro();
-    fetchEmpresas(1, 100);
+    fetchEmpresas();
     if (id) {
       fetchUnidade(id);
     }
@@ -38,10 +40,8 @@ const FormUnidade: React.FC = () => {
     if (id && unidadeAtual) {
       setFormData({
         nome: unidadeAtual.nome || '',
-        empresaId: typeof unidadeAtual.empresaId === 'string' 
-          ? unidadeAtual.empresaId 
-          : (unidadeAtual.empresaId as any)?._id || '',
-        gestor: unidadeAtual.gestor || '',
+        empresaId: typeof unidadeAtual.empresaId === 'object' ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
+        tipo: unidadeAtual.tipo || 'Própria',
         ativa: unidadeAtual.ativa ?? true,
         endereco: {
           logradouro: unidadeAtual.endereco?.logradouro || '',
@@ -77,191 +77,199 @@ const FormUnidade: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.empresaId) {
+      toast.error('Selecione uma empresa');
+      return;
+    }
+
     try {
       if (id) {
         await updateUnidade(id, formData);
+        toast.success('Unidade atualizada com sucesso');
       } else {
         await createUnidade(formData);
+        toast.success('Unidade criada com sucesso');
       }
       navigate('/admin/unidades');
     } catch (err) {
-      // Erro já tratado no store
+      toast.error('Erro ao salvar unidade');
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={() => navigate('/admin/unidades')}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="h-6 w-6 text-gray-600" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {id ? 'Editar Unidade' : 'Nova Unidade'}
-          </h1>
-          <p className="text-gray-600">
-            {id ? 'Atualize os dados da unidade' : 'Preencha os dados da nova unidade/setor'}
-          </p>
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-xl overflow-hidden">
-        <div className="p-6 space-y-8">
-          {/* Dados Básicos */}
-          <section>
-            <div className="flex items-center mb-4 text-blue-600">
-              <MapPin className="h-5 w-5 mr-2" />
-              <h2 className="text-lg font-semibold">Dados da Unidade</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Nome da Unidade *</label>
-                <input
-                  type="text"
-                  name="nome"
-                  required
-                  placeholder="Ex: Matriz, Filial Norte, Departamento de RH"
-                  value={formData.nome}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Empresa *</label>
-                <select
-                  name="empresaId"
-                  required
-                  value={formData.empresaId}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                >
-                  <option value="">Selecione uma empresa</option>
-                  {empresas.map((e) => (
-                    <option key={e._id} value={e._id}>
-                      {e.razaoSocial}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Gestor Responsável</label>
-                <input
-                  type="text"
-                  name="gestor"
-                  value={formData.gestor}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Status</label>
-                <select
-                  name="ativa"
-                  value={String(formData.ativa)}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                >
-                  <option value="true">Ativa</option>
-                  <option value="false">Inativa</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          {/* Endereço */}
-          <section>
-            <div className="flex items-center mb-4 text-blue-600">
-              <MapPin className="h-5 w-5 mr-2" />
-              <h2 className="text-lg font-semibold">Localização</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2 space-y-1">
-                <label className="text-sm font-medium text-gray-700">Logradouro</label>
-                <input
-                  type="text"
-                  name="endereco.logradouro"
-                  value={formData.endereco.logradouro}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Número</label>
-                <input
-                  type="text"
-                  name="endereco.numero"
-                  value={formData.endereco.numero}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Bairro</label>
-                <input
-                  type="text"
-                  name="endereco.bairro"
-                  value={formData.endereco.bairro}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Cidade</label>
-                <input
-                  type="text"
-                  name="endereco.cidade"
-                  value={formData.endereco.cidade}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Estado (UF)</label>
-                <input
-                  type="text"
-                  name="endereco.estado"
-                  maxLength={2}
-                  value={formData.endereco.estado}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+    <MainLayout>
+      <div className="p-6 max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
           <button
-            type="button"
             onClick={() => navigate('/admin/unidades')}
-            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            className="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-500 active:scale-90"
           >
-            Cancelar
+            <ArrowLeft size={24} />
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all"
-          >
-            {loading ? (
-              <span className="animate-spin mr-2">...</span>
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            Salvar Unidade
-          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              {id ? 'Editar Unidade' : 'Nova Unidade'}
+            </h1>
+            <p className="text-slate-500 font-medium">
+              {id ? 'Atualize as informações da unidade' : 'Cadastre uma nova unidade vinculada a uma empresa'}
+            </p>
+          </div>
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Main Data */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Home size={20} className="text-indigo-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Identificação</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Unidade *</label>
+                    <input
+                      required
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium"
+                      placeholder="Ex: Unidade Operacional Norte"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
+                      <Building2 size={14} /> Empresa Vinculada *
+                    </label>
+                    <select
+                      required
+                      name="empresaId"
+                      value={formData.empresaId}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold"
+                    >
+                      <option value="">Selecione uma empresa...</option>
+                      {empresas.map(emp => (
+                        <option key={emp._id} value={emp._id}>{emp.razaoSocial}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address Section */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <MapPin size={20} className="text-indigo-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Endereço</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Logradouro</label>
+                    <input
+                      name="endereco.logradouro"
+                      value={formData.endereco.logradouro}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Número</label>
+                    <input
+                      name="endereco.numero"
+                      value={formData.endereco.numero}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Bairro</label>
+                    <input
+                      name="endereco.bairro"
+                      value={formData.endereco.bairro}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Cidade</label>
+                    <input
+                      name="endereco.cidade"
+                      value={formData.endereco.cidade}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">UF</label>
+                    <input
+                      name="endereco.estado"
+                      maxLength={2}
+                      value={formData.endereco.estado}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all uppercase"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Status */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Info size={20} className="text-indigo-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Status</h2>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Status da Unidade</label>
+                    <select
+                      name="ativa"
+                      value={String(formData.ativa)}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold text-indigo-600"
+                    >
+                      <option value="true">Ativa</option>
+                      <option value="false">Inativa</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 font-bold">Tipo</label>
+                    <select
+                      name="tipo"
+                      value={formData.tipo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    >
+                      <option value="Própria">Própria</option>
+                      <option value="Terceirizada">Terceirizada</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-3xl font-bold transition-all shadow-xl shadow-indigo-100 disabled:opacity-50 active:scale-95"
+              >
+                {loading ? (
+                  <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Save size={20} />
+                    <span>Salvar Unidade</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </MainLayout>
   );
 };
 
