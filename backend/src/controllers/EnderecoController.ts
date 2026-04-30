@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
-import AppError from '../middleware/errorHandler.js';
+import { AppError } from '../middleware/errorHandler.js';
 
 class EnderecoController {
   

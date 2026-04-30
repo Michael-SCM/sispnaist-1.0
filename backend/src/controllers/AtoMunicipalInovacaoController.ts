@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
-import AppError from '../middleware/errorHandler.js';
+import { AppError } from '../middleware/errorHandler.js';
 import { logAction } from '../utils/auditLogger.js';
 
 class AtoMunicipalInovacaoController {
