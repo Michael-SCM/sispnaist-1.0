@@ -28,7 +28,7 @@ const ListaUsuarios: React.FC = () => {
     try {
       setLoading(true);
       const response = await api.get('/usuarios');
-      setUsuarios(response.data.data.usuarios);
+      setUsuarios(response.data.usuarios);
     } catch (error) {
       toast.error('Erro ao carregar usuários');
     } finally {
@@ -62,13 +62,6 @@ const ListaUsuarios: React.FC = () => {
               <p className="text-slate-500 font-medium">Controle de acesso e permissões do sistema</p>
             </div>
           </div>
-          <button
-            onClick={() => navigate('/admin/usuarios/novo')}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-all shadow-lg shadow-slate-100 active:scale-95"
-          >
-            <UserPlus size={20} />
-            Novo Usuário
-          </button>
         </div>
 
         {/* Search & Stats */}
