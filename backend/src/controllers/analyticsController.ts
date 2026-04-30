@@ -92,3 +92,16 @@ export const obterDashboardTrabalhador = asyncHandler(async (req: IAuthRequest, 
     data: { dados },
   });
 });
+
+/**
+ * GET /api/analytics/monitoramento
+ * Obtém dados de inteligência em saúde e monitoramento clínico
+ */
+export const obterMonitoramento = asyncHandler(async (req: Request, res: Response) => {
+  const monitoramento = await analyticsService.obterMonitoramentoClinico();
+
+  res.status(200).json({
+    status: 'success',
+    data: { monitoramento },
+  });
+});

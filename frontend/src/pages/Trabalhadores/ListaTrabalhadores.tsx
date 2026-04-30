@@ -107,12 +107,22 @@ export const ListaTrabalhadores: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-800">Trabalhadores</h1>
           <p className="text-gray-600">Gestão de funcionários e vínculos</p>
         </div>
-        <button
-          onClick={() => navigate('/trabalhadores/novo')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2"
-        >
-          <span>➕</span> Novo Trabalhador
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate('/trabalhadores/novo')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2"
+          >
+            <span>➕</span> Novo Trabalhador
+          </button>
+          <a
+            href={`${import.meta.env.VITE_API_URL}/api/export/trabalhadores`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2"
+          >
+            📥 Exportar CSV
+          </a>
+        </div>
       </div>
 
       <div className="card mb-6 bg-gray-50 border-gray-200">

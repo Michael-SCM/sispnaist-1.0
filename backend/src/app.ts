@@ -24,6 +24,9 @@ import parametrosRoutes from './routes/parametros.js';
 import preferenciasRoutes from './routes/preferencias.js';
 import servidoresRoutes from './routes/servidores.js';
 import videoAulasRoutes from './routes/videoAulas.js';
+import atosMunicipaisRoutes from './routes/atosMunicipais.js';
+import enderecosRoutes from './routes/enderecos.js';
+import exportRoutes from './routes/export.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -195,6 +198,9 @@ app.use('/api/parametros', parametrosRoutes);
 app.use('/api/preferencias', preferenciasRoutes);
 app.use('/api/servidores', servidoresRoutes);
 app.use('/api/video-aulas', videoAulasRoutes);
+app.use('/api/atos-municipais', atosMunicipaisRoutes);
+app.use('/api/enderecos', enderecosRoutes);
+app.use('/api/export', exportRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

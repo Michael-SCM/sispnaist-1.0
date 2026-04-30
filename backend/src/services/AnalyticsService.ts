@@ -17,6 +17,24 @@ export interface IKPIData {
   doencasAtivas: number;
   totalVacinacoes: number;
   proximasVacinacoes: number;
+  coberturaVacinal: number;
+  totalAbsenteismo: number;
+}
+
+export interface IMonitoramentoClinico {
+  coberturaVacinal: {
+    total: number;
+    porEmpresa: { nome: string; cobertura: number }[];
+  };
+  absenteismo: {
+    totalDias: number;
+    porMes: { mes: string; dias: number }[];
+  };
+  alertasCriticos: {
+    trabalhador: string;
+    motivo: string;
+    nivel: 'baixo' | 'medio' | 'alto';
+  }[];
 }
 
 export interface IAnalyticsService {
@@ -29,6 +47,7 @@ export interface IAnalyticsService {
   obterProximasVacinacoes(dias?: number): Promise<any[]>;
   obterUltimosAcidentes(limit?: number): Promise<any[]>;
   obterDadosDashboardAdmin(): Promise<any>;
+  obterMonitoramentoClinico(): Promise<IMonitoramentoClinico>;
 }
 
 export class AnalyticsService {
@@ -62,6 +81,19 @@ export class AnalyticsService {
       proximoDose: { $lte: trintaDias },
     });
 
+    // Cobertura vacinal aproximada
+    const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
+    const coberturaVacinal = totalTrabalhadores > 0 
+      ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) 
+      : 0;
+
+    // Total absenteísmo (dias de afastamento)
+    const acidentesComAfastamento = await Acidente.aggregate([
+      { $match: { diasAfastamento: { $exists: true, $gt: 0 } } },
+      { $group: { _id: null, total: { $sum: '$diasAfastamento' } } }
+    ]);
+    const totalAbsenteismo = acidentesComAfastamento[0]?.total || 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -73,6 +105,8 @@ export class AnalyticsService {
       doencasAtivas,
       totalVacinacoes,
       proximasVacinacoes,
+      coberturaVacinal,
+      totalAbsenteismo
     };
   }
 
@@ -298,6 +332,62 @@ export class AnalyticsService {
         .sort({ dataAcidente: -1 })
         .limit(3)
         .lean(),
+    };
+  }
+
+  /**
+   * Obtém dados detalhados de monitoramento clínico
+   */
+  async obterMonitoramentoClinico(): Promise<IMonitoramentoClinico> {
+    const totalTrabalhadores = await User.countDocuments({ perfil: 'trabalhador', ativo: true });
+    const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
+    
+    // Alertas Críticos (Exemplo: 3+ acidentes ou vacina vencida há 90 dias)
+    const tresMesesAtras = new Date();
+    tresMesesAtras.setDate(tresMesesAtras.getDate() - 90);
+
+    const trabalhadoresEmRisco = await Acidente.aggregate([
+      { $group: { _id: '$trabalhadorId', count: { $sum: 1 } } },
+      { $match: { count: { $gte: 2 } } },
+      { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+      { $unwind: '$user' },
+      { $project: { nome: '$user.nome', total: '$count' } }
+    ]);
+
+    const alertasCriticos = trabalhadoresEmRisco.map(t => ({
+      trabalhador: t.nome,
+      motivo: `${t.total} acidentes registrados`,
+      nivel: t.total > 3 ? 'alto' : 'medio' as 'alto' | 'medio' | 'baixo'
+    }));
+
+    // Absenteísmo por mês
+    const absenteismoAgg = await Acidente.aggregate([
+      { $match: { diasAfastamento: { $gt: 0 } } },
+      {
+        $group: {
+          _id: { $month: '$dataAcidente' },
+          dias: { $sum: '$diasAfastamento' }
+        }
+      },
+      { $sort: { '_id': 1 } }
+    ]);
+
+    const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const porMes = absenteismoAgg.map(item => ({
+      mes: mesesNomes[item._id - 1],
+      dias: item.dias
+    }));
+
+    return {
+      coberturaVacinal: {
+        total: totalTrabalhadores > 0 ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) : 0,
+        porEmpresa: [] // Implementar se necessário
+      },
+      absenteismo: {
+        totalDias: absenteismoAgg.reduce((acc, curr) => acc + curr.dias, 0),
+        porMes
+      },
+      alertasCriticos
     };
   }
 }

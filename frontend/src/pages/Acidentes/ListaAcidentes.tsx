@@ -140,14 +140,22 @@ export const ListaAcidentes: React.FC = () => {
         <p className="text-gray-600">Total: {total} registros</p>
       </div>
 
-      {/* Botão Novo Acidente */}
-      <div className="mb-6">
+      {/* Botões de Ação */}
+      <div className="mb-6 flex gap-3">
         <button
           onClick={() => navigate('/acidentes/novo')}
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
         >
           + Novo Acidente
         </button>
+        <a
+          href={`${import.meta.env.VITE_API_URL}/api/export/acidentes`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center gap-2"
+        >
+          📥 Exportar CSV
+        </a>
       </div>
 
       {/* Filtros */}

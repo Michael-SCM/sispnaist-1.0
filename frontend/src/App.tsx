@@ -19,6 +19,10 @@ import ListaUsuarios from './pages/Admin/Usuarios/ListaUsuarios.js';
 import EditarUsuario from './pages/Admin/Usuarios/EditarUsuario.js';
 import { ListaCatalogos } from './pages/Admin/Catalogos/ListaCatalogos.js';
 import { ItensCatalogo } from './pages/Admin/Catalogos/ItensCatalogo.js';
+import Auditoria from './pages/Admin/Auditoria.js';
+import ListaAtos from './pages/AtosMunicipais/ListaAtos.js';
+import FormAto from './pages/AtosMunicipais/FormAto.js';
+import Monitoramento from './pages/Monitoramento.js';
 
 import './styles/globals.css';
 
@@ -237,6 +241,41 @@ const App: React.FC = () => {
           }
         />
 
+        {/* Atos Municipais Routes */}
+        <Route
+          path="/atos-municipais"
+          element={
+            <ProtectedRoute>
+              <ListaAtos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/atos-municipais/novo"
+          element={
+            <ProtectedRoute>
+              <FormAto />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/atos-municipais/editar/:id"
+          element={
+            <ProtectedRoute>
+              <FormAto />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/monitoramento"
+          element={
+            <ProtectedRoute authorize={['admin', 'gestor']}>
+              <Monitoramento />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Admin - Empresas */}
         <Route
           path="/admin/empresas"
@@ -321,6 +360,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <ItensCatalogo />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/auditoria"
+          element={
+            <ProtectedRoute adminOnly>
+              <Auditoria />
             </ProtectedRoute>
           }
         />
