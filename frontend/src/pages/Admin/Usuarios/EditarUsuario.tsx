@@ -1,139 +1,271 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useUserStore } from '../../../store/userStore.js';
-import { ArrowLeft, Save, Shield, User } from 'lucide-react';
+import api from '../../../services/api.js';
+import { useEmpresaStore } from '../../../store/empresaStore.js';
+import { useUnidadeStore } from '../../../store/unidadeStore.js';
+import { ArrowLeft, Save, User, Shield, Building2, MapPin, Mail, Key } from 'lucide-react';
+import { MainLayout } from '../../../layouts/MainLayout.js';
+import toast from 'react-hot-toast';
 
 const EditarUsuario: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { usuarioAtual, fetchUser, updateUser, loading, error, limparErro } = useUserStore();
+  const isEditing = !!id;
 
+  const { empresas, fetchEmpresas } = useEmpresaStore();
+  const { unidades, fetchUnidades } = useUnidadeStore();
+
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    perfil: '',
+    nome: '',
+    email: '',
+    password: '',
+    perfil: 'trabalhador',
+    empresa: '',
+    unidade: '',
     ativo: true,
   });
 
   useEffect(() => {
-    limparErro();
-    if (id) {
-      fetchUser(id);
+    fetchEmpresas();
+    fetchUnidades();
+    if (isEditing) {
+      carregarUsuario();
     }
-  }, [id, fetchUser, limparErro]);
+  }, [id]);
 
-  useEffect(() => {
-    if (usuarioAtual) {
-      setFormData({
-        perfil: usuarioAtual.perfil || 'trabalhador',
-        ativo: usuarioAtual.ativo ?? true,
-      });
-    }
-  }, [usuarioAtual]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id) return;
+  const carregarUsuario = async () => {
     try {
-      await updateUser(id, formData);
-      navigate('/admin/usuarios');
-    } catch (err) {
-      // Erro tratado no store
+      setLoading(true);
+      const response = await api.get(`/usuarios/${id}`);
+      const user = response.data.data.usuario;
+      setFormData({
+        nome: user.nome,
+        email: user.email,
+        password: '', // Não carregamos a senha
+        perfil: user.perfil,
+        empresa: user.empresa || '',
+        unidade: user.unidade || '',
+        ativo: user.ativo,
+      });
+    } catch (error) {
+      toast.error('Erro ao carregar usuário');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!usuarioAtual && loading) {
-    return <div className="flex justify-center p-12"><div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div></div>;
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as any;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as any).checked : value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (isEditing) {
+        // Na edição, se a senha estiver vazia, removemos para não alterar
+        const dataToSend = { ...formData };
+        if (!dataToSend.password) delete (dataToSend as any).password;
+        await api.put(`/usuarios/${id}`, dataToSend);
+        toast.success('Usuário atualizado com sucesso');
+      } else {
+        if (!formData.password) {
+          toast.error('Senha é obrigatória para novos usuários');
+          return;
+        }
+        await api.post('/usuarios', formData);
+        toast.success('Usuário criado com sucesso');
+      }
+      navigate('/admin/usuarios');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Erro ao salvar usuário');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center space-x-4">
-        <button onClick={() => navigate('/admin/usuarios')} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <ArrowLeft className="h-6 w-6 text-gray-600" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Editar Permissões</h1>
-          <p className="text-gray-600">Alterar perfil e status de acesso do usuário</p>
-        </div>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      )}
-
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-        <div className="p-6 bg-blue-50 border-b border-blue-100 flex items-center space-x-4">
-          <div className="h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            {usuarioAtual?.nome.charAt(0)}
-          </div>
+    <MainLayout>
+      <div className="p-6 max-w-5xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/admin/usuarios')}
+            className="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-500 active:scale-90"
+          >
+            <ArrowLeft size={24} />
+          </button>
           <div>
-            <h2 className="text-xl font-bold text-blue-900">{usuarioAtual?.nome}</h2>
-            <p className="text-blue-700">{usuarioAtual?.email}</p>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              {isEditing ? 'Editar Usuário' : 'Novo Usuário'}
+            </h1>
+            <p className="text-slate-500 font-medium">
+              Defina as permissões e vínculos institucionais do colaborador
+            </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <Shield className="h-4 w-4 mr-2" />
-              Nível de Acesso (Perfil)
-            </label>
-            <select
-              value={formData.perfil}
-              onChange={(e) => setFormData({ ...formData, perfil: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            >
-              <option value="admin">Administrador (Acesso total)</option>
-              <option value="saude">Saúde (Acesso a fichas clínicas)</option>
-              <option value="gestor">Gestor (Visualização e relatórios)</option>
-              <option value="trabalhador">Trabalhador (Perfil básico)</option>
-            </select>
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Data */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <User size={20} className="text-slate-900" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Perfil do Usuário</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome Completo *</label>
+                    <input
+                      required
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
+                      placeholder="Ex: João da Silva"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
+                      <Mail size={14} /> E-mail de Acesso *
+                    </label>
+                    <input
+                      required
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
+                      <Key size={14} /> {isEditing ? 'Alterar Senha' : 'Senha *'}
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+                      placeholder={isEditing ? 'Deixe vazio para manter' : 'Mínimo 6 caracteres'}
+                    />
+                  </div>
+                </div>
+              </div>
 
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              Status da Conta
-            </label>
-            <div className="flex space-x-4">
+              {/* Institutional Vínculos */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Building2 size={20} className="text-slate-900" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Vínculo Institucional</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Empresa</label>
+                    <select
+                      name="empresa"
+                      value={formData.empresa}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      {empresas.map(emp => (
+                        <option key={emp._id} value={emp.razaoSocial}>{emp.razaoSocial}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Unidade</label>
+                    <select
+                      name="unidade"
+                      value={formData.unidade}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      {unidades.map(uni => (
+                        <option key={uni._id} value={uni.nome}>{uni.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar: Access Control */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Shield size={20} className="text-slate-900" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Nível de Acesso</h2>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-4">Perfil do Sistema</label>
+                    <div className="space-y-3">
+                      {['admin', 'gestor', 'trabalhador'].map((p) => (
+                        <label key={p} className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border ${
+                          formData.perfil === p ? 'bg-slate-900 border-slate-900 text-white' : 'bg-slate-50 border-transparent text-slate-600 hover:bg-slate-100'
+                        }`}>
+                          <span className="capitalize font-bold">{p}</span>
+                          <input 
+                            type="radio" 
+                            name="perfil" 
+                            value={p} 
+                            checked={formData.perfil === p}
+                            onChange={handleChange}
+                            className="hidden"
+                          />
+                          {formData.perfil === p && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-slate-100">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className={`w-12 h-6 rounded-full relative transition-all ${formData.ativo ? 'bg-green-500' : 'bg-slate-200'}`}>
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.ativo ? 'left-7' : 'left-1'}`}></div>
+                      </div>
+                      <span className="font-bold text-slate-700">Usuário Ativo</span>
+                      <input 
+                        type="checkbox" 
+                        name="ativo" 
+                        checked={formData.ativo} 
+                        onChange={(e) => setFormData(prev => ({ ...prev, ativo: e.target.checked }))}
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
               <button
-                type="button"
-                onClick={() => setFormData({ ...formData, ativo: true })}
-                className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${formData.ativo ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-500'}`}
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-3xl font-bold transition-all shadow-xl shadow-slate-100 disabled:opacity-50 active:scale-95"
               >
-                Ativa (Pode logar)
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, ativo: false })}
-                className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${!formData.ativo ? 'bg-red-50 border-red-500 text-red-700' : 'bg-white border-gray-200 text-gray-500'}`}
-              >
-                Inativa (Bloqueado)
+                {loading ? (
+                  <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Save size={20} />
+                    <span>Salvar Usuário</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
-
-          <div className="pt-4 flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => navigate('/admin/usuarios')}
-              className="px-6 py-2 text-gray-600 font-medium hover:bg-gray-50 rounded-lg"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-8 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {loading ? 'Salvando...' : 'Salvar Alterações'}
-            </button>
-          </div>
         </form>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

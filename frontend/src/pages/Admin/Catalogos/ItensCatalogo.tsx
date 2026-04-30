@@ -1,271 +1,230 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../../services/api.js';
+import { ArrowLeft, Plus, Edit2, Trash2, Database, Save, X, Search } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
-import { DataTable } from '../../../components/DataTable.js';
-import { catalogoService } from '../../../services/catalogoService.js';
-import { ICatalogoItem } from '../../../types/index.js';
 import toast from 'react-hot-toast';
 
-const NOMES_ENTIDADES: Record<string, string> = {
-  escolaridade: 'Escolaridade',
-  estadoCivil: 'Estado Civil',
-  racaCor: 'Raça/Cor',
-  sexo: 'Sexo',
-  tipoSanguineo: 'Tipo Sanguíneo',
-  situacaoTrabalho: 'Situação de Trabalho',
-  funcao: 'Função',
-  jornadaTrabalho: 'Jornada de Trabalho',
-  turnoTrabalho: 'Turno de Trabalho',
-};
-
-interface FormData {
-  nome: string;
-  sigla: string;
-  descricao: string;
-  ordem: string;
+interface ItemCatalogo {
+  _id?: string;
+  valor: string;
+  descricao?: string;
   ativo: boolean;
 }
 
-const INITIAL_FORM: FormData = {
-  nome: '',
-  sigla: '',
-  descricao: '',
-  ordem: '0',
-  ativo: true,
-};
-
-export const ItensCatalogo: React.FC = () => {
-  const { entidade } = useParams<{ entidade: string }>();
+const ItensCatalogo: React.FC = () => {
+  const { slug } = useParams();
   const navigate = useNavigate();
-  const [itens, setItens] = useState<ICatalogoItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [itens, setItens] = useState<ItemCatalogo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingItem, setEditingItem] = useState<ItemCatalogo | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
+  const [nomeCatalogo, setNomeCatalogo] = useState('');
 
-  const nomeEntidade = entidade ? NOMES_ENTIDADES[entidade] || entidade : '';
+  const [formData, setFormData] = useState<ItemCatalogo>({
+    valor: '',
+    descricao: '',
+    ativo: true
+  });
 
   useEffect(() => {
-    if (entidade) {
-      carregarItens();
-    }
-  }, [entidade]);
+    carregarItens();
+  }, [slug]);
 
   const carregarItens = async () => {
     try {
-      setIsLoading(true);
-      const response = await catalogoService.listar(entidade!, 1, 100, undefined);
-      setItens(response.data);
+      setLoading(true);
+      const response = await api.get(`/catalogos/${slug}`);
+      setItens(response.data.data.itens);
+      setNomeCatalogo(response.data.data.nome);
     } catch (error) {
       toast.error('Erro ao carregar itens do catálogo');
-      console.error(error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (item: ItemCatalogo) => {
+    setEditingItem(item);
+    setFormData(item);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este item?')) {
+      try {
+        await api.delete(`/catalogos/${slug}/${id}`);
+        toast.success('Item excluído com sucesso');
+        carregarItens();
+      } catch (error) {
+        toast.error('Erro ao excluir item');
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.nome.trim()) {
-      toast.error('Nome é obrigatório');
-      return;
-    }
-
     try {
-      const data = {
-        ...formData,
-        ordem: Number(formData.ordem) || 0,
-      };
-
-      if (editingId) {
-        await catalogoService.atualizar(entidade!, editingId, data);
-        toast.success('Item atualizado com sucesso!');
+      if (editingItem) {
+        await api.put(`/catalogos/${slug}/${editingItem._id}`, formData);
+        toast.success('Item atualizado com sucesso');
       } else {
-        await catalogoService.criar(entidade!, data);
-        toast.success('Item criado com sucesso!');
+        await api.post(`/catalogos/${slug}`, formData);
+        toast.success('Item adicionado com sucesso');
       }
-
-      setFormData(INITIAL_FORM);
       setShowForm(false);
-      setEditingId(null);
+      setEditingItem(null);
+      setFormData({ valor: '', descricao: '', ativo: true });
       carregarItens();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao salvar item');
-    }
-  };
-
-  const handleEditar = (item: ICatalogoItem) => {
-    setFormData({
-      nome: item.nome,
-      sigla: item.sigla || '',
-      descricao: item.descricao || '',
-      ordem: String(item.ordem || 0),
-      ativo: item.ativo !== false,
-    });
-    setEditingId(item._id || null);
-    setShowForm(true);
-  };
-
-  const handleDeletar = async (id: string) => {
-    if (!confirm('Tem certeza que deseja remover este item?')) return;
-    try {
-      await catalogoService.deletar(entidade!, id);
-      setItens((prev) => prev.filter((i) => i._id !== id));
-      toast.success('Item removido com sucesso!');
     } catch (error) {
-      toast.error('Erro ao remover item');
+      toast.error('Erro ao salvar item');
     }
   };
-
-  const columns = [
-    { key: 'nome', header: 'Nome' },
-    { key: 'sigla', header: 'Sigla', render: (v: string) => v || '-' },
-    {
-      key: 'ativo',
-      header: 'Status',
-      render: (v: boolean) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium ${
-            v ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {v ? 'Ativo' : 'Inativo'}
-        </span>
-      ),
-    },
-    {
-      key: 'ordem',
-      header: 'Ordem',
-      render: (v: number) => v ?? '-',
-    },
-  ];
-
-  const actions = [
-    {
-      label: 'Editar',
-      onClick: (item: ICatalogoItem) => handleEditar(item),
-      variant: 'primary' as const,
-    },
-    {
-      label: 'Remover',
-      onClick: (item: ICatalogoItem) => handleDeletar(item._id!),
-      variant: 'danger' as const,
-    },
-  ];
 
   return (
     <MainLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-              <Link to="/admin/catalogos" className="hover:text-blue-600 transition">
-                ← Voltar aos catálogos
-              </Link>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/admin/catalogos')}
+              className="p-3 hover:bg-slate-100 rounded-2xl transition-all text-slate-500 active:scale-90"
+            >
+              <ArrowLeft size={24} />
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{nomeCatalogo}</h1>
+              <p className="text-slate-500 font-medium">Gestão de termos e valores do catálogo</p>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800">{nomeEntidade}</h1>
-            <p className="text-gray-600 mt-1">
-              Gerencie os itens do catálogo <strong>{nomeEntidade}</strong>.
-            </p>
           </div>
-          <button
-            onClick={() => {
-              setFormData(INITIAL_FORM);
-              setEditingId(null);
-              setShowForm(!showForm);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow-md shadow-blue-100 transition"
-          >
-            {showForm ? 'Cancelar' : '+ Novo Item'}
-          </button>
+          {!showForm && (
+            <button
+              onClick={() => { setShowForm(true); setEditingItem(null); }}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
+            >
+              <Plus size={20} />
+              Adicionar Item
+            </button>
+          )}
         </div>
 
-        {/* Form */}
+        {/* Dynamic Form Overlay/Inline */}
         {showForm && (
-          <div className="card">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
-              {editingId ? 'Editar Item' : 'Novo Item'}
-            </h3>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome <span className="text-red-500">*</span>
-                </label>
+          <div className="bg-slate-900 rounded-3xl p-8 shadow-2xl text-white animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold">{editingItem ? 'Editar Termo' : 'Novo Termo'}</h2>
+              <button onClick={() => setShowForm(false)} className="p-2 hover:bg-white/10 rounded-xl transition-all">
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Valor do Termo *</label>
                 <input
-                  type="text"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: Masculino"
                   required
+                  value={formData.valor}
+                  onChange={(e) => setFormData({ ...formData, valor: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-white outline-none transition-all font-bold text-lg"
+                  placeholder="Ex: Trabalho Externo"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sigla</label>
-                <input
-                  type="text"
-                  value={formData.sigla}
-                  onChange={(e) => setFormData({ ...formData, sigla: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: M"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ordem</label>
-                <input
-                  type="number"
-                  value={formData.ordem}
-                  onChange={(e) => setFormData({ ...formData, ordem: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-                <input
-                  type="text"
+              <div className="md:col-span-2">
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Descrição / Notas</label>
+                <textarea
                   value={formData.descricao}
                   onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Descrição opcional..."
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:ring-2 focus:ring-white outline-none transition-all resize-none"
+                  placeholder="Opcional..."
+                  rows={2}
                 />
               </div>
-              <div className="flex items-center gap-2 lg:col-span-2">
-                <input
-                  id="ativo"
-                  type="checkbox"
-                  checked={formData.ativo}
-                  onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="ativo" className="text-sm font-medium text-gray-700">
-                  Ativo
-                </label>
-              </div>
-              <div className="lg:col-span-4 flex gap-4">
+              <div className="flex items-center gap-4 mt-2">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition"
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition-all active:scale-95"
                 >
-                  {editingId ? 'Atualizar' : 'Salvar'}
+                  <Save size={20} />
+                  Salvar Alterações
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-6 py-3 border border-white/20 rounded-xl font-bold hover:bg-white/5 transition-all"
+                >
+                  Cancelar
                 </button>
               </div>
             </form>
           </div>
         )}
 
-        {/* Tabela */}
-        <div className="card">
-          <DataTable
-            columns={columns}
-            data={itens}
-            isLoading={isLoading}
-            actions={actions}
-            emptyMessage={`Nenhum item cadastrado em ${nomeEntidade}.`}
-          />
+        {/* List Content */}
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-slate-50/50 border-b border-slate-100">
+                <tr>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Termo</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Descrição</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td colSpan={3} className="px-8 py-6 h-16 bg-slate-50/20"></td>
+                    </tr>
+                  ))
+                ) : itens.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="px-8 py-12 text-center text-slate-400 font-medium">
+                      Nenhum item cadastrado neste catálogo.
+                    </td>
+                  </tr>
+                ) : (
+                  itens.map((item) => (
+                    <tr key={item._id} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-slate-100 text-slate-500 rounded-xl group-hover:bg-slate-900 group-hover:text-white transition-all">
+                            <Database size={18} />
+                          </div>
+                          <span className="font-bold text-slate-700 block text-lg">{item.valor}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <p className="text-sm text-slate-500 max-w-sm truncate">
+                          {item.descricao || <span className="text-slate-300 italic text-xs">Sem descrição</span>}
+                        </p>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-all"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id!)}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </MainLayout>
   );
 };
 
+export default ItensCatalogo;
