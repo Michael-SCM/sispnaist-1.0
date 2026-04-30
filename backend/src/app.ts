@@ -36,7 +36,7 @@ app.use(cors({
 }));
 
 // Parser de requisições
-app.use(express.json({ limit: '10mb', strict: false })); app.use((req, res, next) => { if (req.body) console.log('Body:', JSON.stringify(req.body)); next(); });
+app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Conectar ao MongoDB

@@ -6,7 +6,14 @@ const connectDB = async (): Promise<void> => {
 
     // Mongoose v8: não aceita mais 'retryWrites' e 'w' como opções diretas.
     // Para Atlas, essas opções já estão incluídas na connection string por padrão.
-    await mongoose.connect(mongoUri);
+    const options = {
+      maxPoolSize: 10, // Mantém até 10 conexões abertas
+      serverSelectionTimeoutMS: 5000, // Falha após 5s se não conseguir selecionar o servidor
+      socketTimeoutMS: 45000, // Fecha sockets inativos após 45s
+      family: 4 // Força IPv4
+    };
+
+    await mongoose.connect(mongoUri, options);
 
     console.log('✓ MongoDB connected successfully');
   } catch (error) {

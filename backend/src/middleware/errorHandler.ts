@@ -20,6 +20,33 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
     return;
   }
 
+  // Erros específicos do Mongoose
+  if (err.name === 'ValidationError') {
+    res.status(400).json({
+      status: 'error',
+      message: 'Erro de validação de dados',
+      errors: Object.values((err as any).errors).map((e: any) => e.message)
+    });
+    return;
+  }
+
+  if (err.name === 'CastError') {
+    res.status(400).json({
+      status: 'error',
+      message: `Formato inválido para o campo ${(err as any).path}: ${(err as any).value}`,
+    });
+    return;
+  }
+
+  if ((err as any).code === 11000) {
+    const field = Object.keys((err as any).keyValue)[0];
+    res.status(409).json({
+      status: 'error',
+      message: `Já existe um registro com este ${field}`,
+    });
+    return;
+  }
+
   console.error('Unexpected error:', err);
 
   res.status(500).json({
