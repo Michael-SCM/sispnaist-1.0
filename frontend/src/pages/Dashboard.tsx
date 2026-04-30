@@ -63,6 +63,28 @@ const {
       color: 'green',
       icon: '💉',
     },
+    {
+      title: 'Atos Municipais',
+      description: 'Legislação e Atos de Inovação',
+      link: '/atos-municipais',
+      newLink: '/atos-municipais/novo',
+      color: 'indigo',
+      icon: '📜',
+    },
+    {
+      title: 'Monitoramento',
+      description: 'Inteligência e Alertas Clínicos',
+      link: '/monitoramento',
+      color: 'amber',
+      icon: '📊',
+    },
+    {
+      title: 'Auditoria',
+      description: 'Logs e Rastreabilidade',
+      link: '/admin/auditoria',
+      color: 'slate',
+      icon: '🛡️',
+    },
   ];
 
   // Loading state

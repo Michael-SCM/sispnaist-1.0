@@ -6,6 +6,7 @@ import {
   obterUltimosAcidentes,
   obterDashboardAdmin,
   obterDashboardTrabalhador,
+  obterMonitoramento,
 } from '../controllers/analyticsController.js';
 import { authMiddleware, authorize } from '../middleware/auth.js';
 
@@ -31,5 +32,8 @@ router.get('/dashboard', authorize('admin', 'gestor'), obterDashboardAdmin);
 
 // Dashboard trabalhador (apenas trabalhador)
 router.get('/dashboard/trabalhador', obterDashboardTrabalhador);
+
+// Monitoramento clínico (admin e gestor)
+router.get('/monitoramento', authorize('admin', 'gestor'), obterMonitoramento);
 
 export default router;

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Catalogo from '../models/Catalogo.js';
+import Catalogo from '../models/Catalogo';
 
 /**
  * Seeder para catálogos essenciais do sistema.
@@ -126,6 +126,69 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Tutor(a)', sigla: 'tutor', ordem: 9 },
     { nome: 'Outro', sigla: 'outro', ordem: 99 },
   ]},
+  // Tipo de Violência
+  { entidade: 'tipoViolencia', itens: [
+    { nome: 'Física', ordem: 1 },
+    { nome: 'Psicológica/Moral', ordem: 2 },
+    { nome: 'Sexual', ordem: 3 },
+    { nome: 'Negligência/Abandono', ordem: 4 },
+    { nome: 'Patrimonial/Financeira', ordem: 5 },
+    { nome: 'Tortura', ordem: 6 },
+    { nome: 'Trabalho Infantil', ordem: 7 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Meio de Agressão
+  { entidade: 'meioAgressao', itens: [
+    { nome: 'Força física/Espancamento', ordem: 1 },
+    { nome: 'Envenenamento', ordem: 2 },
+    { nome: 'Objeto perfuro-cortante', ordem: 3 },
+    { nome: 'Objeto contundente', ordem: 4 },
+    { nome: 'Arma de fogo', ordem: 5 },
+    { nome: 'Ameaça', ordem: 6 },
+    { nome: 'Substância quente', ordem: 7 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Agente (Causador de Acidente/Doença)
+  { entidade: 'agente', itens: [
+    { nome: 'Biológico', ordem: 1 },
+    { nome: 'Químico', ordem: 2 },
+    { nome: 'Físico', ordem: 3 },
+    { nome: 'Ergonômico', ordem: 4 },
+    { nome: 'Mecânico/Acidente', ordem: 5 },
+    { nome: 'Psicossocial', ordem: 6 },
+  ]},
+  // Causador de Trauma
+  { entidade: 'causadorTrauma', itens: [
+    { nome: 'Queda de mesmo nível', ordem: 1 },
+    { nome: 'Queda de altura', ordem: 2 },
+    { nome: 'Colisão/Atropelamento', ordem: 3 },
+    { nome: 'Esforço excessivo/Movimento brusco', ordem: 4 },
+    { nome: 'Agressão por pessoa', ordem: 5 },
+    { nome: 'Ataque de animal', ordem: 6 },
+    { nome: 'Ferramenta manual', ordem: 7 },
+    { nome: 'Máquina/Equipamento', ordem: 8 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Parte do Corpo Atingida
+  { entidade: 'parteCorpo', itens: [
+    { nome: 'Cabeça/Face', ordem: 1 },
+    { nome: 'Olhos', ordem: 2 },
+    { nome: 'Pescoço', ordem: 3 },
+    { nome: 'Tronco', ordem: 4 },
+    { nome: 'Mãos/Dedos', ordem: 5 },
+    { nome: 'Braços/Antebraços', ordem: 6 },
+    { nome: 'Pernas/Pés', ordem: 7 },
+    { nome: 'Múltiplas partes', ordem: 8 },
+    { nome: 'Órgãos internos', ordem: 9 },
+  ]},
+  // Resultados de Sorologia
+  { entidade: 'sorologia', itens: [
+    { nome: 'Não Reagente (Negativo)', sigla: 'NR', ordem: 1 },
+    { nome: 'Reagente (Positivo)', sigla: 'R', ordem: 2 },
+    { nome: 'Inconclusivo', sigla: 'INC', ordem: 3 },
+    { nome: 'Aguardando Resultado', sigla: 'AG', ordem: 4 },
+    { nome: 'Não Realizado', sigla: 'NA', ordem: 5 },
+  ]},
 ];
 
 export async function seedCatalogos() {
@@ -167,7 +230,7 @@ export async function seedCatalogos() {
 
 // Se executado diretamente (não importado como módulo)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  import('../config/database.js').then(({ default: connectDB }) => {
+  import('../config/database').then(({ default: connectDB }) => {
     connectDB().then(() => {
       seedCatalogos().then(() => {
         console.log('🚀 Seed finalizado. Fechando conexão...');
