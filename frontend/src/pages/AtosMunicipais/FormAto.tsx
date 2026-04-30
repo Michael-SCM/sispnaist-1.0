@@ -11,12 +11,11 @@ import {
 } from 'lucide-react';
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
 import enderecoService, { Bairro, Logradouro } from '../../services/enderecoService';
-import { useToast } from '../../hooks/useToast';
+import toast from 'react-hot-toast';
 
 const FormAto: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { showToast } = useToast();
   const isEditing = !!id;
 
   const [formData, setFormData] = useState<Partial<AtoMunicipalInovacao>>({
@@ -52,7 +51,7 @@ const FormAto: React.FC = () => {
       const data = await atosService.obter(id!);
       setFormData(data);
     } catch (error) {
-      showToast('Erro ao carregar dados do ato', 'error');
+      toast.error('Erro ao carregar dados do ato');
       navigate('/atos-municipais');
     }
   };
@@ -68,15 +67,15 @@ const FormAto: React.FC = () => {
     try {
       if (isEditing) {
         await atosService.atualizar(id!, formData);
-        showToast('Ato atualizado com sucesso', 'success');
+        toast.success('Ato atualizado com sucesso');
       } else {
         await atosService.criar(formData);
-        showToast('Ato criado com sucesso', 'success');
+        toast.success('Ato criado com sucesso');
       }
       navigate('/atos-municipais');
     } catch (error: any) {
       const msg = error.response?.data?.message || 'Erro ao salvar ato';
-      showToast(msg, 'error');
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
