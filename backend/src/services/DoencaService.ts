@@ -1,5 +1,6 @@
 import Doenca, { IDoencaDocument } from '../models/Doenca.js';
 import Trabalhador from '../models/Trabalhador.js';
+import User from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IDoenca } from '../types/index.js';
 import mongoose from 'mongoose';
@@ -13,12 +14,15 @@ export class DoencaService {
       return identifier;
     }
 
-    const trabalhador = await Trabalhador.findOne({ cpf: identifier });
-    if (!trabalhador) {
-      throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
-    }
+    const [usuario, trabalhador] = await Promise.all([
+      User.findOne({ cpf: identifier }).select('_id').lean(),
+      Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
+    ]);
 
-    return trabalhador._id.toString();
+    if (usuario) return usuario._id.toString();
+    if (trabalhador) return trabalhador._id.toString();
+
+    throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
   }
 
   async criar(doencaData: Partial<IDoenca>): Promise<IDoenca> {
@@ -33,7 +37,6 @@ export class DoencaService {
   }
 
   async obter(id: string): Promise<IDoenca> {
-    console.log(`[DoencaService] Buscando doença ID: ${id}`);
     const doenca = await Doenca.findById(id)
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .lean();
@@ -42,7 +45,6 @@ export class DoencaService {
       throw new AppError('Doença não encontrada', 404);
     }
 
-    console.log(`[DoencaService] Doença retornada:`, JSON.stringify(doenca));
     return doenca as unknown as IDoenca;
   }
 
@@ -100,7 +102,6 @@ export class DoencaService {
   }
 
   async atualizar(id: string, doencaData: Partial<IDoenca>): Promise<IDoenca> {
-    console.log(`[DoencaService] Atualizando doença ID: ${id}, Payload:`, JSON.stringify(doencaData));
 
     // Não permitir alterar data de criação
     if ('dataCriacao' in doencaData) {
@@ -125,7 +126,6 @@ export class DoencaService {
       throw new AppError('Doença não encontrada', 404);
     }
 
-    console.log(`[DoencaService] Doença APÓS atualização:`, JSON.stringify(doenca));
     return doenca as unknown as IDoenca;
   }
 

@@ -1,5 +1,6 @@
 import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
+import User from '../models/User.js';
 import { IVacinacao } from '../types/index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { Types } from 'mongoose';
@@ -19,7 +20,6 @@ export class VacinacaoService {
   }
 
   async obter(id: string): Promise<IVacinacao> {
-    console.log(`[VacinacaoService] Buscando vacinação ID: ${id}`);
     // Validar se é ObjectId válido
     if (!Types.ObjectId.isValid(id)) {
       throw new AppError('ID de vacinação inválido', 400);
@@ -31,7 +31,6 @@ export class VacinacaoService {
       throw new AppError('Vacinação não encontrada', 404);
     }
 
-    console.log(`[VacinacaoService] Vacinação retornada:`, JSON.stringify(vacinacao));
     return vacinacao as unknown as IVacinacao;
   }
 
@@ -73,7 +72,6 @@ export class VacinacaoService {
   }
 
   async atualizar(id: string, data: Partial<IVacinacao>): Promise<IVacinacao> {
-    console.log(`[VacinacaoService] Atualizando vacinação ID: ${id}, Payload:`, JSON.stringify(data));
     // Validar se é ObjectId válido
     if (!Types.ObjectId.isValid(id)) {
       throw new AppError('ID de vacinação inválido', 400);
@@ -97,7 +95,6 @@ export class VacinacaoService {
       throw new AppError('Vacinação não encontrada', 404);
     }
 
-    console.log(`[VacinacaoService] Vacinação APÓS atualização:`, JSON.stringify(vacinacao));
     return vacinacao as unknown as IVacinacao;
   }
 
@@ -165,13 +162,16 @@ export class VacinacaoService {
       return trabalhadorId;
     }
 
-    // Tentar buscar por CPF
-    const trabalhador = await Trabalhador.findOne({ cpf: trabalhadorId });
-    if (!trabalhador) {
-      throw new AppError('Trabalhador não encontrado', 404);
-    }
+    // Tentar buscar por CPF em User e Trabalhador em paralelo
+    const [usuario, trabalhador] = await Promise.all([
+      User.findOne({ cpf: trabalhadorId }).select('_id').lean(),
+      Trabalhador.findOne({ cpf: trabalhadorId }).select('_id').lean()
+    ]);
 
-    return trabalhador._id.toString();
+    if (usuario) return usuario._id.toString();
+    if (trabalhador) return trabalhador._id.toString();
+
+    throw new AppError('Trabalhador não encontrado', 404);
   }
 }
 

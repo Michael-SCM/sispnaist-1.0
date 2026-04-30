@@ -17,17 +17,14 @@ export class AcidenteService {
       return identifier;
     }
 
-    // Tentar buscar na coleção de usuários primeiro
-    const usuario = await User.findOne({ cpf: identifier });
-    if (usuario) {
-      return usuario._id.toString();
-    }
+    // Tentar buscar na coleção de usuários e trabalhadores em paralelo
+    const [usuario, trabalhador] = await Promise.all([
+      User.findOne({ cpf: identifier }).select('_id').lean(),
+      Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
+    ]);
 
-    // Se não encontrar em User, tentar em Trabalhador
-    const trabalhador = await Trabalhador.findOne({ cpf: identifier });
-    if (trabalhador) {
-      return trabalhador._id.toString();
-    }
+    if (usuario) return usuario._id.toString();
+    if (trabalhador) return trabalhador._id.toString();
 
     throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
   }
@@ -44,7 +41,6 @@ export class AcidenteService {
   }
 
   async obter(id: string): Promise<IAcidente> {
-    console.log(`[AcidenteService] Buscando acidente ID: ${id}`);
     const acidente = await Acidente.findById(id)
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .lean();
@@ -53,7 +49,6 @@ export class AcidenteService {
       throw new AppError('Acidente não encontrado', 404);
     }
 
-    console.log(`[AcidenteService] Acidente retornado:`, JSON.stringify(acidente));
     return acidente as unknown as IAcidente;
   }
 
@@ -112,7 +107,6 @@ export class AcidenteService {
   }
 
   async atualizar(id: string, acidenteData: Partial<IAcidente>): Promise<IAcidente> {
-    console.log(`[AcidenteService] Atualizando acidente ID: ${id}, Payload:`, JSON.stringify(acidenteData));
     
     // Não permitir alterar data de criação
     if ('dataCriacao' in acidenteData) {
@@ -143,7 +137,6 @@ export class AcidenteService {
       throw new AppError('Acidente não encontrado', 404);
     }
 
-    console.log(`[AcidenteService] Acidente APÓS atualização:`, JSON.stringify(acidente));
     return acidente as unknown as IAcidente;
   }
 
