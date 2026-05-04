@@ -36,6 +36,9 @@ export const Header: React.FC = () => {
                 <Link to="/acidentes" className="hover:text-blue-100 transition text-sm">
                   Acidentes
                 </Link>
+                <Link to="/acidentes/material-biologico" className="hover:text-emerald-200 transition text-sm font-semibold">
+                  Mat. Biológico
+                </Link>
                 <Link to="/trabalhadores" className="hover:text-blue-100 transition text-sm">
                   Trabalhadores
                 </Link>
@@ -137,6 +140,13 @@ export const Header: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Acidentes
+            </Link>
+            <Link
+              to="/acidentes/material-biologico"
+              className="block py-2 hover:text-emerald-200 transition font-semibold"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Material Biológico
             </Link>
             <Link
               to="/trabalhadores"

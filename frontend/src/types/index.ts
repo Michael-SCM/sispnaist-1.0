@@ -163,6 +163,30 @@ export interface IVacinacao {
   dataAtualizacao?: string;
 }
 
+export interface IMaterialBiologico {
+  _id?: string;
+  acidenteId: string;
+  tipoExposicao: string;
+  materialOrganico: string;
+  circunstanciaAcidente: string;
+  agente: string;
+  equipamentoProtecao: string;
+  sorologiaPaciente: string;
+  sorologiaAcidentado: string;
+  conduta: string;
+  evolucaoCaso: string;
+  usoEPI: boolean;
+  sorologiaFonte: boolean;
+  acompanhamentoPrEP: boolean;
+  descAcompanhamentoPrEP?: string;
+  descEncaminhamento?: string;
+  dataReavaliacao?: string;
+  efeitoColateralPermanente: boolean;
+  descEfeitoColateralPermanente?: string;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface IEmpresa {
   _id?: string;
   razaoSocial: string;

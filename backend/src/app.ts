@@ -27,6 +27,7 @@ import videoAulasRoutes from './routes/videoAulas.js';
 import atosMunicipaisRoutes from './routes/atosMunicipais.js';
 import enderecosRoutes from './routes/enderecos.js';
 import exportRoutes from './routes/export.js';
+import materialBiologicoRoutes from './routes/materialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -201,6 +202,7 @@ app.use('/api/video-aulas', videoAulasRoutes);
 app.use('/api/atos-municipais', atosMunicipaisRoutes);
 app.use('/api/enderecos', enderecosRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/material-biologico', materialBiologicoRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

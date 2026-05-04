@@ -8,6 +8,9 @@ import { Register } from './pages/Register.js';
 import { Dashboard } from './pages/Dashboard.js';
 import { Home } from './pages/Home.js';
 import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
+import { ListaMaterialBiologico } from './pages/Acidentes/MaterialBiologico/ListaMaterialBiologico.js';
+import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoMaterialBiologico.js';
+import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
 import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo } from './pages/Trabalhadores/index.js';
@@ -79,6 +82,30 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <DetalhesAcidente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes/material-biologico"
+          element={
+            <ProtectedRoute>
+              <ListaMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes/material-biologico/novo"
+          element={
+            <ProtectedRoute>
+              <NovoMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes/material-biologico/:id/editar"
+          element={
+            <ProtectedRoute>
+              <EditarMaterialBiologico />
             </ProtectedRoute>
           }
         />
