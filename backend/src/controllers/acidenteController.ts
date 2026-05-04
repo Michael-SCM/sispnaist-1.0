@@ -3,9 +3,15 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import { IAcidente } from '../types/index.js';
+import { logAction } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   const acidente = await acidenteService.criar(req.body);
+
+  await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
+    tipoAcidente: acidente.tipoAcidente,
+    dataAcidente: acidente.dataAcidente
+  });
 
   res.status(201).json({
     status: 'success',
@@ -55,6 +61,10 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const acidente = await acidenteService.atualizar(id, req.body);
 
+  await logAction(req, 'UPDATE', 'Acidente', id, {
+    status: acidente.status
+  });
+
   res.status(200).json({
     status: 'success',
     data: { acidente },
@@ -64,6 +74,8 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await acidenteService.deletar(id);
+
+  await logAction(req, 'DELETE', 'Acidente', id);
 
   res.status(204).send();
 });
