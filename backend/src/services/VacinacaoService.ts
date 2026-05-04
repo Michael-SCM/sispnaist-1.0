@@ -3,7 +3,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import User from '../models/User.js';
 import { IVacinacao } from '../types/index.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export class VacinacaoService {
   async criar(data: Partial<IVacinacao>): Promise<IVacinacao> {
@@ -31,6 +31,22 @@ export class VacinacaoService {
       throw new AppError('Vacinação não encontrada', 404);
     }
 
+    if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !(vacinacao.trabalhadorId as any).nome) {
+      const doc = await Vacinacao.findById(id).select('trabalhadorId').lean();
+      if (doc && doc.trabalhadorId) {
+        const identifier = doc.trabalhadorId.toString();
+        let t = null;
+        if (mongoose.Types.ObjectId.isValid(identifier)) {
+          t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
+          if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
+        } else {
+          t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf email').lean();
+          if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf email').lean();
+        }
+        if (t) (vacinacao as any).trabalhadorId = t;
+      }
+    }
+
     return vacinacao as unknown as IVacinacao;
   }
 
@@ -55,17 +71,37 @@ export class VacinacaoService {
       query.trabalhadorId = trabalhadorId;
     }
 
-    const [vacinacoes, total] = await Promise.all([
+    const [vacinacoesBrutas, total] = await Promise.all([
       Vacinacao.find(query)
         .populate('trabalhadorId', 'cpf nome email')
         .sort({ dataVacinacao: -1 })
         .skip(skip)
-        .limit(limit),
+        .limit(limit)
+        .lean(),
       Vacinacao.countDocuments(query),
     ]);
 
+    const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao: any) => {
+      if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
+        const doc = await Vacinacao.findById(vacinacao._id).select('trabalhadorId').lean();
+        if (doc && doc.trabalhadorId) {
+          const identifier = doc.trabalhadorId.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf email').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf email').lean();
+          }
+          if (t) vacinacao.trabalhadorId = t;
+        }
+      }
+      return vacinacao;
+    }));
+
     return {
-      vacinacoes: vacinacoes.map((v) => v.toObject() as IVacinacao),
+      vacinacoes: vacinacoes as unknown as IVacinacao[],
       total,
       pages: Math.ceil(total / limit),
     };
@@ -114,11 +150,31 @@ export class VacinacaoService {
   async obterPorTrabalhador(trabalhadorId: string): Promise<IVacinacao[]> {
     const resolvedId = await this.resolverTrabalhadorId(trabalhadorId);
 
-    const vacinacoes = await Vacinacao.find({ trabalhadorId: resolvedId })
+    const vacinacoesBrutas = await Vacinacao.find({ trabalhadorId: resolvedId })
       .populate('trabalhadorId', 'cpf nome email')
-      .sort({ dataVacinacao: -1 });
+      .sort({ dataVacinacao: -1 })
+      .lean();
 
-    return vacinacoes.map((v) => v.toObject() as IVacinacao);
+    const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao: any) => {
+      if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
+        const doc = await Vacinacao.findById(vacinacao._id).select('trabalhadorId').lean();
+        if (doc && doc.trabalhadorId) {
+          const identifier = doc.trabalhadorId.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf email').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf email').lean();
+          }
+          if (t) vacinacao.trabalhadorId = t;
+        }
+      }
+      return vacinacao;
+    }));
+
+    return vacinacoes as unknown as IVacinacao[];
   }
 
   async obterEstatisticas(): Promise<{

@@ -1,7 +1,10 @@
 import MaterialBiologico, { IMaterialBiologicoDocument } from '../models/MaterialBiologico.js';
 import Acidente from '../models/Acidente.js';
+import Trabalhador from '../models/Trabalhador.js';
+import User from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IMaterialBiologico } from '../models/MaterialBiologico.js';
+import mongoose from 'mongoose';
 
 export class MaterialBiologicoService {
   async criar(data: Partial<IMaterialBiologico>): Promise<IMaterialBiologico> {
@@ -32,6 +35,32 @@ export class MaterialBiologicoService {
       throw new AppError('Ficha de material biológico não encontrada', 404);
     }
 
+    // Corrigir população falha de trabalhadorId dentro de acidenteId
+    if (ficha.acidenteId && !(ficha.acidenteId as any).trabalhadorId?.nome) {
+      const acidenteIdObj = ficha.acidenteId as any;
+      let trabalhadorIdValue = acidenteIdObj.trabalhadorId;
+      
+      if (!trabalhadorIdValue) {
+        const acidenteDoc = await Acidente.findById(acidenteIdObj._id).select('trabalhadorId').lean();
+        if (acidenteDoc) trabalhadorIdValue = acidenteDoc.trabalhadorId;
+      }
+
+      if (trabalhadorIdValue) {
+        const identifier = trabalhadorIdValue.toString();
+        let t = null;
+        if (mongoose.Types.ObjectId.isValid(identifier)) {
+          t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+          if (!t) t = await User.findById(identifier).select('nome cpf').lean();
+        } else {
+          t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+          if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+        }
+        if (t) {
+          acidenteIdObj.trabalhadorId = t;
+        }
+      }
+    }
+
     return ficha as unknown as IMaterialBiologico;
   }
 
@@ -60,7 +89,7 @@ export class MaterialBiologicoService {
     }
 
     const total = await MaterialBiologico.countDocuments(query);
-    const fichas = await MaterialBiologico.find(query)
+    const fichasBrutas = await MaterialBiologico.find(query)
       .populate({
         path: 'acidenteId',
         populate: { path: 'trabalhadorId', select: 'nome cpf' }
@@ -69,6 +98,34 @@ export class MaterialBiologicoService {
       .skip(skip)
       .limit(limit)
       .lean();
+
+    // Corrigir população falha
+    const fichas = await Promise.all(fichasBrutas.map(async (ficha: any) => {
+      if (ficha.acidenteId && !ficha.acidenteId.trabalhadorId?.nome) {
+        let trabalhadorIdValue = ficha.acidenteId.trabalhadorId;
+        
+        if (!trabalhadorIdValue) {
+           const acidenteDoc = await Acidente.findById(ficha.acidenteId._id).select('trabalhadorId').lean();
+           if (acidenteDoc) trabalhadorIdValue = acidenteDoc.trabalhadorId;
+        }
+
+        if (trabalhadorIdValue) {
+          const identifier = trabalhadorIdValue.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+          }
+          if (t) {
+            ficha.acidenteId.trabalhadorId = t;
+          }
+        }
+      }
+      return ficha;
+    }));
 
     const pages = Math.ceil(total / limit);
 
