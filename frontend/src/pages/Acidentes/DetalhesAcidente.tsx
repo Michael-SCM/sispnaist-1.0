@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
+import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { IAcidente } from '../../types/index.js';
 import { 
   AlertTriangle, 
@@ -44,6 +45,27 @@ export const DetalhesAcidente: React.FC = () => {
         const data = await acidenteService.obter(id);
         setAcidente(data);
         setCurrentAcidente(data);
+
+        // Fallback: se o trabalhador não veio populado (veio como ID string ou null)
+        if (data.trabalhadorId && (typeof data.trabalhadorId === 'string' || !data.trabalhadorId.nome)) {
+          const identificador = typeof data.trabalhadorId === 'string' 
+            ? data.trabalhadorId 
+            : (data.trabalhadorId as any)._id || (data as any).trabalhador_id;
+            
+          if (identificador) {
+            let t = null;
+            if (identificador.length > 20) {
+              t = await trabalhadorService.obterPorId(identificador).catch(() => null);
+            }
+            if (!t) {
+              t = await trabalhadorService.buscarPorCpf(identificador).catch(() => null);
+            }
+            if (t) {
+              (data as any).trabalhadorId = t;
+              setAcidente({ ...data });
+            }
+          }
+        }
 
         // Se for material biológico, buscar a ficha técnica
         if (data.tipoAcidente === 'Acidente com Material Biológico') {

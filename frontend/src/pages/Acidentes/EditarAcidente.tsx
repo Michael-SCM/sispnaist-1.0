@@ -100,8 +100,19 @@ export const EditarAcidente: React.FC = () => {
           return [];
         };
 
+        const extrairIdentificador = (acidente: any): string => {
+          // Tentar vários campos possíveis para o trabalhador
+          const t = acidente.trabalhadorId || acidente.trabalhador_id || acidente.id_trabalhador;
+          if (!t) return '';
+          if (typeof t === 'string') return t;
+          if (typeof t === 'object') return t.cpf || t.id || t._id || '';
+          return '';
+        };
+
+        const identificador = extrairIdentificador(acidente);
+
         setFormData({
-          trabalhadorId: extrairCPF(acidente.trabalhadorId || (acidente as any).trabalhador_id),
+          trabalhadorId: identificador,
           dataAcidente: formatarDataInput(acidente.dataAcidente),
           horario: acidente.horario || '',
           tipoAcidente: acidente.tipoAcidente,
@@ -114,25 +125,34 @@ export const EditarAcidente: React.FC = () => {
           status: acidente.status || 'Aberto',
         });
 
-        // Buscar nome do trabalhador se não estiver populado
-        const identifier = extrairCPF(acidente.trabalhadorId || (acidente as any).trabalhador_id);
-        if (identifier) {
-          // 1. Tentar buscar por CPF
-          let t = await trabalhadorService.buscarPorCpf(identifier).catch(() => null);
-          
-          // 2. Se falhar e for um ID válido, tentar buscar por ID
-          if (!t && identifier.length > 20) {
-            t = await trabalhadorService.obter(identifier).catch(() => null);
-          }
-
-          if (t) {
-            setTrabalhadorNome(t.nome);
-            setFormData(prev => prev ? { ...prev, trabalhadorId: t!.cpf } : null);
-          } else if (typeof acidente.trabalhadorId === 'object' && (acidente.trabalhadorId as any).nome) {
-            setTrabalhadorNome((acidente.trabalhadorId as any).nome);
-            if ((acidente.trabalhadorId as any).cpf) {
-              setFormData(prev => prev ? { ...prev, trabalhadorId: (acidente.trabalhadorId as any).cpf } : null);
+        // Buscar detalhes do trabalhador para exibição
+        if (identificador) {
+          try {
+            let t = null;
+            
+            // 1. Tentar buscar por ID se parecer um ObjectId
+            if (identificador.length > 20) {
+              t = await trabalhadorService.obterPorId(identificador).catch(() => null);
             }
+            
+            // 2. Tentar buscar por CPF se não encontrou ou não era ID
+            if (!t) {
+              t = await trabalhadorService.buscarPorCpf(identificador).catch(() => null);
+            }
+
+            if (t) {
+              setTrabalhadorNome(t.nome);
+              // Atualizar o trabalhadorId no form para o CPF (mais amigável)
+              setFormData(prev => prev ? { ...prev, trabalhadorId: t.cpf || identificador } : null);
+            } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId.nome) {
+              // Fallback para o que veio populado do backend
+              setTrabalhadorNome(acidente.trabalhadorId.nome);
+              if (acidente.trabalhadorId.cpf) {
+                setFormData(prev => prev ? { ...prev, trabalhadorId: acidente.trabalhadorId.cpf } : null);
+              }
+            }
+          } catch (err) {
+            console.error('Erro ao buscar trabalhador:', err);
           }
         }
       } catch (error) {
