@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import CatalogoService from '../services/CatalogoService';
-import AppError from '../middleware/errorHandler';
+import { AppError } from '../middleware/errorHandler';
 
 class CatalogoController {
   /**
@@ -107,7 +107,7 @@ class CatalogoController {
   // POST /api/catalogos/seed - Executa seed de catálogos essenciais
   async seed(req: Request, res: Response, next: NextFunction) {
     try {
-      const { seedCatalogos } = await import('../utils/seedCatalogos.js');
+      const { seedCatalogos } = await import('../utils/seedCatalogos');
       await seedCatalogos();
       return res.status(200).json({ message: 'Seed de catálogos executado com sucesso!' });
     } catch (error) {
