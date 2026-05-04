@@ -187,47 +187,91 @@ export const DetalhesAcidente: React.FC = () => {
               </div>
             </div>
 
-            {/* Card de Material Biológico (Condicional) */}
+            {/* Card de Material Biológico (Integrado) */}
             {acidente.tipoAcidente === 'Acidente com Material Biológico' && (
-              <div className="bg-emerald-600 rounded-3xl border border-emerald-500 shadow-xl overflow-hidden text-white animate-in zoom-in-95 duration-300">
-                <div className="px-8 py-5 bg-white/10 border-b border-white/10 flex items-center justify-between">
+              <div className="bg-white rounded-3xl border border-emerald-100 shadow-xl overflow-hidden animate-in zoom-in-95 duration-300">
+                <div className="px-8 py-5 bg-emerald-600 border-b border-emerald-500 flex items-center justify-between text-white">
                   <div className="flex items-center gap-2">
                     <Dna size={20} />
-                    <h2 className="font-bold uppercase text-sm tracking-wider">Acompanhamento Biológico</h2>
+                    <h2 className="font-bold uppercase text-sm tracking-wider">Dados Clínicos de Exposição</h2>
                   </div>
-                  {fichaBiologica && (
-                    <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                      Ficha Técnica Vinculada
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {fichaBiologica ? (
+                      <button
+                        onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
+                        className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
+                      >
+                        Editar Ficha
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
+                        className="px-4 py-1.5 bg-white text-emerald-700 rounded-xl text-xs font-bold transition-all shadow-sm"
+                      >
+                        Criar Ficha
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="space-y-2 text-center md:text-left">
-                    <h3 className="text-xl font-bold">Protocolo de Exposição</h3>
-                    <p className="text-emerald-100 font-medium">
-                      {fichaBiologica 
-                        ? `Acompanhamento em andamento para o agente: ${fichaBiologica.agente || 'N/I'}`
-                        : 'Este acidente requer o preenchimento da ficha técnica de material biológico.'}
-                    </p>
-                  </div>
+                
+                <div className="p-8">
                   {isLoadingFicha ? (
-                    <Loader2 className="animate-spin" />
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="animate-spin text-emerald-600" />
+                    </div>
                   ) : fichaBiologica ? (
-                    <button
-                      onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold hover:bg-emerald-50 transition-all shadow-lg active:scale-95 whitespace-nowrap"
-                    >
-                      <Edit size={18} />
-                      Editar Ficha Técnica
-                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo de Exposição</p>
+                          <p className="font-bold text-slate-700">{fichaBiologica.tipoExposicao || 'N/I'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Agente Causador</p>
+                          <p className="font-bold text-slate-700">{fichaBiologica.agente || 'N/I'}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Material Orgânico</p>
+                          <p className="font-bold text-slate-700">{fichaBiologica.materialOrganico || 'N/I'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Evolução do Caso</p>
+                          <p className="font-bold text-slate-700">{fichaBiologica.evolucaoCaso || 'N/I'}</p>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">PrEP Acompanhamento</p>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${fichaBiologica.acompanhamentoPrEP ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                            {fichaBiologica.acompanhamentoPrEP ? 'Sim' : 'Não'}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data Reavaliação</p>
+                          <p className="font-bold text-emerald-600">
+                            {fichaBiologica.dataReavaliacao ? new Date(fichaBiologica.dataReavaliacao).toLocaleDateString('pt-BR') : 'Agendar'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   ) : (
-                    <button
-                      onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold hover:bg-emerald-50 transition-all shadow-lg active:scale-95 whitespace-nowrap"
-                    >
-                      <PlusCircle size={18} />
-                      Criar Ficha Técnica
-                    </button>
+                    <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+                      <div className="p-3 bg-amber-50 text-amber-600 rounded-full">
+                        <AlertTriangle size={24} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-700">Ficha Técnica Pendente</p>
+                        <p className="text-sm text-slate-500">Este acidente do tipo biológico ainda não possui dados clínicos registrados.</p>
+                      </div>
+                      <button
+                        onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-100"
+                      >
+                        Registrar Agora
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
