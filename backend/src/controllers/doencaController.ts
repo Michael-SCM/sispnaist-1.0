@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import doencaService from '../services/DoencaService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { IAuthRequest } from '../types/index.js';
+import { logAction } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const doencaData = {
@@ -10,6 +11,11 @@ export const criar = asyncHandler(async (req: IAuthRequest, res: Response) => {
   };
 
   const doenca = await doencaService.criar(doencaData);
+
+  await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), {
+    cid: doenca.cid
+  });
+
   res.status(201).json({ sucesso: true, dados: doenca });
 });
 
@@ -49,12 +55,20 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const doenca = await doencaService.atualizar(id, req.body);
+
+  await logAction(req, 'UPDATE', 'Doenca', id, {
+    cid: doenca.cid
+  });
+
   res.status(200).json({ sucesso: true, dados: doenca });
 });
 
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await doencaService.deletar(id);
+
+  await logAction(req, 'DELETE', 'Doenca', id);
+
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
 

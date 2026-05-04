@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import trabalhadorService from '../services/TrabalhadorService.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { logAction } from '../utils/auditLogger.js';
 
 /**
  * @desc    Listar trabalhadores com paginação e filtros
@@ -50,6 +51,11 @@ export const getTrabalhador = asyncHandler(async (req: Request, res: Response) =
 export const createTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const trabalhador = await trabalhadorService.criar(req.body);
 
+  await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), {
+    nome: trabalhador.nome,
+    cpf: trabalhador.cpf
+  });
+
   res.status(201).json({
     status: 'success',
     data: { trabalhador },
@@ -65,6 +71,10 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
   const { id } = req.params;
   const trabalhador = await trabalhadorService.atualizar(id, req.body);
 
+  await logAction(req, 'UPDATE', 'Trabalhador', id, {
+    nome: trabalhador.nome
+  });
+
   res.status(200).json({
     status: 'success',
     data: { trabalhador },
@@ -79,6 +89,8 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
 export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await trabalhadorService.deletar(id);
+
+  await logAction(req, 'DELETE', 'Trabalhador', id);
 
   res.status(204).json({
     status: 'success',
