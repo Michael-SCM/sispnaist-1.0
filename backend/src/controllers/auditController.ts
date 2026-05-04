@@ -8,7 +8,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
  */
 export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 20, usuarioId, entidade, acao, dataInicio, dataFim } = req.query;
-  
+
   const result = await auditService.obterLogs(
     Number(page),
     Number(limit),

@@ -10,5 +10,6 @@ router.use(authorize('admin', 'gestor'));
 
 router.get('/acidentes', ExportController.exportarAcidentesCSV);
 router.get('/trabalhadores', ExportController.exportarTrabalhadoresCSV);
+router.get('/material-biologico', ExportController.exportarMaterialBiologicoCSV);
 
 export default router;

@@ -135,24 +135,31 @@ export interface IDoenca {
   dataAtualizacao?: Date;
 }
 
-// Occupational Accident types
-export interface IAcidMaterialBiologico {
+// Occupational Accident types (Biological Material)
+export interface IMaterialBiologico {
   _id?: string;
-  dataExposicao: Date;
-  trabalhadorId: string;
-  tipoMaterial: string;
-  descricao: string;
-  medidas?: string[];
-  acompanhamento?: ICompanhame;
+  acidenteId: string;
+  tipoExposicao: string;
+  materialOrganico: string;
+  circunstanciaAcidente: string;
+  agente: string;
+  equipamentoProtecao: string;
+  sorologiaPaciente: string;
+  sorologiaAcidentado: string;
+  conduta: string;
+  evolucaoCaso: string;
+  usoEPI: boolean;
+  sorologiaFonte: boolean;
+  acompanhamentoPrEP: boolean;
+  descAcompanhamentoPrEP?: string;
+  descEncaminhamento?: string;
+  dataReavaliacao?: Date;
+  efeitoColateralPermanente: boolean;
+  descEfeitoColateralPermanente?: string;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
 }
 
-export interface ICompanhame {
-  dataRetorno?: Date;
-  resultado?: string;
-  observacoes?: string;
-}
 
 // Vaccination records
 export interface IVacinacao {

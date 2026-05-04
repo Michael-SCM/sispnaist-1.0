@@ -17,9 +17,13 @@ import {
   Info,
   ChevronRight,
   ShieldAlert,
-  Loader2
+  Loader2,
+  Dna,
+  PlusCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { materialBiologicoService } from '../../services/materialBiologicoService.js';
+import { IMaterialBiologico } from '../../types/index.js';
 
 export const DetalhesAcidente: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +31,9 @@ export const DetalhesAcidente: React.FC = () => {
   const { setCurrentAcidente } = useAcidenteStore();
 
   const [acidente, setAcidente] = useState<IAcidente | null>(null);
+  const [fichaBiologica, setFichaBiologica] = useState<IMaterialBiologico | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingFicha, setIsLoadingFicha] = useState(false);
 
   useEffect(() => {
     const carregarAcidente = async () => {
@@ -38,6 +44,14 @@ export const DetalhesAcidente: React.FC = () => {
         const data = await acidenteService.obter(id);
         setAcidente(data);
         setCurrentAcidente(data);
+
+        // Se for material biológico, buscar a ficha técnica
+        if (data.tipoAcidente === 'Acidente com Material Biológico') {
+          setIsLoadingFicha(true);
+          const ficha = await materialBiologicoService.obterPorAcidente(id);
+          setFichaBiologica(ficha);
+          setIsLoadingFicha(false);
+        }
       } catch (error) {
         toast.error('Erro ao carregar detalhes do acidente');
         navigate('/acidentes');
@@ -172,6 +186,52 @@ export const DetalhesAcidente: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* Card de Material Biológico (Condicional) */}
+            {acidente.tipoAcidente === 'Acidente com Material Biológico' && (
+              <div className="bg-emerald-600 rounded-3xl border border-emerald-500 shadow-xl overflow-hidden text-white animate-in zoom-in-95 duration-300">
+                <div className="px-8 py-5 bg-white/10 border-b border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Dna size={20} />
+                    <h2 className="font-bold uppercase text-sm tracking-wider">Acompanhamento Biológico</h2>
+                  </div>
+                  {fichaBiologica && (
+                    <span className="bg-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                      Ficha Técnica Vinculada
+                    </span>
+                  )}
+                </div>
+                <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 text-center md:text-left">
+                    <h3 className="text-xl font-bold">Protocolo de Exposição</h3>
+                    <p className="text-emerald-100 font-medium">
+                      {fichaBiologica 
+                        ? `Acompanhamento em andamento para o agente: ${fichaBiologica.agente || 'N/I'}`
+                        : 'Este acidente requer o preenchimento da ficha técnica de material biológico.'}
+                    </p>
+                  </div>
+                  {isLoadingFicha ? (
+                    <Loader2 className="animate-spin" />
+                  ) : fichaBiologica ? (
+                    <button
+                      onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold hover:bg-emerald-50 transition-all shadow-lg active:scale-95 whitespace-nowrap"
+                    >
+                      <Edit size={18} />
+                      Editar Ficha Técnica
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-emerald-700 rounded-xl font-bold hover:bg-emerald-50 transition-all shadow-lg active:scale-95 whitespace-nowrap"
+                    >
+                      <PlusCircle size={18} />
+                      Criar Ficha Técnica
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}

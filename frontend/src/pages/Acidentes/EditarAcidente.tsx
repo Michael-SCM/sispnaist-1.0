@@ -101,7 +101,7 @@ export const EditarAcidente: React.FC = () => {
         };
 
         setFormData({
-          trabalhadorId: extrairCPF(acidente.trabalhadorId),
+          trabalhadorId: extrairCPF(acidente.trabalhadorId || (acidente as any).trabalhador_id),
           dataAcidente: formatarDataInput(acidente.dataAcidente),
           horario: acidente.horario || '',
           tipoAcidente: acidente.tipoAcidente,
@@ -115,17 +115,24 @@ export const EditarAcidente: React.FC = () => {
         });
 
         // Buscar nome do trabalhador se não estiver populado
-        const cpfOuId = extrairCPF(acidente.trabalhadorId);
-        if (cpfOuId) {
-          // Tentar buscar por CPF primeiro
-          const t = await trabalhadorService.buscarPorCpf(cpfOuId).catch(() => null);
+        const identifier = extrairCPF(acidente.trabalhadorId || (acidente as any).trabalhador_id);
+        if (identifier) {
+          // 1. Tentar buscar por CPF
+          let t = await trabalhadorService.buscarPorCpf(identifier).catch(() => null);
+          
+          // 2. Se falhar e for um ID válido, tentar buscar por ID
+          if (!t && identifier.length > 20) {
+            t = await trabalhadorService.obter(identifier).catch(() => null);
+          }
+
           if (t) {
             setTrabalhadorNome(t.nome);
-            if (!formData?.trabalhadorId) {
-              setFormData(prev => prev ? { ...prev, trabalhadorId: t.cpf } : null);
+            setFormData(prev => prev ? { ...prev, trabalhadorId: t!.cpf } : null);
+          } else if (typeof acidente.trabalhadorId === 'object' && (acidente.trabalhadorId as any).nome) {
+            setTrabalhadorNome((acidente.trabalhadorId as any).nome);
+            if ((acidente.trabalhadorId as any).cpf) {
+              setFormData(prev => prev ? { ...prev, trabalhadorId: (acidente.trabalhadorId as any).cpf } : null);
             }
-          } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId.nome) {
-            setTrabalhadorNome(acidente.trabalhadorId.nome);
           }
         }
       } catch (error) {
