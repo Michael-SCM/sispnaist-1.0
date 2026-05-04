@@ -189,6 +189,53 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Aguardando Resultado', sigla: 'AG', ordem: 4 },
     { nome: 'Não Realizado', sigla: 'NA', ordem: 5 },
   ]},
+  // Tipo de Exposição
+  { entidade: 'tipoExposicao', itens: [
+    { nome: 'Percutânea', ordem: 1 },
+    { nome: 'Mucosa', ordem: 2 },
+    { nome: 'Pele Íntegra', ordem: 3 },
+    { nome: 'Pele Não Íntegra', ordem: 4 },
+    { nome: 'Mordedura', ordem: 5 },
+  ]},
+  // Material Orgânico
+  { entidade: 'materialOrganico', itens: [
+    { nome: 'Sangue', ordem: 1 },
+    { nome: 'Líquido Amniótico', ordem: 2 },
+    { nome: 'Líquido Pleural', ordem: 3 },
+    { nome: 'Líquido Pericárdico', ordem: 4 },
+    { nome: 'Líquido Peritoneal', ordem: 5 },
+    { nome: 'Líquido Sinovial', ordem: 6 },
+    { nome: 'Líquido Cefalorraquidiano', ordem: 7 },
+    { nome: 'Outros Líquidos com Sangue', ordem: 8 },
+  ]},
+  // Circunstância do Acidente
+  { entidade: 'circunstanciaAcidente', itens: [
+    { nome: 'Durante procedimento cirúrgico', ordem: 1 },
+    { nome: 'Durante punção venosa/arterial', ordem: 2 },
+    { nome: 'Durante descarte de material', ordem: 3 },
+    { nome: 'Recapagem de agulha', ordem: 4 },
+    { nome: 'Limpeza de ambiente/instrumental', ordem: 5 },
+    { nome: 'Lavanderia', ordem: 6 },
+    { nome: 'Manutenção de equipamentos', ordem: 7 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Conduta Médica
+  { entidade: 'conduta', itens: [
+    { nome: 'Apenas acompanhamento', ordem: 1 },
+    { nome: 'Esquema PrEP (2 drogas)', ordem: 2 },
+    { nome: 'Esquema PrEP (3 drogas)', ordem: 3 },
+    { nome: 'Vacinação Hepatite B', ordem: 4 },
+    { nome: 'Imunoglobulina', ordem: 5 },
+  ]},
+  // Evolução do Caso
+  { entidade: 'evolucaoCaso', itens: [
+    { nome: 'Alta (Sem soroconversão)', ordem: 1 },
+    { nome: 'Soroconversão HIV', ordem: 2 },
+    { nome: 'Soroconversão HBV', ordem: 3 },
+    { nome: 'Soroconversão HCV', ordem: 4 },
+    { nome: 'Abandono de tratamento', ordem: 5 },
+    { nome: 'Óbito', ordem: 6 },
+  ]},
 ];
 
 export async function seedCatalogos() {
