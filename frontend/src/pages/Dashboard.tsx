@@ -315,12 +315,14 @@ const {
                   >
                     Ver Todos
                   </Link>
-                  <Link
-                    to={action.newLink}
-                    className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
-                  >
-                    + Novo Registro
-                  </Link>
+                  {action.newLink && (
+                    <Link
+                      to={action.newLink}
+                      className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
+                    >
+                      + Novo Registro
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
@@ -510,12 +512,14 @@ const {
               >
                 Ver Todos
               </Link>
-              <Link
-                to={action.newLink}
-                className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
-              >
-                + Novo Registro
-              </Link>
+              {action.newLink && (
+                <Link
+                  to={action.newLink}
+                  className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
+                >
+                  + Novo Registro
+                </Link>
+              )}
             </div>
           </div>
         ))}
