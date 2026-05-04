@@ -41,12 +41,41 @@ export class AcidenteService {
   }
 
   async obter(id: string): Promise<IAcidente> {
-    const acidente = await Acidente.findById(id)
+    let acidente = await Acidente.findById(id)
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .lean();
 
     if (!acidente) {
       throw new AppError('Acidente não encontrado', 404);
+    }
+
+    // Se a população falhou (trabalhadorId é nulo ou string de ID não encontrada)
+    // Mas o documento original tinha um valor, tentamos buscar manualmente
+    if (!acidente.trabalhadorId) {
+      // Buscar o documento bruto para ver o que tem no campo trabalhadorId
+      const bruto = await Acidente.findById(id).select('trabalhadorId').lean();
+      if (bruto && bruto.trabalhadorId) {
+        const identifier = bruto.trabalhadorId.toString();
+        
+        // Tentar buscar por ID ou CPF
+        let t = null;
+        if (mongoose.Types.ObjectId.isValid(identifier)) {
+          t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+          if (!t) {
+            t = await User.findById(identifier).select('nome cpf').lean();
+          }
+        } else {
+          // É um CPF
+          t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+          if (!t) {
+            t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+          }
+        }
+
+        if (t) {
+          (acidente as any).trabalhadorId = t;
+        }
+      }
     }
 
     return acidente as unknown as IAcidente;
@@ -90,12 +119,33 @@ export class AcidenteService {
     }
 
     const total = await Acidente.countDocuments(query);
-    const acidentes = await Acidente.find(query)
+    const acidentesBrutos = await Acidente.find(query)
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .sort({ dataAcidente: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
+
+    // Corrigir população falha para cada acidente
+    const acidentes = await Promise.all(acidentesBrutos.map(async (acidente: any) => {
+      if (!acidente.trabalhadorId) {
+        // Buscar o documento bruto original
+        const doc = await Acidente.findById(acidente._id).select('trabalhadorId').lean();
+        if (doc && doc.trabalhadorId) {
+          const identifier = doc.trabalhadorId.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+          }
+          if (t) acidente.trabalhadorId = t;
+        }
+      }
+      return acidente;
+    }));
 
     const pages = Math.ceil(total / limit);
 
