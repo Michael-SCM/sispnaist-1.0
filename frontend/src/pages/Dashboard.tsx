@@ -6,10 +6,12 @@ import { MainLayout } from '../layouts/MainLayout.js';
 import { KPICard } from '../components/KPICard.js';
 import { AcidentesPorMes, PieChartComponent, BarChartComponent } from '../components/charts/index.js';
 import { format } from 'date-fns';
+import api from '../services/api.js';
 
 export const Dashboard: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const userPerfil = user?.perfil || 'trabalhador';
+  const [recentLogs, setRecentLogs] = React.useState<any[]>([]);
 
 const {
     kpis,
@@ -25,10 +27,20 @@ const {
     // Carregar dados baseado no perfil do usuário
     if (userPerfil === 'admin' || userPerfil === 'gestor') {
       carregarDashboardAdmin();
+      carregarLogsRecentes();
     } else {
       carregarDashboardTrabalhador();
     }
   }, [userPerfil]);
+
+  const carregarLogsRecentes = async () => {
+    try {
+      const response = await api.get('/audit/logs', { params: { limit: 5 } });
+      setRecentLogs(response.data.data.items);
+    } catch (error) {
+      console.error('Erro ao carregar logs recentes', error);
+    }
+  };
 
   const actions = [
     {
@@ -293,6 +305,67 @@ const {
                 <p className="text-gray-500 text-center py-4">Nenhuma vacinação próxima</p>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Auditoria / Últimas Atividades */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl mb-8 overflow-hidden">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-slate-100 text-slate-700 rounded-xl">
+                <span className="text-xl">🛡️</span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-800">Auditoria / Últimas Atividades</h3>
+            </div>
+            <Link to="/admin/auditoria" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+              Ver Log Completo →
+            </Link>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-50">
+                  <th className="px-4 py-3">Data/Hora</th>
+                  <th className="px-4 py-3">Usuário</th>
+                  <th className="px-4 py-3">Ação</th>
+                  <th className="px-4 py-3">Entidade</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {recentLogs.length > 0 ? (
+                  recentLogs.map((log) => (
+                    <tr key={log._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-4 text-xs font-medium text-slate-500">
+                        {format(new Date(log.createdAt), 'dd/MM HH:mm')}
+                      </td>
+                      <td className="px-4 py-4 text-sm font-bold text-slate-700">
+                        {log.usuarioId?.nome || log.usuarioId || 'Sistema'}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
+                          log.acao === 'CREATE' ? 'bg-emerald-100 text-emerald-700' :
+                          log.acao === 'UPDATE' ? 'bg-blue-100 text-blue-700' :
+                          log.acao === 'DELETE' ? 'bg-rose-100 text-rose-700' :
+                          'bg-slate-100 text-slate-600'
+                        }`}>
+                          {log.acao}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-sm text-slate-500 font-medium">
+                        {log.entidade}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-slate-400 font-medium">
+                      Nenhuma atividade registrada recentemente.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
