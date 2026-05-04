@@ -42,6 +42,8 @@ export const Auditoria: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [entidade, setEntidade] = useState('');
   const [searchUser, setSearchUser] = useState('');
+  const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     carregarLogs();
@@ -226,7 +228,10 @@ export const Auditoria: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <button 
-                          onClick={() => toast.success(`Detalhes: ${JSON.stringify(log.detalhes)}`)}
+                          onClick={() => {
+                            setSelectedLog(log);
+                            setShowModal(true);
+                          }}
                           className="p-3 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all active:scale-90"
                         >
                           <Eye size={20} />
@@ -286,6 +291,70 @@ export const Auditoria: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Details Modal */}
+      {showModal && selectedLog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className={`p-3 rounded-2xl border ${getBadgeColor(selectedLog.acao)}`}>
+                  <Terminal size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">Detalhes da Ação</h3>
+                  <p className="text-sm text-slate-500 font-medium">ID do Registro: {selectedLog.entidadeId}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-white rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-slate-200"
+              >
+                <ArrowLeft className="rotate-90" size={24} />
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
+                  <p className="font-bold text-slate-700">{selectedLog.acao}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
+                  <p className="font-bold text-slate-700">{selectedLog.entidade}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
+                  <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Endereço IP</span>
+                  <p className="font-mono text-sm text-slate-500">{selectedLog.ip || 'Não registrado'}</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
+                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
+                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                  </pre>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-slate-50 flex justify-end">
+              <button 
+                onClick={() => setShowModal(false)}
+                className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg"
+              >
+                Fechar Detalhes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

@@ -17,7 +17,8 @@ export interface IAuditLogDocument extends IAuditLog, Document {}
 const AuditLogSchema = new Schema<IAuditLogDocument>(
   {
     usuarioId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       index: true,
     },
     acao: {

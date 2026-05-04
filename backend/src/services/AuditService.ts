@@ -55,6 +55,7 @@ export class AuditService {
 
     const total = await AuditLog.countDocuments(query);
     const logs = await AuditLog.find(query)
+      .populate('usuarioId', 'nome email perfil')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
