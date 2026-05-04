@@ -77,8 +77,11 @@ export const EditarAcidente: React.FC = () => {
         };
 
         const extrairCPF = (trabalhador: any): string => {
+          if (!trabalhador) return '';
           if (typeof trabalhador === 'string') return trabalhador;
-          if (trabalhador && typeof trabalhador === 'object' && trabalhador.cpf) return trabalhador.cpf;
+          if (typeof trabalhador === 'object') {
+            return trabalhador.cpf || trabalhador.login || '';
+          }
           return '';
         };
 
@@ -111,11 +114,19 @@ export const EditarAcidente: React.FC = () => {
           status: acidente.status || 'Aberto',
         });
 
-        // Buscar nome do trabalhador
-        const cpf = extrairCPF(acidente.trabalhadorId);
-        if (cpf) {
-          const t = await trabalhadorService.buscarPorCpf(cpf);
-          if (t) setTrabalhadorNome(t.nome);
+        // Buscar nome do trabalhador se não estiver populado
+        const cpfOuId = extrairCPF(acidente.trabalhadorId);
+        if (cpfOuId) {
+          // Tentar buscar por CPF primeiro
+          const t = await trabalhadorService.buscarPorCpf(cpfOuId).catch(() => null);
+          if (t) {
+            setTrabalhadorNome(t.nome);
+            if (!formData?.trabalhadorId) {
+              setFormData(prev => prev ? { ...prev, trabalhadorId: t.cpf } : null);
+            }
+          } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId.nome) {
+            setTrabalhadorNome(acidente.trabalhadorId.nome);
+          }
         }
       } catch (error) {
         toast.error('Erro ao carregar acidente');
