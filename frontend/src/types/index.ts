@@ -165,7 +165,7 @@ export interface IVacinacao {
 
 export interface IMaterialBiologico {
   _id?: string;
-  acidenteId: string;
+  acidenteId: string | IAcidentePopulated;
   tipoExposicao: string;
   materialOrganico: string;
   circunstanciaAcidente: string;

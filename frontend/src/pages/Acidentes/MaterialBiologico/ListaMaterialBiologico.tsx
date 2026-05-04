@@ -254,7 +254,17 @@ export const ListaMaterialBiologico: React.FC = () => {
                           >
                             <Trash2 size={20} />
                           </button>
-                          <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-600 transition-colors" />
+                          <button
+                            title="Ver Detalhes do Acidente de Origem"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const acidenteIdStr = typeof ficha.acidenteId === 'object' ? (ficha.acidenteId as any)._id : ficha.acidenteId;
+                              navigate(`/acidentes/${acidenteIdStr}`);
+                            }}
+                            className="p-2 text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group-hover:text-emerald-600"
+                          >
+                            <ChevronRight size={20} />
+                          </button>
                         </div>
                       </td>
                     </tr>

@@ -5,6 +5,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import User from '../models/User.js';
 import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
+import mongoose from 'mongoose';
 
 export interface IKPIData {
   totalAcidentes: number;
@@ -206,13 +207,32 @@ export class AnalyticsService {
     const limite = new Date();
     limite.setDate(limite.getDate() + dias);
 
-    const vacinacoes = await Vacinacao.find({
+    const vacinacoesBrutas = await Vacinacao.find({
       proximoDose: { $lte: limite },
     })
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .sort({ proximoDose: 1 })
       .limit(20)
       .lean();
+
+    const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao: any) => {
+      if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
+        const doc = await Vacinacao.findById(vacinacao._id).select('trabalhadorId').lean();
+        if (doc && doc.trabalhadorId) {
+          const identifier = doc.trabalhadorId.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+          }
+          if (t) vacinacao.trabalhadorId = t;
+        }
+      }
+      return vacinacao;
+    }));
 
     return vacinacoes.map((vac: any) => {
       const dataVencimento = new Date(vac.proximoDose);
@@ -237,11 +257,30 @@ export class AnalyticsService {
    * Obtém últimos acidentes registrados
    */
   async obterUltimosAcidentes(limit: number = 5): Promise<any[]> {
-    const acidentes = await Acidente.find()
+    const acidentesBrutos = await Acidente.find()
       .populate('trabalhadorId', 'nome cpf empresa unidade')
       .sort({ dataAcidente: -1 })
       .limit(limit)
       .lean();
+
+    const acidentes = await Promise.all(acidentesBrutos.map(async (acidente: any) => {
+      if (!acidente.trabalhadorId || typeof acidente.trabalhadorId === 'string' || !acidente.trabalhadorId.nome) {
+        const doc = await Acidente.findById(acidente._id).select('trabalhadorId').lean();
+        if (doc && doc.trabalhadorId) {
+          const identifier = doc.trabalhadorId.toString();
+          let t = null;
+          if (mongoose.Types.ObjectId.isValid(identifier)) {
+            t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+            if (!t) t = await User.findById(identifier).select('nome cpf').lean();
+          } else {
+            t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+            if (!t) t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+          }
+          if (t) acidente.trabalhadorId = t;
+        }
+      }
+      return acidente;
+    }));
 
     return acidentes;
   }
