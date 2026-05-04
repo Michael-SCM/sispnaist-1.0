@@ -4,6 +4,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IAcidente } from '../types/index.js';
 import mongoose from 'mongoose';
+import MaterialBiologico from '../models/MaterialBiologico.js';
 
 export class AcidenteService {
   /**
@@ -196,6 +197,9 @@ export class AcidenteService {
     if (!result) {
       throw new AppError('Acidente não encontrado', 404);
     }
+
+    // Exclusão em cascata: remover a ficha técnica de material biológico vinculada, se existir
+    await MaterialBiologico.findOneAndDelete({ acidenteId: id });
   }
 
   async obterPorTrabalhador(
