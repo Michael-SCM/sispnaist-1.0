@@ -171,29 +171,29 @@ export const NovoMaterialBiologico: React.FC = () => {
               </div>
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Tipo de Exposição</label>
-                  <select name="tipoExposicao" value={formData.tipoExposicao} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Tipo de Exposição *</label>
+                  <select required name="tipoExposicao" value={formData.tipoExposicao} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.tipoExposicao?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Material Orgânico</label>
-                  <select name="materialOrganico" value={formData.materialOrganico} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Material Orgânico *</label>
+                  <select required name="materialOrganico" value={formData.materialOrganico} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.materialOrganico?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Agente Causador</label>
-                  <select name="agente" value={formData.agente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Agente Causador *</label>
+                  <select required name="agente" value={formData.agente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.agente?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Circunstância</label>
-                  <select name="circunstanciaAcidente" value={formData.circunstanciaAcidente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Circunstância *</label>
+                  <select required name="circunstanciaAcidente" value={formData.circunstanciaAcidente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.circunstanciaAcidente?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
@@ -202,6 +202,22 @@ export const NovoMaterialBiologico: React.FC = () => {
                   <input type="checkbox" name="usoEPI" checked={formData.usoEPI} onChange={handleChange} className="w-5 h-5 text-emerald-600 rounded-lg" />
                   <label className="text-sm font-bold text-emerald-900 text-slate-700">O trabalhador fazia uso de EPI no momento?</label>
                 </div>
+
+                {formData.usoEPI && (
+                  <div className="md:col-span-2 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <label className="text-sm font-bold text-slate-600">Qual equipamento de proteção era utilizado?</label>
+                    <select 
+                      name="equipamentoProtecao" 
+                      value={formData.equipamentoProtecao} 
+                      onChange={handleChange} 
+                      required={formData.usoEPI}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione o EPI...</option>
+                      {catalogos.equipamentoProtecao?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -213,29 +229,29 @@ export const NovoMaterialBiologico: React.FC = () => {
               </div>
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Sorologia do Paciente Fonte</label>
-                  <select name="sorologiaPaciente" value={formData.sorologiaPaciente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Sorologia do Paciente Fonte *</label>
+                  <select required name="sorologiaPaciente" value={formData.sorologiaPaciente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.sorologia?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Sorologia do Acidentado</label>
-                  <select name="sorologiaAcidentado" value={formData.sorologiaAcidentado} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Sorologia do Acidentado *</label>
+                  <select required name="sorologiaAcidentado" value={formData.sorologiaAcidentado} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.sorologia?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Conduta Adotada</label>
-                  <select name="conduta" value={formData.conduta} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Conduta Adotada *</label>
+                  <select required name="conduta" value={formData.conduta} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.conduta?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-600">Evolução do Caso</label>
-                  <select name="evolucaoCaso" value={formData.evolucaoCaso} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                  <label className="text-sm font-bold text-slate-600">Evolução do Caso *</label>
+                  <select required name="evolucaoCaso" value={formData.evolucaoCaso} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
                     {catalogos.evolucaoCaso?.map(c => <option key={c._id} value={c.nome}>{c.nome}</option>)}
                   </select>
