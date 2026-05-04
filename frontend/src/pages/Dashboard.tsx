@@ -82,7 +82,7 @@ const {
       title: 'Auditoria',
       description: 'Logs e Rastreabilidade',
       link: '/admin/auditoria',
-      color: 'slate',
+      color: 'blue',
       icon: '🛡️',
       buttonLabel: 'Ver log completo'
     },
