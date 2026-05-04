@@ -7,14 +7,18 @@ import {
   TrendingDown,
   UserX,
   ChevronRight,
-  Download
+  Download,
+  ArrowLeft
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import monitoramentoService, { MonitoramentoData } from '../services/monitoramentoService';
 import { KPICard } from '../components/KPICard';
 import { BarChartComponent } from '../components/charts';
+import toast from 'react-hot-toast';
 
 const Monitoramento: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<MonitoramentoData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -55,10 +59,22 @@ const Monitoramento: React.FC = () => {
             </h1>
             <p className="text-slate-500 mt-1">Inteligência em saúde e vigilância ocupacional proativa.</p>
           </div>
-          <button className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm">
-            <Download size={18} />
-            Exportar Relatório
-          </button>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+            >
+              <ArrowLeft size={18} />
+              Voltar
+            </button>
+            <button 
+              onClick={() => toast.success('Gerando relatório PDF...')}
+              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+            >
+              <Download size={18} />
+              Exportar Relatório
+            </button>
+          </div>
         </div>
 
         {/* Top KPIs */}
@@ -130,7 +146,11 @@ const Monitoramento: React.FC = () => {
             </div>
             <div className="space-y-4">
               {data?.alertasCriticos.map((alerta, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-slate-50/50 hover:bg-slate-50 rounded-2xl transition-all cursor-pointer group">
+                <div 
+                  key={i} 
+                  onClick={() => toast.error('Acesso restrito ao prontuário médico completo.')}
+                  className="flex items-center justify-between p-4 bg-slate-50/50 hover:bg-slate-50 rounded-2xl transition-all cursor-pointer group"
+                >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-xl ${
                       alerta.nivel === 'alto' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
