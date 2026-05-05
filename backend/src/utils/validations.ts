@@ -96,9 +96,7 @@ export const criarAcidenteSchema = Joi.object({
     .messages({
       'string.pattern.base': 'Horário deve estar no formato HH:MM',
     }),
-  horarioAposInicioJornada: Joi.string()
-    .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
-    .optional(),
+  horarioAposInicioJornada: Joi.string().optional(),
   trabalhadorId: Joi.string()
     .required()
     .messages({
@@ -111,9 +109,9 @@ export const criarAcidenteSchema = Joi.object({
       'any.required': 'Tipo de acidente é obrigatório',
       'any.only': 'Tipo de acidente inválido',
     }),
-  tipoTrauma: Joi.string().optional(),
-  agenteCausador: Joi.string().optional(),
-  parteCorpo: Joi.string().optional(),
+  tipoTrauma: Joi.string().allow('', null).optional(),
+  agenteCausador: Joi.string().allow('', null).optional(),
+  parteCorpo: Joi.string().allow('', null).optional(),
   descricao: Joi.string()
     .trim()
     .min(10)
@@ -124,7 +122,7 @@ export const criarAcidenteSchema = Joi.object({
       'string.max': 'Descrição não pode ter mais de 2000 caracteres',
       'any.required': 'Descrição é obrigatória',
     }),
-  descricaoTrauma: Joi.string().trim().max(1000).optional(),
+  descricaoTrauma: Joi.string().trim().max(1000).allow('').optional(),
   local: Joi.string()
     .trim()
     .max(200)
@@ -160,21 +158,19 @@ export const atualizarAcidenteSchema = Joi.object({
   horario: Joi.string()
     .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
     .optional(),
-  horarioAposInicioJornada: Joi.string()
-    .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
-    .optional(),
+  horarioAposInicioJornada: Joi.string().optional(),
   tipoAcidente: Joi.string()
     .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
     .optional(),
-  tipoTrauma: Joi.string().optional(),
-  agenteCausador: Joi.string().optional(),
-  parteCorpo: Joi.string().optional(),
+  tipoTrauma: Joi.string().allow('', null).optional(),
+  agenteCausador: Joi.string().allow('', null).optional(),
+  parteCorpo: Joi.string().allow('', null).optional(),
   descricao: Joi.string()
     .trim()
     .min(10)
     .max(2000)
     .optional(),
-  descricaoTrauma: Joi.string().trim().max(1000).optional(),
+  descricaoTrauma: Joi.string().trim().max(1000).allow('').optional(),
   local: Joi.string()
     .trim()
     .max(200)
