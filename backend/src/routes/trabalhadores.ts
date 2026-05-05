@@ -1,5 +1,6 @@
 import express from 'express';
 import * as trabalhadorController from '../controllers/trabalhadorController.js';
+import * as informacaoController from '../controllers/TrabalhadorInformacaoController.js';
 import { validateRequest } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { criarTrabalhadorSchema, atualizarTrabalhadorSchema } from '../utils/validations.js';
@@ -37,5 +38,12 @@ router.delete('/:id', (req, res, next) => {
   }
   next();
 }, trabalhadorController.deleteTrabalhador);
+
+// Rotas de Informações Históricas do Trabalhador
+router.get('/:id/informacoes', informacaoController.listar);
+router.get('/:id/informacoes/:infoId', informacaoController.obter);
+router.post('/:id/informacoes', informacaoController.criar);
+router.put('/:id/informacoes/:infoId', informacaoController.atualizar);
+router.delete('/:id/informacoes/:infoId', informacaoController.deletar);
 
 export default router;

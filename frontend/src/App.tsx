@@ -13,7 +13,7 @@ import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoM
 import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
-import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo, ListaOcorrenciasViolencia, FormOcorrenciaViolencia, ListaReadaptacoes, FormReadaptacao, ListaProcessosTrabalho, FormProcessoTrabalho } from './pages/Trabalhadores/index.js';
+import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo, ListaOcorrenciasViolencia, FormOcorrenciaViolencia, ListaReadaptacoes, FormReadaptacao, ListaProcessosTrabalho, FormProcessoTrabalho, ListaInformacoes, FormInformacoes } from './pages/Trabalhadores/index.js';
 import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
 import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
 import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
@@ -336,6 +336,30 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormProcessoTrabalho />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/informacoes"
+          element={
+            <ProtectedRoute>
+              <ListaInformacoes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/informacoes/novo"
+          element={
+            <ProtectedRoute>
+              <FormInformacoes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/informacoes/:infoId/editar"
+          element={
+            <ProtectedRoute>
+              <FormInformacoes />
             </ProtectedRoute>
           }
         />
