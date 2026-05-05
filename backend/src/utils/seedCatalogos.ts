@@ -16,6 +16,17 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Masculino', sigla: 'M', ordem: 1 },
     { nome: 'Feminino', sigla: 'F', ordem: 2 },
   ]},
+  // Gênero
+  { entidade: 'genero', itens: [
+    { nome: 'Mulher cisgênero', ordem: 1 },
+    { nome: 'Homem cisgênero', ordem: 2 },
+    { nome: 'Mulher transgender', ordem: 3 },
+    { nome: 'Homem transgender', ordem: 4 },
+    { nome: 'Não-binário', ordem: 5 },
+    { nome: 'Agênero', ordem: 6 },
+    { nome: 'Gênero fluido', ordem: 7 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
   // Raça/Cor (classificação IBGE)
   { entidade: 'racaCor', itens: [
     { nome: 'Branca', ordem: 1 },
@@ -305,6 +316,30 @@ const CATALOGO_DADOS: Array<{
     { nome: '180 dias', ordem: 5 },
     { nome: '365 dias', ordem: 6 },
     { nome: 'Indeterminado', ordem: 7 },
+  ]},
+  // Tipo de Deficiência
+  { entidade: 'tipoDeficiencia', itens: [
+    { nome: 'Física', ordem: 1 },
+    { nome: 'Visual', ordem: 2 },
+    { nome: 'Auditiva', ordem: 3 },
+    { nome: 'Intelectual', ordem: 4 },
+    { nome: 'Múltipla', ordem: 5 },
+    { nome: 'Psicossocial', ordem: 6 },
+    { nome: 'Reabilitado', ordem: 7 },
+  ]},
+  // Tempo de Deficiência
+  { entidade: 'tempoDeficiencia', itens: [
+    { nome: 'Congênita', ordem: 1 },
+    { nome: 'Adquirida', ordem: 2 },
+    { nome: 'Temporária', ordem: 3 },
+    { nome: 'Permanente', ordem: 4 },
+  ]},
+  // Grau de Deficiência
+  { entidade: 'grauDeficiencia', itens: [
+    { nome: 'Leve', ordem: 1 },
+    { nome: 'Moderada', ordem: 2 },
+    { nome: 'Severa', ordem: 3 },
+    { nome: 'Profunda', ordem: 4 },
   ]},
 ];
 
