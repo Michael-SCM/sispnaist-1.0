@@ -13,7 +13,7 @@ router.use(authMiddleware);
 const isValidObjectId = (id: string): boolean => /^[0-9a-fA-F]{24}$/.test(id);
 
 // CRUD básico
-router.post('/', acidenteController.criar); // BYPASS validation temporarily
+router.post('/', validateRequest(criarAcidenteSchema), acidenteController.criar);
 
 router.get('/', acidenteController.listar);
 
@@ -35,7 +35,7 @@ router.put('/:id', (req, res, next) => {
     return res.status(400).json({ message: 'ID inválido' });
   }
   next();
-}, acidenteController.atualizar); // BYPASS validation temporarily
+}, validateRequest(atualizarAcidenteSchema), acidenteController.atualizar);
 
 router.delete('/:id', (req, res, next) => {
   if (!isValidObjectId(req.params.id)) {
