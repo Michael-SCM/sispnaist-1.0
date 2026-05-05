@@ -42,6 +42,7 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
 
     // Dados Pessoais/Diversos
     sexo: String,
+    genero: String,
     raca: String,
     escolaridade: String,
     estadoCivil: String,

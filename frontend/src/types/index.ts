@@ -241,6 +241,7 @@ export interface ITrabalhador {
 
   // Dados Pessoais/Diversos
   sexo?: string;
+  genero?: string;
   raca?: string;
   escolaridade?: string;
   estadoCivil?: string;
