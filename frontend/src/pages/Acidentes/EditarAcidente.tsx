@@ -5,19 +5,23 @@ import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { IAcidente } from '../../types/index.js';
-import { 
-  AlertTriangle, 
-  ArrowLeft, 
-  Save, 
-  User, 
-  Calendar, 
-  MapPin, 
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Save,
+  User,
+  Calendar,
+  MapPin,
   Info,
   Clock,
   CheckCircle2,
   X,
-  Loader2
+  Loader2,
+  Stethoscope,
+  ShieldAlert,
+  Building
 } from 'lucide-react';
+import { useCatalogo } from '../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
 
 interface FormData {
@@ -72,6 +76,11 @@ export const EditarAcidente: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [trabalhadorNome, setTrabalhadorNome] = useState<string | null>(null);
   const [novaLesao, setNovaLesao] = useState('');
+
+  // Catálogos
+  const { itens: tiposTrauma } = useCatalogo('tipoTrauma');
+  const { itens: agentesCausador } = useCatalogo('causadorTrauma');
+  const { itens: partesCorpo } = useCatalogo('parteCorpo');
 
   useEffect(() => {
     const carregarAcidente = async () => {
@@ -229,6 +238,15 @@ export const EditarAcidente: React.FC = () => {
     }
   };
 
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!formData) return;
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value === '' ? 0 : parseInt(value, 10) || 0,
+    });
+  };
+
   const handleAddLesao = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && novaLesao.trim() && formData) {
       e.preventDefault();
@@ -370,11 +388,31 @@ export const EditarAcidente: React.FC = () => {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Notificação</label>
+                    <input
+                      type="date"
+                      name="dataNotificacao"
+                      value={formData?.dataNotificacao}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Horário</label>
                     <input
                       type="time"
                       name="horario"
                       value={formData?.horario}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Horário após início da jornada</label>
+                    <input
+                      type="time"
+                      name="horarioAposInicioJornada"
+                      value={formData?.horarioAposInicioJornada}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
                     />
@@ -393,18 +431,82 @@ export const EditarAcidente: React.FC = () => {
                       ))}
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Trauma</label>
+                    <select
+                      name="tipoTrauma"
+                      value={formData?.tipoTrauma}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      {tiposTrauma.map(t => (
+                        <option key={t.nome} value={t.nome}>{t.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Agente Causador</label>
+                    <select
+                      name="agenteCausador"
+                      value={formData?.agenteCausador}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      {agentesCausador.map(a => (
+                        <option key={a.nome} value={a.nome}>{a.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Parte do Corpo</label>
+                    <select
+                      name="parteCorpo"
+                      value={formData?.parteCorpo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      {partesCorpo.map(p => (
+                        <option key={p.nome} value={p.nome}>{p.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Estado (UF)</label>
+                    <input
+                      name="estado"
+                      value={formData?.estado}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
+                      placeholder="Ex: SP"
+                      maxLength={2}
+                    />
+                  </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2 text-amber-600">Descrição Detalhada *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 text-amber-600">Descrição do Acidente *</label>
                     <textarea
                       required
                       name="descricao"
                       value={formData?.descricao}
                       onChange={handleChange}
-                      rows={4}
+                      rows={3}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all resize-none"
                       placeholder="Descreva minuciosamente o ocorrido..."
                     />
                     {errors.descricao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.descricao}</p>}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição do Trauma</label>
+                    <textarea
+                      name="descricaoTrauma"
+                      value={formData?.descricaoTrauma}
+                      onChange={handleChange}
+                      rows={2}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all resize-none"
+                      placeholder="Descreva o trauma..."
+                    />
                   </div>
                 </div>
               </div>
@@ -444,6 +546,176 @@ export const EditarAcidente: React.FC = () => {
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
                       placeholder="Adicione uma nova lesão e pressione Enter..."
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Atendimento Médico */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Stethoscope size={20} className="text-amber-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Atendimento Médico</h2>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="atendimentoMedico"
+                      id="atendimentoMedico"
+                      checked={formData?.atendimentoMedico}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-amber-600 focus:ring-amber-500"
+                    />
+                    <label htmlFor="atendimentoMedico" className="text-sm font-bold text-slate-600">
+                      Houve atendimento médico?
+                    </label>
+                  </div>
+                  {formData?.atendimentoMedico && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-blue-50 rounded-2xl">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Data</label>
+                        <input
+                          type="date"
+                          name="dataAtendimento"
+                          value={formData?.dataAtendimento}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Hora</label>
+                        <input
+                          type="time"
+                          name="horaAtendimento"
+                          value={formData?.horaAtendimento}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Unidade</label>
+                        <input
+                          name="unidadeAtendimento"
+                          value={formData?.unidadeAtendimento}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                          placeholder="Nome da unidade"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="internamento"
+                      id="internamento"
+                      checked={formData?.internamento}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-amber-600 focus:ring-amber-500"
+                    />
+                    <label htmlFor="internamento" className="text-sm font-bold text-slate-600">
+                      Houve internamento?
+                    </label>
+                  </div>
+                  {formData?.internamento && (
+                    <div className="p-4 bg-orange-50 rounded-2xl">
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Duração (horas)</label>
+                      <input
+                        type="number"
+                        name="duracaoInternamento"
+                        value={formData?.duracaoInternamento}
+                        onChange={handleNumberChange}
+                        min="0"
+                        className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none"
+                        placeholder="Quantidade de horas"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Informações Adicionais */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <ShieldAlert size={20} className="text-amber-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações Adicionais</h2>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <label className="flex items-center gap-3 cursor-pointer group p-3 bg-red-50 rounded-xl">
+                      <input
+                        type="checkbox"
+                        name="catNas"
+                        checked={formData?.catNas}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500"
+                      />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">CAT/NAS?</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer group p-3 bg-blue-50 rounded-xl">
+                      <input
+                        type="checkbox"
+                        name="registroPolicial"
+                        checked={formData?.registroPolicial}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">Registro Policial?</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer group p-3 bg-purple-50 rounded-xl">
+                      <input
+                        type="checkbox"
+                        name="encaminhamentoJuntaMedica"
+                        checked={formData?.encaminhamentoJuntaMedica}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">Junta Médica?</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer group p-3 bg-green-50 rounded-xl">
+                      <input
+                        type="checkbox"
+                        name="afastamento"
+                        checked={formData?.afastamento}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">Afastamento?</span>
+                    </label>
+                  </div>
+
+                  <div className="p-4 bg-yellow-50 rounded-2xl space-y-4">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        name="outrosTrabalhadoresAtingidos"
+                        id="outrosTrabalhadoresAtingidos"
+                        checked={formData?.outrosTrabalhadoresAtingidos}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-yellow-600 focus:ring-yellow-500"
+                      />
+                      <label htmlFor="outrosTrabalhadoresAtingidos" className="text-sm font-bold text-slate-600">
+                        Outros trabalhadores foram atingidos?
+                      </label>
+                    </div>
+                    {formData?.outrosTrabalhadoresAtingidos && (
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Quantidade</label>
+                        <input
+                          type="number"
+                          name="quantidadeTrabalhadoresAtingidos"
+                          value={formData?.quantidadeTrabalhadoresAtingidos}
+                          onChange={handleNumberChange}
+                          min="0"
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-yellow-500 outline-none"
+                          placeholder="Quantidade de trabalhadores"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

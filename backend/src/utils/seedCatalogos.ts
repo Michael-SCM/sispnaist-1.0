@@ -377,6 +377,31 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Severa', ordem: 3 },
     { nome: 'Profunda', ordem: 4 },
   ]},
+  // Tipo de Trauma
+  { entidade: 'tipoTrauma', itens: [
+    { nome: 'Contusão', ordem: 1 },
+    { nome: 'Corte/Laceração', ordem: 2 },
+    { nome: 'Fratura', ordem: 3 },
+    { nome: 'Entorse', ordem: 4 },
+    { nome: 'Luxação', ordem: 5 },
+    { nome: 'Queimadura', ordem: 6 },
+    { nome: 'Trauma Craniano', ordem: 7 },
+    { nome: 'Hemorragia', ordem: 8 },
+    { nome: 'Perfuração', ordem: 9 },
+    { nome: 'Amputação', ordem: 10 },
+    { nome: 'Intoxicação', ordem: 11 },
+    { nome: 'Hipotermia/Queimadura térmica', ordem: 12 },
+    { nome: 'Eletrocução', ordem: 13 },
+    { nome: 'Afogamento', ordem: 14 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Regime de Acompanhamento
+  { entidade: 'regimeAcompanhamento', itens: [
+    { nome: 'Ambulatorial', ordem: 1 },
+    { nome: 'Internação', ordem: 2 },
+    { nome: 'Domiciliar', ordem: 3 },
+    { nome: 'Observação', ordem: 4 },
+  ]},
 ];
 
 export async function seedCatalogos() {
