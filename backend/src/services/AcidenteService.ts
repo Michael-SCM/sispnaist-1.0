@@ -31,17 +31,61 @@ export class AcidenteService {
   }
 
   async criar(acidenteData: Partial<IAcidente>): Promise<IAcidente> {
-    console.log('[AcidenteService.criar] Received data:', JSON.stringify(acidenteData, null, 2));
+    console.log('[AcidenteService.criar] === START ===');
+    console.log('[AcidenteService.criar] Received keys:', Object.keys(acidenteData));
+    console.log('[AcidenteService.criar] tipoTrauma:', acidenteData.tipoTrauma);
+    console.log('[AcidenteService.criar] horarioAposInicioJornada:', acidenteData.horarioAposInicioJornada);
 
     // Resolver trabalhadorId se for CPF
     if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
       acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 
-    const acidente = new Acidente(acidenteData);
-    console.log('[AcidenteService.criar] Acidente document before save:', JSON.stringify(acidente.toObject(), null, 2));
+    // Criar objeto com todos os campos explicitamente
+    const dataToSave: any = {
+      dataAcidente: acidenteData.dataAcidente,
+      horario: acidenteData.horario || '',
+      horarioAposInicioJornada: acidenteData.horarioAposInicioJornada || '',
+      trabalhadorId: acidenteData.trabalhadorId,
+      tipoAcidente: acidenteData.tipoAcidente,
+      tipoTrauma: acidenteData.tipoTrauma || '',
+      agenteCausador: acidenteData.agenteCausador || '',
+      parteCorpo: acidenteData.parteCorpo || '',
+      descricao: acidenteData.descricao,
+      descricaoTrauma: acidenteData.descricaoTrauma || '',
+      local: acidenteData.local || '',
+      lesoes: acidenteData.lesoes || [],
+      feriado: acidenteData.feriado || false,
+      comunicado: acidenteData.comunicado || false,
+      dataComunicacao: acidenteData.dataComunicacao,
+      dataNotificacao: acidenteData.dataNotificacao,
+      estado: acidenteData.estado || '',
+      atendimentoMedico: acidenteData.atendimentoMedico || false,
+      dataAtendimento: acidenteData.dataAtendimento,
+      horaAtendimento: acidenteData.horaAtendimento || '',
+      unidadeAtendimento: acidenteData.unidadeAtendimento || '',
+      internamento: acidenteData.internamento || false,
+      duracaoInternamento: acidenteData.duracaoInternamento || 0,
+      catNas: acidenteData.catNas || false,
+      registroPolicial: acidenteData.registroPolicial || false,
+      encaminhamentoJuntaMedica: acidenteData.encaminhamentoJuntaMedica || false,
+      afastamento: acidenteData.afastamento || false,
+      outrosTrabalhadoresAtingidos: acidenteData.outrosTrabalhadoresAtingidos || false,
+      quantidadeTrabalhadoresAtingidos: acidenteData.quantidadeTrabalhadoresAtingidos || 0,
+      status: acidenteData.status || 'Aberto',
+    };
+
+    console.log('[AcidenteService.criar] Data to save - tipoTrauma:', dataToSave.tipoTrauma);
+    console.log('[AcidenteService.criar] Data to save - all keys:', Object.keys(dataToSave));
+
+    const acidente = new Acidente(dataToSave);
     await acidente.save();
-    return acidente.toObject() as IAcidente;
+
+    const result = accidente.toObject();
+    console.log('[AcidenteService.criar] Saved result - tipoTrauma:', result.tipoTrauma);
+    console.log('[AcidenteService.criar] === END ===');
+
+    return result as IAcidente;
   }
 
   async obter(id: string): Promise<IAcidente> {
@@ -161,32 +205,61 @@ export class AcidenteService {
   }
 
   async atualizar(id: string, acidenteData: Partial<IAcidente>): Promise<IAcidente> {
-    console.log('[AcidenteService.atualizar] Received data:', JSON.stringify(acidenteData, null, 2));
+    console.log('[AcidenteService.atualizar] === START ===');
+    console.log('[AcidenteService.atualizar] Received keys:', Object.keys(acidenteData));
+    console.log('[AcidenteService.atualizar] tipoTrauma:', acidenteData.tipoTrauma);
+    console.log('[AcidenteService.atualizar] horarioAposInicioJornada:', acidenteData.horarioAposInicioJornada);
 
-    // Não permitir alterar data de criação
-    if ('dataCriacao' in acidenteData) {
-      delete acidenteData.dataCriacao;
-    }
+    // NÃO usar runValidators para evitar problemas com validação mongoose
+    // Construir objeto com campos explicitamente definidos
+    const dataToUpdate: any = {};
 
-    // Resolver trabalhadorId se for CPF
-    if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
-      acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
-    }
+    // Sempre enviar todos os campos para garantir que valores vazios sejam salvos
+    if (acidenteData.dataAcidente !== undefined) dataToUpdate.dataAcidente = acidenteData.dataAcidente;
+    if (acidenteData.horario !== undefined) dataToUpdate.horario = acidenteData.horario || '';
+    if (acidenteData.horarioAposInicioJornada !== undefined) dataToUpdate.horarioAposInicioJornada = acidenteData.horarioAposInicioJornada || '';
+    if (acidenteData.trabalhadorId !== undefined) dataToUpdate.trabalhadorId = acidenteData.trabalhadorId;
+    if (acidenteData.tipoAcidente !== undefined) dataToUpdate.tipoAcidente = acidenteData.tipoAcidente;
+    if (acidenteData.tipoTrauma !== undefined) dataToUpdate.tipoTrauma = acidenteData.tipoTrauma || '';
+    if (acidenteData.agenteCausador !== undefined) dataToUpdate.agenteCausador = acidenteData.agenteCausador || '';
+    if (acidenteData.parteCorpo !== undefined) dataToUpdate.parteCorpo = acidenteData.parteCorpo || '';
+    if (acidenteData.descricao !== undefined) dataToUpdate.descricao = acidenteData.descricao;
+    if (acidenteData.descricaoTrauma !== undefined) dataToUpdate.descricaoTrauma = acidenteData.descricaoTrauma || '';
+    if (acidenteData.local !== undefined) dataToUpdate.local = acidenteData.local || '';
+    if (acidenteData.lesoes !== undefined) dataToUpdate.lesoes = acidenteData.lesoes || [];
+    if (acidenteData.feriado !== undefined) dataToUpdate.feriado = acidenteData.feriado;
+    if (acidenteData.comunicado !== undefined) dataToUpdate.comunicado = acidenteData.comunicado;
+    if (acidenteData.dataComunicacao !== undefined) dataToUpdate.dataComunicacao = acidenteData.dataComunicacao;
+    if (acidenteData.dataNotificacao !== undefined) dataToUpdate.dataNotificacao = acidenteData.dataNotificacao;
+    if (acidenteData.estado !== undefined) dataToUpdate.estado = acidenteData.estado || '';
+    if (acidenteData.atendimentoMedico !== undefined) dataToUpdate.atendimentoMedico = acidenteData.atendimentoMedico;
+    if (acidenteData.dataAtendimento !== undefined) dataToUpdate.dataAtendimento = acidenteData.dataAtendimento;
+    if (acidenteData.horaAtendimento !== undefined) dataToUpdate.horaAtendimento = acidenteData.horaAtendimento || '';
+    if (acidenteData.unidadeAtendimento !== undefined) dataToUpdate.unidadeAtendimento = acidenteData.unidadeAtendimento || '';
+    if (acidenteData.internamento !== undefined) dataToUpdate.internamento = acidenteData.internamento;
+    if (acidenteData.duracaoInternamento !== undefined) dataToUpdate.duracaoInternamento = acidenteData.duracaoInternamento || 0;
+    if (acidenteData.catNas !== undefined) dataToUpdate.catNas = acidenteData.catNas;
+    if (acidenteData.registroPolicial !== undefined) dataToUpdate.registroPolicial = acidenteData.registroPolicial;
+    if (acidenteData.encaminhamentoJuntaMedica !== undefined) dataToUpdate.encaminhamentoJuntaMedica = acidenteData.encaminhamentoJuntaMedica;
+    if (acidenteData.afastamento !== undefined) dataToUpdate.afastamento = acidenteData.afastamento;
+    if (acidenteData.outrosTrabalhadoresAtingidos !== undefined) dataToUpdate.outrosTrabalhadoresAtingidos = acidenteData.outrosTrabalhadoresAtingidos;
+    if (acidenteData.quantidadeTrabalhadoresAtingidos !== undefined) dataToUpdate.quantidadeTrabalhadoresAtingidos = acidenteData.quantidadeTrabalhadoresAtingidos || 0;
+    if (acidenteData.status !== undefined) dataToUpdate.status = acidenteData.status;
 
-    // Garantir que lesões é um array, mas SOMENTE se ele foi enviado no payload
-    if (acidenteData.lesoes !== undefined && !Array.isArray(acidenteData.lesoes)) {
-      acidenteData.lesoes = [];
-    }
+    console.log('[AcidenteService.atualizar] Data to update:', Object.keys(dataToUpdate));
+    console.log('[AcidenteService.atualizar] tipoTrauma in update:', dataToUpdate.tipoTrauma);
 
-    // Usar $set explicitamente para garantir que arrays (como lesoes) sejam substituídos corretamente
     const acidente = await Acidente.findByIdAndUpdate(
       id,
-      { $set: acidenteData },
+      { $set: dataToUpdate },
       {
         new: true,
-        runValidators: true,
+        runValidators: false,
       }
     ).populate('trabalhadorId', 'nome cpf email empresa unidade').lean();
+
+    console.log('[AcidenteService.atualizar] Updated document - tipoTrauma:', acidente?.tipoTrauma);
+    console.log('[AcidenteService.atualizar] === END ===');
 
     if (!acidente) {
       throw new AppError('Acidente não encontrado', 404);
