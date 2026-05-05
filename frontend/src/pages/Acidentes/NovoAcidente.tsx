@@ -246,8 +246,6 @@ export const NovoAcidente: React.FC = () => {
           : undefined,
       };
 
-      console.log('[NovoAcidente] Submitting acidenteData:', JSON.stringify(acidenteData, null, 2));
-
       const novoAcidente = await acidenteService.criar(acidenteData);
       adicionarAcidente(novoAcidente);
 
