@@ -126,13 +126,10 @@ class SubmoduloTrabalhadorController {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
       }
 
-      // Soft delete se o model tiver campo ativo
-      const resultado = await Model.updateOne(
-        { _id: itemId, trabalhadorId: id },
-        { ativo: false }
-      );
+      // Hard delete - remoção permanente do banco
+      const resultado = await Model.deleteOne({ _id: itemId, trabalhadorId: id });
 
-      if (resultado.matchedCount === 0) {
+      if (resultado.deletedCount === 0) {
         throw new AppError('Item não encontrado', 404);
       }
 
