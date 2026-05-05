@@ -302,6 +302,7 @@ export const EditarAcidente: React.FC = () => {
       };
 
       const acidenteAtualizado = await acidenteService.atualizar(id, acidenteAtuzalizar as any);
+      console.log('[EditarAcidente] Submitting data:', JSON.stringify(acidenteAtuzalizar, null, 2));
       atualizarAcidente(id, acidenteAtualizado);
 
       toast.success('Acidente atualizado com sucesso!');

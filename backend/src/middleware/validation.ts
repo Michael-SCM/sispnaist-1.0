@@ -7,7 +7,7 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
     console.log(`[Validation] Body BEFORE:`, JSON.stringify(req.body));
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
-      stripUnknown: true,
+      stripUnknown: false, // TEMPORARILY DISABLED TO DEBUG
     });
 
     if (error) {

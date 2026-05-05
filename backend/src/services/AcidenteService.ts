@@ -31,12 +31,15 @@ export class AcidenteService {
   }
 
   async criar(acidenteData: Partial<IAcidente>): Promise<IAcidente> {
+    console.log('[AcidenteService.criar] Received data:', JSON.stringify(acidenteData, null, 2));
+
     // Resolver trabalhadorId se for CPF
     if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
       acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 
     const acidente = new Acidente(acidenteData);
+    console.log('[AcidenteService.criar] Acidente document before save:', JSON.stringify(acidente.toObject(), null, 2));
     await acidente.save();
     return acidente.toObject() as IAcidente;
   }
@@ -158,7 +161,8 @@ export class AcidenteService {
   }
 
   async atualizar(id: string, acidenteData: Partial<IAcidente>): Promise<IAcidente> {
-    
+    console.log('[AcidenteService.atualizar] Received data:', JSON.stringify(acidenteData, null, 2));
+
     // Não permitir alterar data de criação
     if ('dataCriacao' in acidenteData) {
       delete acidenteData.dataCriacao;
