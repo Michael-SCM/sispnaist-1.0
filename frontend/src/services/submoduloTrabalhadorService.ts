@@ -102,27 +102,29 @@ export const submoduloTrabalhadorService = {
   },
 
   // OCORRÊNCIAS DE VIOLÊNCIA
-  listarOcorrenciasViolencia: async (trabalhadorId: string): Promise<ITrabalhadorOcorrenciaViolencia[]> => {
-    const response = await api.get<{ data: ITrabalhadorOcorrenciaViolencia[] }>(
-      `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia`
+  listarOcorrenciasViolencia: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorOcorrenciaViolencia[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorOcorrenciaViolencia[]>(
+      `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia?${params.toString()}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   criarOcorrenciaViolencia: async (trabalhadorId: string, data: Partial<ITrabalhadorOcorrenciaViolencia>): Promise<ITrabalhadorOcorrenciaViolencia> => {
-    const response = await api.post<{ data: ITrabalhadorOcorrenciaViolencia }>(
+    const response = await api.post<ITrabalhadorOcorrenciaViolencia>(
       `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   atualizarOcorrenciaViolencia: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorOcorrenciaViolencia>): Promise<ITrabalhadorOcorrenciaViolencia> => {
-    const response = await api.put<{ data: ITrabalhadorOcorrenciaViolencia }>(
+    const response = await api.put<ITrabalhadorOcorrenciaViolencia>(
       `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia/${itemId}`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   deletarOcorrenciaViolencia: async (trabalhadorId: string, itemId: string): Promise<void> => {
@@ -130,27 +132,29 @@ export const submoduloTrabalhadorService = {
   },
 
   // READAPTAÇÕES
-  listarReadaptacoes: async (trabalhadorId: string): Promise<ITrabalhadorReadaptacao[]> => {
-    const response = await api.get<{ data: ITrabalhadorReadaptacao[] }>(
-      `/trabalhadores/${trabalhadorId}/readaptacoes`
+  listarReadaptacoes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorReadaptacao[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorReadaptacao[]>(
+      `/trabalhadores/${trabalhadorId}/readaptacoes?${params.toString()}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   criarReadaptacao: async (trabalhadorId: string, data: Partial<ITrabalhadorReadaptacao>): Promise<ITrabalhadorReadaptacao> => {
-    const response = await api.post<{ data: ITrabalhadorReadaptacao }>(
+    const response = await api.post<ITrabalhadorReadaptacao>(
       `/trabalhadores/${trabalhadorId}/readaptacoes`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   atualizarReadaptacao: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorReadaptacao>): Promise<ITrabalhadorReadaptacao> => {
-    const response = await api.put<{ data: ITrabalhadorReadaptacao }>(
+    const response = await api.put<ITrabalhadorReadaptacao>(
       `/trabalhadores/${trabalhadorId}/readaptacoes/${itemId}`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   deletarReadaptacao: async (trabalhadorId: string, itemId: string): Promise<void> => {
@@ -158,27 +162,29 @@ export const submoduloTrabalhadorService = {
   },
 
   // PROCESSOS DE TRABALHO
-  listarProcessosTrabalho: async (trabalhadorId: string): Promise<ITrabalhadorProcessoTrabalho[]> => {
-    const response = await api.get<{ data: ITrabalhadorProcessoTrabalho[] }>(
-      `/trabalhadores/${trabalhadorId}/processosTrabalho`
+  listarProcessosTrabalho: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorProcessoTrabalho[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorProcessoTrabalho[]>(
+      `/trabalhadores/${trabalhadorId}/processosTrabalho?${params.toString()}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   criarProcessoTrabalho: async (trabalhadorId: string, data: Partial<ITrabalhadorProcessoTrabalho>): Promise<ITrabalhadorProcessoTrabalho> => {
-    const response = await api.post<{ data: ITrabalhadorProcessoTrabalho }>(
+    const response = await api.post<ITrabalhadorProcessoTrabalho>(
       `/trabalhadores/${trabalhadorId}/processosTrabalho`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   atualizarProcessoTrabalho: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorProcessoTrabalho>): Promise<ITrabalhadorProcessoTrabalho> => {
-    const response = await api.put<{ data: ITrabalhadorProcessoTrabalho }>(
+    const response = await api.put<ITrabalhadorProcessoTrabalho>(
       `/trabalhadores/${trabalhadorId}/processosTrabalho/${itemId}`,
       data
     );
-    return response.data.data;
+    return response.data;
   },
 
   deletarProcessoTrabalho: async (trabalhadorId: string, itemId: string): Promise<void> => {

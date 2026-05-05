@@ -13,7 +13,7 @@ import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoM
 import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
-import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo } from './pages/Trabalhadores/index.js';
+import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo, ListaOcorrenciasViolencia, FormOcorrenciaViolencia, ListaReadaptacoes, FormReadaptacao, ListaProcessosTrabalho, FormProcessoTrabalho } from './pages/Trabalhadores/index.js';
 import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
 import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
 import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
@@ -264,6 +264,78 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormVinculo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/ocorrencias-violencia"
+          element={
+            <ProtectedRoute>
+              <ListaOcorrenciasViolencia />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/ocorrencias-violencia/novo"
+          element={
+            <ProtectedRoute>
+              <FormOcorrenciaViolencia />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/ocorrencias-violencia/:ocorrenciaId/editar"
+          element={
+            <ProtectedRoute>
+              <FormOcorrenciaViolencia />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/readaptacoes"
+          element={
+            <ProtectedRoute>
+              <ListaReadaptacoes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/readaptacoes/novo"
+          element={
+            <ProtectedRoute>
+              <FormReadaptacao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/readaptacoes/:readaptacaoId/editar"
+          element={
+            <ProtectedRoute>
+              <FormReadaptacao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/processos-trabalho"
+          element={
+            <ProtectedRoute>
+              <ListaProcessosTrabalho />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/processos-trabalho/novo"
+          element={
+            <ProtectedRoute>
+              <FormProcessoTrabalho />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/processos-trabalho/:processoId/editar"
+          element={
+            <ProtectedRoute>
+              <FormProcessoTrabalho />
             </ProtectedRoute>
           }
         />
