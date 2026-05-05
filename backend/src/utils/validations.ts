@@ -159,6 +159,7 @@ export const atualizarAcidenteSchema = Joi.object({
     .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
     .optional(),
   horarioAposInicioJornada: Joi.string().optional(),
+  trabalhadorId: Joi.string().optional(),
   tipoAcidente: Joi.string()
     .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
     .optional(),
