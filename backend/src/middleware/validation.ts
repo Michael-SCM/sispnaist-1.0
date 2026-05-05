@@ -5,13 +5,14 @@ import { AppError } from './errorHandler.js';
 export const validateRequest = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     console.log(`[Validation] Body BEFORE:`, JSON.stringify(req.body));
+    console.log(`[Validation] Schema keys:`, Object.keys(schema.describe().keys));
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: false, // TEMPORARILY DISABLED TO DEBUG
     });
 
     if (error) {
-      console.log(`[Validation] Error:`, error.details);
+      console.log(`[Validation] Error details:`, JSON.stringify(error.details, null, 2));
       const messages = error.details.map(d => `${d.path.join('.')}: ${d.message}`).join('; ');
       throw new AppError(messages, 400);
     }
