@@ -96,6 +96,9 @@ export const criarAcidenteSchema = Joi.object({
     .messages({
       'string.pattern.base': 'Horário deve estar no formato HH:MM',
     }),
+  horarioAposInicioJornada: Joi.string()
+    .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
+    .optional(),
   trabalhadorId: Joi.string()
     .required()
     .messages({
@@ -108,16 +111,20 @@ export const criarAcidenteSchema = Joi.object({
       'any.required': 'Tipo de acidente é obrigatório',
       'any.only': 'Tipo de acidente inválido',
     }),
+  tipoTrauma: Joi.string().optional(),
+  agenteCausador: Joi.string().optional(),
+  parteCorpo: Joi.string().optional(),
   descricao: Joi.string()
     .trim()
     .min(10)
-    .max(1000)
+    .max(2000)
     .required()
     .messages({
       'string.min': 'Descrição deve ter pelo menos 10 caracteres',
-      'string.max': 'Descrição não pode ter mais de 1000 caracteres',
+      'string.max': 'Descrição não pode ter mais de 2000 caracteres',
       'any.required': 'Descrição é obrigatória',
     }),
+  descricaoTrauma: Joi.string().trim().max(1000).optional(),
   local: Joi.string()
     .trim()
     .max(200)
@@ -128,6 +135,20 @@ export const criarAcidenteSchema = Joi.object({
   feriado: Joi.boolean().optional(),
   comunicado: Joi.boolean().optional(),
   dataComunicacao: Joi.date().optional().allow('', null),
+  dataNotificacao: Joi.date().optional().allow('', null),
+  estado: Joi.string().trim().max(2).optional(),
+  atendimentoMedico: Joi.boolean().optional(),
+  dataAtendimento: Joi.date().optional().allow('', null),
+  horaAtendimento: Joi.string().optional(),
+  unidadeAtendimento: Joi.string().trim().max(200).optional(),
+  internamento: Joi.boolean().optional(),
+  duracaoInternamento: Joi.number().integer().min(0).optional(),
+  catNas: Joi.boolean().optional(),
+  registroPolicial: Joi.boolean().optional(),
+  encaminhamentoJuntaMedica: Joi.boolean().optional(),
+  afastamento: Joi.boolean().optional(),
+  outrosTrabalhadoresAtingidos: Joi.boolean().optional(),
+  quantidadeTrabalhadoresAtingidos: Joi.number().integer().min(0).optional(),
   status: Joi.string()
     .valid('Aberto', 'Em Análise', 'Fechado')
     .optional(),
@@ -139,14 +160,21 @@ export const atualizarAcidenteSchema = Joi.object({
   horario: Joi.string()
     .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
     .optional(),
+  horarioAposInicioJornada: Joi.string()
+    .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
+    .optional(),
   tipoAcidente: Joi.string()
     .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
     .optional(),
+  tipoTrauma: Joi.string().optional(),
+  agenteCausador: Joi.string().optional(),
+  parteCorpo: Joi.string().optional(),
   descricao: Joi.string()
     .trim()
     .min(10)
-    .max(1000)
+    .max(2000)
     .optional(),
+  descricaoTrauma: Joi.string().trim().max(1000).optional(),
   local: Joi.string()
     .trim()
     .max(200)
@@ -157,6 +185,20 @@ export const atualizarAcidenteSchema = Joi.object({
   feriado: Joi.boolean().optional(),
   comunicado: Joi.boolean().optional(),
   dataComunicacao: Joi.date().optional().allow('', null),
+  dataNotificacao: Joi.date().optional().allow('', null),
+  estado: Joi.string().trim().max(2).optional(),
+  atendimentoMedico: Joi.boolean().optional(),
+  dataAtendimento: Joi.date().optional().allow('', null),
+  horaAtendimento: Joi.string().optional(),
+  unidadeAtendimento: Joi.string().trim().max(200).optional(),
+  internamento: Joi.boolean().optional(),
+  duracaoInternamento: Joi.number().integer().min(0).optional(),
+  catNas: Joi.boolean().optional(),
+  registroPolicial: Joi.boolean().optional(),
+  encaminhamentoJuntaMedica: Joi.boolean().optional(),
+  afastamento: Joi.boolean().optional(),
+  outrosTrabalhadoresAtingidos: Joi.boolean().optional(),
+  quantidadeTrabalhadoresAtingidos: Joi.number().integer().min(0).optional(),
   status: Joi.string()
     .valid('Aberto', 'Em Análise', 'Fechado')
     .optional(),
