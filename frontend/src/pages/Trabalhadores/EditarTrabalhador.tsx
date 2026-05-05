@@ -156,7 +156,7 @@ export const EditarTrabalhador: React.FC = () => {
       <label className={labelCls}>{label}</label>
       <select name={name} value={value} onChange={handleChange} className={selectCls}>
         <option value="">Selecione...</option>
-        {items.map((i) => <option key={i.sigla || i.nome} value={i.sigla || i.nome}>{i.nome}</option>)}
+        {items.map((i) => <option key={i.nome} value={i.nome}>{i.nome}</option>)}
       </select>
     </div>
   );
@@ -231,7 +231,7 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('matricula', 'Matrícula', formData.matricula || '', { required: true })}
                 {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '')}
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
-                {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
+                {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date' })}
               </div>
               <div>
                 <label className={labelCls}><Mail size={14} className="inline mr-1" />Email *</label>

@@ -148,6 +148,26 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Substância quente', ordem: 7 },
     { nome: 'Outro', ordem: 99 },
   ]},
+  // Motivo da Violência
+  { entidade: 'motivoViolencia', itens: [
+    { nome: 'Conflito no trabalho', ordem: 1 },
+    { nome: 'Conflito familiar', ordem: 2 },
+    { nome: 'Roubo/Furto', ordem: 3 },
+    { nome: 'Discriminação', ordem: 4 },
+    { nome: 'Retaliação', ordem: 5 },
+    { nome: 'Abuso de poder', ordem: 6 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Tipo de Autor da Violência
+  { entidade: 'tipoAutorViolencia', itens: [
+    { nome: 'Superior hierárquico', ordem: 1 },
+    { nome: 'Colega de trabalho', ordem: 2 },
+    { nome: 'Subordinado', ordem: 3 },
+    { nome: 'Paciente', ordem: 4 },
+    { nome: 'Familiar', ordem: 5 },
+    { nome: 'Pessoa desconhecida', ordem: 6 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
   // Agente (Causador de Acidente/Doença)
   { entidade: 'agente', itens: [
     { nome: 'Biológico', ordem: 1 },
@@ -235,6 +255,56 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Soroconversão HCV', ordem: 4 },
     { nome: 'Abandono de tratamento', ordem: 5 },
     { nome: 'Óbito', ordem: 6 },
+  ]},
+  // Tipo de Afastamento
+  { entidade: 'tipoAfastamento', itens: [
+    { nome: 'Doença', ordem: 1 },
+    { nome: 'Acidente de trabalho', ordem: 2 },
+    { nome: 'Acidente de trajeto', ordem: 3 },
+    { nome: 'Licença maternidade', ordem: 4 },
+    { nome: 'Licença paternidade', ordem: 5 },
+    { nome: 'Falecimento', ordem: 6 },
+    { nome: 'Assistência à filho', ordem: 7 },
+    { nome: 'Assistência à familiar', ordem: 8 },
+    { nome: 'Licença para tratamento', ordem: 9 },
+    { nome: 'Suspensão disciplinar', ordem: 10 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Motivo de Afastamento
+  { entidade: 'motivoAfastamento', itens: [
+    { nome: 'Doença común', ordem: 1 },
+    { nome: 'Doença profissional', ordem: 2 },
+    { nome: 'COVID-19', ordem: 3 },
+    { nome: 'Cirurgia', ordem: 4 },
+    { nome: 'Tratamento oncológico', ordem: 5 },
+    { nome: 'Tratamento psiquiátrico', ordem: 6 },
+    { nome: 'Fisioterapia', ordem: 7 },
+    { nome: 'Acompanhamento pré-natal', ordem: 8 },
+    { nome: 'Parto', ordem: 9 },
+    { nome: 'Luto', ordem: 10 },
+    { nome: 'Acidente', ordem: 11 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Motivo de Readaptação
+  { entidade: 'motivoReadaptacao', itens: [
+    { nome: 'Limitação física', ordem: 1 },
+    { nome: 'Limitação visual', ordem: 2 },
+    { nome: 'Limitação auditiva', ordem: 3 },
+    { nome: 'Doença crônica', ordem: 4 },
+    { nome: 'Pós-cirúrgico', ordem: 5 },
+    { nome: 'Reabilitação', ordem: 6 },
+    { nome: 'Ajustamento funcional', ordem: 7 },
+    { nome: 'Outro', ordem: 99 },
+  ]},
+  // Tempo de Readaptação
+  { entidade: 'tempoReadaptacao', itens: [
+    { nome: '30 dias', ordem: 1 },
+    { nome: '60 dias', ordem: 2 },
+    { nome: '90 dias', ordem: 3 },
+    { nome: '120 dias', ordem: 4 },
+    { nome: '180 dias', ordem: 5 },
+    { nome: '365 dias', ordem: 6 },
+    { nome: 'Indeterminado', ordem: 7 },
   ]},
 ];
 
