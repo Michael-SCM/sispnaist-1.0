@@ -17,7 +17,6 @@ import {
   Building,
   Calendar,
   CheckCircle2,
-  Heart,
   Loader2,
   Phone,
   GraduationCap,
@@ -233,16 +232,6 @@ export const DetalhesTrabalhador: React.FC = () => {
                   </Link>
                 ))}
               </div>
-            </div>
-
-            {/* Health Info Quick View */}
-            <div className="bg-rose-600 rounded-3xl p-8 text-white shadow-xl shadow-rose-100">
-              <div className="flex items-center gap-3 mb-4">
-                <Heart size={24} className="fill-white" />
-                <h3 className="font-black uppercase text-xs tracking-widest">Informações de Saúde</h3>
-              </div>
-              <p className="text-xs text-rose-100 font-medium mb-1">Tipo Sanguíneo</p>
-              <p className="text-4xl font-black">{trabalhador.tipoSanguineo || 'N/A'}</p>
             </div>
           </div>
         </div>

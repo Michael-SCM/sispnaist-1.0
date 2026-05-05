@@ -124,7 +124,7 @@ export const NovoTrabalhador: React.FC = () => {
       <label className={labelCls}>{label}</label>
       <select name={name} value={value} onChange={handleChange} className={selectCls}>
         <option value="">Selecione...</option>
-        {items.map((i) => <option key={i.sigla || i.nome} value={i.sigla || i.nome}>{i.nome}</option>)}
+        {items.map((i) => <option key={i.nome} value={i.nome}>{i.nome}</option>)}
       </select>
     </div>
   );
@@ -195,12 +195,12 @@ export const NovoTrabalhador: React.FC = () => {
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true, placeholder: 'Nome completo do trabalhador' })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}
               </div>
-              {/* Matrícula, Cartão SUS, Celular, Outro Contato */}
+              {/* Matrícula, Cartão SUS, Celular, Nascimento */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {renderInput('matricula', 'Matrícula', formData.matricula || '', { required: true })}
                 {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '')}
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
-                {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
+                {renderInput('dataNascimento', 'Data de Nascimento', formData.dataNascimento ? String(formData.dataNascimento).split('T')[0] : '', { type: 'date' })}
               </div>
               {/* Email */}
               <div>
