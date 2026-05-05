@@ -27,6 +27,42 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Gênero fluido', ordem: 7 },
     { nome: 'Outro', ordem: 99 },
   ]},
+  // Estado Vacinal
+  { entidade: 'estadoVacinal', itens: [
+    { nome: 'Vacinado', ordem: 1 },
+    { nome: 'Parcialmente vacinado', ordem: 2 },
+    { nome: 'Não vacinado', ordem: 3 },
+    { nome: 'Aguardando vacinação', ordem: 4 },
+    { nome: 'Recusa da vacinação', ordem: 5 },
+  ]},
+  // Doença de Base
+  { entidade: 'doencaBase', itens: [
+    { nome: 'Hipertensão', ordem: 1 },
+    { nome: 'Diabetes', ordem: 2 },
+    { nome: 'Asma', ordem: 3 },
+    { nome: 'Artrite', ordem: 4 },
+    { nome: 'Cardiopatia', ordem: 5 },
+    { nome: 'Câncer', ordem: 6 },
+    { nome: 'HIV/AIDS', ordem: 7 },
+    { nome: 'Hepatite', ordem: 8 },
+    { nome: 'Nenhuma', ordem: 9 },
+    { nome: 'Outra', ordem: 99 },
+  ]},
+  // Tipo de Droga
+  { entidade: 'tipoDroga', itens: [
+    { nome: 'Álcool', ordem: 1 },
+    { nome: 'Cigarro', ordem: 2 },
+    { nome: 'Maconha', ordem: 3 },
+    { nome: 'Cocaína', ordem: 4 },
+    { nome: 'Crack', ordem: 5 },
+    { nome: 'Ecstasy', ordem: 6 },
+    { nome: 'Heroína', ordem: 7 },
+    { nome: 'Inalantes', ordem: 8 },
+    { nome: 'Anfetaminas', ordem: 9 },
+    { nome: 'Ansiolíticos', ordem: 10 },
+    { nome: 'Opioides', ordem: 11 },
+    { nome: 'Outra', ordem: 99 },
+  ]},
   // Raça/Cor (classificação IBGE)
   { entidade: 'racaCor', itens: [
     { nome: 'Branca', ordem: 1 },

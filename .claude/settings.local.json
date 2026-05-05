@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx ts-node src/utils/seedCatalogos.ts)"
+      "Bash(npx ts-node src/utils/seedCatalogos.ts)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
