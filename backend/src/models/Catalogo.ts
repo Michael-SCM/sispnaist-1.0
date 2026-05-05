@@ -35,6 +35,7 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'doencaBase', 'tipoViolencia', 'tipoViolenciaSexual', 'motivoViolencia',
         'meioAgressao', 'tipoAutorViolencia', 'jornadaTrabalho', 'turnoTrabalho',
         'situacaoTrabalho', 'tipoAfastamento', 'motivoAfastamento',
+        'motivoReadaptacao', 'tempoReadaptacao',
         'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
         'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
         'padraoEmail', 'parametro', 'parentesco', 'sorologia'
