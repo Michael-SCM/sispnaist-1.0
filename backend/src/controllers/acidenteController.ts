@@ -6,7 +6,9 @@ import { IAcidente } from '../types/index.js';
 import { logAction } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
+  console.log('[acidenteController.criar] req.body received:', JSON.stringify(req.body, null, 2));
   const acidente = await acidenteService.criar(req.body);
+  console.log('[acidenteController.criar] acidente created:', JSON.stringify(acidente, null, 2));
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
     tipoAcidente: acidente.tipoAcidente,
@@ -58,8 +60,10 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
+  console.log('[acidenteController.atualizar] req.body received:', JSON.stringify(req.body, null, 2));
   const { id } = req.params;
   const acidente = await acidenteService.atualizar(id, req.body);
+  console.log('[acidenteController.atualizar] acidente updated:', JSON.stringify(acidente, null, 2));
 
   await logAction(req, 'UPDATE', 'Acidente', id, {
     status: acidente.status
