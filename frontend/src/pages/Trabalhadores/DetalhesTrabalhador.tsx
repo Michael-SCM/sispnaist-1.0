@@ -4,13 +4,13 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
-import { 
-  Users, 
-  ArrowLeft, 
-  Edit, 
-  User, 
-  MapPin, 
-  Briefcase, 
+import {
+  Users,
+  ArrowLeft,
+  Edit,
+  User,
+  MapPin,
+  Briefcase,
   Info,
   Mail,
   Fingerprint,
@@ -25,7 +25,9 @@ import {
   Users2,
   Stethoscope,
   ClipboardList,
-  ChevronRight
+  ChevronRight,
+  ShieldAlert,
+  RefreshCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -213,7 +215,10 @@ export const DetalhesTrabalhador: React.FC = () => {
                 {[
                   { label: 'Afastamentos', icon: Stethoscope, path: 'afastamentos', color: 'text-amber-400' },
                   { label: 'Dependentes', icon: Users2, path: 'dependentes', color: 'text-rose-400' },
-                  { label: 'Vínculos', icon: ClipboardList, path: 'vinculos', color: 'text-blue-400' }
+                  { label: 'Vínculos', icon: ClipboardList, path: 'vinculos', color: 'text-blue-400' },
+                  { label: 'Ocorrências de Violência', icon: ShieldAlert, path: 'ocorrencias-violencia', color: 'text-red-400' },
+                  { label: 'Readaptações', icon: RefreshCcw, path: 'readaptacoes', color: 'text-purple-400' },
+                  { label: 'Processos de Trabalho', icon: Briefcase, path: 'processos-trabalho', color: 'text-cyan-400' }
                 ].map((item) => (
                   <Link
                     key={item.path}
