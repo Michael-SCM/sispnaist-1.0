@@ -108,14 +108,48 @@ export interface IAcidente {
   _id?: string;
   dataAcidente: Date;
   horario?: string;
+  horarioAposInicioJornada?: string;
   trabalhadorId: string;
   tipoAcidente: string;
+  tipoTrauma?: string;
+  agenteCausador?: string;
+  parteCorpo?: string;
   descricao: string;
+  descricaoTrauma?: string;
   local?: string;
   lesoes?: string[];
   feriado?: boolean;
   comunicado?: boolean;
   dataComunicacao?: Date;
+  dataNotificacao?: Date;
+  estado?: string;
+
+  // Campos de atendimento médico
+  atendimentoMedico?: boolean;
+  dataAtendimento?: Date;
+  horaAtendimento?: string;
+  unidadeAtendimento?: string;
+
+  // Campos de internamento
+  internamento?: boolean;
+  duracaoInternamento?: number;
+
+  // CAT/NAS
+  catNas?: boolean;
+
+  // Registro Policial
+  registroPolicial?: boolean;
+
+  // Encaminhamento junta médica
+  encaminhamentoJuntaMedica?: boolean;
+
+  // Afastamento
+  afastamento?: boolean;
+
+  // Outros trabalhadores atingidos
+  outrosTrabalhadoresAtingidos?: boolean;
+  quantidadeTrabalhadoresAtingidos?: number;
+
   status?: 'Aberto' | 'Em Análise' | 'Fechado';
   dataCriacao?: Date;
   dataAtualizacao?: Date;

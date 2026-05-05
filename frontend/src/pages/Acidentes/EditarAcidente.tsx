@@ -24,13 +24,32 @@ interface FormData {
   trabalhadorId: string;
   dataAcidente: string;
   horario: string;
+  horarioAposInicioJornada: string;
   tipoAcidente: string;
+  tipoTrauma: string;
+  agenteCausador: string;
+  parteCorpo: string;
   descricao: string;
+  descricaoTrauma: string;
   local: string;
   lesoes: string[];
   feriado: boolean;
   comunicado: boolean;
   dataComunicacao: string;
+  dataNotificacao: string;
+  estado: string;
+  atendimentoMedico: boolean;
+  dataAtendimento: string;
+  horaAtendimento: string;
+  unidadeAtendimento: string;
+  internamento: boolean;
+  duracaoInternamento: number;
+  catNas: boolean;
+  registroPolicial: boolean;
+  encaminhamentoJuntaMedica: boolean;
+  afastamento: boolean;
+  outrosTrabalhadoresAtingidos: boolean;
+  quantidadeTrabalhadoresAtingidos: number;
   status: string;
 }
 
@@ -122,6 +141,20 @@ export const EditarAcidente: React.FC = () => {
           feriado: acidente.feriado || false,
           comunicado: acidente.comunicado || false,
           dataComunicacao: formatarDataInput(acidente.dataComunicacao),
+          dataNotificacao: formatarDataInput(acidente.dataNotificacao),
+          estado: acidente.estado || '',
+          atendimentoMedico: acidente.atendimentoMedico || false,
+          dataAtendimento: formatarDataInput(acidente.dataAtendimento),
+          horaAtendimento: acidente.horaAtendimento || '',
+          unidadeAtendimento: acidente.unidadeAtendimento || '',
+          internamento: acidente.internamento || false,
+          duracaoInternamento: acidente.duracaoInternamento || 0,
+          catNas: acidente.catNas || false,
+          registroPolicial: acidente.registroPolicial || false,
+          encaminhamentoJuntaMedica: acidente.encaminhamentoJuntaMedica || false,
+          afastamento: acidente.afastamento || false,
+          outrosTrabalhadoresAtingidos: acidente.outrosTrabalhadoresAtingidos || false,
+          quantidadeTrabalhadoresAtingidos: acidente.quantidadeTrabalhadoresAtingidos || 0,
           status: acidente.status || 'Aberto',
         });
 
@@ -239,8 +272,14 @@ export const EditarAcidente: React.FC = () => {
       const acidenteAtuzalizar = {
         ...formData,
         dataAcidente: formData.dataAcidente ? converterDataLocal(formData.dataAcidente) : undefined,
-        dataComunicacao: formData.comunicado && formData.dataComunicacao 
+        dataComunicacao: formData.comunicado && formData.dataComunicacao
           ? converterDataLocal(formData.dataComunicacao)
+          : undefined,
+        dataNotificacao: formData.dataNotificacao
+          ? converterDataLocal(formData.dataNotificacao)
+          : undefined,
+        dataAtendimento: formData.dataAtendimento
+          ? converterDataLocal(formData.dataAtendimento)
           : undefined,
       };
 
