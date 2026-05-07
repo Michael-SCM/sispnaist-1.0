@@ -202,6 +202,9 @@ export const NovoTrabalhador: React.FC = () => {
       toast.success('Trabalhador cadastrado com sucesso');
       navigate('/trabalhadores');
     } catch (error: any) {
+      if (error.receivedBody) {
+        console.log('Dados recebidos pelo servidor:', error.receivedBody);
+      }
       const msg = error.details ? `${error.message}: ${error.details.join(', ')}` : error.message;
       toast.error(msg || 'Erro ao cadastrar trabalhador');
     } finally {

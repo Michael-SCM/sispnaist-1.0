@@ -25,7 +25,8 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
     res.status(400).json({
       status: 'error',
       message: 'Erro de validação de dados',
-      errors: Object.values((err as any).errors).map((e: any) => e.message)
+      errors: Object.values((err as any).errors).map((e: any) => e.message),
+      receivedBody: (err as any).receivedBody // Debug
     });
     return;
   }
