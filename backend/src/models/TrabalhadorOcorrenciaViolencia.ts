@@ -42,7 +42,7 @@ const TrabalhadorOcorrenciaViolenciaSchema = new Schema<ITrabalhadorOcorrenciaVi
     reincidencia: { type: Boolean, default: false },
     atendimentoRealizado: { type: String, required: true },
     condutaViolencia: { type: String, required: true },
-    pessoasEnvolvidas: { type: String },
+    pessoasEnvolvidas: { type: String, required: true },
     emissaoCatNas: { type: Boolean, default: false },
     boletimOcorrencia: { type: String, trim: true },
     medidasTomadas: { type: String, trim: true },

@@ -138,6 +138,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
     if (!formData.atendimentoRealizado.trim()) novoErros.atendimentoRealizado = 'Obrigatório';
     if (!formData.condutaViolencia) novoErros.condutaViolencia = 'Obrigatória';
     if (!formData.descricaoOcorrencia) novoErros.descricaoOcorrencia = 'Obrigatória';
+    if (!formData.pessoasEnvolvidas.trim()) novoErros.pessoasEnvolvidas = 'Obrigatório';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -289,14 +290,16 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.tipoViolenciaSexual && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolenciaSexual}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas *</label>
                     <input
                       name="pessoasEnvolvidas"
+                      required
                       value={formData.pessoasEnvolvidas}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
                       placeholder="Ex: 1"
                     />
+                    {errors.pessoasEnvolvidas && <p className="mt-1 text-xs text-red-500 font-bold">{errors.pessoasEnvolvidas}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência *</label>

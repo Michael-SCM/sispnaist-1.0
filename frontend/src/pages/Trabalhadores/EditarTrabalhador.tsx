@@ -123,7 +123,6 @@ export const EditarTrabalhador: React.FC = () => {
       'matricula': 'Matrícula',
       'cartaoSus': 'Cartão do SUS',
       'celular': 'Celular',
-      'telefoneContato': 'Telefone de Contato',
       'email': 'Email',
       'sexo': 'Sexo',
       'genero': 'Gênero',
@@ -133,7 +132,6 @@ export const EditarTrabalhador: React.FC = () => {
       'endereco.cep': 'CEP',
       'endereco.logradouro': 'Logradouro',
       'endereco.numero': 'Número',
-      'endereco.complemento': 'Complemento',
       'endereco.bairro': 'Bairro',
       'endereco.cidade': 'Cidade',
       'endereco.estado': 'Estado',
@@ -323,7 +321,7 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('matricula', 'Matrícula', formData.matricula || '', { required: true })}
                 {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '', { required: true })}
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
-                {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '', { required: true })}
+                {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
                 {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date' })}
               </div>
               <div>
@@ -364,7 +362,7 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('endereco.logradouro', 'Logradouro', formData.endereco?.logradouro || '', { required: true })}
               </div>
               {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '', { required: true })}
-              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '', { required: true })}
+              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '')}
               {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '', { required: true })}
               {renderInput('endereco.cidade', 'Cidade', formData.endereco?.cidade || '', { required: true })}
               {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '', { required: true })}

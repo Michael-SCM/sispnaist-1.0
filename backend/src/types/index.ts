@@ -29,7 +29,7 @@ export interface ITrabalhador {
   matricula: string;
   cartaoSus: string;
   celular: string;
-  telefoneContato: string;
+  telefoneContato?: string;
   email: string;
   dataNascimento?: Date;
 
@@ -96,7 +96,7 @@ export interface ITrabalhador {
 export interface IEndereco {
   logradouro: string;
   numero: string;
-  complemento: string;
+  complemento?: string;
   bairro: string;
   cidade: string;
   estado: string;

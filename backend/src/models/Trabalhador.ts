@@ -39,7 +39,6 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
     },
     telefoneContato: {
       type: String,
-      required: [true, 'Telefone de contato é obrigatório'],
       trim: true,
     },
     email: {
@@ -125,7 +124,6 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       },
       complemento: {
         type: String,
-        required: [true, 'Complemento é obrigatório'],
       },
       bairro: {
         type: String,

@@ -31,7 +31,7 @@ const TrabalhadorProcessoTrabalhoSchema = new Schema<ITrabalhadorProcessoTrabalh
     jornadaTrabalho: { type: String, trim: true },
     turnoTrabalho: { type: String, trim: true },
     jornadaSemanal: { type: String, trim: true },
-    questionarioId: { type: Schema.Types.ObjectId, ref: 'Questionario' },
+    questionarioId: { type: Schema.Types.ObjectId, ref: 'Questionario', required: true },
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },
     observacoes: { type: String, trim: true },
