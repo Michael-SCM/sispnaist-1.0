@@ -68,6 +68,9 @@ axiosInstance.interceptors.response.use(
     if (responseData?.errors) {
       customError.details = responseData.errors;
     }
+    if (responseData?.receivedBody) {
+      customError.receivedBody = responseData.receivedBody;
+    }
     
     return Promise.reject(customError);
   }

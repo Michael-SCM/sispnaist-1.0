@@ -49,17 +49,25 @@ export const getTrabalhador = asyncHandler(async (req: Request, res: Response) =
  * @access  Private/Admin/Saude
  */
 export const createTrabalhador = asyncHandler(async (req: Request, res: Response) => {
-  const trabalhador = await trabalhadorService.criar(req.body);
+  try {
+    const trabalhador = await trabalhadorService.criar(req.body);
 
-  await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), {
-    nome: trabalhador.nome,
-    cpf: trabalhador.cpf
-  });
+    await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), {
+      nome: trabalhador.nome,
+      cpf: trabalhador.cpf
+    });
 
-  res.status(201).json({
-    status: 'success',
-    data: { trabalhador },
-  });
+    res.status(201).json({
+      status: 'success',
+      data: { trabalhador },
+    });
+  } catch (error: any) {
+    if (error.name === 'ValidationError') {
+      // Adicionar o body recebido para debug
+      (error as any).receivedBody = req.body;
+    }
+    throw error;
+  }
 });
 
 /**
