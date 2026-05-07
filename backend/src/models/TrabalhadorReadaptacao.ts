@@ -10,10 +10,18 @@ export interface ITrabalhadorReadaptacao extends Document {
   dataReadaptacao: Date;
   motivo: string;
   cid?: string;
-  atividadeAnterior?: string;
-  atividadeAtual?: string;
+  mudancaSetor: boolean;
+  setorOrigem: string;
+  setorReadaptacao: string;
+  mudancaFuncao: boolean;
+  funcaoAnterior: string;
+  funcaoNova: string;
+  tempoReadaptacao: string;    // temporário, definitivo, etc.
+  restricao: string;
+  novasAtribuicoes: string;
+  acompanhamento: string;
+  grauSatisfacao: string;
   laudoMedico?: string;
-  tempoReadaptacao?: string;    // temporário, definitivo, etc.
   dataRetorno?: Date;
   observacoes?: string;
   ativo: boolean;
@@ -27,10 +35,18 @@ const TrabalhadorReadaptacaoSchema = new Schema<ITrabalhadorReadaptacao>(
     dataReadaptacao: { type: Date, required: true },
     motivo: { type: String, required: true },
     cid: { type: String, trim: true },
-    atividadeAnterior: { type: String, trim: true },
-    atividadeAtual: { type: String, trim: true },
+    mudancaSetor: { type: Boolean, default: false },
+    setorOrigem: { type: String, required: true },
+    setorReadaptacao: { type: String, required: true },
+    mudancaFuncao: { type: Boolean, default: false },
+    funcaoAnterior: { type: String, required: true },
+    funcaoNova: { type: String, required: true },
+    tempoReadaptacao: { type: String, required: true },
+    restricao: { type: String, required: true },
+    novasAtribuicoes: { type: String, required: true },
+    acompanhamento: { type: String, required: true },
+    grauSatisfacao: { type: String, required: true },
     laudoMedico: { type: String, trim: true },
-    tempoReadaptacao: { type: String, trim: true },
     dataRetorno: { type: Date },
     observacoes: { type: String, trim: true },
     ativo: { type: Boolean, default: true }

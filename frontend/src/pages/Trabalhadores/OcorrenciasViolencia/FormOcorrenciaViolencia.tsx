@@ -27,6 +27,11 @@ interface FormData {
   meioAgressao: string;
   tipoAutorViolencia: string;
   descricaoOcorrencia: string;
+  reincidencia: boolean;
+  atendimentoRealizado: string;
+  condutaViolencia: string;
+  pessoasEnvolvidas: string;
+  emissaoCatNas: boolean;
   boletimOcorrencia: string;
   medidasTomadas: string;
   ativo: boolean;
@@ -41,6 +46,11 @@ const INITIAL_FORM: FormData = {
   meioAgressao: '',
   tipoAutorViolencia: '',
   descricaoOcorrencia: '',
+  reincidencia: false,
+  atendimentoRealizado: '',
+  condutaViolencia: '',
+  pessoasEnvolvidas: '',
+  emissaoCatNas: false,
   boletimOcorrencia: '',
   medidasTomadas: '',
   ativo: true,
@@ -96,6 +106,11 @@ export const FormOcorrenciaViolencia: React.FC = () => {
           meioAgressao: ocorrencia.meioAgressao || '',
           tipoAutorViolencia: ocorrencia.tipoAutorViolencia || '',
           descricaoOcorrencia: ocorrencia.descricaoOcorrencia || '',
+          reincidencia: (ocorrencia as any).reincidencia || false,
+          atendimentoRealizado: (ocorrencia as any).atendimentoRealizado || '',
+          condutaViolencia: (ocorrencia as any).condutaViolencia || '',
+          pessoasEnvolvidas: (ocorrencia as any).pessoasEnvolvidas || '',
+          emissaoCatNas: (ocorrencia as any).emissaoCatNas || false,
           boletimOcorrencia: ocorrencia.boletimOcorrencia || '',
           medidasTomadas: ocorrencia.medidasTomadas || '',
           ativo: ocorrencia.ativo !== false,
@@ -116,9 +131,12 @@ export const FormOcorrenciaViolencia: React.FC = () => {
 
     if (!formData.dataOcorrencia) novoErros.dataOcorrencia = 'Obrigatória';
     if (!formData.tipoViolencia) novoErros.tipoViolencia = 'Obrigatório';
+    if (!formData.tipoViolenciaSexual) novoErros.tipoViolenciaSexual = 'Obrigatório';
     if (!formData.motivoViolencia) novoErros.motivoViolencia = 'Obrigatório';
     if (!formData.meioAgressao) novoErros.meioAgressao = 'Obrigatório';
     if (!formData.tipoAutorViolencia) novoErros.tipoAutorViolencia = 'Obrigatório';
+    if (!formData.atendimentoRealizado.trim()) novoErros.atendimentoRealizado = 'Obrigatório';
+    if (!formData.condutaViolencia) novoErros.condutaViolencia = 'Obrigatória';
     if (!formData.descricaoOcorrencia) novoErros.descricaoOcorrencia = 'Obrigatória';
 
     setErrors(novoErros);
@@ -255,18 +273,30 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.tipoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolencia}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual *</label>
                     <select
+                      required
                       name="tipoViolenciaSexual"
                       value={formData.tipoViolenciaSexual}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-bold text-red-600"
                     >
                       <option value="">Selecione...</option>
                       {tiposViolencia.map((t) => (
                         <option key={t.nome} value={t.nome}>{t.nome}</option>
                       ))}
                     </select>
+                    {errors.tipoViolenciaSexual && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolenciaSexual}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas</label>
+                    <input
+                      name="pessoasEnvolvidas"
+                      value={formData.pessoasEnvolvidas}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                      placeholder="Ex: 1"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência *</label>
@@ -315,6 +345,30 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                       ))}
                     </select>
                     {errors.tipoAutorViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAutorViolencia}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Conduta de Violência *</label>
+                    <input
+                      required
+                      name="condutaViolencia"
+                      value={formData.condutaViolencia}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                      placeholder="Descreva a conduta"
+                    />
+                    {errors.condutaViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.condutaViolencia}</p>}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição do Atendimento Realizado *</label>
+                    <input
+                      required
+                      name="atendimentoRealizado"
+                      value={formData.atendimentoRealizado}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                      placeholder="Procedimentos realizados"
+                    />
+                    {errors.atendimentoRealizado && <p className="mt-1 text-xs text-red-500 font-bold">{errors.atendimentoRealizado}</p>}
                   </div>
                 </div>
               </div>
@@ -373,6 +427,34 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-6">
                   <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="reincidencia"
+                      checked={formData.reincidencia}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500 transition-all"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Reincidência?</span>
+                      <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Já ocorreu anteriormente</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
+                    <input
+                      type="checkbox"
+                      name="emissaoCatNas"
+                      checked={formData.emissaoCatNas}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500 transition-all"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Emitida CAT/NAS?</span>
+                      <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Documentação oficial</span>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
                     <input
                       type="checkbox"
                       name="ativo"

@@ -25,12 +25,12 @@ export interface ITrabalhador {
   _id?: string;
   cpf: string;
   nome: string;
-  nomeMae?: string;
-  matricula?: string;
-  cartaoSus?: string;
-  celular?: string;
-  telefoneContato?: string;
-  email?: string;
+  nomeMae: string;
+  matricula: string;
+  cartaoSus: string;
+  celular: string;
+  telefoneContato: string;
+  email: string;
   dataNascimento?: Date;
 
   // Vínculo com Empresa/Unidade
@@ -38,11 +38,11 @@ export interface ITrabalhador {
   unidade?: string; // ObjectId da Unidade
 
   // Dados Pessoais/Diversos
-  sexo?: string; // M, F, etc.
-  genero?: string;
-  raca?: string;
-  escolaridade?: string;
-  estadoCivil?: string;
+  sexo: string; // M, F, etc.
+  genero: string;
+  raca: string;
+  escolaridade: string;
+  estadoCivil: string;
   tipoSanguineo?: string;
   
   // Deficiência
@@ -54,12 +54,12 @@ export interface ITrabalhador {
 
   // Vínculos e Situação
   vinculo?: {
-    tipo?: string;
+    tipo: string;
     outro?: string;
-    turno?: string;
-    jornada?: string;
+    turno: string;
+    jornada: string;
     jornadaOutro?: string;
-    situacao?: string;
+    situacao: string;
   };
 
   // Endereço
@@ -69,11 +69,11 @@ export interface ITrabalhador {
   trabalho?: {
     dataPosse?: Date;
     empresaTerceirizada?: string;
-    dataEntrada?: Date;
-    setor?: string;
-    cargo?: string;
-    funcao?: string;
-    ocupacao?: string;
+    dataEntrada: Date;
+    setor: string;
+    cargo: string;
+    funcao: string;
+    ocupacao: string;
   };
 
   // Histórico e Eventos
@@ -94,13 +94,13 @@ export interface ITrabalhador {
 }
 
 export interface IEndereco {
-  logradouro?: string;
-  numero?: string;
-  complemento?: string;
-  bairro?: string;
-  cidade?: string;
-  estado?: string;
-  cep?: string;
+  logradouro: string;
+  numero: string;
+  complemento: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
 }
 
 // Accident types
@@ -303,7 +303,7 @@ export interface ITrabalhadorDependente {
   trabalhadorId: string;
   nome: string;
   cpf?: string;
-  dataNascimento?: Date;
+  dataNascimento: Date;
   parentesco: string;
   dependentIR?: boolean;
   ativo?: boolean;
@@ -317,7 +317,10 @@ export interface ITrabalhadorAfastamento {
   cid?: string;
   dataInicio: Date;
   dataFim?: Date;
-  dataRetorno?: Date;
+  dataRetorno: Date;
+  dataPericia?: Date;
+  desfecho?: string;
+  tempoAfastamento?: string;
   laudoMedico?: string;
   observacoes?: string;
   ativo?: boolean;
@@ -329,11 +332,16 @@ export interface ITrabalhadorOcorrenciaViolencia {
   dataOcorrencia: Date;
   localOcorrencia?: string;
   tipoViolencia: string;
-  tipoViolenciaSexual?: string;
+  tipoViolenciaSexual: string;
   motivoViolencia: string;
   meioAgressao: string;
   tipoAutorViolencia: string;
   descricaoOcorrencia: string;
+  reincidencia: boolean;
+  atendimentoRealizado: string;
+  condutaViolencia: string;
+  pessoasEnvolvidas?: string;
+  emissaoCatNas: boolean;
   boletimOcorrencia?: string;
   medidasTomadas?: string;
   ativo?: boolean;
@@ -345,10 +353,18 @@ export interface ITrabalhadorReadaptacao {
   dataReadaptacao: Date;
   motivo: string;
   cid?: string;
-  atividadeAnterior?: string;
-  atividadeAtual?: string;
+  mudancaSetor: boolean;
+  setorOrigem: string;
+  setorReadaptacao: string;
+  mudancaFuncao: boolean;
+  funcaoAnterior: string;
+  funcaoNova: string;
+  tempoReadaptacao: string;
+  restricao: string;
+  novasAtribuicoes: string;
+  acompanhamento: string;
+  grauSatisfacao: string;
   laudoMedico?: string;
-  tempoReadaptacao?: string;
   dataRetorno?: Date;
   ativo?: boolean;
 }
@@ -361,6 +377,8 @@ export interface ITrabalhadorProcessoTrabalho {
   funcao: string;
   jornadaTrabalho?: string;
   turnoTrabalho?: string;
+  jornadaSemanal?: string;
+  questionarioId?: string;
   dataInicio: Date;
   dataFim?: Date;
   ativo?: boolean;
@@ -388,6 +406,27 @@ export interface IQuestionarioItem {
   ordem?: number;
   alternativas?: { valor: string; texto: string; pontuacao?: number }[];
   ativo?: boolean;
+}
+
+export interface ITrabalhadorVinculo {
+  _id?: string;
+  trabalhadorId: string;
+  tipoVinculo: string;
+  matricula: string;
+  funcao?: string;
+  jornadaTrabalho: string;
+  turnoTrabalho?: string;
+  dataInicio: Date;
+  dataFim?: Date;
+  situacao?: string;
+  empresaTerceirizada?: string;
+  setor?: string;
+  cargo?: string;
+  ocupacao?: string;
+  cargaHoraria?: number;
+  salario?: number;
+  observacoes?: string;
+  ativo: boolean;
 }
 
 // Upload

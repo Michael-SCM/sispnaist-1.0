@@ -9,7 +9,7 @@ export interface ITrabalhadorDependente extends Document {
   trabalhadorId: string;
   nome: string;
   cpf?: string;
-  dataNascimento?: Date;
+  dataNascimento: Date;
   parentesco: string;     // 'conjuge', 'filho', 'enteado', 'irmao', 'mae', 'pai', 'outro'
   dependentIR?: boolean;   // dependente para imposto de renda
   ativo: boolean;
@@ -22,7 +22,7 @@ const TrabalhadorDependenteSchema = new Schema<ITrabalhadorDependente>(
     trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
     nome: { type: String, required: true, trim: true },
     cpf: { type: String, trim: true },
-    dataNascimento: { type: Date },
+    dataNascimento: { type: Date, required: true },
     parentesco: { type: String, required: true },
     dependentIR: { type: Boolean, default: false },
     ativo: { type: Boolean, default: true }

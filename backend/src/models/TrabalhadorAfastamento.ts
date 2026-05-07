@@ -12,7 +12,10 @@ export interface ITrabalhadorAfastamento extends Document {
   cid?: string;                  // CID-10
   dataInicio: Date;
   dataFim?: Date;
-  dataRetorno?: Date;
+  dataRetorno: Date;
+  dataPericia?: Date;
+  desfecho?: string;
+  tempoAfastamento?: string;
   laudoMedico?: string;
   observacoes?: string;
   ativo: boolean;
@@ -28,7 +31,10 @@ const TrabalhadorAfastamentoSchema = new Schema<ITrabalhadorAfastamento>(
     cid: { type: String, trim: true },
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },
-    dataRetorno: { type: Date },
+    dataRetorno: { type: Date, required: true },
+    dataPericia: { type: Date },
+    desfecho: { type: String, trim: true },
+    tempoAfastamento: { type: String, trim: true },
     laudoMedico: { type: String, trim: true },
     observacoes: { type: String, trim: true },
     ativo: { type: Boolean, default: true }

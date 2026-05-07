@@ -22,8 +22,16 @@ interface FormData {
   dataReadaptacao: string;
   motivo: string;
   cid: string;
-  atividadeAnterior: string;
-  atividadeAtual: string;
+  mudancaSetor: boolean;
+  setorOrigem: string;
+  setorReadaptacao: string;
+  mudancaFuncao: boolean;
+  funcaoAnterior: string;
+  funcaoNova: string;
+  restricao: string;
+  novasAtribuicoes: string;
+  acompanhamento: string;
+  grauSatisfacao: string;
   laudoMedico: string;
   tempoReadaptacao: string;
   dataRetorno: string;
@@ -35,8 +43,16 @@ const INITIAL_FORM: FormData = {
   dataReadaptacao: '',
   motivo: '',
   cid: '',
-  atividadeAnterior: '',
-  atividadeAtual: '',
+  mudancaSetor: false,
+  setorOrigem: '',
+  setorReadaptacao: '',
+  mudancaFuncao: false,
+  funcaoAnterior: '',
+  funcaoNova: '',
+  restricao: '',
+  novasAtribuicoes: '',
+  acompanhamento: '',
+  grauSatisfacao: '',
   laudoMedico: '',
   tempoReadaptacao: '',
   dataRetorno: '',
@@ -58,6 +74,8 @@ export const FormReadaptacao: React.FC = () => {
   // Catálogos
   const { itens: motivosReadaptacao } = useCatalogo('motivoReadaptacao');
   const { itens: temposReadaptacao } = useCatalogo('tempoReadaptacao');
+  const { itens: acompanhamentos } = useCatalogo('acompanhamentoReadaptacao');
+  const { itens: grausSatisfacao } = useCatalogo('grauSatisfacao');
 
   useEffect(() => {
     if (id) {
@@ -87,8 +105,16 @@ export const FormReadaptacao: React.FC = () => {
           dataReadaptacao: readaptacao.dataReadaptacao ? readaptacao.dataReadaptacao.split('T')[0] : '',
           motivo: readaptacao.motivo || '',
           cid: readaptacao.cid || '',
-          atividadeAnterior: readaptacao.atividadeAnterior || '',
-          atividadeAtual: readaptacao.atividadeAtual || '',
+          mudancaSetor: (readaptacao as any).mudancaSetor || false,
+          setorOrigem: (readaptacao as any).setorOrigem || '',
+          setorReadaptacao: (readaptacao as any).setorReadaptacao || '',
+          mudancaFuncao: (readaptacao as any).mudancaFuncao || false,
+          funcaoAnterior: (readaptacao as any).funcaoAnterior || '',
+          funcaoNova: (readaptacao as any).funcaoNova || '',
+          restricao: (readaptacao as any).restricao || '',
+          novasAtribuicoes: (readaptacao as any).novasAtribuicoes || '',
+          acompanhamento: (readaptacao as any).acompanhamento || '',
+          grauSatisfacao: (readaptacao as any).grauSatisfacao || '',
           laudoMedico: readaptacao.laudoMedico || '',
           tempoReadaptacao: readaptacao.tempoReadaptacao || '',
           dataRetorno: readaptacao.dataRetorno ? readaptacao.dataRetorno.split('T')[0] : '',
@@ -111,6 +137,15 @@ export const FormReadaptacao: React.FC = () => {
 
     if (!formData.dataReadaptacao) novoErros.dataReadaptacao = 'Obrigatória';
     if (!formData.motivo) novoErros.motivo = 'Obrigatório';
+    if (!formData.setorOrigem.trim()) novoErros.setorOrigem = 'Obrigatório';
+    if (!formData.setorReadaptacao.trim()) novoErros.setorReadaptacao = 'Obrigatório';
+    if (!formData.funcaoAnterior.trim()) novoErros.funcaoAnterior = 'Obrigatória';
+    if (!formData.funcaoNova.trim()) novoErros.funcaoNova = 'Obrigatória';
+    if (!formData.tempoReadaptacao) novoErros.tempoReadaptacao = 'Obrigatório';
+    if (!formData.restricao.trim()) novoErros.restricao = 'Obrigatória';
+    if (!formData.novasAtribuicoes.trim()) novoErros.novasAtribuicoes = 'Obrigatórias';
+    if (!formData.acompanhamento) novoErros.acompanhamento = 'Obrigatório';
+    if (!formData.grauSatisfacao) novoErros.grauSatisfacao = 'Obrigatório';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -247,18 +282,20 @@ export const FormReadaptacao: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Readaptação</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Readaptação *</label>
                     <select
+                      required
                       name="tempoReadaptacao"
                       value={formData.tempoReadaptacao}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all text-sm"
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all text-sm font-bold"
                     >
                       <option value="">Selecione...</option>
                       {temposReadaptacao.map((t) => (
                         <option key={t.nome} value={t.nome}>{t.nome}</option>
                       ))}
                     </select>
+                    {errors.tempoReadaptacao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tempoReadaptacao}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Laudo Médico</label>
@@ -291,24 +328,112 @@ export const FormReadaptacao: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Atividade Anterior</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Origem *</label>
                     <input
-                      name="atividadeAnterior"
-                      value={formData.atividadeAnterior}
+                      required
+                      name="setorOrigem"
+                      value={formData.setorOrigem}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-                      placeholder="Função/cargo anterior"
+                      placeholder="Setor anterior"
                     />
+                    {errors.setorOrigem && <p className="mt-1 text-xs text-red-500 font-bold">{errors.setorOrigem}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Atividade Atual</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Readaptação *</label>
                     <input
-                      name="atividadeAtual"
-                      value={formData.atividadeAtual}
+                      required
+                      name="setorReadaptacao"
+                      value={formData.setorReadaptacao}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-                      placeholder="Função/cargo atual readaptado"
+                      placeholder="Novo setor"
                     />
+                    {errors.setorReadaptacao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.setorReadaptacao}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Anterior *</label>
+                    <input
+                      required
+                      name="funcaoAnterior"
+                      value={formData.funcaoAnterior}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                      placeholder="Função anterior"
+                    />
+                    {errors.funcaoAnterior && <p className="mt-1 text-xs text-red-500 font-bold">{errors.funcaoAnterior}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Nova *</label>
+                    <input
+                      required
+                      name="funcaoNova"
+                      value={formData.funcaoNova}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                      placeholder="Nova função"
+                    />
+                    {errors.funcaoNova && <p className="mt-1 text-xs text-red-500 font-bold">{errors.funcaoNova}</p>}
+                  </div>
+                  <div className="md:col-span-2 space-y-6 pt-4 border-t border-slate-50">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Restrição *</label>
+                      <textarea
+                        required
+                        name="restricao"
+                        value={formData.restricao}
+                        onChange={handleChange}
+                        rows={3}
+                        className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all resize-none"
+                        placeholder="Detalhes das restrições funcionais"
+                      />
+                      {errors.restricao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.restricao}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Novas Atribuições *</label>
+                      <textarea
+                        required
+                        name="novasAtribuicoes"
+                        value={formData.novasAtribuicoes}
+                        onChange={handleChange}
+                        rows={3}
+                        className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all resize-none"
+                        placeholder="O que o trabalhador passará a fazer"
+                      />
+                      {errors.novasAtribuicoes && <p className="mt-1 text-xs text-red-500 font-bold">{errors.novasAtribuicoes}</p>}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Acompanhamento *</label>
+                    <select
+                      required
+                      name="acompanhamento"
+                      value={formData.acompanhamento}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all text-sm"
+                    >
+                      <option value="">Selecione...</option>
+                      {acompanhamentos.map((a) => (
+                        <option key={a.nome} value={a.nome}>{a.nome}</option>
+                      ))}
+                    </select>
+                    {errors.acompanhamento && <p className="mt-1 text-xs text-red-500 font-bold">{errors.acompanhamento}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Grau de Satisfação *</label>
+                    <select
+                      required
+                      name="grauSatisfacao"
+                      value={formData.grauSatisfacao}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all text-sm"
+                    >
+                      <option value="">Selecione...</option>
+                      {grausSatisfacao.map((g) => (
+                        <option key={g.nome} value={g.nome}>{g.nome}</option>
+                      ))}
+                    </select>
+                    {errors.grauSatisfacao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.grauSatisfacao}</p>}
                   </div>
                 </div>
               </div>
@@ -341,6 +466,28 @@ export const FormReadaptacao: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-6">
                   <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="mudancaSetor"
+                      checked={formData.mudancaSetor}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-purple-600 focus:ring-purple-500 transition-all"
+                    />
+                    <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Mudou de Setor?</span>
+                  </label>
+
+                  <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
+                    <input
+                      type="checkbox"
+                      name="mudancaFuncao"
+                      checked={formData.mudancaFuncao}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-purple-600 focus:ring-purple-500 transition-all"
+                    />
+                    <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Mudou de Função?</span>
+                  </label>
+
+                  <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
                     <input
                       type="checkbox"
                       name="ativo"

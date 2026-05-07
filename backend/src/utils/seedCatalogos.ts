@@ -402,6 +402,32 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Domiciliar', ordem: 3 },
     { nome: 'Observação', ordem: 4 },
   ]},
+  // Acompanhamento de Readaptação
+  { entidade: 'acompanhamentoReadaptacao', itens: [
+    { nome: 'Semanal', ordem: 1 },
+    { nome: 'Quinzenal', ordem: 2 },
+    { nome: 'Mensal', ordem: 3 },
+    { nome: 'Trimestral', ordem: 4 },
+    { nome: 'Semestral', ordem: 5 },
+    { nome: 'Anual', ordem: 6 },
+    { nome: 'Concluído', ordem: 7 },
+  ]},
+  // Grau de Satisfação
+  { entidade: 'grauSatisfacao', itens: [
+    { nome: 'Muito Satisfeito', ordem: 1 },
+    { nome: 'Satisfeito', ordem: 2 },
+    { nome: 'Indiferente', ordem: 3 },
+    { nome: 'Insatisfeito', ordem: 4 },
+    { nome: 'Muito Insatisfeito', ordem: 5 },
+  ]},
+  // Tipo de Violência Sexual
+  { entidade: 'tipoViolenciaSexual', itens: [
+    { nome: 'Assédio Sexual', ordem: 1 },
+    { nome: 'Estupro', ordem: 2 },
+    { nome: 'Atentado Violento ao Pudor', ordem: 3 },
+    { nome: 'Outro', ordem: 99 },
+    { nome: 'Não se aplica', ordem: 100 },
+  ]},
 ];
 
 export async function seedCatalogos() {

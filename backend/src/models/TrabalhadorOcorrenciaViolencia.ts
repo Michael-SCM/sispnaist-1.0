@@ -10,11 +10,16 @@ export interface ITrabalhadorOcorrenciaViolencia extends Document {
   dataOcorrencia: Date;
   localOcorrencia?: string;
   tipoViolencia: string;          // vinculado a tb_tipo_violencia
-  tipoViolenciaSexual?: string;   // vinculado a tb_tipo_violencia_sexual (se aplicável)
+  tipoViolenciaSexual: string;    // vinculado a tb_tipo_violencia_sexual (se aplicável)
   motivoViolencia: string;        // vinculado a tb_motivo_violencia
   meioAgressao: string;           // vinculado a tb_meio_agressao
   tipoAutorViolencia: string;     // vinculado a tb_tipo_autor_violencia
   descricaoOcorrencia: string;
+  reincidencia: boolean;
+  atendimentoRealizado: string;
+  condutaViolencia: string;
+  pessoasEnvolvidas?: string;
+  emissaoCatNas: boolean;
   boletimOcorrencia?: string;     // número do BO
   medidasTomadas?: string;
   acompanhamentos?: string;
@@ -29,11 +34,16 @@ const TrabalhadorOcorrenciaViolenciaSchema = new Schema<ITrabalhadorOcorrenciaVi
     dataOcorrencia: { type: Date, required: true },
     localOcorrencia: { type: String, trim: true },
     tipoViolencia: { type: String, required: true },
-    tipoViolenciaSexual: { type: String },
+    tipoViolenciaSexual: { type: String, required: true },
     motivoViolencia: { type: String, required: true },
     meioAgressao: { type: String, required: true },
     tipoAutorViolencia: { type: String, required: true },
     descricaoOcorrencia: { type: String, required: true },
+    reincidencia: { type: Boolean, default: false },
+    atendimentoRealizado: { type: String, required: true },
+    condutaViolencia: { type: String, required: true },
+    pessoasEnvolvidas: { type: String },
+    emissaoCatNas: { type: Boolean, default: false },
     boletimOcorrencia: { type: String, trim: true },
     medidasTomadas: { type: String, trim: true },
     acompanhamentos: { type: String, trim: true },
