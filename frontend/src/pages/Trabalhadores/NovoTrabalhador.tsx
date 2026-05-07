@@ -197,7 +197,14 @@ export const NovoTrabalhador: React.FC = () => {
 
     try {
       setIsLoading(true);
-      const novo = await trabalhadorService.criar(formData);
+      
+      // Garantir que campos críticos como gênero sejam enviados
+      const payload = {
+        ...formData,
+        genero: formData.genero
+      };
+
+      const novo = await trabalhadorService.criar(payload);
       adicionarTrabalhador(novo);
       toast.success('Trabalhador cadastrado com sucesso');
       navigate('/trabalhadores');
