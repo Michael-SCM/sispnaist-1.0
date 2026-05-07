@@ -72,7 +72,7 @@ export const NovoTrabalhador: React.FC = () => {
 
   const [formData, setFormData] = useState<Partial<ITrabalhador>>({
     nome: '', cpf: '', email: '',
-    sexo: '', identidadeGenero: '', raca: '', escolaridade: '', estadoCivil: '',
+    sexo: '', id_genero: '', raca: '', escolaridade: '', estadoCivil: '',
     nomeMae: '', matricula: '', cartaoSus: '', celular: '', telefoneContato: '',
     endereco: {}, deficiencia: {},
     vinculo: { situacao: 'Ativo' },
@@ -115,7 +115,7 @@ export const NovoTrabalhador: React.FC = () => {
       'celular': 'Celular',
       'email': 'Email',
       'sexo': 'Sexo',
-      'identidadeGenero': 'Identidade de Gênero',
+      'id_genero': 'Gênero',
       'raca': 'Raça',
       'escolaridade': 'Escolaridade',
       'estadoCivil': 'Estado Civil',
@@ -201,8 +201,10 @@ export const NovoTrabalhador: React.FC = () => {
       // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
-        identidadeGenero: formData.identidadeGenero
+        id_genero: formData.id_genero
       };
+      
+      console.log('PAYLOAD FINAL:', payload);
 
       const novo = await trabalhadorService.criar(payload);
       adicionarTrabalhador(novo);
@@ -318,7 +320,21 @@ export const NovoTrabalhador: React.FC = () => {
               {/* Sexo, Gênero, Raça, Escolaridade, Estado Civil */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
-                {renderSelect('identidadeGenero', 'Identidade de Gênero *', generos, formData.identidadeGenero || '')}
+                <div>
+                  <label className={labelCls}>Gênero *</label>
+                  <select 
+                    name="id_genero" 
+                    value={formData.id_genero || ''} 
+                    onChange={(e) => {
+                      console.log('MUDANÇA NO GÊNERO:', e.target.value);
+                      handleChange(e);
+                    }} 
+                    className={selectCls}
+                  >
+                    <option value="">Selecione...</option>
+                    {generos.map((i) => <option key={i.nome} value={i.nome}>{i.nome}</option>)}
+                  </select>
+                </div>
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}

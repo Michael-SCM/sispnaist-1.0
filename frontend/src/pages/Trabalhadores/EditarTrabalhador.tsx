@@ -134,7 +134,7 @@ export const EditarTrabalhador: React.FC = () => {
       'celular': 'Celular',
       'email': 'Email',
       'sexo': 'Sexo',
-      'identidadeGenero': 'Identidade de Gênero',
+      'id_genero': 'Gênero',
       'raca': 'Raça',
       'escolaridade': 'Escolaridade',
       'estadoCivil': 'Estado Civil',
@@ -220,8 +220,10 @@ export const EditarTrabalhador: React.FC = () => {
       // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
-        identidadeGenero: formData.identidadeGenero
+        id_genero: formData.id_genero
       };
+      
+      console.log('PAYLOAD FINAL:', payload);
 
       const atualizado = await trabalhadorService.atualizar(id!, payload);
       atualizarTrabalhador(id, atualizado);
@@ -350,7 +352,21 @@ export const EditarTrabalhador: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
-                {renderSelect('identidadeGenero', 'Identidade de Gênero *', generos, formData.identidadeGenero || '')}
+                <div>
+                  <label className={labelCls}>Gênero *</label>
+                  <select 
+                    name="id_genero" 
+                    value={formData.id_genero || ''} 
+                    onChange={(e) => {
+                      console.log('MUDANÇA NO GÊNERO:', e.target.value);
+                      handleChange(e);
+                    }} 
+                    className={selectCls}
+                  >
+                    <option value="">Selecione...</option>
+                    {generos.map((i) => <option key={i.nome} value={i.nome}>{i.nome}</option>)}
+                  </select>
+                </div>
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}
