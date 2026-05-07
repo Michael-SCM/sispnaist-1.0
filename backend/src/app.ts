@@ -32,12 +32,26 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
-// Middleware de segurança
-app.use(helmet());
+// Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
 app.use(cors({
-  origin: config.corsOrigin,
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://sispnaist-1-0.vercel.app'
+    ];
+    // Permitir se for um dos origens permitidas ou se for um subdomínio da vercel
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
+
+// Middleware de segurança
+app.use(helmet());
 
 // Parser de requisições
 app.use(express.json({ limit: '10mb', strict: false }));
