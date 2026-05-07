@@ -98,6 +98,7 @@ export const FormDependente: React.FC = () => {
     const novoErros: Record<string, string> = {};
 
     if (!formData.nome.trim()) novoErros.nome = 'Obrigatório';
+    if (!formData.dataNascimento) novoErros.dataNascimento = 'Obrigatória';
     if (!formData.parentesco) novoErros.parentesco = 'Obrigatório';
 
     setErrors(novoErros);
@@ -219,14 +220,16 @@ export const FormDependente: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Nascimento</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Nascimento *</label>
                     <input
+                      required
                       type="date"
                       name="dataNascimento"
                       value={formData.dataNascimento}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all"
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-medium"
                     />
+                    {errors.dataNascimento && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataNascimento}</p>}
                   </div>
                 </div>
               </div>

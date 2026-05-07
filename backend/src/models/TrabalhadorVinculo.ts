@@ -9,7 +9,8 @@ export interface ITrabalhadorVinculo extends Document {
   trabalhadorId: string;
   tipoVinculo: string;        // vinculado a tb_tipo_vinculo
   funcao?: string;            // vinculado a tb_funcao
-  jornadaTrabalho?: string;   // vinculado a tb_jornada_trabalho
+  matricula: string;
+  jornadaTrabalho: string;   // vinculado a tb_jornada_trabalho
   turnoTrabalho?: string;     // vinculado a tb_turno_trabalho
   dataInicio: Date;
   dataFim?: Date;
@@ -30,8 +31,9 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculo>(
   {
     trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
     tipoVinculo: { type: String, required: true, trim: true },
+    matricula: { type: String, required: true, trim: true },
     funcao: { type: String, trim: true },
-    jornadaTrabalho: { type: String, trim: true },
+    jornadaTrabalho: { type: String, required: true, trim: true },
     turnoTrabalho: { type: String, trim: true },
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },

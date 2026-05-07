@@ -22,6 +22,7 @@ import toast from 'react-hot-toast';
 
 interface FormData {
   tipoVinculo: string;
+  matricula: string;
   funcao: string;
   jornadaTrabalho: string;
   turnoTrabalho: string;
@@ -40,6 +41,7 @@ interface FormData {
 
 const INITIAL_FORM: FormData = {
   tipoVinculo: '',
+  matricula: '',
   funcao: '',
   jornadaTrabalho: '',
   turnoTrabalho: '',
@@ -99,6 +101,7 @@ export const FormVinculo: React.FC = () => {
       if (vinculo) {
         setFormData({
           tipoVinculo: vinculo.tipoVinculo || '',
+          matricula: (vinculo as any).matricula || '',
           funcao: vinculo.funcao || '',
           jornadaTrabalho: vinculo.jornadaTrabalho || '',
           turnoTrabalho: vinculo.turnoTrabalho || '',
@@ -128,6 +131,8 @@ export const FormVinculo: React.FC = () => {
   const validar = (): boolean => {
     const novoErros: Record<string, string> = {};
     if (!formData.tipoVinculo) novoErros.tipoVinculo = 'Obrigatório';
+    if (!formData.matricula.trim()) novoErros.matricula = 'Obrigatória';
+    if (!formData.jornadaTrabalho) novoErros.jornadaTrabalho = 'Obrigatória';
     if (!formData.dataInicio) novoErros.dataInicio = 'Obrigatória';
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -226,6 +231,18 @@ export const FormVinculo: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Matrícula *</label>
+                    <input
+                      required
+                      name="matricula"
+                      value={formData.matricula}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold"
+                      placeholder="Número da Matrícula"
+                    />
+                    {errors.matricula && <p className="mt-1 text-xs text-red-500 font-bold">{errors.matricula}</p>}
+                  </div>
+                  <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Cargo</label>
                     <input
                       name="cargo"
@@ -291,18 +308,20 @@ export const FormVinculo: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Jornada</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Jornada *</label>
                     <select
+                      required
                       name="jornadaTrabalho"
                       value={formData.jornadaTrabalho}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm"
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-bold"
                     >
                       <option value="">Selecione...</option>
                       {jornadas.map((j) => (
                         <option key={j.nome} value={j.nome}>{j.nome}</option>
                       ))}
                     </select>
+                    {errors.jornadaTrabalho && <p className="mt-1 text-xs text-red-500 font-bold">{errors.jornadaTrabalho}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Turno</label>

@@ -25,6 +25,9 @@ interface FormData {
   dataInicio: string;
   dataFim: string;
   dataRetorno: string;
+  dataPericia: string;
+  desfecho: string;
+  tempoAfastamento: string;
   laudoMedico: string;
   observacoes: string;
   ativo: boolean;
@@ -37,6 +40,9 @@ const INITIAL_FORM: FormData = {
   dataInicio: '',
   dataFim: '',
   dataRetorno: '',
+  dataPericia: '',
+  desfecho: '',
+  tempoAfastamento: '',
   laudoMedico: '',
   observacoes: '',
   ativo: true,
@@ -88,6 +94,9 @@ export const FormAfastamento: React.FC = () => {
           dataInicio: afastamento.dataInicio ? afastamento.dataInicio.split('T')[0] : '',
           dataFim: afastamento.dataFim ? afastamento.dataFim.split('T')[0] : '',
           dataRetorno: afastamento.dataRetorno ? afastamento.dataRetorno.split('T')[0] : '',
+          dataPericia: afastamento.dataPericia ? afastamento.dataPericia.split('T')[0] : '',
+          desfecho: afastamento.desfecho || '',
+          tempoAfastamento: afastamento.tempoAfastamento || '',
           laudoMedico: afastamento.laudoMedico || '',
           observacoes: afastamento.observacoes || '',
           ativo: afastamento.ativo !== false,
@@ -109,6 +118,7 @@ export const FormAfastamento: React.FC = () => {
     if (!formData.tipoAfastamento) novoErros.tipoAfastamento = 'Obrigatório';
     if (!formData.motivoAfastamento) novoErros.motivoAfastamento = 'Obrigatório';
     if (!formData.dataInicio) novoErros.dataInicio = 'Obrigatória';
+    if (!formData.dataRetorno) novoErros.dataRetorno = 'Obrigatória';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -260,6 +270,26 @@ export const FormAfastamento: React.FC = () => {
                       placeholder="Nº do Laudo ou Ref."
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Desfecho</label>
+                    <input
+                      name="desfecho"
+                      value={formData.desfecho}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                      placeholder="Ex: Alta, Óbito, etc."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Afastamento</label>
+                    <input
+                      name="tempoAfastamento"
+                      value={formData.tempoAfastamento}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                      placeholder="Ex: 15 dias"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -292,11 +322,23 @@ export const FormAfastamento: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Retorno Efetivo</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Retorno Efetivo *</label>
                     <input
                       type="date"
+                      required
                       name="dataRetorno"
                       value={formData.dataRetorno}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
+                    />
+                    {errors.dataRetorno && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataRetorno}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Perícia</label>
+                    <input
+                      type="date"
+                      name="dataPericia"
+                      value={formData.dataPericia}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
                     />

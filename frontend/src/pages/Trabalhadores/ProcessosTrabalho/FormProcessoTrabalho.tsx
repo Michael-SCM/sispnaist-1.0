@@ -25,6 +25,7 @@ interface FormData {
   jornadaTrabalho: string;
   turnoTrabalho: string;
   jornadaSemanal: string;
+  questionarioId: string;
   dataInicio: string;
   dataFim: string;
   observacoes: string;
@@ -38,6 +39,7 @@ const INITIAL_FORM: FormData = {
   jornadaTrabalho: '',
   turnoTrabalho: '',
   jornadaSemanal: '',
+  questionarioId: '',
   dataInicio: '',
   dataFim: '',
   observacoes: '',
@@ -90,6 +92,7 @@ export const FormProcessoTrabalho: React.FC = () => {
           jornadaTrabalho: processo.jornadaTrabalho || '',
           turnoTrabalho: processo.turnoTrabalho || '',
           jornadaSemanal: processo.jornadaSemanal || '',
+          questionarioId: (processo as any).questionarioId || '',
           dataInicio: processo.dataInicio ? processo.dataInicio.split('T')[0] : '',
           dataFim: processo.dataFim ? processo.dataFim.split('T')[0] : '',
           observacoes: processo.observacoes || '',
@@ -254,6 +257,16 @@ export const FormProcessoTrabalho: React.FC = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all"
                       placeholder="Ex: 40 horas"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Questionário ID (Opcional)</label>
+                    <input
+                      name="questionarioId"
+                      value={formData.questionarioId}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all font-mono"
+                      placeholder="ID do questionário respondido"
                     />
                   </div>
                 </div>

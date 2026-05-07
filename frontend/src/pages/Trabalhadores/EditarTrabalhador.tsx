@@ -115,6 +115,98 @@ export const EditarTrabalhador: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+    // Validação de campos obrigatórios (Baseado no legado PHP)
+    const camposObrigatorios: { [key: string]: string } = {
+      'nome': 'Nome Completo',
+      'nomeMae': 'Nome da Mãe',
+      'matricula': 'Matrícula',
+      'cartaoSus': 'Cartão do SUS',
+      'celular': 'Celular',
+      'telefoneContato': 'Telefone de Contato',
+      'email': 'Email',
+      'sexo': 'Sexo',
+      'genero': 'Gênero',
+      'raca': 'Raça',
+      'escolaridade': 'Escolaridade',
+      'estadoCivil': 'Estado Civil',
+      'endereco.cep': 'CEP',
+      'endereco.logradouro': 'Logradouro',
+      'endereco.numero': 'Número',
+      'endereco.complemento': 'Complemento',
+      'endereco.bairro': 'Bairro',
+      'endereco.cidade': 'Cidade',
+      'endereco.estado': 'Estado',
+      'trabalho.dataEntrada': 'Data de Entrada em Serviço',
+      'vinculo.tipo': 'Tipo de Vínculo',
+      'trabalho.setor': 'Setor de Trabalho',
+      'trabalho.cargo': 'Cargo',
+      'trabalho.funcao': 'Função',
+      'trabalho.ocupacao': 'Ocupação',
+      'vinculo.turno': 'Turno de Trabalho',
+      'vinculo.jornada': 'Jornada de Trabalho',
+      'vinculo.situacao': 'Situação do Trabalho',
+    };
+
+    for (const [path, label] of Object.entries(camposObrigatorios)) {
+      const value = path.includes('.') 
+        ? path.split('.').reduce((obj, key) => (obj as any)?.[key], formData)
+        : formData[path as keyof ITrabalhador];
+      
+      if (!value) {
+        toast.error(`O campo "${label}" é obrigatório`);
+        return;
+      }
+    }
+
+    // Validações Condicionais
+    if (checks.deficiencia) {
+      if (!formData.deficiencia?.tipo || !formData.deficiencia?.tempo || !formData.deficiencia?.grau) {
+        toast.error('Preencha todos os campos de deficiência');
+        return;
+      }
+    }
+    if (checks.posse && !formData.trabalho?.dataPosse) {
+      toast.error('Data da posse é obrigatória');
+      return;
+    }
+    if (checks.terceirizado && !formData.trabalho?.empresaTerceirizada) {
+      toast.error('Nome da empresa terceirizada é obrigatório');
+      return;
+    }
+    if (checks.aposentadoria && !formData.historico?.dataAposentadoria) {
+      toast.error('Data da aposentadoria é obrigatória');
+      return;
+    }
+    if (checks.obito && !formData.historico?.dataObito) {
+      toast.error('Data do óbito é obrigatória');
+      return;
+    }
+    if (checks.remocao) {
+      if (!formData.historico?.dataRemocao || !formData.historico?.novoServico) {
+        toast.error('Data da remoção e novo serviço são obrigatórios');
+        return;
+      }
+    }
+    if (checks.retorno && !formData.historico?.dataRetorno) {
+      toast.error('Data de retorno é obrigatória');
+      return;
+    }
+    if (checks.relotacao && !formData.historico?.dataRelotacao) {
+      toast.error('Data da relotação é obrigatória');
+      return;
+    }
+    if (checks.desligamento && !formData.historico?.dataDesligamento) {
+      toast.error('Data do desligamento é obrigatória');
+      return;
+    }
+    if (checks.afastamento) {
+      if (!formData.historico?.dataAfastamento || !formData.historico?.tipoAfastamento) {
+        toast.error('Data do afastamento e tipo de afastamento são obrigatórios');
+        return;
+      }
+    }
+
     try {
       setIsSaving(true);
       const atualizado = await trabalhadorService.atualizar(id, formData);
@@ -227,10 +319,11 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 {renderInput('matricula', 'Matrícula', formData.matricula || '', { required: true })}
-                {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '')}
+                {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '', { required: true })}
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
+                {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '', { required: true })}
                 {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date' })}
               </div>
               <div>
@@ -266,15 +359,15 @@ export const EditarTrabalhador: React.FC = () => {
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={MapPin} title="Endereço Residencial" />
             <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {renderInput('endereco.cep', 'CEP', formData.endereco?.cep || '')}
+              {renderInput('endereco.cep', 'CEP', formData.endereco?.cep || '', { required: true })}
               <div className="md:col-span-2">
-                {renderInput('endereco.logradouro', 'Logradouro', formData.endereco?.logradouro || '')}
+                {renderInput('endereco.logradouro', 'Logradouro', formData.endereco?.logradouro || '', { required: true })}
               </div>
-              {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '')}
-              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '')}
-              {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '')}
-              {renderInput('endereco.cidade', 'Cidade', formData.endereco?.cidade || '')}
-              {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '')}
+              {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '', { required: true })}
+              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '', { required: true })}
+              {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '', { required: true })}
+              {renderInput('endereco.cidade', 'Cidade', formData.endereco?.cidade || '', { required: true })}
+              {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '', { required: true })}
             </div>
           </div>
 

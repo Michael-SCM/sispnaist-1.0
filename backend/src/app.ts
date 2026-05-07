@@ -29,6 +29,7 @@ import enderecosRoutes from './routes/enderecos.js';
 import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { seedCatalogos } from './utils/seedCatalogos.js';
 
 const app = express();
 
@@ -57,8 +58,13 @@ app.use(helmet());
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Conectar ao MongoDB
-connectDB();
+// Conectar ao MongoDB e rodar seeds
+connectDB().then(() => {
+  // Executa o seed apenas se não estiver em ambiente de teste
+  if (process.env.NODE_ENV !== 'test') {
+    seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
+  }
+});
 
 // Root route
 app.get('/', (req, res) => {
