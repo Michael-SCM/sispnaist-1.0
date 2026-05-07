@@ -61,11 +61,14 @@ axiosInstance.interceptors.response.use(
     }
 
     // Extrair mensagem de erro detalhada do servidor
-    const errorMessage = (error.response?.data as any)?.message || 
-                        error.message || 
-                        'Erro na requisição';
+    const responseData = error.response?.data as any;
+    const errorMessage = responseData?.message || error.message || 'Erro na requisição';
     
-    const customError = new Error(errorMessage);
+    const customError = new Error(errorMessage) as any;
+    if (responseData?.errors) {
+      customError.details = responseData.errors;
+    }
+    
     return Promise.reject(customError);
   }
 );

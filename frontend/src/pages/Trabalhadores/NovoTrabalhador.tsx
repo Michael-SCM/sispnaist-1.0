@@ -81,7 +81,16 @@ export const NovoTrabalhador: React.FC = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    
+    // Máscara de CPF
+    if (name === 'cpf') {
+      value = value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      }
+    }
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData((prev) => ({
@@ -193,7 +202,8 @@ export const NovoTrabalhador: React.FC = () => {
       toast.success('Trabalhador cadastrado com sucesso');
       navigate('/trabalhadores');
     } catch (error: any) {
-      toast.error(error.message || 'Erro ao cadastrar trabalhador');
+      const msg = error.details ? `${error.message}: ${error.details.join(', ')}` : error.message;
+      toast.error(msg || 'Erro ao cadastrar trabalhador');
     } finally {
       setIsLoading(false);
     }
