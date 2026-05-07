@@ -72,7 +72,7 @@ export const NovoTrabalhador: React.FC = () => {
 
   const [formData, setFormData] = useState<Partial<ITrabalhador>>({
     nome: '', cpf: '', email: '',
-    sexo: '', id_genero: '', raca: '', escolaridade: '', estadoCivil: '',
+    sexo: '', genero: '', raca: '', escolaridade: '', estadoCivil: '',
     nomeMae: '', matricula: '', cartaoSus: '', celular: '', telefoneContato: '',
     endereco: {}, deficiencia: {},
     vinculo: { situacao: 'Ativo' },
@@ -115,7 +115,7 @@ export const NovoTrabalhador: React.FC = () => {
       'celular': 'Celular',
       'email': 'Email',
       'sexo': 'Sexo',
-      'id_genero': 'Gênero',
+      'genero': 'Gênero',
       'raca': 'Raça',
       'escolaridade': 'Escolaridade',
       'estadoCivil': 'Estado Civil',
@@ -201,7 +201,7 @@ export const NovoTrabalhador: React.FC = () => {
       // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
-        id_genero: formData.id_genero
+        genero: formData.genero
       };
       
       console.log('PAYLOAD FINAL:', payload);
@@ -323,8 +323,8 @@ export const NovoTrabalhador: React.FC = () => {
                 <div>
                   <label className={labelCls}>Gênero *</label>
                   <select 
-                    name="id_genero" 
-                    value={formData.id_genero || ''} 
+                    name="genero" 
+                    value={formData.genero || ''} 
                     onChange={(e) => {
                       console.log('MUDANÇA NO GÊNERO:', e.target.value);
                       handleChange(e);

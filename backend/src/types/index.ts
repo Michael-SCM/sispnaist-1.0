@@ -39,7 +39,7 @@ export interface ITrabalhador {
 
   // Dados Pessoais/Diversos
   sexo: string; // M, F, etc.
-  id_genero: string;
+  genero: string;
   raca: string;
   escolaridade: string;
   estadoCivil: string;
