@@ -134,7 +134,7 @@ export const EditarTrabalhador: React.FC = () => {
       'celular': 'Celular',
       'email': 'Email',
       'sexo': 'Sexo',
-      'genero': 'Gênero',
+      'identidadeGenero': 'Identidade de Gênero',
       'raca': 'Raça',
       'escolaridade': 'Escolaridade',
       'estadoCivil': 'Estado Civil',
@@ -217,10 +217,10 @@ export const EditarTrabalhador: React.FC = () => {
     try {
       setIsSaving(true);
 
-      // Garantir que campos críticos como gênero sejam enviados
+      // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
-        genero: formData.genero
+        identidadeGenero: formData.identidadeGenero
       };
 
       const atualizado = await trabalhadorService.atualizar(id!, payload);
@@ -350,7 +350,7 @@ export const EditarTrabalhador: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
-                {renderSelect('genero', 'Gênero *', generos, formData.genero || '')}
+                {renderSelect('identidadeGenero', 'Identidade de Gênero *', generos, formData.identidadeGenero || '')}
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}

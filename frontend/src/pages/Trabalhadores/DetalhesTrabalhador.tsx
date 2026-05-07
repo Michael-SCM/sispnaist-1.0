@@ -131,7 +131,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                 <InfoCard label="Matrícula" value={trabalhador.matricula} icon={ClipboardList} color="text-amber-500" />
                 <InfoCard label="Cartão SUS" value={trabalhador.cartaoSus} icon={Heart} color="text-rose-500" />
                 <InfoCard label="Sexo" value={trabalhador.sexo} icon={User} color="text-blue-400" />
-                <InfoCard label="Gênero" value={trabalhador.genero} icon={User} color="text-purple-400" />
+                <InfoCard label="Identidade de Gênero" value={trabalhador.identidadeGenero} icon={User} color="text-purple-400" />
                 <InfoCard label="Raça" value={trabalhador.raca} icon={User} color="text-amber-400" />
                 <InfoCard label="Escolaridade" value={trabalhador.escolaridade} icon={GraduationCap} color="text-indigo-500" />
                 <InfoCard label="Estado Civil" value={trabalhador.estadoCivil} icon={Scale} color="text-slate-500" />
