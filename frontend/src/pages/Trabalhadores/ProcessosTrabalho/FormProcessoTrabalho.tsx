@@ -116,6 +116,7 @@ export const FormProcessoTrabalho: React.FC = () => {
     if (!formData.cargo) novoErros.cargo = 'Obrigatório';
     if (!formData.funcao) novoErros.funcao = 'Obrigatória';
     if (!formData.dataInicio) novoErros.dataInicio = 'Obrigatória';
+    if (!formData.questionarioId) novoErros.questionarioId = 'Obrigatório';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -260,14 +261,16 @@ export const FormProcessoTrabalho: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Questionário ID (Opcional)</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Questionário *</label>
                     <input
                       name="questionarioId"
+                      required
                       value={formData.questionarioId}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none transition-all font-mono"
                       placeholder="ID do questionário respondido"
                     />
+                    {errors.questionarioId && <p className="mt-1 text-xs text-red-500 font-bold">{errors.questionarioId}</p>}
                   </div>
                 </div>
               </div>

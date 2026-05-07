@@ -119,6 +119,9 @@ export const FormAfastamento: React.FC = () => {
     if (!formData.motivoAfastamento) novoErros.motivoAfastamento = 'Obrigatório';
     if (!formData.dataInicio) novoErros.dataInicio = 'Obrigatória';
     if (!formData.dataRetorno) novoErros.dataRetorno = 'Obrigatória';
+    if (!formData.tempoAfastamento.trim()) novoErros.tempoAfastamento = 'Obrigatório';
+    if (!formData.dataPericia) novoErros.dataPericia = 'Obrigatória';
+    if (!formData.desfecho.trim()) novoErros.desfecho = 'Obrigatório';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -271,24 +274,28 @@ export const FormAfastamento: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Desfecho</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Desfecho *</label>
                     <input
+                      required
                       name="desfecho"
                       value={formData.desfecho}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
                       placeholder="Ex: Alta, Óbito, etc."
                     />
+                    {errors.desfecho && <p className="mt-1 text-xs text-red-500 font-bold">{errors.desfecho}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Afastamento</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Afastamento *</label>
                     <input
+                      required
                       name="tempoAfastamento"
                       value={formData.tempoAfastamento}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
                       placeholder="Ex: 15 dias"
                     />
+                    {errors.tempoAfastamento && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tempoAfastamento}</p>}
                   </div>
                 </div>
               </div>
@@ -334,14 +341,16 @@ export const FormAfastamento: React.FC = () => {
                     {errors.dataRetorno && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataRetorno}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Perícia</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Perícia *</label>
                     <input
+                      required
                       type="date"
                       name="dataPericia"
                       value={formData.dataPericia}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
                     />
+                    {errors.dataPericia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataPericia}</p>}
                   </div>
                 </div>
               </div>
