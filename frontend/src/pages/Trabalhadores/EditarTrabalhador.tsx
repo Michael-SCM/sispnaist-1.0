@@ -216,7 +216,14 @@ export const EditarTrabalhador: React.FC = () => {
 
     try {
       setIsSaving(true);
-      const atualizado = await trabalhadorService.atualizar(id, formData);
+
+      // Garantir que campos críticos como gênero sejam enviados
+      const payload = {
+        ...formData,
+        genero: formData.genero
+      };
+
+      const atualizado = await trabalhadorService.atualizar(id!, payload);
       atualizarTrabalhador(id, atualizado);
       toast.success('Trabalhador atualizado com sucesso');
       navigate('/trabalhadores');
