@@ -65,9 +65,9 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       type: String,
       required: [true, 'Sexo é obrigatório'],
     },
-    genero: {
+    identidadeGenero: {
       type: String,
-      required: [true, 'Gênero é obrigatório'],
+      required: [true, 'Identidade de Gênero é obrigatória'],
     },
     raca: {
       type: String,

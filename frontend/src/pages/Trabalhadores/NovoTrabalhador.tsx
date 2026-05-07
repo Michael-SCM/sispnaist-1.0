@@ -72,7 +72,7 @@ export const NovoTrabalhador: React.FC = () => {
 
   const [formData, setFormData] = useState<Partial<ITrabalhador>>({
     nome: '', cpf: '', email: '',
-    sexo: '', genero: '', raca: '', escolaridade: '', estadoCivil: '',
+    sexo: '', identidadeGenero: '', raca: '', escolaridade: '', estadoCivil: '',
     nomeMae: '', matricula: '', cartaoSus: '', celular: '', telefoneContato: '',
     endereco: {}, deficiencia: {},
     vinculo: { situacao: 'Ativo' },
@@ -115,7 +115,7 @@ export const NovoTrabalhador: React.FC = () => {
       'celular': 'Celular',
       'email': 'Email',
       'sexo': 'Sexo',
-      'genero': 'Gênero',
+      'identidadeGenero': 'Identidade de Gênero',
       'raca': 'Raça',
       'escolaridade': 'Escolaridade',
       'estadoCivil': 'Estado Civil',
@@ -198,10 +198,10 @@ export const NovoTrabalhador: React.FC = () => {
     try {
       setIsLoading(true);
       
-      // Garantir que campos críticos como gênero sejam enviados
+      // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
-        genero: formData.genero
+        identidadeGenero: formData.identidadeGenero
       };
 
       const novo = await trabalhadorService.criar(payload);
@@ -318,7 +318,7 @@ export const NovoTrabalhador: React.FC = () => {
               {/* Sexo, Gênero, Raça, Escolaridade, Estado Civil */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
-                {renderSelect('genero', 'Gênero *', generos, formData.genero || '')}
+                {renderSelect('identidadeGenero', 'Identidade de Gênero *', generos, formData.identidadeGenero || '')}
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}
