@@ -55,3 +55,23 @@ export const updateProfile = asyncHandler(async (req: IAuthRequest, res: Respons
     data: { user },
   });
 });
+
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { email, dataNascimento } = req.body;
+  await authService.forgotPassword(email, dataNascimento);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Se os dados estiverem corretos, um link de recuperação será enviado para o seu email.',
+  });
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { token, novaSenha } = req.body;
+  await authService.resetPassword(token, novaSenha);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Senha atualizada com sucesso!',
+  });
+});
