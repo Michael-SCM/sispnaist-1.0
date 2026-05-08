@@ -9,26 +9,25 @@ import config from '../config/config.js';
 export const sendResetPasswordEmail = async (email: string, token: string) => {
   const resetLink = `${config.frontendUrl}/reset-password?token=${token}`;
   
-  // Se não houver configurações de e-mail, apenas loga no console
   if (!config.email.host || !config.email.user || !config.email.pass) {
-    console.log('================================================');
-    console.log('AVISO: CONFIGURAÇÕES DE EMAIL AUSENTES NO .ENV');
-    console.log('SIMULAÇÃO DE ENVIO DE EMAIL');
-    console.log(`Para: ${email}`);
-    console.log('Assunto: Recuperação de Senha - SISPNAIST');
-    console.log(`Link: ${resetLink}`);
-    console.log('================================================');
+    console.log('AVISO: Configurações de e-mail incompletas. Link:', resetLink);
     return;
   }
 
+  // Configuração mais robusta para servidores online (como Render)
   const transporter = nodemailer.createTransport({
     host: config.email.host,
     port: config.email.port,
-    secure: config.email.port === 465, // true para 465, false para outras portas
+    secure: config.email.port === 465, // SSL
     auth: {
       user: config.email.user,
       pass: config.email.pass,
     },
+    tls: {
+      rejectUnauthorized: false // Ajuda a evitar erros de certificado em alguns servidores
+    },
+    connectionTimeout: 10000, // 10 segundos
+    greetingTimeout: 10000,
   });
 
   try {
@@ -37,27 +36,29 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       to: email,
       subject: "Recuperação de Senha - SISPNAIST",
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2563eb;">Recuperação de Senha</h2>
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2563eb; text-align: center;">Recuperação de Senha</h2>
           <p>Olá,</p>
-          <p>Você solicitou a redefinição de sua senha no sistema SISPNAIST.</p>
+          <p>Você solicitou a redefinição de sua senha no sistema <strong>SISPNAIST</strong>.</p>
           <p>Clique no botão abaixo para criar uma nova senha:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetLink}" 
-               style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+               style="background-color: #2563eb; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
               Redefinir Minha Senha
             </a>
           </div>
-          <p>Se você não solicitou isso, pode ignorar este e-mail.</p>
+          <p>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</p>
+          <p style="word-break: break-all; color: #666; font-size: 14px;">${resetLink}</p>
+          <p>Se você não solicitou isso, pode ignorar este e-mail com segurança.</p>
           <p>O link expirará em 1 hora.</p>
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 12px; color: #666;">Este é um e-mail automático, por favor não responda.</p>
+          <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático do SISPNAIST, por favor não responda.</p>
         </div>
       `,
     });
-    console.log(`E-mail de recuperação enviado com sucesso para: ${email}`);
+    console.log(`E-mail enviado para: ${email}`);
   } catch (error) {
-    console.error('Erro ao enviar e-mail:', error);
-    throw new Error('Falha ao enviar e-mail de recuperação.');
+    console.error('ERRO NO NODEMAILER:', error);
+    throw new Error('Não foi possível enviar o e-mail. Verifique as configurações de SMTP no painel do Render.');
   }
 };
