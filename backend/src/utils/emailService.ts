@@ -14,7 +14,7 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
     return;
   }
 
-  // Configuração mais robusta para servidores online (como Render)
+  // Configuração otimizada para evitar erros de rede (ENETUNREACH)
   const transporter = nodemailer.createTransport({
     host: config.email.host,
     port: config.email.port,
@@ -23,11 +23,13 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       user: config.email.user,
       pass: config.email.pass,
     },
+    // Forçar o uso de IPv4 para evitar erros ENETUNREACH no Render
+    // @ts-ignore
+    family: 4, 
     tls: {
-      rejectUnauthorized: false // Ajuda a evitar erros de certificado em alguns servidores
+      rejectUnauthorized: false
     },
-    connectionTimeout: 10000, // 10 segundos
-    greetingTimeout: 10000,
+    connectionTimeout: 20000, // Aumentado para 20s
   });
 
   try {
@@ -56,9 +58,9 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
         </div>
       `,
     });
-    console.log(`E-mail enviado para: ${email}`);
+    console.log(`E-mail enviado com sucesso para: ${email}`);
   } catch (error) {
     console.error('ERRO NO NODEMAILER:', error);
-    throw new Error('Não foi possível enviar o e-mail. Verifique as configurações de SMTP no painel do Render.');
+    throw new Error('Erro ao enviar e-mail. Tente novamente em instantes.');
   }
 };
