@@ -126,8 +126,7 @@ export class AuthService {
       { expiresIn: '1h' }
     );
 
-    // Enviar email (simulado)
-    await sendResetPasswordEmail(user.email, resetToken);
+    return resetToken;
   }
 
   async resetPassword(token: string, novaSenha: string): Promise<void> {

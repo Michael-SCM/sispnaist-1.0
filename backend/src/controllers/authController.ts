@@ -58,11 +58,12 @@ export const updateProfile = asyncHandler(async (req: IAuthRequest, res: Respons
 
 export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
   const { email, dataNascimento } = req.body;
-  await authService.forgotPassword(email, dataNascimento);
+  const resetToken = await authService.forgotPassword(email, dataNascimento);
 
   res.status(200).json({
     status: 'success',
-    message: 'Se os dados estiverem corretos, um link de recuperação será enviado para o seu email.',
+    message: 'Dados confirmados! Redirecionando para alteração de senha...',
+    token: resetToken,
   });
 });
 
