@@ -15,9 +15,17 @@ export const ForgotPassword: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const message = await authService.forgotPassword(email, dataNascimento);
-      toast.success(message);
-      setIsSent(true);
+      const data = await authService.forgotPassword(email, dataNascimento);
+      if (data.token) {
+        toast.success(data.message);
+        // Pequeno delay para o usuário ler a mensagem de sucesso
+        setTimeout(() => {
+          navigate(`/reset-password?token=${data.token}`);
+        }, 1500);
+      } else {
+        toast.success(data.message);
+        setIsSent(true);
+      }
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Erro ao processar solicitação';
       toast.error(message);
