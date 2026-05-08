@@ -28,7 +28,10 @@ export const registerSchema = Joi.object({
       'string.min': 'Senha deve ter pelo menos 6 caracteres',
     }),
   telefone: Joi.string().optional(),
-  dataNascimento: Joi.date().optional(),
+  dataNascimento: Joi.date().required().messages({
+    'date.base': 'Data de nascimento inválida',
+    'any.required': 'Data de nascimento é obrigatória',
+  }),
 });
 
 // Validação genérica para catálogos/tabelas auxiliares
