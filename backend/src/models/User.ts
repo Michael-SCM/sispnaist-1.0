@@ -72,16 +72,11 @@ const UserSchema = new Schema<IUserDocument>(
       type: Boolean,
       default: true,
     },
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'usuarios', timestamps: true }
+  { 
+    collection: 'usuarios', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 // Hash password before saving

@@ -22,16 +22,11 @@ const VacinacaoSchema = new Schema<IVacinacaoDocument>(
     unidadeSaude: String,
     profissional: String,
     certificado: String,
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'vacinacoes', timestamps: true }
+  { 
+    collection: 'vacinacoes', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 VacinacaoSchema.index({ trabalhadorId: 1, dataVacinacao: -1 });
