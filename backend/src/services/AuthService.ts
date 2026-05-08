@@ -107,9 +107,15 @@ export class AuthService {
       throw new AppError('Usuário não encontrado', 404);
     }
 
+    if (!user.dataNascimento) {
+      throw new AppError('Data de nascimento não cadastrada para este usuário. Entre em contato com o administrador.', 400);
+    }
+
     // Verificar data de nascimento (comparar apenas YYYY-MM-DD)
-    const userBirthDate = user.dataNascimento?.toISOString().split('T')[0];
-    const providedBirthDate = new Date(dataNascimento).toISOString().split('T')[0];
+    const userBirthDate = user.dataNascimento.toISOString().split('T')[0];
+    
+    // Garantir que a data fornecida seja tratada como UTC para evitar problemas de fuso horário
+    const providedBirthDate = new Date(dataNascimento + 'T12:00:00Z').toISOString().split('T')[0];
 
     if (userBirthDate !== providedBirthDate) {
       throw new AppError('Data de nascimento incorreta', 400);
