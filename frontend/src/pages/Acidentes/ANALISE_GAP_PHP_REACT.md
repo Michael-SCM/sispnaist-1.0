@@ -202,11 +202,14 @@ A paginação atual renderiza **todas as páginas** como botões (linha 358: `Ar
 | `frontend/src/types/index.ts` | Atualizar `IAcidente` com campos faltantes | ✅ Implementado |
 | `frontend/src/services/acidenteService.ts` | Remover `as any` após atualizar `IAcidente` | ✅ Implementado |
 | `frontend/src/pages/Acidentes/ListaMaterialBiologico.tsx` | Adicionar paginação | ✅ Implementado |
-| `frontend/src/pages/Acidentes/DetalhesAcidente.tsx` | Clarificar/implementar histórico | ✅ Implementado (renomeado para "Datas do Registro") |
+| `frontend/src/pages/Acidentes/DetalhesAcidente.tsx` | Clarificar/implementar histórico + exibir campos adicionais | ✅ Implementado |
 | `frontend/src/pages/Acidentes/NovoMaterialBiologico.tsx` | Adicionar suporte a query param `acidenteId` | ✅ Implementado |
 | `frontend/src/pages/Acidentes/ListaAcidentes.tsx` | Implementar busca textual real ou remover promise | ✅ Implementado |
 | `frontend/src/pages/Acidentes/ListaAcidentes.tsx` | Janela de paginação | ✅ Implementado |
 | `frontend/src/pages/Acidentes/NovoAcidente.tsx` | Verificar se catálogo de tipoAcidente existe no backend | ✅ Confirmado existente |
+| `frontend/src/pages/Acidentes/EditarAcidente.tsx` | Adicionar campos faltando no setFormData | ✅ Implementado |
+| `frontend/src/pages/Acidentes/DetalhesAcidente.tsx` | Adicionar seção de Informações do Acidente e Atendimento Médico | ✅ Implementado |
+| `backend/src/utils/validations.ts` | Expandir schemas criar/atualizarAcidenteSchema com todos os campos | ✅ Implementado |
 | `frontend/src/pages/Acidentes/EditarAcidente.tsx` | Verificar se catálogo de tipoAcidente existe no backend | ✅ Confirmado existente |
 
 ---
