@@ -38,7 +38,14 @@ export class AcidenteService {
 
     const acidente = new Acidente(acidenteData);
     await acidente.save();
-    return acidente.toObject() as IAcidente;
+
+    // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
+    const acidenteObj = acidente.toObject() as any;
+    return {
+      ...acidenteObj,
+      dataCriacao: acidenteObj.createdAt,
+      dataAtualizacao: acidenteObj.updatedAt,
+    } as IAcidente;
   }
 
   async obter(id: string): Promise<IAcidente> {
@@ -79,7 +86,14 @@ export class AcidenteService {
       }
     }
 
-    return acidente as unknown as IAcidente;
+    // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
+    const acidenteMapeado = {
+      ...acidente,
+      dataCriacao: (acidente as any).createdAt || (acidente as any).dataCriacao,
+      dataAtualizacao: (acidente as any).updatedAt || (acidente as any).dataAtualizacao,
+    };
+
+    return acidenteMapeado as unknown as IAcidente;
   }
 
   async listar(
@@ -155,8 +169,15 @@ export class AcidenteService {
 
     const pages = Math.ceil(total / limit);
 
+    // Mapear timestamps do MongoDB para os nomes esperados pelo frontend
+    const acidentesMapeados = acidentes.map((a: any) => ({
+      ...a,
+      dataCriacao: a.createdAt || a.dataCriacao,
+      dataAtualizacao: a.updatedAt || a.dataAtualizacao,
+    }));
+
     return {
-      acidentes: acidentes as IAcidente[],
+      acidentes: acidentesMapeados as IAcidente[],
       total,
       pages,
     };
@@ -193,7 +214,14 @@ export class AcidenteService {
       throw new AppError('Acidente não encontrado', 404);
     }
 
-    return acidente as unknown as IAcidente;
+    // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
+    const acidenteMapeado = {
+      ...acidente,
+      dataCriacao: (acidente as any).createdAt || (acidente as any).dataCriacao,
+      dataAtualizacao: (acidente as any).updatedAt || (acidente as any).dataAtualizacao,
+    };
+
+    return acidenteMapeado as unknown as IAcidente;
   }
 
   async deletar(id: string): Promise<void> {
