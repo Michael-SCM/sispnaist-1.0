@@ -4,7 +4,7 @@ import { MainLayout } from '../../../layouts/MainLayout.js';
 import { materialBiologicoService } from '../../../services/materialBiologicoService.js';
 import { acidenteService } from '../../../services/acidenteService.js';
 import { catalogoService } from '../../../services/catalogoService.js';
-import { IMaterialBiologico, IAcidente, ICatalogoItem } from '../../../types/index.js';
+import { IMaterialBiologico, IAcidente, ICatalogoItem, IAcidentePopulated } from '../../../types/index.js';
 import { 
   Dna, 
   ArrowLeft, 
@@ -23,8 +23,14 @@ export const EditarMaterialBiologico: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [acidentesRecentes, setAcidentesRecentes] = useState<IAcidente[]>([]);
   const [catalogos, setCatalogos] = useState<{ [key: string]: ICatalogoItem[] }>({});
-
   const [formData, setFormData] = useState<Partial<IMaterialBiologico>>({});
+
+  const getAcidenteIdValue = () => {
+    if (typeof formData.acidenteId === 'object' && formData.acidenteId !== null) {
+      return (formData.acidenteId as IAcidentePopulated)._id || '';
+    }
+    return formData.acidenteId || '';
+  };
 
   useEffect(() => {
     const carregarDados = async () => {
@@ -54,9 +60,12 @@ export const EditarMaterialBiologico: React.FC = () => {
           catalogoService.listarAtivos('evolucaoCaso')
         ]);
 
-        // Formatar data para input
+        // Formatar data para input (pode vir como Date do backend ou string do state)
         if (ficha.dataReavaliacao) {
-          ficha.dataReavaliacao = new Date(ficha.dataReavaliacao).toISOString().split('T')[0] as any;
+          const dateValue = typeof ficha.dataReavaliacao === 'string'
+            ? new Date(ficha.dataReavaliacao)
+            : ficha.dataReavaliacao;
+          ficha.dataReavaliacao = dateValue.toISOString().split('T')[0];
         }
 
         setFormData(ficha);
@@ -124,7 +133,7 @@ export const EditarMaterialBiologico: React.FC = () => {
               </div>
               <div className="p-8">
                 <label className="block text-sm font-bold text-slate-600 mb-2">Acidente Vinculado</label>
-                <select name="acidenteId" value={typeof formData.acidenteId === 'object' ? (formData.acidenteId as any)._id : formData.acidenteId} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-emerald-700">
+                <select name="acidenteId" value={getAcidenteIdValue()} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-emerald-700">
                   <option value="">Selecione um acidente...</option>
                   {acidentesRecentes.map(ac => (
                     <option key={ac._id} value={ac._id}>
@@ -209,7 +218,7 @@ export const EditarMaterialBiologico: React.FC = () => {
                 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-600">Data Reavaliação</label>
-                  <input type="date" name="dataReavaliacao" value={formData.dataReavaliacao as any} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" />
+                  <input type="date" name="dataReavaliacao" value={formData.dataReavaliacao || ''} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" />
                 </div>
               </div>
             </section>

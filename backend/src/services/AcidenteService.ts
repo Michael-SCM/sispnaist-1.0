@@ -91,6 +91,7 @@ export class AcidenteService {
       trabalhadorId?: string;
       dataInicio?: string;
       dataFim?: string;
+      descricao?: string;
     }
   ): Promise<{ acidentes: IAcidente[]; total: number; pages: number }> {
     const skip = (page - 1) * limit;
@@ -117,6 +118,10 @@ export class AcidenteService {
       if (filtros?.dataFim) {
         query.dataAcidente.$lte = new Date(filtros.dataFim);
       }
+    }
+
+    if (filtros?.descricao) {
+      query.descricao = { $regex: filtros.descricao, $options: 'i' };
     }
 
     const total = await Acidente.countDocuments(query);

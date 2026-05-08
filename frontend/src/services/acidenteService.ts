@@ -40,6 +40,7 @@ export const acidenteService = {
       trabalhadorId?: string;
       dataInicio?: string;
       dataFim?: string;
+      descricao?: string;
     }
   ): Promise<ListarAcidentesResponse> => {
     const params = new URLSearchParams();
@@ -51,6 +52,7 @@ export const acidenteService = {
     if (filtros?.trabalhadorId) params.append('trabalhadorId', filtros.trabalhadorId);
     if (filtros?.dataInicio) params.append('dataInicio', filtros.dataInicio);
     if (filtros?.dataFim) params.append('dataFim', filtros.dataFim);
+    if (filtros?.descricao) params.append('descricao', filtros.descricao);
 
     const response = await api.get<{ data: ListarAcidentesResponse }>(
       `/acidentes?${params.toString()}`

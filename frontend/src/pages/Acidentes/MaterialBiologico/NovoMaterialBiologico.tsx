@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { materialBiologicoService } from '../../../services/materialBiologicoService.js';
 import { acidenteService } from '../../../services/acidenteService.js';
@@ -22,7 +22,9 @@ import toast from 'react-hot-toast';
 export const NovoMaterialBiologico: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const stateAcidenteId = location.state?.acidenteId;
+  const [searchParams] = useSearchParams();
+  // Support both location.state and query param as fallback
+  const stateAcidenteId = location.state?.acidenteId || searchParams.get('acidenteId') || '';
   
   const [isLoading, setIsLoading] = useState(false);
   const [acidentesRecentes, setAcidentesRecentes] = useState<IAcidente[]>([]);
@@ -280,7 +282,7 @@ export const NovoMaterialBiologico: React.FC = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-slate-600 flex items-center gap-2"><Calendar size={16} /> Data de Reavaliação</label>
-                  <input type="date" name="dataReavaliacao" value={formData.dataReavaliacao as any} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" />
+                  <input type="date" name="dataReavaliacao" value={formData.dataReavaliacao || ''} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium" />
                 </div>
 
                 <div className="space-y-4 pt-4 border-t border-slate-50">

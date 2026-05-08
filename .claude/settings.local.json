@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npx ts-node src/utils/seedCatalogos.ts)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(npm run build)",
+      "Bash(npx vite build)"
     ]
   }
 }

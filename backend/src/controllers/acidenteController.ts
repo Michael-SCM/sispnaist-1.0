@@ -39,6 +39,7 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     trabalhadorId: req.query.trabalhadorId as string | undefined,
     dataInicio: req.query.dataInicio as string | undefined,
     dataFim: req.query.dataFim as string | undefined,
+    descricao: req.query.descricao as string | undefined,
   };
 
   const { acidentes, total, pages } = await acidenteService.listar(page, limit, filtros);

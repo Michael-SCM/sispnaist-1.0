@@ -301,7 +301,7 @@ export const EditarAcidente: React.FC = () => {
           : undefined,
       };
 
-      const acidenteAtualizado = await acidenteService.atualizar(id, acidenteAtuzalizar as any);
+      const acidenteAtualizado = await acidenteService.atualizar(id, acidenteAtuzalizar);
       atualizarAcidente(id, acidenteAtualizado);
 
       toast.success('Acidente atualizado com sucesso!');
