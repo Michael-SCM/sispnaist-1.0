@@ -35,16 +35,11 @@ const EmpresaSchema = new Schema<IEmpresaDocument>(
       type: Boolean,
       default: true,
     },
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'empresas', timestamps: true }
+  { 
+    collection: 'empresas', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 export default mongoose.model<IEmpresaDocument>('Empresa', EmpresaSchema);

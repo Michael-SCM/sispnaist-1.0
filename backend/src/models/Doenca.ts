@@ -29,16 +29,11 @@ const DoencaSchema = new Schema<IDoencaDocument>(
       type: Boolean,
       default: true,
     },
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'doencas', timestamps: true }
+  { 
+    collection: 'doencas', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 DoencaSchema.index({ trabalhadorId: 1, dataInicio: -1 });

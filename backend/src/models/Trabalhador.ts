@@ -182,16 +182,11 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       tipoAfastamento: String,
     },
 
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'trabalhadores', timestamps: true }
+  { 
+    collection: 'trabalhadores', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 export default mongoose.model<ITrabalhadorDocument>('Trabalhador', TrabalhadorSchema);

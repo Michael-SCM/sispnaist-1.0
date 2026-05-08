@@ -28,16 +28,11 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
       type: Boolean,
       default: true,
     },
-    dataCriacao: {
-      type: Date,
-      default: Date.now,
-    },
-    dataAtualizacao: {
-      type: Date,
-      default: Date.now,
-    },
   },
-  { collection: 'unidades', timestamps: true }
+  { 
+    collection: 'unidades', 
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } 
+  }
 );
 
 UnidadeSchema.index({ empresaId: 1 });
