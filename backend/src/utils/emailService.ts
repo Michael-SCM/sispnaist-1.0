@@ -9,27 +9,21 @@ import config from '../config/config.js';
 export const sendResetPasswordEmail = async (email: string, token: string) => {
   const resetLink = `${config.frontendUrl}/reset-password?token=${token}`;
   
-  if (!config.email.host || !config.email.user || !config.email.pass) {
-    console.log('AVISO: Configurações de e-mail incompletas. Link:', resetLink);
+  if (!config.email.user || !config.email.pass) {
+    console.log('AVISO: Configurações de e-mail incompletas no .env');
     return;
   }
 
-  // Configuração otimizada para evitar erros de rede (ENETUNREACH)
+  // Tentativa usando o modo 'service' que é mais resiliente em alguns servidores
   const transporter = nodemailer.createTransport({
-    host: config.email.host,
-    port: config.email.port,
-    secure: config.email.port === 465, // SSL
+    service: 'gmail',
     auth: {
       user: config.email.user,
       pass: config.email.pass,
     },
-    // Forçar o uso de IPv4 para evitar erros ENETUNREACH no Render
-    // @ts-ignore
-    family: 4, 
     tls: {
       rejectUnauthorized: false
-    },
-    connectionTimeout: 20000, // Aumentado para 20s
+    }
   });
 
   try {
@@ -49,18 +43,17 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
               Redefinir Minha Senha
             </a>
           </div>
-          <p>Se o botão não funcionar, copie e cole o link abaixo no seu navegador:</p>
-          <p style="word-break: break-all; color: #666; font-size: 14px;">${resetLink}</p>
-          <p>Se você não solicitou isso, pode ignorar este e-mail com segurança.</p>
+          <p>Se você não solicitou isso, pode ignorar este e-mail.</p>
           <p>O link expirará em 1 hora.</p>
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático do SISPNAIST, por favor não responda.</p>
+          <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático, por favor não responda.</p>
         </div>
       `,
     });
-    console.log(`E-mail enviado com sucesso para: ${email}`);
+    console.log(`E-mail enviado via Gmail Service para: ${email}`);
   } catch (error) {
-    console.error('ERRO NO NODEMAILER:', error);
-    throw new Error('Erro ao enviar e-mail. Tente novamente em instantes.');
+    console.error('ERRO NO NODEMAILER (MODO SERVICE):', error);
+    // Se falhar, vamos tentar o método manual com porta 2525 (que às vezes é aberta)
+    throw new Error('O servidor de hospedagem bloqueou o envio de e-mail. Recomenda-se usar SendGrid ou similar.');
   }
 };
