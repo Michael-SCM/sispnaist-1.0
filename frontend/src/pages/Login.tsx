@@ -80,6 +80,15 @@ export const Login: React.FC = () => {
           >
             {isLoading ? 'Entrando...' : 'Entrar'}
           </button>
+
+          <div className="text-center">
+            <a 
+              href="/forgot-password" 
+              className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              Esqueci a senha
+            </a>
+          </div>
         </form>
 
         <div className="mt-6 text-center">
