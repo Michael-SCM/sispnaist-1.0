@@ -37,7 +37,9 @@ export const ListaAcidentes: React.FC = () => {
   } = useAcidenteStore();
 
   const [localFiltros, setLocalFiltros] = useState(filtros);
+  const [localSearch, setLocalSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+
 
   // Carregar acidentes
   const carregarAcidentes = async (pageNumber: number = 1) => {
@@ -134,6 +136,23 @@ export const ListaAcidentes: React.FC = () => {
             <input 
               type="text" 
               placeholder="Buscar acidentes..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  // Busca textual: filtra por descrição do acidente no backend
+                  const valor = localSearch.trim();
+                  const nextFiltros: typeof localFiltros = { ...localFiltros };
+                  if (valor) {
+                    nextFiltros.descricao = valor;
+                  } else {
+                    delete nextFiltros.descricao;
+                  }
+                  setLocalFiltros(nextFiltros);
+                  setFiltros(nextFiltros);
+                  setShowFilters(false);
+                }
+              }}
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-amber-500 outline-none transition-all"
             />
           </div>
@@ -338,19 +357,59 @@ export const ListaAcidentes: React.FC = () => {
                   Anterior
                 </button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: pages }).map((_, i) => (
+                  {/* Primeira página */}
+                  {pages > 5 && (
                     <button
-                      key={i}
-                      onClick={() => carregarAcidentes(i + 1)}
-                      className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                        page === i + 1 
-                          ? 'bg-amber-600 text-white shadow-lg shadow-amber-100' 
-                          : 'text-slate-500 hover:bg-slate-100'
-                      }`}
+                      onClick={() => carregarAcidentes(1)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
                     >
-                      {i + 1}
+                      1
                     </button>
-                  ))}
+                  )}
+                  {/* Ellipse início */}
+                  {pages > 7 && page > 3 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+                  {/* Páginas centrais */}
+                  {Array.from({ length: Math.min(pages, 7) }).map((_, i) => {
+                    let pageNum: number;
+                    if (pages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= pages - 3) {
+                      pageNum = pages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+                    if (pageNum < 1 || pageNum > pages) return null;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => carregarAcidentes(pageNum)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                          page === pageNum
+                            ? 'bg-amber-600 text-white shadow-lg shadow-amber-100'
+                            : 'text-slate-500 hover:bg-slate-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  {/* Ellipse fim */}
+                  {pages > 7 && page < pages - 2 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+                  {/* Última página */}
+                  {pages > 5 && (
+                    <button
+                      onClick={() => carregarAcidentes(pages)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                    >
+                      {pages}
+                    </button>
+                  )}
                 </div>
                 <button
                   disabled={page === pages || isLoading}

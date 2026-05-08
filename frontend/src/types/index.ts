@@ -123,14 +123,33 @@ export interface IAcidente {
   _id?: string;
   dataAcidente: string;
   horario?: string;
+  horarioAposInicioJornada?: string;
   trabalhadorId: string;
   tipoAcidente: string;
+  tipoTrauma?: string;
+  agenteCausador?: string;
+  parteCorpo?: string;
   descricao: string;
+  descricaoTrauma?: string;
   local?: string;
+  estado?: string;
   lesoes?: string[];
   feriado?: boolean;
   comunicado?: boolean;
   dataComunicacao?: string;
+  dataNotificacao?: string;
+  atendimentoMedico?: boolean;
+  dataAtendimento?: string;
+  horaAtendimento?: string;
+  unidadeAtendimento?: string;
+  internamento?: boolean;
+  duracaoInternamento?: number;
+  catNas?: boolean;
+  registroPolicial?: boolean;
+  encaminhamentoJuntaMedica?: boolean;
+  afastamento?: boolean;
+  outrosTrabalhadoresAtingidos?: boolean;
+  quantidadeTrabalhadoresAtingidos?: number;
   status?: 'Aberto' | 'Em Análise' | 'Fechado';
   dataCriacao?: string;
   dataAtualizacao?: string;
@@ -161,6 +180,50 @@ export interface IVacinacao {
   certificado?: string;
   dataCriacao?: string;
   dataAtualizacao?: string;
+}
+
+export interface IAcidentePopulated {
+  _id?: string;
+  dataAcidente: string;
+  horario?: string;
+  horarioAposInicioJornada?: string;
+  tipoAcidente: string;
+  tipoTrauma?: string;
+  agenteCausador?: string;
+  parteCorpo?: string;
+  descricao: string;
+  descricaoTrauma?: string;
+  local?: string;
+  estado?: string;
+  lesoes?: string[];
+  feriado?: boolean;
+  comunicado?: boolean;
+  dataComunicacao?: string;
+  dataNotificacao?: string;
+  atendimentoMedico?: boolean;
+  dataAtendimento?: string;
+  horaAtendimento?: string;
+  unidadeAtendimento?: string;
+  internamento?: boolean;
+  duracaoInternamento?: number;
+  catNas?: boolean;
+  registroPolicial?: boolean;
+  encaminhamentoJuntaMedica?: boolean;
+  afastamento?: boolean;
+  outrosTrabalhadoresAtingidos?: boolean;
+  quantidadeTrabalhadoresAtingidos?: number;
+  status?: 'Aberto' | 'Em Análise' | 'Fechado';
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+  // Populated fields
+  trabalhadorId?: {
+    _id?: string;
+    nome?: string;
+    cpf?: string;
+    email?: string;
+    empresa?: string;
+    unidade?: string;
+  };
 }
 
 export interface IMaterialBiologico {

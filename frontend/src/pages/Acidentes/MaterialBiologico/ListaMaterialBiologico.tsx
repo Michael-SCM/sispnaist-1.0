@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { useMaterialBiologicoStore } from '../../../store/materialBiologicoStore.js';
 import { materialBiologicoService } from '../../../services/materialBiologicoService.js';
-import { IMaterialBiologico } from '../../../types/index.js';
+import { IMaterialBiologico, IAcidentePopulated } from '../../../types/index.js';
 import { 
   Dna, 
   Plus, 
@@ -36,8 +36,34 @@ export const ListaMaterialBiologico: React.FC = () => {
     clearFiltros,
   } = useMaterialBiologicoStore();
 
-  const [localFiltros, setLocalFiltros] = useState(filtros);
+  const [localFiltros, setLocalFiltros] = useState<{ tipoExposicao?: string; agente?: string; buscaTexto?: string }>({});
   const [showFilters, setShowFilters] = useState(false);
+
+  // Helpers para acessar acidente populado (pode vir como objeto populado ou string ID)
+  const getAcidenteTrabalhadorNome = (acidenteId: string | IAcidentePopulated | undefined | null): string => {
+    if (!acidenteId) return 'N/A';
+    if (typeof acidenteId === 'object' && acidenteId?.trabalhadorId) {
+      const tid = acidenteId.trabalhadorId;
+      if (typeof tid === 'object' && tid?.nome) return tid.nome;
+    }
+    return 'N/A';
+  };
+
+  const getAcidenteData = (acidenteId: string | IAcidentePopulated | undefined | null): Date | null => {
+    if (!acidenteId) return null;
+    if (typeof acidenteId === 'object' && acidenteId?.dataAcidente) {
+      return new Date(acidenteId.dataAcidente);
+    }
+    return null;
+  };
+
+  const getAcidenteIdStr = (acidenteId: string | IAcidentePopulated | undefined | null): string => {
+    if (!acidenteId) return '';
+    if (typeof acidenteId === 'object' && acidenteId?._id) return acidenteId._id;
+    if (typeof acidenteId === 'string') return acidenteId;
+    return '';
+  };
+
 
   const carregarFichas = async (pageNumber: number = 1) => {
     try {
@@ -63,7 +89,19 @@ export const ListaMaterialBiologico: React.FC = () => {
   }, [filtros]);
 
   const handleAplicarFiltros = () => {
-    setFiltros(localFiltros);
+    // Mapeamento: buscaTexto é enviado como filtro de agente
+    const { buscaTexto, ...filtrosSemBusca } = localFiltros;
+    const nextFiltros = {
+      ...filtrosSemBusca,
+      ...(buscaTexto ? { agente: String(buscaTexto) } : {}),
+    };
+
+    // Remove campos undefined para não mandar payload “sujo”.
+    Object.keys(nextFiltros).forEach((k) => {
+      if (nextFiltros[k as keyof typeof nextFiltros] === undefined) delete nextFiltros[k as keyof typeof nextFiltros];
+    });
+
+    setFiltros(nextFiltros as { tipoExposicao?: string; agente?: string });
     setShowFilters(false);
   };
 
@@ -128,7 +166,12 @@ export const ListaMaterialBiologico: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por agente, trabalhador ou tipo de exposição..."
+              placeholder="Buscar por agente..."
+              value={localFiltros.buscaTexto || ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLocalFiltros({ ...localFiltros, buscaTexto: e.target.value || undefined })}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === 'Enter') handleAplicarFiltros();
+              }}
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
             />
           </div>
@@ -217,10 +260,10 @@ export const ListaMaterialBiologico: React.FC = () => {
                           </div>
                           <div>
                             <span className="font-bold text-slate-700 block">
-                              {(ficha.acidenteId as any)?.trabalhadorId?.nome || 'N/A'}
+                              {getAcidenteTrabalhadorNome(ficha.acidenteId)}
                             </span>
                             <span className="text-xs text-slate-400">
-                              Acidente: {new Date((ficha.acidenteId as any)?.dataAcidente).toLocaleDateString('pt-BR')}
+                              Acidente: {getAcidenteData(ficha.acidenteId)?.toLocaleDateString('pt-BR') || 'N/A'}
                             </span>
                           </div>
                         </div>
@@ -258,8 +301,8 @@ export const ListaMaterialBiologico: React.FC = () => {
                             title="Ver Detalhes do Acidente de Origem"
                             onClick={(e) => {
                               e.stopPropagation();
-                              const acidenteIdStr = typeof ficha.acidenteId === 'object' ? (ficha.acidenteId as any)._id : ficha.acidenteId;
-                              navigate(`/acidentes/${acidenteIdStr}`);
+                              const acidenteIdStr = getAcidenteIdStr(ficha.acidenteId);
+                              if (acidenteIdStr) navigate(`/acidentes/${acidenteIdStr}`);
                             }}
                             className="p-2 text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all group-hover:text-emerald-600"
                           >
@@ -273,6 +316,46 @@ export const ListaMaterialBiologico: React.FC = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {pages > 1 && (
+            <div className="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+              <p className="text-sm text-slate-500 font-medium">
+                Mostrando <span className="text-slate-900 font-bold">{fichas.length}</span> de <span className="text-slate-900 font-bold">{total}</span> registros
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  disabled={page === 1 || isLoading}
+                  onClick={() => carregarFichas(page - 1)}
+                  className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
+                >
+                  Anterior
+                </button>
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: pages }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => carregarFichas(i + 1)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                        page === i + 1
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100'
+                          : 'text-slate-500 hover:bg-slate-100'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  disabled={page === pages || isLoading}
+                  onClick={() => carregarFichas(page + 1)}
+                  className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
+                >
+                  Próximo
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>

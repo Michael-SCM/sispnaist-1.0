@@ -4,7 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
-import { IAcidente } from '../../types/index.js';
+import { IAcidente, IAcidentePopulated } from '../../types/index.js';
 import { 
   AlertTriangle, 
   ArrowLeft, 
@@ -31,10 +31,25 @@ export const DetalhesAcidente: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { setCurrentAcidente } = useAcidenteStore();
 
-  const [acidente, setAcidente] = useState<IAcidente | null>(null);
+  const [acidente, setAcidente] = useState<IAcidente | IAcidentePopulated | null>(null);
   const [fichaBiologica, setFichaBiologica] = useState<IMaterialBiologico | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingFicha, setIsLoadingFicha] = useState(false);
+
+  // Helper para acessar nome do trabalhador (pode vir populado ou como ID string)
+  const getTrabalhadorNome = () => {
+    if (!acidente) return 'Não informado';
+    const tid = acidente.trabalhadorId;
+    if (typeof tid === 'object' && tid?.nome) return tid.nome;
+    return 'Não informado';
+  };
+
+  const getTrabalhadorCpf = () => {
+    if (!acidente) return 'Não informado';
+    const tid = acidente.trabalhadorId;
+    if (typeof tid === 'object' && tid?.cpf) return tid.cpf;
+    return 'Não informado';
+  };
 
   useEffect(() => {
     const carregarAcidente = async () => {
@@ -45,27 +60,6 @@ export const DetalhesAcidente: React.FC = () => {
         const data = await acidenteService.obter(id);
         setAcidente(data);
         setCurrentAcidente(data);
-
-        // Fallback: se o trabalhador não veio populado (veio como ID string ou null)
-        if (data.trabalhadorId && (typeof data.trabalhadorId === 'string' || !data.trabalhadorId.nome)) {
-          const identificador = typeof data.trabalhadorId === 'string' 
-            ? data.trabalhadorId 
-            : (data.trabalhadorId as any)._id || (data as any).trabalhador_id;
-            
-          if (identificador) {
-            let t = null;
-            if (identificador.length > 20) {
-              t = await trabalhadorService.obterPorId(identificador).catch(() => null);
-            }
-            if (!t) {
-              t = await trabalhadorService.buscarPorCpf(identificador).catch(() => null);
-            }
-            if (t) {
-              (data as any).trabalhadorId = t;
-              setAcidente({ ...data });
-            }
-          }
-        }
 
         // Se for material biológico, buscar a ficha técnica
         if (data.tipoAcidente === 'Acidente com Material Biológico') {
@@ -311,11 +305,11 @@ export const DetalhesAcidente: React.FC = () => {
               <div className="p-8 space-y-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nome Completo</p>
-                  <p className="font-bold text-slate-900">{(acidente.trabalhadorId as any)?.nome || 'Não informado'}</p>
+                  <p className="font-bold text-slate-900">{getTrabalhadorNome()}</p>
                 </div>
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">CPF</p>
-                  <p className="font-mono text-slate-600">{(acidente.trabalhadorId as any)?.cpf || 'Não informado'}</p>
+                  <p className="font-mono text-slate-600">{getTrabalhadorCpf()}</p>
                 </div>
               </div>
             </div>
@@ -348,20 +342,20 @@ export const DetalhesAcidente: React.FC = () => {
               </div>
             </div>
 
-            {/* Audit Log */}
+            {/* Datas do Registro */}
             <div className="bg-slate-900 rounded-3xl p-6 text-slate-400 space-y-4 shadow-xl">
               <div className="flex items-center gap-2 text-white">
                 <Clock size={16} />
-                <span className="text-xs font-black uppercase tracking-wider">Histórico do Registro</span>
+                <span className="text-xs font-black uppercase tracking-wider">Datas do Registro</span>
               </div>
               <div className="space-y-3">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Criação</p>
-                  <p className="text-xs font-medium text-slate-200">{new Date(acidente.dataCriacao!).toLocaleString('pt-BR')}</p>
+                  <p className="text-xs font-medium text-slate-200">{acidente.dataCriacao ? new Date(acidente.dataCriacao).toLocaleString('pt-BR') : 'Não disponível'}</p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Última Atualização</p>
-                  <p className="text-xs font-medium text-slate-200">{new Date(acidente.dataAtualizacao!).toLocaleString('pt-BR')}</p>
+                  <p className="text-xs font-medium text-slate-200">{acidente.dataAtualizacao ? new Date(acidente.dataAtualizacao).toLocaleString('pt-BR') : 'Não disponível'}</p>
                 </div>
               </div>
             </div>

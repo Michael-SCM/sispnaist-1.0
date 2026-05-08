@@ -7,6 +7,7 @@ interface AcidenteFilters {
   trabalhadorId?: string;
   dataInicio?: string;
   dataFim?: string;
+  descricao?: string;
 }
 
 interface AcidenteStore {
