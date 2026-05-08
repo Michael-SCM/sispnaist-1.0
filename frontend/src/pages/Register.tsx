@@ -23,6 +23,7 @@ export const Register: React.FC = () => {
     nome: '',
     email: '',
     cpf: '',
+    dataNascimento: '',
     senha: '',
     confirmaSenha: '',
   });
@@ -43,6 +44,7 @@ export const Register: React.FC = () => {
         nome: values.nome,
         email: values.email,
         cpf: values.cpf,
+        dataNascimento: values.dataNascimento,
         senha: values.senha,
       });
 
@@ -100,6 +102,19 @@ export const Register: React.FC = () => {
               onBlur={handleBlur}
               className="input"
               placeholder="000.000.000-00"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="label">Data de Nascimento</label>
+            <input
+              type="date"
+              name="dataNascimento"
+              value={values.dataNascimento}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className="input"
               required
             />
           </div>
