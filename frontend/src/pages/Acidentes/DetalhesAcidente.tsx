@@ -180,6 +180,126 @@ export const DetalhesAcidente: React.FC = () => {
               </div>
             </div>
 
+            {/* Informações do Acidente */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <AlertTriangle size={20} className="text-amber-600" />
+                <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações do Acidente</h2>
+              </div>
+              <div className="p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
+                {acidente.dataNotificacao && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data da Notificação</p>
+                    <p className="font-bold text-slate-700">{formatarData(acidente.dataNotificacao)}</p>
+                  </div>
+                )}
+                {acidente.horarioAposInicioJornada && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Horário Após Início da Jornada</p>
+                    <p className="font-bold text-slate-700">{acidente.horarioAposInicioJornada}</p>
+                  </div>
+                )}
+                {acidente.tipoTrauma && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo de Trauma</p>
+                    <p className="font-bold text-slate-700">{acidente.tipoTrauma}</p>
+                  </div>
+                )}
+                {acidente.agenteCausador && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Agente Causador</p>
+                    <p className="font-bold text-slate-700">{acidente.agenteCausador}</p>
+                  </div>
+                )}
+                {acidente.parteCorpo && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Parte do Corpo</p>
+                    <p className="font-bold text-slate-700">{acidente.parteCorpo}</p>
+                  </div>
+                )}
+                {acidente.estado && (
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estado (UF)</p>
+                    <p className="font-bold text-slate-700">{acidente.estado}</p>
+                  </div>
+                )}
+              </div>
+              {acidente.descricaoTrauma && (
+                <div className="px-8 pb-8">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Descrição do Trauma</p>
+                  <p className="text-slate-600 leading-relaxed bg-slate-50 rounded-xl p-4">{acidente.descricaoTrauma}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Atendimento Médico */}
+            {acidente.atendimentoMedico && (
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Info size={20} className="text-blue-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Atendimento Médico</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {acidente.dataAtendimento && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data do Atendimento</p>
+                      <p className="font-bold text-slate-700">{formatarData(acidente.dataAtendimento)}</p>
+                    </div>
+                  )}
+                  {acidente.horaAtendimento && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hora do Atendimento</p>
+                      <p className="font-bold text-slate-700">{acidente.horaAtendimento}</p>
+                    </div>
+                  )}
+                  {acidente.unidadeAtendimento && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Unidade de Atendimento</p>
+                      <p className="font-bold text-slate-700">{acidente.unidadeAtendimento}</p>
+                    </div>
+                  )}
+                </div>
+                {acidente.internamento && (
+                  <div className="px-8 pb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-xl text-sm font-bold border border-orange-100">
+                      Internamento: {acidente.duracaoInternamento ? `${acidente.duracaoInternamento} horas` : 'Sim'}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Informações Adicionais */}
+            {(acidente.catNas || acidente.registroPolicial || acidente.encaminhamentoJuntaMedica || acidente.afastamento || acidente.outrosTrabalhadoresAtingidos) && (
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <ShieldAlert size={20} className="text-amber-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações Adicionais</h2>
+                </div>
+                <div className="p-8">
+                  <div className="flex flex-wrap gap-3">
+                    {acidente.catNas && (
+                      <span className="px-4 py-2 bg-red-50 text-red-700 rounded-xl text-sm font-bold border border-red-100">CAT/NAS</span>
+                    )}
+                    {acidente.registroPolicial && (
+                      <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">Registro Policial</span>
+                    )}
+                    {acidente.encaminhamentoJuntaMedica && (
+                      <span className="px-4 py-2 bg-purple-50 text-purple-700 rounded-xl text-sm font-bold border border-purple-100">Encaminhamento Junta Médica</span>
+                    )}
+                    {acidente.afastamento && (
+                      <span className="px-4 py-2 bg-green-50 text-green-700 rounded-xl text-sm font-bold border border-green-100">Afastamento</span>
+                    )}
+                    {acidente.outrosTrabalhadoresAtingidos && (
+                      <span className="px-4 py-2 bg-yellow-50 text-yellow-700 rounded-xl text-sm font-bold border border-yellow-100">
+                        Outros Trabalhadores Atingidos{acidente.quantidadeTrabalhadoresAtingidos ? ` (${acidente.quantidadeTrabalhadoresAtingidos})` : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Lesões */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
               <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
