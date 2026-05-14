@@ -28,8 +28,9 @@ export const videoAulaService = {
   },
 
   obter: async (id: string): Promise<IVideoAula> => {
-    const response = await api.get<{ data: IVideoAula }>(`/video-aulas/${id}`);
-    return response.data.data;
+    // backend: GET /video-aulas/:id retorna o documento direto (não { data: ... })
+    const response = await api.get<IVideoAula>(`/video-aulas/${id}`);
+    return response.data;
   },
 
   criar: async (data: Partial<IVideoAula>): Promise<IVideoAula> => {
