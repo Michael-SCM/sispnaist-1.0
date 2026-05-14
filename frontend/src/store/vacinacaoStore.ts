@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IVacinacao } from '../types/index.js';
+import { IVacinacao } from '../types';
 
 interface VacinacaoFilters {
   vacina?: string;

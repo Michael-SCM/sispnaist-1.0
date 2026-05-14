@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ICatalogoItem } from '../types/index.js';
+import { ICatalogoItem } from '../types';
 
 interface CatalogoFilters {
   ativo?: boolean;

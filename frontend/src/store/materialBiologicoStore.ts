@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IMaterialBiologico } from '../types/index.js';
+import { IMaterialBiologico } from '../types';
 
 interface MaterialBiologicoFilters {
   tipoExposicao?: string;

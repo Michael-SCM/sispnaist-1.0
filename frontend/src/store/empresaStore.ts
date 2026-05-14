@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import empresaService from '../services/empresaService.js';
-import { IEmpresa } from '../types/index.js';
+import empresaService from '../services/empresaService';
+import { IEmpresa } from '../types';
 
 interface EmpresaState {
   empresas: IEmpresa[];

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IVideoAula } from '../types/index.js';
+import { IVideoAula } from '../types';
 
 interface VideoAulaStore {
   videoAulas: IVideoAula[];

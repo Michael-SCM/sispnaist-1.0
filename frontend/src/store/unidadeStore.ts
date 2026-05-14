@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import unidadeService from '../services/unidadeService.js';
-import { IUnidade } from '../types/index.js';
+import unidadeService from '../services/unidadeService';
+import { IUnidade } from '../types';
 
 interface UnidadeState {
   unidades: IUnidade[];

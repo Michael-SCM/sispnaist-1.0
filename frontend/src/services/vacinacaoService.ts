@@ -1,5 +1,5 @@
-import api from './api.js';
-import { IVacinacao } from '../types/index.js';
+import api from './api';
+import { IVacinacao } from '../types';
 
 export interface ListarVacinacoesResponse {
   vacinacoes: IVacinacao[];

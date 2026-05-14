@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ITrabalhador } from '../types/index.js';
+import { ITrabalhador } from '../types';
 
 interface TrabalhadorFilters {
   nome?: string;
