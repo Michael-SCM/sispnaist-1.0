@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { IVideoAula } from '../../types/index.js';
-import { FormFields } from '../../components/FormFields.js';
+import { TextInput } from '../../components/FormFields';
 import { ArrowLeft, Save, Video, PlayCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
