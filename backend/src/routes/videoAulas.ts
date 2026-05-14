@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import videoAulaController from '../controllers/videoAulaController';
-import { authMiddleware, adminMiddleware } from '../middleware/auth';
+import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import Joi from 'joi';
 
@@ -22,8 +22,8 @@ router.get('/', authMiddleware, videoAulaController.listar);
 router.get('/:id', authMiddleware, videoAulaController.obter);
 
 // Criar, atualizar e deletar requerem admin
-router.post('/', adminMiddleware, validateRequest(videoAulaSchema), videoAulaController.criar);
-router.put('/:id', adminMiddleware, videoAulaController.atualizar);
-router.delete('/:id', adminMiddleware, videoAulaController.deletar);
+router.post('/', adminOuGestorMiddleware, validateRequest(videoAulaSchema), videoAulaController.criar);
+router.put('/:id', adminOuGestorMiddleware, videoAulaController.atualizar);
+router.delete('/:id', adminOuGestorMiddleware, videoAulaController.deletar);
 
 export default router;
