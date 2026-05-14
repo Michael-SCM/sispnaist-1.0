@@ -356,3 +356,19 @@ export interface ITrabalhador {
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
+
+export interface IVideoAula {
+  _id?: string;
+  titulo: string;
+  descricao?: string;
+  url: string;
+  thumbnail?: string;
+  duracao?: string;
+  categoria?: string;
+  tags?: string[];
+  ordem?: number;
+  ativo?: boolean;
+  visualizacoes?: number;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
