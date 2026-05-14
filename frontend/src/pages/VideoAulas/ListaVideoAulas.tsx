@@ -46,7 +46,12 @@ export const ListaVideoAulas: React.FC = () => {
       if (categoria) filtros.categoria = categoria;
       
       const data = await videoAulaService.listar(pageNumber, 12, filtros);
+      console.log('[ListaVideoAulas] listar response:', data);
+      console.log('[ListaVideoAulas] data.data length:', data?.data?.length);
+
       setVideoAulas(data.data || []);
+      console.log('[ListaVideoAulas] setVideoAulas called, raw data count:', (data.data || []).length);
+
       if (data.total !== undefined) {
         setPaginacao({
           total: data.total,
