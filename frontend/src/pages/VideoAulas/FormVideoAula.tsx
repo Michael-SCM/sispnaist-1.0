@@ -33,10 +33,20 @@ export const FormVideoAula: React.FC = () => {
   const carregarVideo = async () => {
     try {
       setIsLoading(true);
-      const data = await videoAulaService.obter(id!);
+      const resp: any = await videoAulaService.obter(id!);
+
+      // pode vir como { data: video } ou como video direto
+      const data: any = resp?.data ?? resp;
+
+      if (!data) {
+        toast.error('Vídeo não encontrado');
+        navigate('/video-aulas');
+        return;
+      }
+
       setFormData({
         ...data,
-        tags: data.tags || []
+        tags: Array.isArray(data.tags) ? data.tags : []
       });
     } catch (error) {
       toast.error('Erro ao carregar dados do vídeo');

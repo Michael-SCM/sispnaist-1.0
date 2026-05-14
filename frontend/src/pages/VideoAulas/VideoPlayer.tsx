@@ -19,10 +19,21 @@ export const VideoPlayer: React.FC = () => {
   const carregarVideo = async () => {
     try {
       setIsLoading(true);
-      const data = await videoAulaService.obter(id!);
+      const resp: any = await videoAulaService.obter(id!);
+
+      // pode vir como { data: video } ou como video direto
+      const data: any = resp?.data ?? resp;
+
+      if (!data) {
+        toast.error('Vídeo não encontrado');
+        navigate('/video-aulas');
+        return;
+      }
+
       setVideo(data);
     } catch (error) {
       toast.error('Erro ao carregar vídeo');
+      console.error(error);
       navigate('/video-aulas');
     } finally {
       setIsLoading(false);
@@ -50,7 +61,15 @@ export const VideoPlayer: React.FC = () => {
     );
   }
 
-  if (!video) return null;
+  if (!video) {
+    return (
+      <MainLayout>
+        <div className="p-6 max-w-5xl mx-auto text-center text-slate-600">
+          Vídeo não disponível.
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
