@@ -28,6 +28,8 @@ import Auditoria from './pages/Admin/Auditoria.js';
 import ListaAtos from './pages/AtosMunicipais/ListaAtos.js';
 import FormAto from './pages/AtosMunicipais/FormAto.js';
 import Monitoramento from './pages/Monitoramento.js';
+import { ListaVideoAulas, FormVideoAula, VideoPlayer } from './pages/VideoAulas/index.js';
+
 
 import './styles/globals.css';
 
@@ -165,6 +167,41 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Video Aulas Routes */}
+        <Route
+          path="/video-aulas"
+          element={
+            <ProtectedRoute>
+              <ListaVideoAulas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/video-aulas/novo"
+          element={
+            <ProtectedRoute authorize={['admin', 'gestor']}>
+              <FormVideoAula />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/video-aulas/:id/editar"
+          element={
+            <ProtectedRoute authorize={['admin', 'gestor']}>
+              <FormVideoAula />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/video-aulas/:id"
+          element={
+            <ProtectedRoute>
+              <VideoPlayer />
+            </ProtectedRoute>
+          }
+        />
+
         
         {/* Trabalhadores Routes */}
         <Route

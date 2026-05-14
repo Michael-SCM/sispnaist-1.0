@@ -45,6 +45,10 @@ export const Header: React.FC = () => {
                 <Link to="/vacinacoes" className="hover:text-blue-100 transition text-sm">
                   Vacinações
                 </Link>
+                <Link to="/video-aulas" className="hover:text-blue-100 transition text-sm">
+                  Treinamentos
+                </Link>
+
                 {user.perfil === 'admin' && (
                   <>
                     <Link
@@ -159,6 +163,14 @@ export const Header: React.FC = () => {
             >
               Vacinações
             </Link>
+            <Link
+              to="/video-aulas"
+              className="block py-2 hover:text-blue-100 transition"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Treinamentos
+            </Link>
+
             {user.perfil === 'admin' && (
               <>
                 <div className="pt-2 border border-blue-500">
