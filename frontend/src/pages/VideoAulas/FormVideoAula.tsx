@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { IVideoAula } from '../../types/index.js';
-import { TextInput } from '../../components/FormFields';
+import { TextInput, Select, TextArea } from '../../components/FormFields';
 import { ArrowLeft, Save, Video, PlayCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -120,7 +120,7 @@ export const FormVideoAula: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormFields.Input
+              <TextInput
                 label="Título do Vídeo *"
                 name="titulo"
                 value={formData.titulo || ''}
@@ -128,7 +128,7 @@ export const FormVideoAula: React.FC = () => {
                 placeholder="Ex: Treinamento de EPI"
                 required
               />
-              <FormFields.Select
+              <Select
                 label="Categoria"
                 name="categoria"
                 value={formData.categoria || ''}
@@ -142,7 +142,7 @@ export const FormVideoAula: React.FC = () => {
                 ]}
               />
               <div className="md:col-span-2">
-                <FormFields.TextArea
+                <TextArea
                   label="Descrição"
                   name="descricao"
                   value={formData.descricao || ''}
@@ -162,7 +162,7 @@ export const FormVideoAula: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <FormFields.Input
+                <TextInput
                   label="URL do Vídeo (YouTube, Vimeo, etc) *"
                   name="url"
                   value={formData.url || ''}
@@ -171,8 +171,9 @@ export const FormVideoAula: React.FC = () => {
                   required
                 />
               </div>
+
               <div className="md:col-span-2">
-                <FormFields.Input
+                <TextInput
                   label="URL da Capa (Thumbnail)"
                   name="thumbnail"
                   value={formData.thumbnail || ''}
@@ -180,22 +181,24 @@ export const FormVideoAula: React.FC = () => {
                   placeholder="Link para a imagem de capa (opcional)"
                 />
               </div>
-              <FormFields.Input
+
+              <TextInput
                 label="Duração"
                 name="duracao"
                 value={formData.duracao || ''}
                 onChange={handleChange}
                 placeholder="Ex: 10:45"
               />
-              <FormFields.Input
+
+              <TextInput
                 label="Tags (separadas por vírgula)"
                 name="tags"
                 value={(formData.tags || []).join(', ')}
                 onChange={handleTagsChange}
                 placeholder="Ex: epi, segurança, nr32"
               />
-              
-              <div className="flex items-center gap-3 mt-4">
+
+              <div className="flex items-center gap-3 mt-4 md:col-span-2">
                 <input
                   type="checkbox"
                   id="ativo"
