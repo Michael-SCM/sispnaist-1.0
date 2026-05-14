@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useVideoAulaStore } from '../../store/videoAulaStore.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 
 export const ListaVideoAulas: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
   const isAdmin = user?.perfil === 'admin' || user?.perfil === 'gestor';
   
@@ -64,7 +65,7 @@ export const ListaVideoAulas: React.FC = () => {
 
   useEffect(() => {
     carregarVideoAulas(1);
-  }, [categoria]);
+  }, [categoria, location.key]);
 
   const handleDeletar = async (e: React.MouseEvent, video: IVideoAula) => {
     e.stopPropagation();
