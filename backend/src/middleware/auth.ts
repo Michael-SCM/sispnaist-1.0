@@ -16,6 +16,7 @@ export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunct
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
+      console.log('[Auth] token não fornecido - header authorization vazio');
       res.status(401).json({ message: 'Token não fornecido' });
       return;
     }
@@ -24,11 +25,15 @@ export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunct
     
     if (typeof decoded === 'object' && decoded !== null) {
       req.user = {
-        id: decoded.id || '',
-        cpf: decoded.cpf || '',
-        email: decoded.email || '',
-        perfil: decoded.perfil || '',
+        id: (decoded as any).id || '',
+        cpf: (decoded as any).cpf || '',
+        email: (decoded as any).email || '',
+        perfil: (decoded as any).perfil || '',
       };
+
+      console.log('[Auth] perfil decodificado:', req.user.perfil, 'id:', req.user.id);
+    } else {
+      console.log('[Auth] decoded inesperado:', typeof decoded);
     }
 
     next();
