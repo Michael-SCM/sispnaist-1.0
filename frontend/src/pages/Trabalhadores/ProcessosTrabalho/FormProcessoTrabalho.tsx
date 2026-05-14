@@ -123,7 +123,7 @@ export const FormProcessoTrabalho: React.FC = () => {
       const v = formData.questionarioId.trim();
       const objectIdRegex = /^[a-fA-F0-9]{24}$/;
       if (!objectIdRegex.test(v)) {
-        novoErros.questionarioId = 'questionárioId inválido (esperado 24 caracteres hex)';
+        novoErros.questionarioId = 'questionárioId inválido (mín. 24 e máx. 50 caracteres)';
       }
     }
 
