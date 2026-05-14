@@ -21,9 +21,9 @@ const videoAulaSchema = Joi.object({
 router.get('/', authMiddleware, videoAulaController.listar);
 router.get('/:id', authMiddleware, videoAulaController.obter);
 
-// Criar, atualizar e deletar requerem admin
-router.post('/', adminOuGestorMiddleware, validateRequest(videoAulaSchema), videoAulaController.criar);
-router.put('/:id', adminOuGestorMiddleware, videoAulaController.atualizar);
-router.delete('/:id', adminOuGestorMiddleware, videoAulaController.deletar);
+// Criar, atualizar e deletar requerem admin/gestor
+router.post('/', authMiddleware, adminOuGestorMiddleware, validateRequest(videoAulaSchema), videoAulaController.criar);
+router.put('/:id', authMiddleware, adminOuGestorMiddleware, videoAulaController.atualizar);
+router.delete('/:id', authMiddleware, adminOuGestorMiddleware, videoAulaController.deletar);
 
 export default router;
