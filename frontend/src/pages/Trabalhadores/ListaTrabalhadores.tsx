@@ -19,10 +19,10 @@ import {
   Mail
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { exportTrabalhadores } from '../../services/exportService.js';
 
 export const ListaTrabalhadores: React.FC = () => {
   const navigate = useNavigate();
-  const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/api\/?$/, '');
   const {
     trabalhadores,
     total,
@@ -103,15 +103,20 @@ export const ListaTrabalhadores: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <a
-              href={`${API_BASE}/api/export/trabalhadores`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  await exportTrabalhadores();
+                } catch (e) {
+                  toast.error('Erro ao exportar trabalhadores');
+                  console.error(e);
+                }
+              }}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"
             >
               <Download size={18} />
               Exportar
-            </a>
+            </button>
             <button
               onClick={() => navigate('/trabalhadores/novo')}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"

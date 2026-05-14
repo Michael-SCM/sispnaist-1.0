@@ -18,6 +18,7 @@ import {
   FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { exportAcidentes } from '../../services/exportService.js';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
@@ -111,15 +112,20 @@ export const ListaAcidentes: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <a
-              href={`${API_BASE}/api/export/acidentes`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  await exportAcidentes();
+                } catch (e) {
+                  toast.error('Erro ao exportar acidentes');
+                  console.error(e);
+                }
+              }}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"
             >
               <Download size={18} />
               Exportar
-            </a>
+            </button>
             <button
               onClick={() => navigate('/acidentes/novo')}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"

@@ -1,163 +1,44 @@
-/**
- * Serviço para exportação de relatórios em PDF e XLS
- */
+import api from './api';
 
-/**
- * Exporta dados para CSV (compatível com Excel)
- */
-export const exportToCSV = (data: any[], filename: string = 'relatorio') => {
-  if (!data || data.length === 0) {
-    alert('Nenhum dado para exportar');
-    return;
-  }
+const getFilenameFromContentDisposition = (contentDisposition?: string | null): string | null => {
+  if (!contentDisposition) return null;
 
-  // Obter headers
-  const headers = Object.keys(data[0]);
-  
-  // Criar CSV
-  const csvRows = [
-    headers.join(';'), // Headers
-    ...data.map(row =>
-      headers.map(header => {
-        const value = (row as any)[header];
-        // Escapar valores com ponto-e-vírgula ou aspas
-        const escaped = String(value ?? '').replace(/"/g, '""');
-        return `"${escaped}"`;
-      }).join(';')
-    )
-  ];
+  // ex: attachment; filename="relatorio_2026-01-01.pdf"
+  const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]+)["']?/i);
+  if (match?.[1]) return decodeURIComponent(match[1]);
 
-  const csvContent = csvRows.join('\n');
-  
-  // Criar blob e download
-  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
+  const match2 = contentDisposition.match(/filename=["']?([^"';\n]+)["']?/i);
+  return match2?.[1] ?? null;
+};
+
+const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 };
 
-/**
- * Exporta dados para JSON
- */
-export const exportToJSON = (data: any[], filename: string = 'relatorio') => {
-  if (!data || data.length === 0) {
-    alert('Nenhum dado para exportar');
-    return;
-  }
+export const exportAcidentes = async (): Promise<void> => {
+  const response = await api.get('/export/acidentes', { responseType: 'blob' });
 
-  const jsonContent = JSON.stringify(data, null, 2);
-  const blob = new Blob([jsonContent], { type: 'application/json' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.json`);
-  link.style.visibility = 'hidden';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const filename =
+    getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+    `acidentes_${new Date().toISOString().split('T')[0]}`;
+
+  downloadBlob(response.data, filename);
 };
 
-/**
- * Gera PDF usando window.print() (solução simples sem bibliotecas externas)
- */
-export const exportToPDF = (title: string = 'Relatório') => {
-  // Criar versão para impressão
-  const printWindow = window.open('', '_blank');
-  
-  if (!printWindow) {
-    alert('Pop-up bloqueado. Permita pop-ups para exportar PDF.');
-    return;
-  }
+export const exportTrabalhadores = async (): Promise<void> => {
+  const response = await api.get('/export/trabalhadores', { responseType: 'blob' });
 
-  // Clonar conteúdo da página
-  const content = document.body.innerHTML;
-  
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${title}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-        }
-        h1 {
-          color: #2563eb;
-          border-bottom: 2px solid #2563eb;
-          padding-bottom: 10px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-        }
-        th, td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: left;
-        }
-        th {
-          background-color: #f3f4f6;
-          font-weight: bold;
-        }
-        tr:nth-child(even) {
-          background-color: #f9fafb;
-        }
-        @media print {
-          body { margin: 0; }
-          table { page-break-inside: avoid; }
-          h1 { page-break-after: avoid; }
-        }
-      </style>
-    </head>
-    <body>
-      <h1>${title}</h1>
-      <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
-      ${content}
-      <script>
-        window.onload = function() {
-          window.print();
-          window.onafterprint = function() {
-            window.close();
-          };
-        };
-      </script>
-    </body>
-    </html>
-  `);
-  
-  printWindow.document.close();
-};
+  const filename =
+    getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+    `trabalhadores_${new Date().toISOString().split('T')[0]}`;
 
-/**
- * Hook para exportação de tabela
- */
-export const useTableExport = (data: any[], title: string) => {
-  const handleExportCSV = () => {
-    exportToCSV(data, title);
-  };
-
-  const handleExportJSON = () => {
-    exportToJSON(data, title);
-  };
-
-  const handleExportPDF = () => {
-    exportToPDF(title);
-  };
-
-  return {
-    handleExportCSV,
-    handleExportJSON,
-    handleExportPDF,
-  };
+  downloadBlob(response.data, filename);
 };
