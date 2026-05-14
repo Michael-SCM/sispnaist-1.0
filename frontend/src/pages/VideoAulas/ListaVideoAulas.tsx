@@ -45,19 +45,18 @@ export const ListaVideoAulas: React.FC = () => {
       const filtros: any = { ativo: true };
       if (categoria) filtros.categoria = categoria;
       
-      const data = await videoAulaService.listar(pageNumber, 12, filtros);
-      console.log('[ListaVideoAulas] listar response:', data);
-      console.log('[ListaVideoAulas] data.data length:', data?.data?.length);
+      const resp: any = await videoAulaService.listar(pageNumber, 12, filtros);
 
-      setVideoAulas(data.data || []);
-      console.log('[ListaVideoAulas] setVideoAulas called, raw data count:', (data.data || []).length);
+      // Pode vir como { data: [...], total, ... } ou como array puro ([...])
+      const videos = Array.isArray(resp) ? resp : (resp?.data ?? []);
+      setVideoAulas(videos);
 
-      if (data.total !== undefined) {
+      if (resp && !Array.isArray(resp) && resp.total !== undefined) {
         setPaginacao({
-          total: data.total,
-          pages: data.totalPages,
-          page: data.page,
-          limit: data.limit,
+          total: resp.total,
+          pages: resp.totalPages,
+          page: resp.page,
+          limit: resp.limit,
         });
       }
     } catch (error) {
