@@ -21,6 +21,7 @@ import toast from 'react-hot-toast';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
+  const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/api\/?$/, '');
   const {
     acidentes,
     total,
@@ -111,7 +112,7 @@ export const ListaAcidentes: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href={`${import.meta.env.VITE_API_URL}/api/export/acidentes`}
+              href={`${API_BASE}/api/export/acidentes`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"
