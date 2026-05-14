@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IAcidente } from '../types/index.js';
+import { IAcidente } from '../types';
 
 interface AcidenteFilters {
   tipoAcidente?: string;

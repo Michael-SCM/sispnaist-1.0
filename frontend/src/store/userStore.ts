@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import userService from '../services/userService.js';
-import { IUser } from '../types/index.js';
+import userService from '../services/userService';
+import { IUser } from '../types';
 
 interface UserState {
   usuarios: IUser[];

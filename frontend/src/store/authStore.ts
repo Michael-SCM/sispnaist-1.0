@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IUser } from '../types/index.js';
+import { IUser } from '../types';
 
 interface AuthStore {
   user: IUser | null;

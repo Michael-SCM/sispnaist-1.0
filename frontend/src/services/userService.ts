@@ -1,5 +1,5 @@
-import api from './api.js';
-import { IUser } from '../types/index.js';
+import api from './api';
+import { IUser } from '../types';
 
 const userService = {
   listar: async (page = 1, limit = 10, filtros = {}) => {

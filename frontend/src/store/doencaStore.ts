@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IDoenca } from '../types/index.js';
+import { IDoenca } from '../types';
 
 interface DoencaFilters {
   nomeDoenca?: string;

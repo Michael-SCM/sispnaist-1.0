@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IQuestionario } from '../types/index.js';
+import { IQuestionario } from '../types';
 
 interface QuestionarioStore {
   questionarios: IQuestionario[];
