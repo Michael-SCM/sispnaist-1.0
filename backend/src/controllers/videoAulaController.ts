@@ -18,6 +18,9 @@ class VideoAulaController {
         VideoAula.countDocuments(filtro)
       ]);
 
+      console.log('[VideoAulaController.listar] query:', { page, limit, ativo, categoria, filtro, total });
+      console.log('[VideoAulaController.listar] ids retornados:', (videoAulas || []).map((v: any) => v._id));
+
       return res.status(200).json({
         data: videoAulas,
         total,
