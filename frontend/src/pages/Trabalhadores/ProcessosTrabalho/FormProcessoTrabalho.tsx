@@ -116,7 +116,16 @@ export const FormProcessoTrabalho: React.FC = () => {
     if (!formData.cargo) novoErros.cargo = 'Obrigatório';
     if (!formData.funcao) novoErros.funcao = 'Obrigatória';
     if (!formData.dataInicio) novoErros.dataInicio = 'Obrigatória';
-    if (!formData.questionarioId) novoErros.questionarioId = 'Obrigatório';
+
+    if (!formData.questionarioId) {
+      novoErros.questionarioId = 'Obrigatório';
+    } else {
+      const v = formData.questionarioId.trim();
+      const objectIdRegex = /^[a-fA-F0-9]{24}$/;
+      if (!objectIdRegex.test(v)) {
+        novoErros.questionarioId = 'questionárioId inválido (esperado 24 caracteres hex)';
+      }
+    }
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
