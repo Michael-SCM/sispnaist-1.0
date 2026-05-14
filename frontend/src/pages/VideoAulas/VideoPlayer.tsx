@@ -42,6 +42,7 @@ export const VideoPlayer: React.FC = () => {
 
   const getEmbedUrl = (url: string) => {
     // Basic YouTube embed URL converter
+    if (!url) return '';
     if (url.includes('youtube.com/watch?v=')) {
       return url.replace('youtube.com/watch?v=', 'youtube.com/embed/');
     }
@@ -71,6 +72,10 @@ export const VideoPlayer: React.FC = () => {
     );
   }
 
+  const embedUrl = video?.url ? getEmbedUrl(video.url) : '';
+  console.log('[VideoPlayer] video:', video);
+  console.log('[VideoPlayer] embedUrl:', embedUrl);
+
   return (
     <MainLayout>
       <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
@@ -88,13 +93,22 @@ export const VideoPlayer: React.FC = () => {
           
           {/* Video Player Container */}
           <div className="relative aspect-video bg-black w-full">
-            <iframe
-              src={getEmbedUrl(video.url)}
-              title={video.titulo}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute top-0 left-0 w-full h-full border-0"
-            ></iframe>
+            {embedUrl ? (
+              <iframe
+                src={embedUrl}
+                title={video.titulo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute top-0 left-0 w-full h-full border-0"
+              ></iframe>
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center text-white/80 text-center p-6">
+                URL do vídeo inválida ou vazia.
+                <div className="mt-2 text-xs text-white/60 break-all">
+                  url: {video?.url}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Video Information */}
