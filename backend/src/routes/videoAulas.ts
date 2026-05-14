@@ -12,7 +12,7 @@ const videoAulaSchema = Joi.object({
   url: Joi.string().uri().required(),
   thumbnail: Joi.string().optional(),
   duracao: Joi.string().optional(),
-  categoria: Joi.string().trim().optional(),
+  categoria: Joi.string().trim().allow('').optional(),
   tags: Joi.array().items(Joi.string()).optional(),
   ordem: Joi.number().integer().min(0).optional()
 });
