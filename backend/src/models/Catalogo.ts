@@ -38,7 +38,8 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'motivoReadaptacao', 'tempoReadaptacao',
         'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
         'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
-        'padraoEmail', 'parametro', 'parentesco', 'sorologia'
+        'padraoEmail', 'parametro', 'parentesco', 'sorologia',
+        'acompanhamentoReadaptacao'
       ]
     },
     nome: { type: String, required: true, trim: true },
