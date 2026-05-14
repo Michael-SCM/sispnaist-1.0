@@ -59,3 +59,11 @@ export const adminMiddleware = (req: IAuthRequest, res: Response, next: NextFunc
   }
   next();
 };
+
+export const adminOuGestorMiddleware = (req: IAuthRequest, res: Response, next: NextFunction): void => {
+  if (!req.user || !['admin', 'gestor'].includes(req.user.perfil)) {
+    res.status(403).json({ message: 'Sem permissão de administrador/gestor' });
+    return;
+  }
+  next();
+};
