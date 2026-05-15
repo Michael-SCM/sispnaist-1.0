@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatCPF } from '../../utils/masks';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
@@ -62,7 +63,12 @@ export const NovaDoenca: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    let finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+
+    // Se for campo de CPF, armazena apenas números, mas exibe a máscara
+    if (name === 'trabalhadorId') {
+      finalValue = value.replace(/\D/g, '');
+    }
 
     setFormData({
       ...formData,
@@ -136,10 +142,11 @@ export const NovaDoenca: React.FC = () => {
                     <input
                       required
                       name="trabalhadorId"
-                      value={formData.trabalhadorId}
+                      value={formatCPF(formData.trabalhadorId)}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-mono"
                       placeholder="000.000.000-00"
+                      maxLength={14}
                     />
                   </div>
                   <div>
