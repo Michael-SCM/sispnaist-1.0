@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../hooks/useForm.js';
-import { CPFInput } from '../components/FormFields';
 import { authService } from '../services/authService.js';
 import { useAuthStore } from '../store/authStore.js';
 import toast from 'react-hot-toast';
@@ -94,18 +93,15 @@ export const Register: React.FC = () => {
           </div>
 
           <div>
-            <CPFInput
-              label="CPF (XXX.XXX.XXX-XX)"
+            <label className="label">CPF (XXX.XXX.XXX-XX)</label>
+            <input
+              type="text"
               name="cpf"
               value={values.cpf}
-              onChange={(e) => {
-                // Armazena apenas números no estado
-                const onlyNumbers = e.target.value.replace(/\D/g, '');
-                handleChange({
-                  ...e,
-                  target: { ...e.target, value: onlyNumbers, name: 'cpf' }
-                });
-              }}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className="input"
+              placeholder="000.000.000-00"
               required
             />
           </div>
