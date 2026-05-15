@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 
@@ -9,7 +9,12 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, adminOnly }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, initializeAuth } = useAuthStore();
+
+  useEffect(() => {
+    // Garante que ao dar F5/refresh o Zustand recarregue user/token do localStorage
+    if (!isAuthenticated) initializeAuth();
+  }, [isAuthenticated, initializeAuth]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -25,3 +30,4 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
 
   return <>{children}</>;
 };
+
