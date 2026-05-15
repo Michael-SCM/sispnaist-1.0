@@ -18,6 +18,7 @@ import {
   Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { maskCPF } from '../../../utils/cpfMask.js';
 
 interface FormData {
   nome: string;
@@ -132,7 +133,8 @@ export const FormDependente: React.FC = () => {
 
       const dados: Partial<ITrabalhadorDependente> = {
         ...formData,
-        cpf: formData.cpf || undefined,
+        // Backend valida CPF no formato XXX.XXX.XXX-XX
+        cpf: formData.cpf ? maskCPF(formData.cpf) : undefined,
         dataNascimento: formData.dataNascimento || undefined,
       };
 

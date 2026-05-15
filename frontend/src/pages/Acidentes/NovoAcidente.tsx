@@ -235,7 +235,8 @@ export const NovoAcidente: React.FC = () => {
 
       const acidenteData: Partial<IAcidente> = {
         ...formData,
-        trabalhadorId: formData.trabalhadorId || user?._id || '',
+        // Backend valida CPF no formato XXX.XXX.XXX-XX
+        trabalhadorId: maskCPF(formData.trabalhadorId || user?._id || ''),
         dataAcidente: formData.dataAcidente ? converterDataLocal(formData.dataAcidente) : undefined,
         dataComunicacao: formData.comunicado && formData.dataComunicacao
           ? converterDataLocal(formData.dataComunicacao)
