@@ -1,4 +1,6 @@
 import React from 'react';
+import { maskCPF, unmaskCPF } from '../utils/cpfMask';
+
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../hooks/useForm.js';
 import { authService } from '../services/authService.js';
@@ -97,13 +99,20 @@ export const Register: React.FC = () => {
             <input
               type="text"
               name="cpf"
-              value={values.cpf}
-              onChange={handleChange}
+              value={maskCPF(values.cpf)}
+              onChange={(e) => {
+                const unmasked = unmaskCPF(e.target.value);
+                // manter estado apenas com dígitos
+                (handleChange as any)({
+                  target: { name: 'cpf', value: unmasked },
+                });
+              }}
               onBlur={handleBlur}
               className="input"
               placeholder="000.000.000-00"
               required
             />
+
           </div>
 
           <div>
