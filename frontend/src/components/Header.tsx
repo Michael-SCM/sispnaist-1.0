@@ -172,9 +172,10 @@ export const Header: React.FC = () => {
               Treinamentos
             </Link>
 
-            {user.perfil === 'admin' && (
+            {user?.perfil === 'admin' && (
               <>
                 <div className="pt-2 border border-blue-500">
+
                   <Link
                     to="/admin/empresas"
                     className="block py-2 hover:text-amber-200 transition font-semibold"
