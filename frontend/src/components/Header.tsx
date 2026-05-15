@@ -126,8 +126,9 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && user && (
+        {mobileMenuOpen && (
           <nav className="md:hidden mt-4 pt-4 border-t border-blue-500 space-y-2">
+
             <Link
               to="/dashboard"
               className="block py-2 hover:text-blue-100 transition"
