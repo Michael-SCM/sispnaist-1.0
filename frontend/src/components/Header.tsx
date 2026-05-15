@@ -72,7 +72,7 @@ export const Header: React.FC = () => {
                   </>
                 )}
                 <div className="flex items-center gap-4">
-                  <span className="text-sm">{user.nome}</span>
+                  <span className="text-sm">{user?.nome ?? ''}</span>
                   <button
                     onClick={handleLogout}
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition"
@@ -201,7 +201,7 @@ export const Header: React.FC = () => {
               </>
             )}
             <div className="pt-4 border-t border-blue-500">
-              <div className="py-2 text-sm">{user.nome}</div>
+              <div className="py-2 text-sm">{user?.nome ?? ''}</div>
               <button
                 onClick={() => {
                   handleLogout();
