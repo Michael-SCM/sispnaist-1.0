@@ -13,6 +13,7 @@ import {
   Phone, CreditCard, BookOpen
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { maskCPF } from '../../utils/cpfMask.js';
 
 // Reusable input style
 const inputCls = "w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all";
@@ -201,6 +202,8 @@ export const NovoTrabalhador: React.FC = () => {
       // Garantir que campos críticos sejam enviados
       const payload = {
         ...formData,
+        // Backend valida CPF no formato XXX.XXX.XXX-XX
+        cpf: maskCPF(String(formData.cpf || '')),
         genero: formData.genero
       };
       
@@ -300,7 +303,7 @@ export const NovoTrabalhador: React.FC = () => {
             <div className="p-8 space-y-6">
               {/* CPF + Nome + Nome da Mãe */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {renderInput('cpf', 'CPF', formData.cpf || '', { required: true, placeholder: '000.000.000-00' })}
+                {renderInput('cpf', 'CPF', maskCPF(formData.cpf || ''), { required: true, placeholder: '000.000.000-00',})}
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true, placeholder: 'Nome completo do trabalhador' })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}
               </div>
