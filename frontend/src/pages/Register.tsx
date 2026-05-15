@@ -1,5 +1,5 @@
 import React from 'react';
-import { maskCPF, unmaskCPF } from '../utils/cpfMask';
+import { maskCPF, unmaskCPF } from '../utils/cpfMask.js';
 
 import { useNavigate } from 'react-router-dom';
 import { useForm } from '../hooks/useForm.js';

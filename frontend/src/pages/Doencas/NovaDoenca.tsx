@@ -4,7 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { doencaService } from '../../services/doencaService.js';
 import { IDoenca } from '../../types/index.js';
-import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 
 import { useAuthStore } from '../../store/authStore.js';
 import { 
