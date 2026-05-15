@@ -25,6 +25,8 @@ import {
   Building
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { maskCPF, unmaskCPF } from '../../../utils/cpfMask';
+
 
 interface FormData {
   trabalhadorId: string;
@@ -291,13 +293,23 @@ export const NovoAcidente: React.FC = () => {
                     <input
                       required
                       name="trabalhadorId"
-                      value={formData.trabalhadorId}
-                      onChange={handleChange}
+                      value={maskCPF(formData.trabalhadorId)}
+                      onChange={(e) => {
+                        const unmasked = unmaskCPF(e.target.value);
+                        setFormData((prev) => ({
+                          ...prev,
+                          trabalhadorId: unmasked,
+                        }));
+                        if (errors.trabalhadorId) {
+                          setErrors((prev) => ({ ...prev, trabalhadorId: '' }));
+                        }
+                      }}
                       className={`w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono ${
                         errors.trabalhadorId ? 'ring-2 ring-red-500' : ''
                       }`}
                       placeholder="000.000.000-00"
                     />
+
                     {trabalhadorNome && (
                       <div className="mt-2 flex items-center gap-2 text-emerald-600 font-bold text-sm bg-emerald-50 px-3 py-1 rounded-lg w-fit">
                         <CheckCircle2 size={14} />

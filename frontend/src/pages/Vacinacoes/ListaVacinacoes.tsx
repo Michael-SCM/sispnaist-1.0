@@ -17,6 +17,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
+
 
 export const ListaVacinacoes: React.FC = () => {
   const navigate = useNavigate();
@@ -138,11 +140,12 @@ export const ListaVacinacoes: React.FC = () => {
                 <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Trabalhador (CPF)</label>
                 <input 
                   type="text"
-                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-mono"
                   placeholder="000.000.000-00"
-                  value={localFiltros.trabalhadorId || ''}
-                  onChange={(e) => setLocalFiltros({ ...localFiltros, trabalhadorId: e.target.value })}
+                  value={maskCPF(localFiltros.trabalhadorId || '')}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, trabalhadorId: unmaskCPF(e.target.value) })}
                 />
+
               </div>
             </div>
 

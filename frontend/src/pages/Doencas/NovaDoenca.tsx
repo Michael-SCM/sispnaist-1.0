@@ -4,6 +4,8 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { doencaService } from '../../services/doencaService.js';
 import { IDoenca } from '../../types/index.js';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
+
 import { useAuthStore } from '../../store/authStore.js';
 import { 
   HeartPulse, 
@@ -136,11 +138,16 @@ export const NovaDoenca: React.FC = () => {
                     <input
                       required
                       name="trabalhadorId"
-                      value={formData.trabalhadorId}
-                      onChange={handleChange}
+                      value={maskCPF(formData.trabalhadorId)}
+                      onChange={(e) => {
+                        const unmasked = unmaskCPF(e.target.value);
+                        setFormData((prev) => ({ ...prev, trabalhadorId: unmasked }));
+                        if (errors['trabalhadorId']) setErrors((prev) => ({ ...prev, trabalhadorId: '' }));
+                      }}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-mono"
                       placeholder="000.000.000-00"
                     />
+
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Código CID *</label>
