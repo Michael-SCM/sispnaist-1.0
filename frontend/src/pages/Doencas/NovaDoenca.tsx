@@ -89,7 +89,7 @@ export const NovaDoenca: React.FC = () => {
 
       const doencaData: Partial<IDoenca> = {
         ...formData,
-        trabalhadorId: formData.trabalhadorId || user?._id || '',
+        trabalhadorId: maskCPF(formData.trabalhadorId || user?._id || ''),
         dataFim: formData.dataFim ? formData.dataFim : undefined,
       };
 

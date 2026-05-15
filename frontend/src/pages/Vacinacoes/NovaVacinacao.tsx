@@ -76,6 +76,8 @@ export const NovaVacinacao: React.FC = () => {
     try {
       const dataToSend = {
         ...formData,
+        // Backend valida CPF no formato XXX.XXX.XXX-XX
+        trabalhadorId: maskCPF(formData.trabalhadorId),
         proximoDose: formData.proximoDose || undefined,
         unidadeSaude: formData.unidadeSaude || undefined,
         profissional: formData.profissional || undefined,

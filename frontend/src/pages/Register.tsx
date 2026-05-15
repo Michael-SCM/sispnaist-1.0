@@ -45,7 +45,8 @@ export const Register: React.FC = () => {
       const { user, token } = await authService.register({
         nome: values.nome,
         email: values.email,
-        cpf: values.cpf,
+        // Backend valida CPF no formato: XXX.XXX.XXX-XX
+        cpf: maskCPF(values.cpf),
         dataNascimento: values.dataNascimento,
         senha: values.senha,
       });
