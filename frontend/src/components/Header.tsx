@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
                   Treinamentos
                 </Link>
 
-                {user.perfil === 'admin' && (
+                {user?.perfil === 'admin' && (
                   <>
                     <Link
                       to="/admin/empresas"
