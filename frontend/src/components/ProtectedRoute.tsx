@@ -11,14 +11,19 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, adminOnly }) => {
   const { isAuthenticated, user, initializeAuth } = useAuthStore();
 
-  useEffect(() => {
-    // Garante que ao dar F5/refresh o Zustand recarregue user/token do localStorage
-    if (!isAuthenticated) initializeAuth();
-  }, [isAuthenticated, initializeAuth]);
+  const [bootstrapped, setBootstrapped] = React.useState(false);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  useEffect(() => {
+    // Ao recarregar, initializeAuth() precisa rodar antes de decidir pelo redirect.
+    initializeAuth();
+    setBootstrapped(true);
+  }, [initializeAuth]);
+
+  if (!bootstrapped || !isAuthenticated) {
+    // Evita redirect imediato no primeiro render após refresh.
+    return null;
   }
+
 
   if (adminOnly && user?.perfil !== 'admin') {
     return <Navigate to="/dashboard" replace />;
