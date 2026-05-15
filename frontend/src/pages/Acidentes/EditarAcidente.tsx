@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
+import { maskCPF, unmaskCPF } from '../../../utils/cpfMask';
+
 
 interface FormData {
   trabalhadorId: string;
@@ -361,9 +363,10 @@ export const EditarAcidente: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-600 mb-2">CPF do Trabalhador</label>
                     <input
                       disabled
-                      value={formData?.trabalhadorId}
+                      value={maskCPF(formData?.trabalhadorId || '')}
                       className="w-full px-4 py-3 bg-slate-100 border-transparent rounded-2xl text-slate-500 font-mono cursor-not-allowed"
                     />
+
                     {trabalhadorNome && (
                       <div className="mt-2 flex items-center gap-2 text-slate-600 font-bold text-sm bg-slate-50 px-3 py-1 rounded-lg w-fit border border-slate-100">
                         <CheckCircle2 size={14} className="text-emerald-500" />
