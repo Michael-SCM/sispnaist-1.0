@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
-import { maskCPF, unmaskCPF } from '../../../utils/cpfMask';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
 
 
 interface FormData {

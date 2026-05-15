@@ -25,7 +25,7 @@ import {
   Building
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { maskCPF, unmaskCPF } from '../../../utils/cpfMask';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
 
 
 interface FormData {
