@@ -100,7 +100,7 @@ export class AuthService {
     return userObj;
   }
 
-  async forgotPassword(email: string, dataNascimento: string): Promise<void> {
+  async forgotPassword(email: string, dataNascimento: string): Promise<string> {
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -125,6 +125,9 @@ export class AuthService {
       config.jwtSecret,
       { expiresIn: '1h' }
     );
+
+    // Enviar e-mail de redefinição de senha
+    await sendResetPasswordEmail(user.email, resetToken);
 
     return resetToken;
   }

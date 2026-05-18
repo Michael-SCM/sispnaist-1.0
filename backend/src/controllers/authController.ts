@@ -60,10 +60,16 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   const { email, dataNascimento } = req.body;
   const resetToken = await authService.forgotPassword(email, dataNascimento);
 
+  // Em desenvolvimento, logar o link para facilitar testes locais
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`\n=== LINK DE RECUPERAÇÃO DE SENHA (DESENVOLVIMENTO) ===`);
+    console.log(`http://localhost:5173/reset-password?token=${resetToken}`);
+    console.log(`======================================================\n`);
+  }
+
   res.status(200).json({
     status: 'success',
-    message: 'Dados confirmados! Redirecionando para alteração de senha...',
-    token: resetToken,
+    message: 'Solicitação de redefinição de senha enviada com sucesso! Verifique sua caixa de e-mail.',
   });
 });
 
