@@ -82,6 +82,7 @@ const UserSchema = new Schema<IUserDocument>(
     verificationTokenExpires: {
       type: Date,
       select: false,
+      index: { expires: 0 }, // Índice TTL: o MongoDB exclui a conta automaticamente se passar de 24h sem verificação
     },
   },
   { 
