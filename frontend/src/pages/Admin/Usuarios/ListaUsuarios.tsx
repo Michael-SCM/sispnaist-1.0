@@ -10,8 +10,8 @@ interface Usuario {
   nome: string;
   email: string;
   perfil: string;
-  empresa?: string;
-  unidade?: string;
+  empresa?: any;
+  unidade?: any;
   ativo: boolean;
 }
 
@@ -141,10 +141,16 @@ const ListaUsuarios: React.FC = () => {
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
                             <Building2 size={14} className="text-slate-400" />
-                            {usuario.empresa || 'Sem Empresa'}
+                            {typeof usuario.empresa === 'object' && usuario.empresa !== null
+                              ? usuario.empresa.razaoSocial
+                              : (usuario.empresa || 'Sem Empresa')}
                           </div>
                           {usuario.unidade && (
-                            <span className="text-xs text-slate-400 pl-5">{usuario.unidade}</span>
+                            <span className="text-xs text-slate-400 pl-5">
+                              {typeof usuario.unidade === 'object' && usuario.unidade !== null
+                                ? usuario.unidade.nome
+                                : usuario.unidade}
+                            </span>
                           )}
                         </div>
                       </td>
