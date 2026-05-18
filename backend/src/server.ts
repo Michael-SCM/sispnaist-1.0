@@ -1,4 +1,10 @@
 import 'dotenv/config';
+import dns from 'node:dns';
+
+// Forçar a resolução de DNS a priorizar IPv4. 
+// Isso resolve o erro ENETUNREACH no Render, pois a plataforma não possui suporte a IPv6 de saída.
+dns.setDefaultResultOrder('ipv4first');
+
 import app from './app.js';
 import config from './config/config.js';
 

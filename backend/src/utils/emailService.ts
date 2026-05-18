@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
+import dns from 'node:dns';
 import config from '../config/config.js';
+
+// Garantir prioridade de IPv4 para evitar ENETUNREACH no Render
+dns.setDefaultResultOrder('ipv4first');
 
 /**
  * Servico de Email (Nodemailer)
