@@ -5,6 +5,7 @@ import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViole
 import TrabalhadorReadaptacao from '../models/TrabalhadorReadaptacao';
 import TrabalhadorProcessoTrabalho from '../models/TrabalhadorProcessoTrabalho';
 import TrabalhadorVinculo from '../models/TrabalhadorVinculo';
+import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 
 /**
@@ -30,6 +31,14 @@ class SubmoduloTrabalhadorController {
       const { id, submodulo } = req.params;
       const { ativo } = req.query;
 
+      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
+      if ((req as any).user?.perfil === 'trabalhador') {
+        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+        if (!trabalhador || id !== trabalhador._id.toString()) {
+          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        }
+      }
+
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
@@ -52,6 +61,14 @@ class SubmoduloTrabalhadorController {
     try {
       const { id, submodulo, itemId } = req.params;
 
+      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
+      if ((req as any).user?.perfil === 'trabalhador') {
+        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+        if (!trabalhador || id !== trabalhador._id.toString()) {
+          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        }
+      }
+
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
@@ -73,6 +90,11 @@ class SubmoduloTrabalhadorController {
   async criar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para cadastrar registros em submódulos de trabalhadores', 403);
+      }
+
       const dados = req.body;
 
       const Model = SUBMODULO_MODELS[submodulo];
@@ -93,6 +115,11 @@ class SubmoduloTrabalhadorController {
   async atualizar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo, itemId } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para atualizar registros em submódulos de trabalhadores', 403);
+      }
+
       const dados = req.body;
 
       const Model = SUBMODULO_MODELS[submodulo];
@@ -120,6 +147,10 @@ class SubmoduloTrabalhadorController {
   async deletar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo, itemId } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para deletar registros em submódulos de trabalhadores', 403);
+      }
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {

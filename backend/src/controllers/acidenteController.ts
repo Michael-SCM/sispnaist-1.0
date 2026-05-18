@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
-import { IAuthRequest } from '../middleware/auth.js';
-import { IAcidente } from '../types/index.js';
+import Trabalhador from '../models/Trabalhador.js';
+import { AppError } from '../middleware/errorHandler.js';
 import { logAction } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para criar acidentes', 403);
+  }
+
   const acidente = await acidenteService.criar(req.body);
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
@@ -23,6 +27,18 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const acidente = await acidenteService.obter(id);
 
+  if (!acidente) {
+    throw new AppError('Acidente não encontrado', 404);
+  }
+
+  // Se o usuário logado for trabalhador, só pode visualizar se o acidente for dele
+  if ((req as any).user?.perfil === 'trabalhador') {
+    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+    if (!trabalhador || acidente.trabalhadorId.toString() !== trabalhador._id.toString()) {
+      throw new AppError('Sem permissão para acessar os dados deste acidente', 403);
+    }
+  }
+
   res.status(200).json({
     status: 'success',
     data: { acidente },
@@ -33,7 +49,7 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
 
-  const filtros = {
+  const filtros: any = {
     tipoAcidente: req.query.tipoAcidente as string | undefined,
     status: req.query.status as string | undefined,
     trabalhadorId: req.query.trabalhadorId as string | undefined,
@@ -41,6 +57,12 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     dataFim: req.query.dataFim as string | undefined,
     descricao: req.query.descricao as string | undefined,
   };
+
+  // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
+  if ((req as any).user?.perfil === 'trabalhador') {
+    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+    filtros.trabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
+  }
 
   const { acidentes, total, pages } = await acidenteService.listar(page, limit, filtros);
 
@@ -59,6 +81,10 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para atualizar acidentes', 403);
+  }
+
   const { id } = req.params;
   const acidente = await acidenteService.atualizar(id, req.body);
 
@@ -73,6 +99,10 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para deletar acidentes', 403);
+  }
+
   const { id } = req.params;
   await acidenteService.deletar(id);
 
@@ -85,6 +115,14 @@ export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Respon
   const { trabalhadorId } = req.params;
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
+
+  // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
+  if ((req as any).user?.perfil === 'trabalhador') {
+    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+    if (!trabalhador || trabalhador._id.toString() !== trabalhadorId) {
+      throw new AppError('Sem permissão para acessar estes dados', 403);
+    }
+  }
 
   const { acidentes, total, pages } = await acidenteService.obterPorTrabalhador(
     trabalhadorId,
@@ -107,6 +145,10 @@ export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Respon
 });
 
 export const obterEstatisticas = asyncHandler(async (req: Request, res: Response) => {
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para acessar estatísticas gerais', 403);
+  }
+
   const stats = await acidenteService.obterEstatisticas();
 
   res.status(200).json({

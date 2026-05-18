@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import TrabalhadorInformacaoService from '../services/TrabalhadorInformacaoService';
+import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 
 class TrabalhadorInformacaoController {
@@ -7,6 +8,14 @@ class TrabalhadorInformacaoController {
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+
+      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
+      if ((req as any).user?.perfil === 'trabalhador') {
+        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+        if (!trabalhador || id !== trabalhador._id.toString()) {
+          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
+        }
+      }
 
       const informacoes = await TrabalhadorInformacaoService.listarPorTrabalhador(id);
 
@@ -20,6 +29,14 @@ class TrabalhadorInformacaoController {
   async obter(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
+
+      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
+      if ((req as any).user?.perfil === 'trabalhador') {
+        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
+        if (!trabalhador || id !== trabalhador._id.toString()) {
+          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
+        }
+      }
 
       const informacao = await TrabalhadorInformacaoService.obterPorId(infoId);
 
@@ -37,6 +54,11 @@ class TrabalhadorInformacaoController {
   async criar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para criar informações de trabalhadores', 403);
+      }
+
       const dados = req.body;
 
       const informacao = await TrabalhadorInformacaoService.criar({
@@ -54,6 +76,11 @@ class TrabalhadorInformacaoController {
   async atualizar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para atualizar informações de trabalhadores', 403);
+      }
+
       const dados = req.body;
 
       const informacao = await TrabalhadorInformacaoService.atualizar(infoId, dados);
@@ -72,6 +99,10 @@ class TrabalhadorInformacaoController {
   async deletar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
+
+      if ((req as any).user?.perfil === 'trabalhador') {
+        throw new AppError('Sem permissão para deletar informações de trabalhadores', 403);
+      }
 
       const existe = await TrabalhadorInformacaoService.obterPorId(infoId);
       if (!existe || existe.trabalhadorId !== id) {
