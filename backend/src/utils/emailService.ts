@@ -7,9 +7,12 @@ import config from '../config/config.js';
 dns.setDefaultResultOrder('ipv4first');
 
 /**
- * Servico de Email (Híbrido)
+ * Servico de Email (Híbrido de Alta Compatibilidade)
  * Envia o link de redefinição de senha para o usuário.
- * Suporta Resend HTTP API (ideal para Produção no Render) e Gmail SMTP (ideal para Localhost).
+ * Suporta:
+ * 1. Brevo HTTP API (Ideal para Render: envia para qualquer e-mail do mundo sem domínio próprio)
+ * 2. Resend HTTP API (Excelente para Render se possuir domínio próprio)
+ * 3. Gmail SMTP (Nodemailer, ideal para Localhost)
  */
 export const sendResetPasswordEmail = async (email: string, token: string) => {
   const resetLink = `${config.frontendUrl}/reset-password?token=${token}`;
@@ -33,11 +36,41 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
     </div>
   `;
 
-  // 1. Usar Resend HTTP API se a chave estiver configurada (Garante funcionamento no Render)
+  // 1. Usar Brevo HTTP API se a chave estiver configurada (Garante funcionamento no Render para qualquer e-mail sem domínio)
+  if (process.env.BREVO_API_KEY) {
+    console.log('Tentando enviar e-mail via API da Brevo (Porta 443 HTTPS)...');
+    try {
+      await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: {
+          name: 'SISPNAIST',
+          email: config.email.user || 'sispnaist@gmail.com'
+        },
+        to: [
+          {
+            email: email
+          }
+        ],
+        subject: "Recuperação de Senha - SISPNAIST",
+        htmlContent: htmlContent
+      }, {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(`E-mail de redefinição enviado com sucesso via Brevo HTTP API para: ${email}`);
+      return;
+    } catch (brevoError: any) {
+      const errorMsg = brevoError.response?.data || brevoError.message;
+      console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      throw new Error(`Falha ao enviar e-mail via Brevo API: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 2. Usar Resend HTTP API se a chave estiver configurada
   if (process.env.RESEND_API_KEY) {
     console.log('Tentando enviar e-mail via API do Resend (Porta 443 HTTPS)...');
     
-    // Simplificar remetente caso use o domínio padrão de testes da Resend
     const fromEmail = config.email.from && config.email.from.includes('gmail')
       ? 'SISPNAIST <onboarding@resend.dev>'
       : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
@@ -63,9 +96,9 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
     }
   }
 
-  // 2. Fallback para Gmail SMTP se nenhuma API Key do Resend estiver configurada (Ideal para Local)
+  // 3. Fallback para Gmail SMTP se nenhuma API Key estiver configurada (Ideal para Local)
   if (!config.email.user || !config.email.pass) {
-    console.log('AVISO: Nenhuma chave RESEND_API_KEY foi definida e as configurações SMTP locais estão incompletas.');
+    console.log('AVISO: Nenhuma chave de API (Brevo/Resend) configurada e credenciais SMTP locais incompletas.');
     return;
   }
 
@@ -91,6 +124,6 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
     console.log(`E-mail de redefinição enviado com sucesso via Gmail SMTP para: ${email}`);
   } catch (smtpError: any) {
     console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
-    throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Recomenda-se adicionar a variável RESEND_API_KEY no painel da Render.');
+    throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Configure BREVO_API_KEY para enviar sem restrições no Render.');
   }
 };
