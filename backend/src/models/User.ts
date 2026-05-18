@@ -74,7 +74,6 @@ const UserSchema = new Schema<IUserDocument>(
     },
     isVerified: {
       type: Boolean,
-      default: false,
     },
     verificationToken: {
       type: String,
