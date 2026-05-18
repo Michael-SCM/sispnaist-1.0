@@ -25,7 +25,18 @@ export class AuthService {
     );
     const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
 
-    // Create new user
+    // 1. Tentar enviar o e-mail de verificação primeiro
+    try {
+      await sendVerificationEmail(userData.email, verificationToken);
+    } catch (emailError: any) {
+      console.error('ERRO NO ENVIO DO E-MAIL DE CADASTRO:', emailError);
+      throw new AppError(
+        'Não foi possível enviar o e-mail de confirmação. Por favor, verifique se o e-mail digitado realmente existe e está correto.',
+        400
+      );
+    }
+
+    // 2. Criar e salvar o usuário no banco apenas se o envio do e-mail foi bem-sucedido
     const user = new User({
       ...userData,
       isVerified: false,
@@ -33,9 +44,6 @@ export class AuthService {
       verificationTokenExpires,
     });
     await user.save();
-
-    // Enviar e-mail de verificação
-    await sendVerificationEmail(user.email, verificationToken);
 
     // Em desenvolvimento, logar o link para facilitar testes
     if (process.env.NODE_ENV !== 'production') {
