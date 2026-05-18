@@ -66,7 +66,7 @@ export class AnalyticsService {
       ? Math.round((acidentesFechados / totalAcidentes) * 100) 
       : 0;
 
-    const totalTrabalhadores = await User.countDocuments({ perfil: 'trabalhador', ativo: true });
+    const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
     
     const totalDoencas = await Doenca.countDocuments();
     const doencasAtivas = await Doenca.countDocuments({ ativo: true });
@@ -378,7 +378,7 @@ export class AnalyticsService {
    * Obtém dados detalhados de monitoramento clínico
    */
   async obterMonitoramentoClinico(): Promise<IMonitoramentoClinico> {
-    const totalTrabalhadores = await User.countDocuments({ perfil: 'trabalhador', ativo: true });
+    const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
     const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
     
     // Alertas Críticos (Exemplo: 3+ acidentes ou vacina vencida há 90 dias)
