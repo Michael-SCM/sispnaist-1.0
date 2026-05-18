@@ -34,7 +34,11 @@ export const obterVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
   // Se o usuário logado for trabalhador, só pode visualizar se for dele
   if (req.user?.perfil === 'trabalhador') {
     const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
-    if (!trabalhador || vacinacao.trabalhadorId.toString() !== trabalhador._id.toString()) {
+    const recordTrabalhadorId = (vacinacao.trabalhadorId && (vacinacao.trabalhadorId as any)._id)
+      ? (vacinacao.trabalhadorId as any)._id.toString()
+      : vacinacao.trabalhadorId.toString();
+
+    if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
       throw new AppError('Sem permissão para acessar os dados desta vacinação', 403);
     }
   }

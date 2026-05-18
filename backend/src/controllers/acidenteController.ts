@@ -34,7 +34,11 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
   // Se o usuário logado for trabalhador, só pode visualizar se o acidente for dele
   if ((req as any).user?.perfil === 'trabalhador') {
     const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-    if (!trabalhador || acidente.trabalhadorId.toString() !== trabalhador._id.toString()) {
+    const recordTrabalhadorId = (acidente.trabalhadorId && (acidente.trabalhadorId as any)._id)
+      ? (acidente.trabalhadorId as any)._id.toString()
+      : acidente.trabalhadorId.toString();
+
+    if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
       throw new AppError('Sem permissão para acessar os dados deste acidente', 403);
     }
   }
