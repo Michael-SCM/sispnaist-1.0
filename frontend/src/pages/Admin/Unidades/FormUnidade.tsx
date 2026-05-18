@@ -40,7 +40,7 @@ const FormUnidade: React.FC = () => {
     if (id && unidadeAtual) {
       setFormData({
         nome: unidadeAtual.nome || '',
-        empresaId: typeof unidadeAtual.empresaId === 'object' ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
+        empresaId: typeof unidadeAtual.empresaId === 'object' && unidadeAtual.empresaId !== null ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
         tipo: unidadeAtual.tipo || 'Própria',
         ativa: unidadeAtual.ativa ?? true,
         endereco: {

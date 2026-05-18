@@ -28,7 +28,8 @@ const ListaUnidades: React.FC = () => {
   };
 
   const getEmpresaNome = (empresaId: any) => {
-    const id = typeof empresaId === 'object' ? empresaId._id : empresaId;
+    if (!empresaId) return 'Empresa não encontrada';
+    const id = typeof empresaId === 'object' && empresaId !== null ? empresaId._id : empresaId;
     const empresa = empresas.find(e => e._id === id);
     return empresa ? empresa.razaoSocial : 'Empresa não encontrada';
   };

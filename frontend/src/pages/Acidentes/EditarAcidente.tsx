@@ -193,7 +193,7 @@ export const EditarAcidente: React.FC = () => {
               setTrabalhadorNome(t.nome);
               // Atualizar o trabalhadorId no form para o CPF (mais amigável)
               setFormData(prev => prev ? { ...prev, trabalhadorId: t.cpf || identificador } : null);
-            } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId.nome) {
+            } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId !== null && acidente.trabalhadorId.nome) {
               // Fallback para o que veio populado do backend
               setTrabalhadorNome(acidente.trabalhadorId.nome);
               if (acidente.trabalhadorId.cpf) {
