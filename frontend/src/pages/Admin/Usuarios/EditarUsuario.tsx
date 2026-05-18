@@ -44,8 +44,8 @@ const EditarUsuario: React.FC = () => {
         email: user.email,
         password: '', // Não carregamos a senha
         perfil: user.perfil,
-        empresa: user.empresa || '',
-        unidade: user.unidade || '',
+        empresa: typeof user.empresa === 'object' && user.empresa !== null ? user.empresa._id : user.empresa || '',
+        unidade: typeof user.unidade === 'object' && user.unidade !== null ? user.unidade._id : user.unidade || '',
         ativo: user.ativo,
       });
     } catch (error) {
@@ -177,7 +177,7 @@ const EditarUsuario: React.FC = () => {
                     >
                       <option value="">Selecione...</option>
                       {empresas.map(emp => (
-                        <option key={emp._id} value={emp.razaoSocial}>{emp.razaoSocial}</option>
+                        <option key={emp._id} value={emp._id}>{emp.razaoSocial}</option>
                       ))}
                     </select>
                   </div>
@@ -191,7 +191,7 @@ const EditarUsuario: React.FC = () => {
                     >
                       <option value="">Selecione...</option>
                       {unidades.map(uni => (
-                        <option key={uni._id} value={uni.nome}>{uni.nome}</option>
+                        <option key={uni._id} value={uni._id}>{uni.nome}</option>
                       ))}
                     </select>
                   </div>
