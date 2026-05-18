@@ -173,6 +173,7 @@ export class AuthService {
     } catch (error: any) {
       if (error instanceof AppError) throw error;
       throw new AppError('Token de recuperação inválido ou expirado', 400);
+    }
   }
 
   async verifyEmail(token: string): Promise<void> {
