@@ -5,14 +5,19 @@ import { informacaoService, ITrabalhadorInformacao } from '../../../services/inf
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../../types/index.js';
 import {
+  FileText,
   Plus,
   Edit,
   Trash2,
+  Calendar,
   ArrowLeft,
+  Activity,
+  Heart,
+  Droplet,
+  Eye,
+  X,
   Pill,
   AlertCircle,
-  Heart,
-  Activity,
   Wine,
   Cigarette,
   Zap
@@ -25,6 +30,7 @@ export const ListaInformacoes: React.FC = () => {
   const [informacoes, setInformacoes] = useState<ITrabalhadorInformacao[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [informacaoSelecionada, setInformacaoSelecionada] = useState<ITrabalhadorInformacao | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -122,7 +128,7 @@ export const ListaInformacoes: React.FC = () => {
                     <tr
                       key={info._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`)}
+                      onClick={() => setInformacaoSelecionada(info)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -194,15 +200,27 @@ export const ListaInformacoes: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              setInformacaoSelecionada(info);
+                            }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Visualizar Detalhes"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
                               navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`);
                             }}
                             className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                            title="Editar"
                           >
                             <Edit size={20} />
                           </button>
                           <button
                             onClick={(e) => handleDeletar(e, info._id!)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Excluir"
                           >
                             <Trash2 size={20} />
                           </button>
@@ -216,6 +234,160 @@ export const ListaInformacoes: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes */}
+      {informacaoSelecionada && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div 
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+              onClick={() => setInformacaoSelecionada(null)}
+            ></div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
+                    <Heart size={18} />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">Histórico e Informações de Saúde</h3>
+                </div>
+                <button 
+                  onClick={() => setInformacaoSelecionada(null)}
+                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo Sanguíneo</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {informacaoSelecionada.tipoSanguineo || 'Não informado'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Medicamentos de Uso Contínuo</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {informacaoSelecionada.medicamentos || 'Nenhum informado'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-3">
+                  <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Alergias e Acompanhamento Médico</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Possui Alergias?</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.allergy ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+                    {informacaoSelecionada.allergy && (
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição das Alergias</span>
+                        <span className="font-semibold text-slate-700 block">
+                          {informacaoSelecionada.alergiasDescricao || 'Não descritas'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Acompanhamento Médico?</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.acompanhamentoMedico ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+                    {informacaoSelecionada.acompanhamentoMedico && (
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo do Acompanhamento</span>
+                        <span className="font-semibold text-slate-700 block">
+                          {informacaoSelecionada.acompanhamentoMedicoMotivo || 'Não informado'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Programa de Reabilitação?</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.acompanhamentoReabilitacao ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-3">
+                  <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Hábitos e Estilo de Vida</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Consumo de Álcool</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.usoAlcool ? `Sim (${informacaoSelecionada.dosesAlcool} doses/semana)` : 'Não'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Uso de Cigarro / Tabaco</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.usoCigarro ? `Sim (${informacaoSelecionada.macosCigarro} maços/dia)` : 'Não'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Uso de Outras Substâncias</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {informacaoSelecionada.usoOutraDroga ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+                    {informacaoSelecionada.usoOutraDroga && (
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição das Substâncias</span>
+                        <span className="font-semibold text-slate-700 block">
+                          {informacaoSelecionada.outraDrogaDescricao || 'Não informada'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-3">
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações Gerais</span>
+                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                    {informacaoSelecionada.observacoes || 'Nenhuma observação complementar registrada'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+                <button 
+                  onClick={() => {
+                    setInformacaoSelecionada(null);
+                    navigate(`/trabalhadores/${id}/informacoes/${informacaoSelecionada._id}/editar`);
+                  }}
+                  className="px-4 py-2 text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Editar Registro
+                </button>
+                <button 
+                  onClick={() => setInformacaoSelecionada(null)}
+                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

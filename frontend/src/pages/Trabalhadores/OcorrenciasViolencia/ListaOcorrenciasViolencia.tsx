@@ -13,7 +13,9 @@ import {
   ArrowLeft,
   ChevronRight,
   AlertTriangle,
-  Shield
+  Shield,
+  Eye,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -23,6 +25,7 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
   const [ocorrencias, setOcorrencias] = useState<ITrabalhadorOcorrenciaViolencia[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [ocorrenciaSelecionada, setOcorrenciaSelecionada] = useState<ITrabalhadorOcorrenciaViolencia | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -121,6 +124,7 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                     <tr
                       key={ocorrencia._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                      onClick={() => setOcorrenciaSelecionada(ocorrencia)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -157,15 +161,27 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              setOcorrenciaSelecionada(ocorrencia);
+                            }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Visualizar Detalhes"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
                               navigate(`/trabalhadores/${id}/ocorrencias-violencia/${ocorrencia._id}/editar`);
                             }}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Editar"
                           >
                             <Edit size={20} />
                           </button>
                           <button
                             onClick={(e) => handleDeletar(e, ocorrencia._id!)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Excluir"
                           >
                             <Trash2 size={20} />
                           </button>
@@ -179,6 +195,141 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes */}
+      {ocorrenciaSelecionada && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div 
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+              onClick={() => setOcorrenciaSelecionada(null)}
+            ></div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-red-50 text-red-600 rounded-xl">
+                    <ShieldAlert size={18} />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">Detalhes da Ocorrência</h3>
+                </div>
+                <button 
+                  onClick={() => setOcorrenciaSelecionada(null)}
+                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data da Ocorrência</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {ocorrenciaSelecionada.dataOcorrencia ? new Date(ocorrenciaSelecionada.dataOcorrencia).toLocaleDateString('pt-BR') : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Local do Fato</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {ocorrenciaSelecionada.localOcorrencia || 'Não informado'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo de Violência</span>
+                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-black uppercase w-fit block mt-0.5">
+                      {ocorrenciaSelecionada.tipoViolencia}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Violência Sexual</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {ocorrenciaSelecionada.tipoViolenciaSexual || 'Não se aplica'}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo da Violência</span>
+                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                    {ocorrenciaSelecionada.motivoViolencia || 'Não informado'}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição dos Fatos</span>
+                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                    {ocorrenciaSelecionada.descricao || 'Nenhuma descrição fornecida'}
+                  </p>
+                </div>
+
+                <div>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Conduta Tomada</span>
+                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                    {ocorrenciaSelecionada.condutaTomada || 'Nenhuma conduta registrada'}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Comunicado a Órgão Externo</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {ocorrenciaSelecionada.comunicacaoOrgao ? 'Sim' : 'Não'}
+                    </span>
+                  </div>
+                  {ocorrenciaSelecionada.comunicacaoOrgao && (
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Órgão Comunicado</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {ocorrenciaSelecionada.orgaoComunicado || 'Não especificado'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações</span>
+                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                    {ocorrenciaSelecionada.observacoes || 'Nenhuma observação cadastrada'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status da Ocorrência:</span>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                    ocorrenciaSelecionada.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {ocorrenciaSelecionada.ativo ? 'Ativo' : 'Encerrada'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+                <button 
+                  onClick={() => {
+                    setOcorrenciaSelecionada(null);
+                    navigate(`/trabalhadores/${id}/ocorrencias-violencia/${ocorrenciaSelecionada._id}/editar`);
+                  }}
+                  className="px-4 py-2 text-sm bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Editar Registro
+                </button>
+                <button 
+                  onClick={() => setOcorrenciaSelecionada(null)}
+                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

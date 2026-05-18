@@ -15,7 +15,9 @@ import {
   Heart,
   ChevronRight,
   ShieldCheck,
-  UserCheck
+  UserCheck,
+  Eye,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,6 +27,7 @@ export const ListaDependentes: React.FC = () => {
   const [dependentes, setDependentes] = useState<ITrabalhadorDependente[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dependenteSelecionado, setDependenteSelecionado] = useState<ITrabalhadorDependente | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -122,6 +125,7 @@ export const ListaDependentes: React.FC = () => {
                     <tr 
                       key={dep._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                      onClick={() => setDependenteSelecionado(dep)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -167,15 +171,27 @@ export const ListaDependentes: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              setDependenteSelecionado(dep);
+                            }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Visualizar Detalhes"
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
                               navigate(`/trabalhadores/${id}/dependentes/${dep._id}/editar`);
                             }}
                             className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            title="Editar"
                           >
                             <Edit size={20} />
                           </button>
                           <button
                             onClick={(e) => handleDeletar(e, dep._id!)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                            title="Excluir"
                           >
                             <Trash2 size={20} />
                           </button>
@@ -189,6 +205,103 @@ export const ListaDependentes: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Detalhes */}
+      {dependenteSelecionado && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div 
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+              onClick={() => setDependenteSelecionado(null)}
+            ></div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-rose-50 text-rose-600 rounded-xl">
+                    <Users2 size={18} />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">Detalhes do Dependente</h3>
+                </div>
+                <button 
+                  onClick={() => setDependenteSelecionado(null)}
+                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Nome Completo</span>
+                  <span className="font-semibold text-slate-700 text-lg block">
+                    {dependenteSelecionado.nome}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">CPF</span>
+                    <span className="font-semibold text-slate-700 font-mono block">
+                      {dependenteSelecionado.cpf || 'Não cadastrado'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Grau de Parentesco</span>
+                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-black uppercase w-fit block border border-slate-200/50 mt-0.5">
+                      {dependenteSelecionado.parentesco}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Nascimento</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {dependenteSelecionado.dataNascimento ? new Date(dependenteSelecionado.dataNascimento).toLocaleDateString('pt-BR') : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Dependente de IR</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {dependenteSelecionado.dependentIR ? 'Sim' : 'Não'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status do Dependente:</span>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                    dependenteSelecionado.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {dependenteSelecionado.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
+                <button 
+                  onClick={() => {
+                    setDependenteSelecionado(null);
+                    navigate(`/trabalhadores/${id}/dependentes/${dependenteSelecionado._id}/editar`);
+                  }}
+                  className="px-4 py-2 text-sm bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Editar Registro
+                </button>
+                <button 
+                  onClick={() => setDependenteSelecionado(null)}
+                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
