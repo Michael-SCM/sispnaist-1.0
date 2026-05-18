@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import trabalhadorService from '../services/TrabalhadorService.js';
-import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction } from '../utils/auditLogger.js';
 
@@ -64,20 +63,9 @@ export const getTrabalhador = asyncHandler(async (req: Request, res: Response) =
  * @access  Private/Admin/Saude
  */
 export const createTrabalhador = asyncHandler(async (req: Request, res: Response) => {
-  const authReq = req as any;
-
-  // Se for perfil trabalhador, impõe regras de autocadastro estritas
-  if (authReq.user?.perfil === 'trabalhador') {
-    // 1. O CPF enviado no cadastro deve ser obrigatoriamente o dele
-    if (req.body.cpf !== authReq.user.cpf) {
-      throw new AppError('Você só pode cadastrar um perfil com o seu próprio CPF', 403);
-    }
-
-    // 2. Não pode cadastrar mais de uma vez (apenas 1 perfil)
-    const existing = await Trabalhador.findOne({ cpf: authReq.user.cpf });
-    if (existing) {
-      throw new AppError('Você já possui um perfil de trabalhador cadastrado', 400);
-    }
+  // Trabalhadores não podem cadastrar nenhum perfil
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para cadastrar trabalhadores', 403);
   }
 
   try {
@@ -106,22 +94,12 @@ export const createTrabalhador = asyncHandler(async (req: Request, res: Response
  * @access  Private/Admin/Saude
  */
 export const updateTrabalhador = asyncHandler(async (req: Request, res: Response) => {
-  const authReq = req as any;
-  const { id } = req.params;
-
-  // Se for perfil trabalhador, impõe regras de autoedição estritas
-  if (authReq.user?.perfil === 'trabalhador') {
-    const trabalhadorExistente = await trabalhadorService.obter(id);
-    if (!trabalhadorExistente || trabalhadorExistente.cpf !== authReq.user.cpf) {
-      throw new AppError('Sem permissão para atualizar os dados deste trabalhador', 403);
-    }
-
-    // Impedir que o trabalhador altere o CPF do seu próprio cadastro para burlar filtros de segurança
-    if (req.body.cpf && req.body.cpf !== authReq.user.cpf) {
-      throw new AppError('Você não pode alterar o CPF do seu perfil', 400);
-    }
+  // Trabalhadores não podem atualizar nenhum perfil (apenas leitura de seus próprios dados)
+  if ((req as any).user?.perfil === 'trabalhador') {
+    throw new AppError('Sem permissão para atualizar dados de trabalhadores', 403);
   }
 
+  const { id } = req.params;
   const trabalhador = await trabalhadorService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Trabalhador', id, {
@@ -141,7 +119,7 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
  */
 export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para deletar cadastros de trabalhadores', 403);
+    throw new AppError('Sem permissão para deletar trabalhadores', 403);
   }
 
   const { id } = req.params;
