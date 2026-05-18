@@ -6,6 +6,31 @@ import config from '../config/config.js';
 // Garantir prioridade de IPv4 para evitar ENETUNREACH no Render
 dns.setDefaultResultOrder('ipv4first');
 
+import { promisify } from 'util';
+const resolveMx = promisify(dns.resolveMx);
+
+/**
+ * Valida em tempo real via DNS se o domínio do e-mail possui registros MX configurados
+ * e está apto a receber mensagens.
+ */
+export const validateEmailDomain = async (email: string): Promise<boolean> => {
+  const domain = email.split('@')[1];
+  if (!domain) return false;
+
+  try {
+    const records = await resolveMx(domain);
+    return records && records.length > 0;
+  } catch (error: any) {
+    // Se o erro for de domínio não encontrado (ENOTFOUND) ou sem registros de e-mail (ENODATA)
+    if (error.code === 'ENOTFOUND' || error.code === 'ENODATA') {
+      return false;
+    }
+    // Em caso de timeout ou problemas de rede local no dev, permite prosseguir para não travar testes offline
+    return true;
+  }
+};
+
+
 /**
  * Servico de Email (Híbrido de Alta Compatibilidade)
  * Envia o link de redefinição de senha para o usuário.
@@ -218,6 +243,9 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   // 3. Fallback para Gmail SMTP se nenhuma API Key estiver configurada (Ideal para Local)
   if (!config.email.user || !config.email.pass) {
     console.log('AVISO: Nenhuma chave de API (Brevo/Resend) configurada e credenciais SMTP locais incompletas.');
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Nenhum serviço de envio de e-mail (Brevo/Resend/SMTP) foi configurado nas variáveis de ambiente do servidor.');
+    }
     return;
   }
 

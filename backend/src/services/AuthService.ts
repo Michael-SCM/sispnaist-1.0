@@ -2,7 +2,7 @@ import User, { IUserDocument } from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
-import { sendResetPasswordEmail, sendVerificationEmail } from '../utils/emailService.js';
+import { sendResetPasswordEmail, sendVerificationEmail, validateEmailDomain } from '../utils/emailService.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 
@@ -15,6 +15,15 @@ export class AuthService {
 
     if (existingUser) {
       throw new AppError('Email ou CPF já cadastrado', 400);
+    }
+
+    // Validar se o domínio do e-mail realmente existe e está ativo (registros MX)
+    const isDomainValid = await validateEmailDomain(userData.email);
+    if (!isDomainValid) {
+      throw new AppError(
+        'O domínio do e-mail informado não é válido ou não está configurado para receber mensagens. Por favor, informe um e-mail com domínio existente.',
+        400
+      );
     }
 
     // Gerar token de verificação de e-mail (expira em 24 horas)
