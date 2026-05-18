@@ -100,6 +100,7 @@ export interface IUser {
   dataAdmissao?: string;
   perfil?: string;
   ativo?: boolean;
+  isVerified?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
 }

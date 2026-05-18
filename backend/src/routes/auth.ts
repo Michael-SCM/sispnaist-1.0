@@ -2,7 +2,7 @@ import express from 'express';
 import * as authController from '../controllers/authController.js';
 import { validateRequest } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema } from '../utils/validations.js';
+import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -37,6 +37,12 @@ router.post(
   '/reset-password',
   validateRequest(resetPasswordSchema),
   authController.resetPassword
+);
+
+router.post(
+  '/verify-email',
+  validateRequest(verifyEmailSchema),
+  authController.verifyEmail
 );
 
 export default router;

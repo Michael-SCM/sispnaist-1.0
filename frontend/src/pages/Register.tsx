@@ -42,7 +42,7 @@ export const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authService.register({
+      const response = await authService.register({
         nome: values.nome,
         email: values.email,
         // Backend valida CPF no formato: XXX.XXX.XXX-XX
@@ -51,9 +51,8 @@ export const Register: React.FC = () => {
         senha: values.senha,
       });
 
-      setAuth(user, token);
-      toast.success('Cadastro realizado com sucesso!');
-      navigate('/dashboard');
+      toast.success(response.message || 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar sua conta.');
+      navigate('/login');
       reset();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro ao fazer cadastro';

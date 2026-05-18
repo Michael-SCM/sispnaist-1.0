@@ -2,12 +2,12 @@ import User, { IUserDocument } from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
-import { sendResetPasswordEmail } from '../utils/emailService.js';
+import { sendResetPasswordEmail, sendVerificationEmail } from '../utils/emailService.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 
 export class AuthService {
-  async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser; token: string }> {
+  async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser }> {
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email: userData.email }, { cpf: userData.cpf }],
@@ -17,22 +17,37 @@ export class AuthService {
       throw new AppError('Email ou CPF já cadastrado', 400);
     }
 
+    // Gerar token de verificação de e-mail (expira em 24 horas)
+    const verificationToken = jwt.sign(
+      { email: userData.email, type: 'verify' },
+      config.jwtSecret,
+      { expiresIn: '24h' }
+    );
+    const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
     // Create new user
-    const user = new User(userData);
+    const user = new User({
+      ...userData,
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires,
+    });
     await user.save();
 
-    // Generate token
-    const token = generateToken({
-      id: user._id.toString(),
-      cpf: user.cpf,
-      email: user.email,
-      perfil: user.perfil || 'trabalhador',
-    });
+    // Enviar e-mail de verificação
+    await sendVerificationEmail(user.email, verificationToken);
+
+    // Em desenvolvimento, logar o link para facilitar testes
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n=== LINK DE CONFIRMAÇÃO DE E-MAIL (DESENVOLVIMENTO) ===`);
+      console.log(`${config.frontendUrl}/verify-email?token=${verificationToken}`);
+      console.log(`======================================================\n`);
+    }
 
     const userObj = user.toObject() as IUser;
     delete userObj.senha;
 
-    return { user: userObj, token };
+    return { user: userObj };
   }
 
   async login(email: string, password: string): Promise<{ user: IUser; token: string }> {
@@ -41,6 +56,11 @@ export class AuthService {
 
     if (!user) {
       throw new AppError('Email ou senha inválidos', 401);
+    }
+
+    // Verificar se o e-mail está verificado
+    if (user.isVerified === false) {
+      throw new AppError('Por favor, confirme seu e-mail para ativar sua conta antes de fazer o login.', 401);
     }
 
     // Compare password
@@ -153,6 +173,41 @@ export class AuthService {
     } catch (error: any) {
       if (error instanceof AppError) throw error;
       throw new AppError('Token de recuperação inválido ou expirado', 400);
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    try {
+      // Verificar token JWT
+      const decoded = jwt.verify(token, config.jwtSecret) as any;
+      
+      if (decoded.type !== 'verify') {
+        throw new AppError('Token de verificação inválido', 400);
+      }
+
+      // Encontrar usuário com o token correspondente
+      const user = await User.findOne({ 
+        email: decoded.email,
+        verificationToken: token 
+      }).select('+verificationToken +verificationTokenExpires');
+
+      if (!user) {
+        throw new AppError('Token inválido ou conta já ativada', 400);
+      }
+
+      // Verificar se expirou
+      if (user.verificationTokenExpires && user.verificationTokenExpires < new Date()) {
+        throw new AppError('Link de verificação expirado. Por favor, faça um novo cadastro.', 400);
+      }
+
+      // Ativar e salvar usuário
+      user.isVerified = true;
+      user.verificationToken = undefined;
+      user.verificationTokenExpires = undefined;
+      await user.save();
+
+    } catch (error: any) {
+      if (error instanceof AppError) throw error;
+      throw new AppError('Link de verificação inválido ou expirado', 400);
     }
   }
 }

@@ -17,6 +17,9 @@ export interface IUser {
   dataAdmissao?: Date;
   perfil?: string;
   ativo?: boolean;
+  isVerified?: boolean;
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
 }

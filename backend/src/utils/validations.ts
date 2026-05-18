@@ -87,6 +87,12 @@ export const resetPasswordSchema = Joi.object({
   }),
 });
 
+export const verifyEmailSchema = Joi.object({
+  token: Joi.string().required().messages({
+    'any.required': 'O token de verificação é obrigatório.',
+  }),
+});
+
 export const updateProfileSchema = Joi.object({
   nome: Joi.string()
     .trim()

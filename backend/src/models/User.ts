@@ -72,6 +72,18 @@ const UserSchema = new Schema<IUserDocument>(
       type: Boolean,
       default: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      select: false,
+    },
+    verificationTokenExpires: {
+      type: Date,
+      select: false,
+    },
   },
   { 
     collection: 'usuarios', 

@@ -2,12 +2,9 @@ import api from './api.js';
 import { IUser, IAuthResponse } from '../types/index.js';
 
 export const authService = {
-  register: async (userData: Partial<IUser> & { senha: string }): Promise<IAuthResponse> => {
-    const response = await api.post<{ data: IAuthResponse }>('/auth/register', userData);
-    const { token, user } = response.data.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    return response.data.data;
+  register: async (userData: Partial<IUser> & { senha: string }): Promise<{ status: string; message: string; data?: { user: IUser } }> => {
+    const response = await api.post<{ status: string; message: string; data?: { user: IUser } }>('/auth/register', userData);
+    return response.data;
   },
 
   login: async (email: string, senha: string): Promise<IAuthResponse> => {
@@ -54,6 +51,11 @@ export const authService = {
 
   resetPassword: async (token: string, novaSenha: string, confirmarSenha: string): Promise<string> => {
     const response = await api.post<{ status: string; message: string }>('/auth/reset-password', { token, novaSenha, confirmarSenha });
+    return response.data.message;
+  },
+
+  verifyEmail: async (token: string): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/verify-email', { token });
     return response.data.message;
   },
 };

@@ -7,6 +7,7 @@ import { Login } from './pages/Login.js';
 import { Register } from './pages/Register.js';
 import { ForgotPassword } from './pages/ForgotPassword.js';
 import { ResetPassword } from './pages/ResetPassword.js';
+import { VerifyEmail } from './pages/VerifyEmail.js';
 import { Dashboard } from './pages/Dashboard.js';
 import { Home } from './pages/Home.js';
 import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
@@ -49,6 +50,7 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route
           path="/dashboard"
           element={

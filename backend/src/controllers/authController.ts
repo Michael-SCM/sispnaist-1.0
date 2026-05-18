@@ -4,13 +4,13 @@ import authService from '../services/AuthService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { user, token } = await authService.register(req.body);
+  const { user } = await authService.register(req.body);
 
   res.status(201).json({
     status: 'success',
+    message: 'Cadastro realizado com sucesso! Por favor, verifique seu e-mail para ativar sua conta.',
     data: {
       user,
-      token,
     },
   });
 });
@@ -80,5 +80,15 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   res.status(200).json({
     status: 'success',
     message: 'Senha atualizada com sucesso!',
+  });
+});
+
+export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.body;
+  await authService.verifyEmail(token);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'E-mail verificado e conta ativada com sucesso! Você já pode fazer login.',
   });
 });
