@@ -77,7 +77,7 @@ export class AuthService {
 
     // Verificar se o e-mail está verificado
     if (user.isVerified === false) {
-      throw new AppError('Por favor, confirme seu e-mail para ativar sua conta antes de fazer o login.', 401);
+      throw new AppError('O e-mail desta conta ainda não foi verificado! Por favor, verifique sua caixa de entrada (ou spam) para ativar sua conta.', 401);
     }
 
     // Compare password
