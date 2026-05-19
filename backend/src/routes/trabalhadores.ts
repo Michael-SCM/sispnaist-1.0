@@ -18,6 +18,14 @@ router.get('/', trabalhadorController.getTrabalhadores);
 
 router.post('/', validateRequest(criarTrabalhadorSchema), trabalhadorController.createTrabalhador);
 
+// Rota para obter trabalhador com todos os submódulos (deve vir ANTES de /:id)
+router.get('/:id/completo', (req, res, next) => {
+  if (!isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: 'ID de trabalhador inválido' });
+  }
+  next();
+}, trabalhadorController.getTrabalhadorCompleto);
+
 router.get('/:id', (req, res, next) => {
   if (!isValidObjectId(req.params.id)) {
     return res.status(400).json({ message: 'ID de trabalhador inválido' });

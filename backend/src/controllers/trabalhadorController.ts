@@ -58,6 +58,30 @@ export const getTrabalhador = asyncHandler(async (req: Request, res: Response) =
 });
 
 /**
+ * @desc    Obter um único trabalhador com todos os submódulos
+ * @route   GET /api/trabalhadores/:id/completo
+ * @access  Private
+ */
+export const getTrabalhadorCompleto = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const trabalhador = await trabalhadorService.obterComSubmodulos(id);
+
+  if (!trabalhador) {
+    throw new AppError('Trabalhador não encontrado', 404);
+  }
+
+  // Se o usuário logado for trabalhador, ele só pode acessar seu próprio perfil (CPF correspondente)
+  if ((req as any).user?.perfil === 'trabalhador' && trabalhador.cpf !== (req as any).user.cpf) {
+    throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { trabalhador },
+  });
+});
+
+/**
  * @desc    Criar novo trabalhador
  * @route   POST /api/trabalhadores
  * @access  Private/Admin/Saude
