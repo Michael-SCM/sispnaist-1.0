@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { exportAcidentes } from '../../services/exportService.js';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
@@ -242,8 +243,8 @@ export const ListaAcidentes: React.FC = () => {
                   type="text"
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
                   placeholder="000.000.000-00"
-                  value={localFiltros.cpfTrabalhador || ''}
-                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpfTrabalhador: e.target.value || undefined })}
+                  value={maskCPF(localFiltros.cpfTrabalhador || '')}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpfTrabalhador: unmaskCPF(e.target.value) || undefined })}
                 />
               </div>
             </div>

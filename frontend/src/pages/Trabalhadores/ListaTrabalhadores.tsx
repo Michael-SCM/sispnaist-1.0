@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { exportTrabalhadores } from '../../services/exportService.js';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 
 export const ListaTrabalhadores: React.FC = () => {
   const navigate = useNavigate();
@@ -166,8 +167,8 @@ export const ListaTrabalhadores: React.FC = () => {
                 <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">CPF</label>
                 <input 
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-mono"
-                  value={localFiltros.cpf || ''}
-                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpf: e.target.value })}
+                  value={maskCPF(localFiltros.cpf || '')}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpf: unmaskCPF(e.target.value) || undefined })}
                   placeholder="000.000.000-00"
                 />
               </div>

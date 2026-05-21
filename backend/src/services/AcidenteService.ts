@@ -121,34 +121,33 @@ export class AcidenteService {
     }
 
     if (filtros?.trabalhadorId) {
-      // Se vier CPF (com máscara ou não), resolve para ObjectId via $or no momento do filtro
-      // Caso venha ObjectId puro, mantém como está
-      query.trabalhadorId = filtros.trabalhadorId;
+      // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
+      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+      query.trabalhadorId = toCPFMaskedOrDigits(filtros.trabalhadorId);
     }
+
 
     // Filtro explícito por CPF do trabalhador (prefixo/igualdade exata no banco)
     // Aqui usamos igualdade (CPF do trabalhador deve bater exatamente)
     if (filtros?.cpfTrabalhador) {
       const cpf = String(filtros.cpfTrabalhador).trim();
 
-      const cpfNormalizado = cpf.includes('.') || cpf.includes('-')
-        ? cpf.replace(/\D/g, '')
-        : cpf;
+      const { normalizeCPF } = await import('../utils/cpf.js');
+      const { digits, masked } = normalizeCPF(cpf);
 
-      // Tenta formato mascarado (se tiver 11 dígitos) e formato só dígitos.
-      const cpfFormatado = cpfNormalizado.length === 11
-        ? `${cpfNormalizado.slice(0, 3)}.${cpfNormalizado.slice(3, 6)}.${cpfNormalizado.slice(6, 9)}-${cpfNormalizado.slice(9, 11)}`
-        : cpfNormalizado;
+      // Normaliza para buscar o Trabalhador correto; depois filtra acidentes por trabalhadorId.
+      const or: Array<any> = [];
+      if (masked) or.push({ cpf: masked });
+      if (digits) or.push({ cpf: digits });
 
-      const trabalhador = await Trabalhador.findOne({
-        $or: [
-          { cpf: cpfFormatado },
-          { cpf: cpfNormalizado },
-        ]
-      }).select('_id').lean();
+      const trabalhador = or.length
+        ? await Trabalhador.findOne({ $or: or }).select('_id').lean()
+        : null;
 
       query.trabalhadorId = trabalhador?._id ?? null;
     }
+
+
     if (filtros?.dataInicio || filtros?.dataFim) {
       query.dataAcidente = {};
       if (filtros?.dataInicio) {

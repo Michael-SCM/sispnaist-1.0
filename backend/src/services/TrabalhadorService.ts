@@ -33,8 +33,12 @@ export class TrabalhadorService {
     }
 
     if (filtros?.cpf) {
-      query.cpf = filtros.cpf;
+      // Normaliza para bater com o padrão do banco (XXX.XXX.XXX-XX) ou pelo menos remove máscara.
+      // O backend aceita tanto CPF mascarado quanto apenas dígitos.
+      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+      query.cpf = toCPFMaskedOrDigits(filtros.cpf);
     }
+
 
     if (filtros?.matricula) {
       query.matricula = filtros.matricula;
