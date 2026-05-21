@@ -1,4 +1,4 @@
-pimport { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
