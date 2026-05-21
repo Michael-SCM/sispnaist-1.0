@@ -62,8 +62,11 @@ export class VacinacaoService {
 
     const query: Record<string, any> = {};
 
+
     if (filtros.vacina) {
-      query.vacina = { $regex: filtros.vacina, $options: 'i' };
+      const vacina = String(filtros.vacina).trim();
+      const pattern = new RegExp('^' + vacina, 'i');
+      query.vacina = { $regex: pattern };
     }
 
     if (filtros.trabalhadorId) {

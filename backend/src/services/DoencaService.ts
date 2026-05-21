@@ -62,8 +62,11 @@ export class DoencaService {
     const skip = (page - 1) * limit;
     const query: any = {};
 
+
     if (filtros?.nomeDoenca) {
-      query.nomeDoenca = { $regex: filtros.nomeDoenca, $options: 'i' };
+      const nomeDoenca = String(filtros.nomeDoenca).trim();
+      const pattern = new RegExp('^' + nomeDoenca, 'i');
+      query.nomeDoenca = { $regex: pattern };
     }
 
     if (filtros?.ativo !== undefined) {

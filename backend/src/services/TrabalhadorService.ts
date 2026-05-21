@@ -23,8 +23,13 @@ export class TrabalhadorService {
     const skip = (page - 1) * limit;
     const query: any = {};
 
+
     if (filtros?.nome) {
-      query.nome = { $regex: filtros.nome, $options: 'i' };
+      // Filtrar começando pelas iniciais do nome (prefixo)
+      // Ex: "jo" -> nomes que começam com "Jo" (ignora acentos)
+      const nome = String(filtros.nome).trim();
+      const pattern = new RegExp('^' + nome, 'i');
+      query.nome = { $regex: pattern };
     }
 
     if (filtros?.cpf) {
