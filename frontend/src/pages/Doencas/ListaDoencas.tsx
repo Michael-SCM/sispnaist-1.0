@@ -18,7 +18,8 @@ import {
   ClipboardList
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { unmaskCPF } from '../../utils/cpfMask.js';
+import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
+
 
 
 export const ListaDoencas: React.FC = () => {
@@ -163,7 +164,7 @@ export const ListaDoencas: React.FC = () => {
                   type="text"
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-mono"
                   placeholder="000.000.000-00"
-                  value={localFiltros.trabalhadorId ? localFiltros.trabalhadorId : ''}
+                  value={maskCPF(localFiltros.trabalhadorId ? localFiltros.trabalhadorId : '')}
                   onChange={(e) => setLocalFiltros({ ...localFiltros, trabalhadorId: unmaskCPF(e.target.value) || undefined })}
                 />
               </div>

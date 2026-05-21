@@ -74,8 +74,10 @@ export class DoencaService {
     }
 
     if (filtros?.trabalhadorId) {
-      query.trabalhadorId = filtros.trabalhadorId;
+      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+      query.trabalhadorId = toCPFMaskedOrDigits(filtros.trabalhadorId);
     }
+
 
     if (filtros?.dataInicio || filtros?.dataFim) {
       query.dataInicio = {};
