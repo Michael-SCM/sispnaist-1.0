@@ -265,18 +265,72 @@ export const ListaVacinacoes: React.FC = () => {
           {pages > 1 && (
             <div className="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
               <p className="text-sm text-slate-500 font-medium">
-                Página <span className="text-slate-900 font-bold">{page}</span> de <span className="text-slate-900 font-bold">{pages}</span>
+                Mostrando <span className="text-slate-900 font-bold">{vacinacoes.length}</span> de <span className="text-slate-900 font-bold">{total}</span> registros
               </p>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <button
-                  disabled={page === 1}
+                  disabled={page === 1 || isLoading}
                   onClick={() => setPage(page - 1)}
                   className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
                 >
                   Anterior
                 </button>
+                <div className="flex items-center gap-1">
+                  {pages > 5 && (
+                    <button
+                      onClick={() => setPage(1)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                    >
+                      1
+                    </button>
+                  )}
+                  {pages > 7 && page > 3 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+
+                  {Array.from({ length: Math.min(pages, 7) }).map((_, i) => {
+                    let pageNum: number;
+                    if (pages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= pages - 3) {
+                      pageNum = pages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+                    if (pageNum < 1 || pageNum > pages) return null;
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                          page === pageNum
+                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100'
+                            : 'text-slate-500 hover:bg-slate-100'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  {pages > 7 && page < pages - 2 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+
+                  {pages > 5 && (
+                    <button
+                      onClick={() => setPage(pages)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                    >
+                      {pages}
+                    </button>
+                  )}
+                </div>
                 <button
-                  disabled={page === pages}
+                  disabled={page === pages || isLoading}
                   onClick={() => setPage(page + 1)}
                   className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
                 >

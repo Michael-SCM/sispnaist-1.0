@@ -277,16 +277,38 @@ export const ListaDoencas: React.FC = () => {
                   Anterior
                 </button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, pages) }).map((_, i) => {
-                    const pageNum = Math.max(1, page - 2) + i;
-                    if (pageNum > pages) return null;
+                  {pages > 5 && (
+                    <button
+                      onClick={() => setPage(1)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                    >
+                      1
+                    </button>
+                  )}
+                  {pages > 7 && page > 3 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+
+                  {Array.from({ length: Math.min(pages, 7) }).map((_, i) => {
+                    let pageNum: number;
+                    if (pages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= pages - 3) {
+                      pageNum = pages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+                    if (pageNum < 1 || pageNum > pages) return null;
+
                     return (
                       <button
                         key={pageNum}
                         onClick={() => setPage(pageNum)}
                         className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                          page === pageNum 
-                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-100' 
+                          page === pageNum
+                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-100'
                             : 'text-slate-500 hover:bg-slate-100'
                         }`}
                       >
@@ -294,6 +316,19 @@ export const ListaDoencas: React.FC = () => {
                       </button>
                     );
                   })}
+
+                  {pages > 7 && page < pages - 2 && (
+                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
+                  )}
+
+                  {pages > 5 && (
+                    <button
+                      onClick={() => setPage(pages)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                    >
+                      {pages}
+                    </button>
+                  )}
                 </div>
                 <button
                   disabled={page === pages || isLoading}
