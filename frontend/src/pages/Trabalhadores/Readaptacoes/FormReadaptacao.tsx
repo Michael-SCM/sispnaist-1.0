@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { ICatalogoItem } from '../../../types/index.js';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -60,7 +61,16 @@ const INITIAL_FORM: FormData = {
   ativo: true,
 };
 
+const normalizeString = (value: unknown): string => {
+
+  if (value === null || value === undefined) return '';
+  if (typeof value !== 'string') return String(value);
+  // NFKC remove variações de composição Unicode; trim remove espaços.
+  return value.normalize('NFKC').trim();
+};
+
 export const FormReadaptacao: React.FC = () => {
+
   const { id, readaptacaoId } = useParams<{ id: string; readaptacaoId: string }>();
   const navigate = useNavigate();
   const isEdicao = Boolean(readaptacaoId);
@@ -113,8 +123,9 @@ export const FormReadaptacao: React.FC = () => {
           funcaoNova: (readaptacao as any).funcaoNova || '',
           restricao: (readaptacao as any).restricao || '',
           novasAtribuicoes: (readaptacao as any).novasAtribuicoes || '',
-          acompanhamento: (readaptacao as any).acompanhamento || '',
-          grauSatisfacao: (readaptacao as any).grauSatisfacao || '',
+          acompanhamento: normalizeString((readaptacao as any).acompanhamento),
+          grauSatisfacao: normalizeString((readaptacao as any).grauSatisfacao),
+
           laudoMedico: readaptacao.laudoMedico || '',
           tempoReadaptacao: readaptacao.tempoReadaptacao || '',
           dataRetorno: readaptacao.dataRetorno ? readaptacao.dataRetorno.split('T')[0] : '',
@@ -178,6 +189,8 @@ export const FormReadaptacao: React.FC = () => {
 
       const dados: Partial<ITrabalhadorReadaptacao> = {
         ...formData,
+        acompanhamento: normalizeString(formData.acompanhamento),
+        grauSatisfacao: normalizeString(formData.grauSatisfacao),
         dataReadaptacao: formData.dataReadaptacao ? new Date(formData.dataReadaptacao) : undefined,
         dataRetorno: formData.dataRetorno ? new Date(formData.dataRetorno) : undefined,
       };

@@ -11,7 +11,10 @@
     "test": "jest",
     "lint": "eslint src --ext .ts",
     "migrate": "ts-node src/scripts/migrate.ts",
-    "seed:catalogos": "tsx src/utils/seedCatalogos.ts"
+    "seed:catalogos": "tsx src/utils/seedCatalogos.ts",
+    "seed:trabalhadores": "tsx src/scripts/seedTrabalhadores.ts",
+    "seed:acidentes": "tsx src/scripts/seedAcidentesDoencasVacinacoes.ts",
+    "seed": "npm run seed:catalogos && npm run seed:trabalhadores && npm run seed:acidentes"
   },
   "keywords": [
     "express",
