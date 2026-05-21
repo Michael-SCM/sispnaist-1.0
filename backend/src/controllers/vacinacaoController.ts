@@ -59,6 +59,19 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
     targetTrabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
   }
 
+  // Normaliza CPF recebido no filtro: remove máscara (.,-) se vier mascarado
+  // (o service tenta resolver CPF -> ObjectId)
+  if (typeof targetTrabalhadorId === 'string' && targetTrabalhadorId.trim()) {
+    // Se o filtro parece CPF mascarado, remove caracteres não numéricos
+    if (targetTrabalhadorId.includes('.') || targetTrabalhadorId.includes('-')) {
+      targetTrabalhadorId = targetTrabalhadorId.replace(/\D/g, '');
+      // Reaplica máscara esperada no banco: XXX.XXX.XXX-XX
+      if (targetTrabalhadorId.length === 11) {
+        targetTrabalhadorId = `${targetTrabalhadorId.slice(0, 3)}.${targetTrabalhadorId.slice(3, 6)}.${targetTrabalhadorId.slice(6, 9)}-${targetTrabalhadorId.slice(9, 11)}`;
+      }
+    }
+  }
+
   const result = await vacinacaoService.listar({
     page: page ? Number(page) : 1,
     limit: limit ? Number(limit) : 10,

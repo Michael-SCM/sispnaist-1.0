@@ -1,4 +1,4 @@
-import Acidente, { IAcidenteDocument } from '../models/Acidente.js';
+import Acidente from '../models/Acidente.js';
 import User from '../models/User.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
@@ -121,9 +121,34 @@ export class AcidenteService {
     }
 
     if (filtros?.trabalhadorId) {
+      // Se vier CPF (com máscara ou não), resolve para ObjectId via $or no momento do filtro
+      // Caso venha ObjectId puro, mantém como está
       query.trabalhadorId = filtros.trabalhadorId;
     }
 
+    // Filtro explícito por CPF do trabalhador (prefixo/igualdade exata no banco)
+    // Aqui usamos igualdade (CPF do trabalhador deve bater exatamente)
+    if (filtros?.cpfTrabalhador) {
+      const cpf = String(filtros.cpfTrabalhador).trim();
+
+      const cpfNormalizado = cpf.includes('.') || cpf.includes('-')
+        ? cpf.replace(/\D/g, '')
+        : cpf;
+
+      // Tenta formato mascarado (se tiver 11 dígitos) e formato só dígitos.
+      const cpfFormatado = cpfNormalizado.length === 11
+        ? `${cpfNormalizado.slice(0, 3)}.${cpfNormalizado.slice(3, 6)}.${cpfNormalizado.slice(6, 9)}-${cpfNormalizado.slice(9, 11)}`
+        : cpfNormalizado;
+
+      const trabalhador = await Trabalhador.findOne({
+        $or: [
+          { cpf: cpfFormatado },
+          { cpf: cpfNormalizado },
+        ]
+      }).select('_id').lean();
+
+      query.trabalhadorId = trabalhador?._id ?? null;
+    }
     if (filtros?.dataInicio || filtros?.dataFim) {
       query.dataAcidente = {};
       if (filtros?.dataInicio) {

@@ -142,12 +142,11 @@ export const ListaAcidentes: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar acidentes..."
+              placeholder="Buscar por descrição..."
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  // Busca textual: filtra por descrição do acidente no backend
                   const valor = localSearch.trim();
                   const nextFiltros: typeof localFiltros = { ...localFiltros };
                   if (valor) {
@@ -156,10 +155,12 @@ export const ListaAcidentes: React.FC = () => {
                     delete nextFiltros.descricao;
                   }
                   setLocalFiltros(nextFiltros);
+                  // garante que o filtro CPF (cpfTrabalhador) não é perdido ao digitar descrição
                   setFiltros(nextFiltros);
                   setShowFilters(false);
                 }
               }}
+
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-amber-500 outline-none transition-all"
             />
           </div>
@@ -232,6 +233,17 @@ export const ListaAcidentes: React.FC = () => {
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-medium"
                   value={localFiltros.dataFim || ''}
                   onChange={(e) => setLocalFiltros({ ...localFiltros, dataFim: e.target.value || undefined })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Trabalhador (CPF)</label>
+                <input 
+                  type="text"
+                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
+                  placeholder="000.000.000-00"
+                  value={localFiltros.cpfTrabalhador || ''}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpfTrabalhador: e.target.value || undefined })}
                 />
               </div>
             </div>

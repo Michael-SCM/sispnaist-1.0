@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+pimport { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
@@ -60,6 +60,7 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     dataInicio: req.query.dataInicio as string | undefined,
     dataFim: req.query.dataFim as string | undefined,
     descricao: req.query.descricao as string | undefined,
+    cpfTrabalhador: req.query.cpfTrabalhador as string | undefined,
   };
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
