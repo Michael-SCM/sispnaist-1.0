@@ -1,6 +1,7 @@
 import Catalogo, { ICatalogoItem } from '../models/Catalogo';
 import { AppError } from '../middleware/errorHandler';
-import { IPaginatedResponse, IPaginationOptions } from '../types';
+import { IPaginatedResponse } from '../types';
+
 
 interface ICatalogoDados {
   nome: string;
@@ -178,8 +179,11 @@ class CatalogoService {
       'meioAgressao', 'tipoAutorViolencia', 'jornadaTrabalho', 'turnoTrabalho',
       'situacaoTrabalho', 'tipoAfastamento', 'motivoAfastamento',
       'motivoReadaptacao', 'tempoReadaptacao',
+      'acompanhamentoReadaptacao',
+      'grauSatisfacao',
       'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
-      'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
+
+      'outroVinculo', 'funcao', 'bairro', 'tipoDroga',
       'padraoEmail', 'parametro', 'parentesco', 'sorologia'
     ];
 
