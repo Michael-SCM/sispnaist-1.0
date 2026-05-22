@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Plus, 
-  Search, 
-  FileText, 
-  Edit2, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  FileText,
+  Edit2,
+  Trash2,
   ExternalLink,
   Filter,
-  ChevronLeft,
-  ChevronRight,
-  Gavel
+  Gavel,
+  X
 } from 'lucide-react';
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
 import { MainLayout } from '../../layouts/MainLayout.js';
@@ -23,7 +22,9 @@ const ListaAtos: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchCidade, setSearchCidade] = useState('');
   const [searchAno, setSearchAno] = useState<number | ''>('');
-  
+
+  const [atoSelecionado, setAtoSelecionado] = useState<AtoMunicipalInovacao | null>(null);
+
   const navigate = useNavigate();
 
   const carregarAtos = async () => {
@@ -152,7 +153,14 @@ const ListaAtos: React.FC = () => {
                             <FileText size={20} />
                           </div>
                           <div>
-                            <span className="font-bold text-slate-700 block text-lg">{ato.nr_ato}</span>
+                            <button
+                              type="button"
+                              onClick={() => setAtoSelecionado(ato)}
+                              className="font-bold text-slate-700 block text-lg hover:text-indigo-700 transition-colors text-left"
+                              title="Ver detalhes do ato"
+                            >
+                              {ato.nr_ato}
+                            </button>
                             <span className="text-xs font-black text-indigo-400 uppercase tracking-tighter">{ato.ano_ato}</span>
                           </div>
                         </div>
@@ -306,6 +314,93 @@ const ListaAtos: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Detalhes do Ato */}
+      {atoSelecionado && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/70 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Detalhes do Ato Municipal</h3>
+                <p className="text-sm text-slate-500 font-medium">
+                  Número: <span className="font-mono">{atoSelecionado.nr_ato}</span> • Ano: <span className="font-black">{atoSelecionado.ano_ato}</span>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAtoSelecionado(null)}
+                className="p-2 hover:bg-white rounded-xl transition-all active:scale-95 shadow-sm border border-transparent hover:border-slate-200"
+                aria-label="Fechar detalhes"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4">
+                  <div className="text-xs font-black text-slate-500 uppercase tracking-widest">Localidade</div>
+                  <div className="mt-2 font-bold text-slate-900">{atoSelecionado.nm_cidade}</div>
+                  <div className="text-sm text-slate-600 uppercase">{atoSelecionado.nm_estado}</div>
+                </div>
+
+                <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4">
+                  <div className="text-xs font-black text-slate-500 uppercase tracking-widest">Classificação</div>
+                  <div className="mt-2 font-bold text-slate-900">{atoSelecionado.nm_tipo || '—'}</div>
+                  <div className="text-sm text-slate-600">{atoSelecionado.nm_categoria || '—'}</div>
+                  <div className="text-sm text-slate-600">{atoSelecionado.nm_classe_categoria || '—'}</div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-100 p-4">
+                <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Ementa</div>
+                <div className="text-slate-700 whitespace-pre-wrap">
+                  {atoSelecionado.texto_ementa || 'Sem ementa cadastrada.'}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-100 p-4">
+                <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Texto Legal</div>
+                <div className="text-slate-700 whitespace-pre-wrap">
+                  {atoSelecionado.texto_legal || 'Sem texto legal cadastrado.'}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                {atoSelecionado.link_ato_legal ? (
+                  <a
+                    href={atoSelecionado.link_ato_legal}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                  >
+                    <ExternalLink size={18} />
+                    Abrir link do ato
+                  </a>
+                ) : (
+                  <div className="text-sm text-slate-500 font-medium">Sem link do ato cadastrado.</div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAtoSelecionado(null);
+                    navigate(`/atos-municipais/editar/${atoSelecionado._id}`);
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold transition-all shadow-lg shadow-slate-100 active:scale-95"
+                >
+                  <Edit2 size={18} />
+                  Editar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
