@@ -206,27 +206,104 @@ const ListaAtos: React.FC = () => {
           </div>
 
           {/* Pagination */}
-          <div className="px-8 py-4 bg-slate-50/30 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-500 uppercase tracking-widest text-[10px]">
-              Página {page} de {totalPages}
-            </span>
-            <div className="flex gap-2">
-              <button
-                disabled={page === 1}
-                onClick={() => setPage(p => p - 1)}
-                className="p-2 border border-slate-200 rounded-xl disabled:opacity-30 hover:bg-white transition-all active:scale-90 shadow-sm"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                disabled={page === totalPages}
-                onClick={() => setPage(p => p + 1)}
-                className="p-2 border border-slate-200 rounded-xl disabled:opacity-30 hover:bg-white transition-all active:scale-90 shadow-sm"
-              >
-                <ChevronRight size={20} />
-              </button>
+          {totalPages > 1 && (
+            <div className="px-8 py-5 bg-slate-50/30 border-t border-slate-100">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={page === 1 || loading}
+                    onClick={() => setPage(page - 1)}
+                    className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
+                  >
+                    Anterior
+                  </button>
+
+                  {/* Numeração com rolagem horizontal (mobile portrait) */}
+                  <div className="flex-1 overflow-x-auto">
+                    <div className="inline-flex items-center gap-1 w-max whitespace-nowrap">
+                      {/* Primeira página */}
+                      {totalPages > 5 && (
+                        <button
+                          onClick={() => setPage(1)}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all flex-none"
+                        >
+                          1
+                        </button>
+                      )}
+
+                      {/* Ellipse início */}
+                      {totalPages > 7 && page > 3 && (
+                        <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
+                          ...
+                        </span>
+                      )}
+
+                      {/* Páginas centrais */}
+                      {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
+                        let pageNum: number;
+                        if (totalPages <= 7) {
+                          pageNum = i + 1;
+                        } else if (page <= 4) {
+                          pageNum = i + 1;
+                        } else if (page >= totalPages - 3) {
+                          pageNum = totalPages - 6 + i;
+                        } else {
+                          pageNum = page - 3 + i;
+                        }
+                        if (pageNum < 1 || pageNum > totalPages) return null;
+
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setPage(pageNum)}
+                            className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all flex-none ${
+                              page === pageNum
+                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
+                                : 'text-slate-500 hover:bg-slate-100'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+
+                      {/* Ellipse fim */}
+                      {totalPages > 7 && page < totalPages - 2 && (
+                        <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
+                          ...
+                        </span>
+                      )}
+
+                      {/* Última página */}
+                      {totalPages > 5 && (
+                        <button
+                          onClick={() => setPage(totalPages)}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all flex-none"
+                        >
+                          {totalPages}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={page === totalPages || loading}
+                    onClick={() => setPage(page + 1)}
+                    className="px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-all"
+                  >
+                    Próximo
+                  </button>
+                </div>
+
+                {/* Texto abaixo da numeração no mobile */}
+                <p className="text-sm text-slate-500 font-medium md:order-none">
+                  Página{" "}
+                  <span className="text-slate-900 font-bold">{page}</span> de{" "}
+                  <span className="text-slate-900 font-bold">{totalPages}</span>
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </MainLayout>
