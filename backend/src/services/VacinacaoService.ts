@@ -70,9 +70,13 @@ export class VacinacaoService {
     }
 
     if (filtros.trabalhadorId) {
-      const trabalhadorId = await this.resolverTrabalhadorId(filtros.trabalhadorId);
+      // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
+      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+      const cpfNorm = toCPFMaskedOrDigits(filtros.trabalhadorId);
+      const trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
       query.trabalhadorId = trabalhadorId;
     }
+
 
     const [vacinacoesBrutas, total] = await Promise.all([
       Vacinacao.find(query)

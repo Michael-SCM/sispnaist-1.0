@@ -127,25 +127,27 @@ export class AcidenteService {
     }
 
 
-    // Filtro explícito por CPF do trabalhador (prefixo/igualdade exata no banco)
-    // Aqui usamos igualdade (CPF do trabalhador deve bater exatamente)
+    // Filtro por CPF do trabalhador
     if (filtros?.cpfTrabalhador) {
-      const cpf = String(filtros.cpfTrabalhador).trim();
+      // Usa normalização única (mesmo padrão do filtro de Trabalhadores)
+      const cpfInput = String(filtros.cpfTrabalhador).trim();
+      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
 
-      const { normalizeCPF } = await import('../utils/cpf.js');
-      const { digits, masked } = normalizeCPF(cpf);
+      // Tenta primeiro o formato mascarado (padrão do banco)
+      const cpfNormalizado = toCPFMaskedOrDigits(cpfInput);
 
-      // Normaliza para buscar o Trabalhador correto; depois filtra acidentes por trabalhadorId.
-      const or: Array<any> = [];
-      if (masked) or.push({ cpf: masked });
-      if (digits) or.push({ cpf: digits });
-
-      const trabalhador = or.length
-        ? await Trabalhador.findOne({ $or: or }).select('_id').lean()
-        : null;
+      const trabalhador = await Trabalhador.findOne({
+        $or: [
+          { cpf: cpfNormalizado },
+          { cpf: cpfInput.replace(/\D/g, '') },
+        ]
+      })
+        .select('_id')
+        .lean();
 
       query.trabalhadorId = trabalhador?._id ?? null;
     }
+
 
 
     if (filtros?.dataInicio || filtros?.dataFim) {
