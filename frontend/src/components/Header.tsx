@@ -20,10 +20,11 @@ export const Header: React.FC = () => {
 
   return (
     <header className="bg-blue-600 text-white shadow-lg w-full">
-      <div className="w-full px-4 py-4 flex justify-between items-center max-w-full">
-        <Link to="/" className="text-2xl font-bold hover:text-blue-100 transition">
-          SISPNAIST
-        </Link>
+      <div className="px-4 py-4 max-w-screen-xl mx-auto">
+        <div className="flex justify-between items-center">
+          <Link to="/" className="text-2xl font-bold hover:text-blue-100 transition">
+            SISPNAIST
+          </Link>
 
           {/* Desktop Menu */}
           <nav className="hidden md:flex items-center gap-6">
