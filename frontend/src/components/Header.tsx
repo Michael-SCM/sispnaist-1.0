@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Menu */}
-          <nav className="hidden lg:flex items-center gap-6 w-full">
+          <nav className="hidden lg:flex items-center gap-6 justify-end">
             {user ? (
               <>
                 <Link to="/dashboard" className="hover:text-blue-100 transition text-sm">

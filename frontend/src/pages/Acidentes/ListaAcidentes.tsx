@@ -382,60 +382,67 @@ export const ListaAcidentes: React.FC = () => {
                 >
                   Anterior
                 </button>
-                <div className="flex items-center gap-1">
-                  {/* Primeira página */}
-                  {pages > 5 && (
-                    <button
-                      onClick={() => carregarAcidentes(1)}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
-                    >
-                      1
-                    </button>
-                  )}
-                  {/* Ellipse início */}
-                  {pages > 7 && page > 3 && (
-                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
-                  )}
-                  {/* Páginas centrais */}
-                  {Array.from({ length: Math.min(pages, 7) }).map((_, i) => {
-                    let pageNum: number;
-                    if (pages <= 7) {
-                      pageNum = i + 1;
-                    } else if (page <= 4) {
-                      pageNum = i + 1;
-                    } else if (page >= pages - 3) {
-                      pageNum = pages - 6 + i;
-                    } else {
-                      pageNum = page - 3 + i;
-                    }
-                    if (pageNum < 1 || pageNum > pages) return null;
-                    return (
+                {/* Numeração com rolagem horizontal apenas no mobile (portrait) */}
+                <div className="flex-1 overflow-x-auto">
+                  <div className="flex items-center gap-1 w-max sm:overflow-visible sm:whitespace-normal overflow-x-auto whitespace-nowrap">
+                    {/* Primeira página */}
+                    {pages > 5 && (
                       <button
-                        key={pageNum}
-                        onClick={() => carregarAcidentes(pageNum)}
-                        className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                          page === pageNum
-                            ? 'bg-amber-600 text-white shadow-lg shadow-amber-100'
-                            : 'text-slate-500 hover:bg-slate-100'
-                        }`}
+                        onClick={() => carregarAcidentes(1)}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all flex-none"
                       >
-                        {pageNum}
+                        1
                       </button>
-                    );
-                  })}
-                  {/* Ellipse fim */}
-                  {pages > 7 && page < pages - 2 && (
-                    <span className="w-10 h-10 flex items-center justify-center text-slate-400">...</span>
-                  )}
-                  {/* Última página */}
-                  {pages > 5 && (
-                    <button
-                      onClick={() => carregarAcidentes(pages)}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
-                    >
-                      {pages}
-                    </button>
-                  )}
+                    )}
+                    {/* Ellipse início */}
+                    {pages > 7 && page > 3 && (
+                      <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
+                        ...
+                      </span>
+                    )}
+                    {/* Páginas centrais */}
+                    {Array.from({ length: Math.min(pages, 7) }).map((_, i) => {
+                      let pageNum: number;
+                      if (pages <= 7) {
+                        pageNum = i + 1;
+                      } else if (page <= 4) {
+                        pageNum = i + 1;
+                      } else if (page >= pages - 3) {
+                        pageNum = pages - 6 + i;
+                      } else {
+                        pageNum = page - 3 + i;
+                      }
+                      if (pageNum < 1 || pageNum > pages) return null;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => carregarAcidentes(pageNum)}
+                          className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all flex-none ${
+                            page === pageNum
+                              ? 'bg-amber-600 text-white shadow-lg shadow-amber-100'
+                              : 'text-slate-500 hover:bg-slate-100'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    {/* Ellipse fim */}
+                    {pages > 7 && page < pages - 2 && (
+                      <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
+                        ...
+                      </span>
+                    )}
+                    {/* Última página */}
+                    {pages > 5 && (
+                      <button
+                        onClick={() => carregarAcidentes(pages)}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all flex-none"
+                      >
+                        {pages}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <button
                   disabled={page === pages || isLoading}
