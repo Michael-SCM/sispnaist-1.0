@@ -14,8 +14,8 @@ import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from '
 import { ListaMaterialBiologico } from './pages/Acidentes/MaterialBiologico/ListaMaterialBiologico.js';
 import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoMaterialBiologico.js';
 import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
-import { ListaDoencas, NovaDoenca, EditarDoenca } from './pages/Doencas/index.js';
-import { ListaVacinacoes, NovaVacinacao, EditarVacinacao } from './pages/Vacinacoes/index.js';
+import { ListaDoencas, NovaDoenca, EditarDoenca, DetalhesDoenca } from './pages/Doencas/index.js';
+import { ListaVacinacoes, NovaVacinacao, EditarVacinacao, DetalhesVacinacao } from './pages/Vacinacoes/index.js';
 import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo, ListaOcorrenciasViolencia, FormOcorrenciaViolencia, ListaReadaptacoes, FormReadaptacao, ListaProcessosTrabalho, FormProcessoTrabalho, ListaInformacoes, FormInformacoes } from './pages/Trabalhadores/index.js';
 import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
 import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
@@ -143,6 +143,14 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/doencas/:id"
+          element={
+            <ProtectedRoute>
+              <DetalhesDoenca />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Vacinacoes Routes */}
         <Route
@@ -166,6 +174,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <EditarVacinacao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vacinacoes/:id"
+          element={
+            <ProtectedRoute>
+              <DetalhesVacinacao />
             </ProtectedRoute>
           }
         />

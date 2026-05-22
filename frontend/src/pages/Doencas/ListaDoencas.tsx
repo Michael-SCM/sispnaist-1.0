@@ -221,10 +221,10 @@ export const ListaDoencas: React.FC = () => {
                   </tr>
                 ) : (
                   doencas.map((d) => (
-                    <tr 
-                      key={d._id} 
+                    <tr
+                      key={d._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => navigate(`/doencas/${d._id}/editar`)}
+                      onClick={() => navigate(`/doencas/${d._id}`)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">

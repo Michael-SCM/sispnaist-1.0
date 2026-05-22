@@ -200,10 +200,10 @@ export const ListaVacinacoes: React.FC = () => {
                   </tr>
                 ) : (
                   vacinacoes.map((v) => (
-                    <tr 
-                      key={v._id} 
+                    <tr
+                      key={v._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => navigate(`/vacinacoes/${v._id}/editar`)}
+                      onClick={() => navigate(`/vacinacoes/${v._id}`)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
