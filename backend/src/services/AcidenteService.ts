@@ -127,25 +127,13 @@ export class AcidenteService {
     }
 
 
-    // Filtro por CPF do trabalhador
+    // Filtro por CPF do trabajador
     if (filtros?.cpfTrabalhador) {
-      // Usa normalização única (mesmo padrão do filtro de Trabalhadores)
-      const cpfInput = String(filtros.cpfTrabalhador).trim();
+      // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
-
-      // Tenta primeiro o formato mascarado (padrão do banco)
-      const cpfNormalizado = toCPFMaskedOrDigits(cpfInput);
-
-      const trabalhador = await Trabalhador.findOne({
-        $or: [
-          { cpf: cpfNormalizado },
-          { cpf: cpfInput.replace(/\D/g, '') },
-        ]
-      })
-        .select('_id')
-        .lean();
-
-      query.trabalhadorId = trabalhador?._id ?? null;
+      const cpfNorm = toCPFMaskedOrDigits(String(filtros.cpfTrabalhador));
+      const resolvedId = await this.resolverTrabalhadorId(cpfNorm);
+      query.trabalhadorId = resolvedId;
     }
 
 

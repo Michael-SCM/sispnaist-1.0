@@ -74,9 +74,10 @@ export class DoencaService {
     }
 
     if (filtros?.trabalhadorId) {
-      // Normaliza CPF de filtro (mascarado ou dígitos) antes de montar a query
+      // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
-      query.trabalhadorId = toCPFMaskedOrDigits(filtros.trabalhadorId);
+      const cpfNorm = toCPFMaskedOrDigits(String(filtros.trabalhadorId));
+      query.trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
     }
 
 
