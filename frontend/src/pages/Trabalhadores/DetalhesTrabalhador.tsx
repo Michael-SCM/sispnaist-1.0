@@ -27,7 +27,8 @@ import {
   ClipboardList,
   ChevronRight,
   ShieldAlert,
-  RefreshCcw
+  RefreshCcw,
+  Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -146,11 +147,36 @@ export const DetalhesTrabalhador: React.FC = () => {
               </div>
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Cargo" value={trabalhador.trabalho?.cargo} icon={Briefcase} color="text-blue-600" />
+                <InfoCard label="Função" value={trabalhador.trabalho?.funcao} icon={Briefcase} color="text-indigo-600" />
                 <InfoCard label="Setor" value={trabalhador.trabalho?.setor} icon={Building} color="text-slate-600" />
+                <InfoCard label="Ocupação" value={trabalhador.trabalho?.ocupacao} icon={Building} color="text-cyan-600" />
+                <InfoCard label="Data de Posse" value={trabalhador.trabalho?.dataPosse ? new Date(trabalhador.trabalho.dataPosse).toLocaleDateString('pt-BR') : '-'} icon={Calendar} color="text-purple-600" />
                 <InfoCard label="Data de Entrada" value={trabalhador.trabalho?.dataEntrada ? new Date(trabalhador.trabalho.dataEntrada).toLocaleDateString('pt-BR') : '-'} icon={Calendar} color="text-emerald-600" />
                 <InfoCard label="Tipo de Vínculo" value={trabalhador.vinculo?.tipo} icon={ClipboardList} color="text-amber-600" />
+                <InfoCard label="Turno" value={trabalhador.vinculo?.turno} icon={Clock} color="text-rose-600" />
+                <InfoCard label="Jornada" value={trabalhador.vinculo?.jornada} icon={ClipboardList} color="text-teal-600" />
+                <InfoCard label="Empresa Terceirizada" value={trabalhador.trabalho?.empresaTerceirizada} icon={Building} color="text-orange-600" />
               </div>
             </div>
+
+            {/* Dados de Saúde */}
+            {(trabalhador.tipoSanguineo || (trabalhador.deficiencia && trabalhador.deficiencia.tipo)) && (
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Heart size={20} className="text-rose-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados de Saúde</h2>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <InfoCard label="Tipo Sanguíneo" value={trabalhador.tipoSanguineo} icon={Heart} color="text-rose-500" />
+                  {trabalhador.deficiencia?.tipo && (
+                    <>
+                      <InfoCard label="Tipo de Deficiência" value={trabalhador.deficiencia.tipo} icon={ShieldAlert} color="text-amber-500" />
+                      <InfoCard label="Tempo de Deficiência" value={trabalhador.deficiencia.tempo} icon={ShieldAlert} color="text-orange-500" />
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Endereço */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
@@ -204,6 +230,17 @@ export const DetalhesTrabalhador: React.FC = () => {
                     <p className="text-sm font-bold text-slate-700">{trabalhador.celular || 'Não informado'}</p>
                   </div>
                 </div>
+                {trabalhador.telefoneContato && (
+                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                    <div className="p-2 bg-white rounded-lg text-slate-600 shadow-sm">
+                      <Phone size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-slate-400">Telefone Contato</p>
+                      <p className="text-sm font-bold text-slate-700">{trabalhador.telefoneContato}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
