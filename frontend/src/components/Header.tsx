@@ -19,15 +19,15 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-blue-600 text-white shadow-lg w-full">
-      <div className="px-4 py-4 max-w-screen-xl mx-auto">
-        <div className="flex justify-between items-center">
+    <header className="bg-blue-600 text-white shadow-lg w-full overflow-x-hidden">
+      <div className="px-4 py-4 w-full max-w-screen-xl mx-auto">
+        <div className="flex justify-between items-center w-full">
           <Link to="/" className="text-2xl font-bold hover:text-blue-100 transition">
             SISPNAIST
           </Link>
 
           {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-6 w-full">
             {user ? (
               <>
                 <Link to="/dashboard" className="hover:text-blue-100 transition text-sm">
@@ -96,7 +96,7 @@ export const Header: React.FC = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={toggleMobileMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-blue-700 transition"
+            className="lg:hidden p-2 rounded-lg hover:bg-blue-700 transition"
             aria-label="Toggle menu"
           >
             <svg
@@ -127,46 +127,46 @@ export const Header: React.FC = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pt-4 border-t border-blue-500 space-y-2">
+          <nav className="lg:hidden mt-4 pt-4 border-t border-blue-500 space-y-2 w-full max-w-full overflow-x-hidden">
 
             <Link
               to="/dashboard"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Dashboard
             </Link>
             <Link
               to="/acidentes"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Acidentes
             </Link>
             <Link
               to="/trabalhadores"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Trabalhadores
             </Link>
             <Link
               to="/doencas"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Doenças
             </Link>
             <Link
               to="/vacinacoes"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Vacinações
             </Link>
             <Link
               to="/video-aulas"
-              className="block py-2 hover:text-blue-100 transition"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Treinamentos
@@ -178,21 +178,21 @@ export const Header: React.FC = () => {
 
                   <Link
                     to="/admin/empresas"
-                    className="block py-2 hover:text-amber-200 transition font-semibold"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Empresas
                   </Link>
                   <Link
                     to="/admin/unidades"
-                    className="block py-2 hover:text-amber-200 transition font-semibold"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Unidades
                   </Link>
                   <Link
                     to="/admin/usuarios"
-                    className="block py-2 hover:text-amber-200 transition font-semibold"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Usuários
