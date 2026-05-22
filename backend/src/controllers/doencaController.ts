@@ -54,10 +54,17 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
   const filtros: any = {
     nomeDoenca: req.query.nomeDoenca as string,
     ativo: req.query.ativo ? req.query.ativo === 'true' : undefined,
+    // Tratar trabalhadorId de filtro: pode vir CPF (mascarado ou apenas dígitos)
+    // Não deixar passar por validação de ObjectId.
     trabalhadorId: req.query.trabalhadorId as string,
     dataInicio: req.query.dataInicio as string,
     dataFim: req.query.dataFim as string,
   };
+
+  // Normaliza CPF de filtro (remove máscara) para evitar erros de validação
+  if (typeof filtros.trabalhadorId === 'string' && filtros.trabalhadorId.trim()) {
+    filtros.trabalhadorId = filtros.trabalhadorId.replace(/\D/g, '');
+  }
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
   if ((req as any).user?.perfil === 'trabalhador') {

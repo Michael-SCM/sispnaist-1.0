@@ -63,11 +63,17 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     cpfTrabalhador: req.query.cpfTrabalhador as string | undefined,
   };
 
-  // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
+    // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
   if ((req as any).user?.perfil === 'trabalhador') {
     const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
     filtros.trabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
   }
+
+  // Normaliza CPF do filtro (remover máscara) para evitar validações/rejeições
+  if (typeof filtros.cpfTrabalhador === 'string' && filtros.cpfTrabalhador.trim()) {
+    filtros.cpfTrabalhador = filtros.cpfTrabalhador.replace(/\D/g, '');
+  }
+
 
   const { acidentes, total, pages } = await acidenteService.listar(page, limit, filtros);
 
