@@ -53,8 +53,14 @@ export const ListaDoencas: React.FC = () => {
       const resultado = await doencaService.listar(page, 10, filtros);
       setDoencas(resultado.dados);
       setPaginacao(resultado.paginacao.page, resultado.paginacao.limit, resultado.paginacao.total, resultado.paginacao.pages);
-    } catch (error) {
-      toast.error('Erro ao carregar doenças');
+    } catch (error: any) {
+      // Verificar se é erro de CPF não encontrado
+      if (error?.message?.includes('não encontrado')) {
+        toast.error('CPF não encontrado no sistema');
+        setDoencas([]);
+      } else {
+        toast.error('Erro ao carregar doenças');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -56,8 +56,14 @@ export const ListaAcidentes: React.FC = () => {
         page: pageNumber,
         limit: data.paginacao.limit,
       });
-    } catch (error) {
-      toast.error('Erro ao carregar acidentes');
+    } catch (error: any) {
+      // Verificar se é erro de CPF não encontrado
+      if (error?.message?.includes('não encontrado')) {
+        toast.error('CPF não encontrado no sistema');
+        setAcidentes([]);
+      } else {
+        toast.error('Erro ao carregar acidentes');
+      }
       console.error(error);
     } finally {
       setIsLoading(false);

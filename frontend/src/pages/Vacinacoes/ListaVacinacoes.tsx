@@ -53,8 +53,14 @@ export const ListaVacinacoes: React.FC = () => {
 
       setVacinacoes(resultado.vacinacoes);
       setPaginacao(page, 10, resultado.total, resultado.pages);
-    } catch (error) {
-      toast.error('Erro ao carregar vacinações');
+    } catch (error: any) {
+      // Verificar se é erro de CPF não encontrado
+      if (error?.message?.includes('não encontrado')) {
+        toast.error('CPF não encontrado no sistema');
+        setVacinacoes([]);
+      } else {
+        toast.error('Erro ao carregar vacinações');
+      }
     } finally {
       setIsLoading(false);
     }
