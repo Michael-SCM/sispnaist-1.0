@@ -5,26 +5,24 @@ const AcidenteSchema = new Schema({
         required: [true, 'Data do acidente é obrigatória'],
     },
     horario: String,
+    horarioAposInicioJornada: String,
     trabalhadorId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Trabalhador',
         required: [true, 'Trabalhador é obrigatório'],
     },
     tipoAcidente: {
         type: String,
         required: [true, 'Tipo de acidente é obrigatório'],
-        enum: [
-            'Típico',
-            'Trajeto',
-            'Doença Ocupacional',
-            'Acidente com Material Biológico',
-            'Violência',
-        ],
     },
+    tipoTrauma: String,
+    agenteCausador: String,
+    parteCorpo: String,
     descricao: {
         type: String,
         required: [true, 'Descrição é obrigatória'],
     },
+    descricaoTrauma: String,
     local: String,
     lesoes: [String],
     feriado: {
@@ -36,20 +34,34 @@ const AcidenteSchema = new Schema({
         default: false,
     },
     dataComunicacao: Date,
+    dataNotificacao: Date,
+    estado: String,
+    // Campos de atendimento médico
+    atendimentoMedico: Boolean,
+    dataAtendimento: Date,
+    horaAtendimento: String,
+    unidadeAtendimento: String,
+    // Campos de internamento
+    internamento: Boolean,
+    duracaoInternamento: Number,
+    // CAT/NAS
+    catNas: Boolean,
+    // Registro Policial
+    registroPolicial: Boolean,
+    // Encaminhamento junta médica
+    encaminhamentoJuntaMedica: Boolean,
+    // Afastamento
+    afastamento: Boolean,
+    // Outros trabalhadores atingidos
+    outrosTrabalhadoresAtingidos: Boolean,
+    quantidadeTrabalhadoresAtingidos: Number,
     status: {
         type: String,
         enum: ['Aberto', 'Em Análise', 'Fechado'],
         default: 'Aberto',
     },
-    dataCriacao: {
-        type: Date,
-        default: Date.now,
-    },
-    dataAtualizacao: {
-        type: Date,
-        default: Date.now,
-    },
 }, { collection: 'acidentes', timestamps: true });
 AcidenteSchema.index({ trabalhadorId: 1, dataAcidente: -1 });
+AcidenteSchema.index({ status: 1 });
+AcidenteSchema.index({ dataAcidente: 1 });
 export default mongoose.model('Acidente', AcidenteSchema);
-//# sourceMappingURL=Acidente.js.map

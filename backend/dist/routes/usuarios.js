@@ -10,4 +10,3 @@ router.get('/:id', userController.getUser);
 router.put('/:id', userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 export default router;
-//# sourceMappingURL=usuarios.js.map

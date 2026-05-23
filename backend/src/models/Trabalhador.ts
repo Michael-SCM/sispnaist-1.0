@@ -189,4 +189,10 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
   }
 );
 
+// Índices para busca, paginação e estatísticas do dashboard
+TrabalhadorSchema.index({ 'vinculo.situacao': 1 });
+TrabalhadorSchema.index({ empresa: 1 });
+TrabalhadorSchema.index({ unidade: 1 });
+TrabalhadorSchema.index({ nome: 1 });
+
 export default mongoose.model<ITrabalhadorDocument>('Trabalhador', TrabalhadorSchema);

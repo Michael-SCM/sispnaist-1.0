@@ -3,7 +3,6 @@ import 'express-async-errors';
 import cors from 'cors';
 import helmet from 'helmet';
 import connectDB from './config/database.js';
-import config from './config/config.js';
 import authRoutes from './routes/auth.js';
 import acidentesRoutes from './routes/acidentes.js';
 import doencasRoutes from './routes/doencas.js';
@@ -13,24 +12,59 @@ import empresasRoutes from './routes/empresas.js';
 import unidadesRoutes from './routes/unidades.js';
 import usuariosRoutes from './routes/usuarios.js';
 import analyticsRoutes from './routes/analytics.js';
+import reportsRoutes from './routes/reports.js';
+import auditRoutes from './routes/audit.js';
+import catalogosRoutes from './routes/catalogos.js';
+import submodulosTrabalhadorRoutes from './routes/submodulosTrabalhador.js';
+import questionariosRoutes from './routes/questionarios.js';
+import uploadsRoutes from './routes/uploads.js';
+import emailsRoutes from './routes/emails.js';
+import parametrosRoutes from './routes/parametros.js';
+import preferenciasRoutes from './routes/preferencias.js';
+import servidoresRoutes from './routes/servidores.js';
+import videoAulasRoutes from './routes/videoAulas.js';
+import atosMunicipaisRoutes from './routes/atosMunicipais.js';
+import enderecosRoutes from './routes/enderecos.js';
+import exportRoutes from './routes/export.js';
+import materialBiologicoRoutes from './routes/materialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { seedCatalogos } from './utils/seedCatalogos.js';
 const app = express();
-// Middleware de segurança
-app.use(helmet());
+// Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
 app.use(cors({
-    origin: config.corsOrigin,
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:5173',
+            'https://sispnaist-1-0.vercel.app'
+        ];
+        // Permitir se for um dos origens permitidas ou se for um subdomínio da vercel
+        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+            callback(null, true);
+        }
+        else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
+// Middleware de segurança
+app.use(helmet());
 // Parser de requisições
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
-// Conectar ao MongoDB
-connectDB();
+// Conectar ao MongoDB e rodar seeds
+connectDB().then(() => {
+    // Executa o seed apenas se não estiver em ambiente de teste
+    if (process.env.NODE_ENV !== 'test') {
+        seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
+    }
+});
 // Root route
 app.get('/', (req, res) => {
     res.json({
         status: 'success',
-        message: 'SISPATNAIST Backend API',
+        message: 'SISPNAIST Backend API',
         version: '1.0.0',
         documentation: {
             auth: {
@@ -81,6 +115,68 @@ app.get('/', (req, res) => {
                 dashboardAdmin: 'GET /api/analytics/dashboard (admin/gestor)',
                 dashboardTrabalhador: 'GET /api/analytics/dashboard/trabalhador'
             },
+            catalogos: {
+                listarTodos: 'GET /api/catalogos/listar-todos',
+                listar: 'GET /api/catalogos/:entidade',
+                ativos: 'GET /api/catalogos/:entidade/ativos (equivale ao getdados.php)',
+                obter: 'GET /api/catalogos/:entidade/:id',
+                criar: 'POST /api/catalogos/:entidade',
+                atualizar: 'PUT /api/catalogos/:entidade/:id',
+                deletar: 'DELETE /api/catalogos/:entidade/:id',
+                entidades: 'sexo, genero, racaCor, escolaridade, estadoCivil, tipoSanguineo, etc.'
+            },
+            submodulosTrabalhador: {
+                listar: 'GET /api/trabalhadores/:id/:submodulo (dependentes|afastamentos|ocorrenciasViolencia|readaptacoes|processosTrabalho)',
+                obter: 'GET /api/trabalhadores/:id/:submodulo/:itemId',
+                criar: 'POST /api/trabalhadores/:id/:submodulo',
+                atualizar: 'PUT /api/trabalhadores/:id/:submodulo/:itemId',
+                deletar: 'DELETE /api/trabalhadores/:id/:submodulo/:itemId'
+            },
+            questionarios: {
+                listar: 'GET /api/questionarios',
+                obter: 'GET /api/questionarios/:id (inclui itens)',
+                criar: 'POST /api/questionarios',
+                atualizar: 'PUT /api/questionarios/:id',
+                deletar: 'DELETE /api/questionarios/:id',
+                itens: 'POST/PUT/DELETE /api/questionarios/:id/itens[/:itemId]'
+            },
+            uploads: {
+                listar: 'GET /api/uploads',
+                obter: 'GET /api/uploads/:id',
+                criar: 'POST /api/uploads (multipart/form-data)',
+                download: 'GET /api/uploads/:id/download',
+                deletar: 'DELETE /api/uploads/:id'
+            },
+            emails: {
+                padroes: 'GET/POST/PUT/DELETE /api/emails/padroes[/:id]',
+                enviar: 'POST /api/emails/enviar (requer Nodemailer/SendGrid)'
+            },
+            parametros: {
+                listar: 'GET /api/parametros',
+                obterPorChave: 'GET /api/parametros/chave/:chave',
+                obter: 'GET /api/parametros/:id',
+                criar: 'POST /api/parametros (admin)',
+                atualizar: 'PUT /api/parametros/:id (admin)',
+                deletar: 'DELETE /api/parametros/:id (admin)'
+            },
+            preferencias: {
+                minhas: 'GET/PUT /api/preferencias/minhas',
+                usuario: 'GET/PUT /api/preferencias/usuario/:usuarioId'
+            },
+            servidores: {
+                listar: 'GET /api/servidores',
+                obter: 'GET /api/servidores/:id',
+                criar: 'POST /api/servidores',
+                atualizar: 'PUT /api/servidores/:id',
+                deletar: 'DELETE /api/servidores/:id'
+            },
+            videoAulas: {
+                listar: 'GET /api/video-aulas',
+                obter: 'GET /api/video-aulas/:id',
+                criar: 'POST /api/video-aulas (admin)',
+                atualizar: 'PUT /api/video-aulas/:id (admin)',
+                deletar: 'DELETE /api/video-aulas/:id (admin)'
+            },
             health: 'GET /health'
         }
     });
@@ -103,9 +199,23 @@ app.use('/api/empresas', empresasRoutes);
 app.use('/api/unidades', unidadesRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/audit', auditRoutes);
+app.use('/api/catalogos', catalogosRoutes);
+app.use('/api/trabalhadores', submodulosTrabalhadorRoutes);
+app.use('/api/questionarios', questionariosRoutes);
+app.use('/api/uploads', uploadsRoutes);
+app.use('/api/emails', emailsRoutes);
+app.use('/api/parametros', parametrosRoutes);
+app.use('/api/preferencias', preferenciasRoutes);
+app.use('/api/servidores', servidoresRoutes);
+app.use('/api/video-aulas', videoAulasRoutes);
+app.use('/api/atos-municipais', atosMunicipaisRoutes);
+app.use('/api/enderecos', enderecosRoutes);
+app.use('/api/export', exportRoutes);
+app.use('/api/material-biologico', materialBiologicoRoutes);
 // 404 handler
 app.use(notFoundHandler);
 // Error handler
 app.use(errorHandler);
 export default app;
-//# sourceMappingURL=app.js.map

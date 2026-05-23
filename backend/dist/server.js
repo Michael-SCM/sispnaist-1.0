@@ -1,10 +1,15 @@
+import 'dotenv/config';
+import dns from 'node:dns';
+// Forçar a resolução de DNS a priorizar IPv4. 
+// Isso resolve o erro ENETUNREACH no Render, pois a plataforma não possui suporte a IPv6 de saída.
+dns.setDefaultResultOrder('ipv4first');
 import app from './app.js';
 import config from './config/config.js';
 const PORT = config.port;
 const server = app.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════╗
-║   SISPATNAIST Backend Server Started   ║
+║    SISPNAIST Backend Server Started    ║
 ╚════════════════════════════════════════╝
 
 🚀 Server running on: http://localhost:${PORT}
@@ -44,4 +49,3 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
     process.exit(1);
 });
-//# sourceMappingURL=server.js.map

@@ -30,5 +30,6 @@ const VacinacaoSchema = new Schema<IVacinacaoDocument>(
 );
 
 VacinacaoSchema.index({ trabalhadorId: 1, dataVacinacao: -1 });
+VacinacaoSchema.index({ proximoDose: 1 });
 
 export default mongoose.model<IVacinacaoDocument>('Vacinacao', VacinacaoSchema);

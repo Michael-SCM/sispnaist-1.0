@@ -78,5 +78,7 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
 );
 
 AcidenteSchema.index({ trabalhadorId: 1, dataAcidente: -1 });
+AcidenteSchema.index({ status: 1 });
+AcidenteSchema.index({ dataAcidente: 1 });
 
 export default mongoose.model<IAcidenteDocument>('Acidente', AcidenteSchema);

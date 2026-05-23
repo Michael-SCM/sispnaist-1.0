@@ -34,4 +34,3 @@ router.delete('/:id', (req, res, next) => {
     next();
 }, deletarVacinacao);
 export default router;
-//# sourceMappingURL=vacinacoes.js.map

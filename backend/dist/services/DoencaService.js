@@ -1,4 +1,5 @@
 import Doenca from '../models/Doenca.js';
+import Trabalhador from '../models/Trabalhador.js';
 import User from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import mongoose from 'mongoose';
@@ -10,11 +11,15 @@ export class DoencaService {
         if (mongoose.Types.ObjectId.isValid(identifier)) {
             return identifier;
         }
-        const usuario = await User.findOne({ cpf: identifier });
-        if (!usuario) {
-            throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
-        }
-        return usuario._id.toString();
+        const [usuario, trabalhador] = await Promise.all([
+            User.findOne({ cpf: identifier }).select('_id').lean(),
+            Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
+        ]);
+        if (usuario)
+            return usuario._id.toString();
+        if (trabalhador)
+            return trabalhador._id.toString();
+        throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
     }
     async criar(doencaData) {
         // Resolver trabalhadorId se for CPF
@@ -26,27 +31,30 @@ export class DoencaService {
         return doenca.toObject();
     }
     async obter(id) {
-        console.log(`[DoencaService] Buscando doença ID: ${id}`);
         const doenca = await Doenca.findById(id)
             .populate('trabalhadorId', 'nome cpf email empresa unidade')
             .lean();
         if (!doenca) {
             throw new AppError('Doença não encontrada', 404);
         }
-        console.log(`[DoencaService] Doença retornada:`, JSON.stringify(doenca));
         return doenca;
     }
     async listar(page = 1, limit = 10, filtros) {
         const skip = (page - 1) * limit;
         const query = {};
         if (filtros?.nomeDoenca) {
-            query.nomeDoenca = { $regex: filtros.nomeDoenca, $options: 'i' };
+            const nomeDoenca = String(filtros.nomeDoenca).trim();
+            const pattern = new RegExp('^' + nomeDoenca, 'i');
+            query.nomeDoenca = { $regex: pattern };
         }
         if (filtros?.ativo !== undefined) {
             query.ativo = filtros.ativo;
         }
         if (filtros?.trabalhadorId) {
-            query.trabalhadorId = filtros.trabalhadorId;
+            // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
+            const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+            const cpfNorm = toCPFMaskedOrDigits(String(filtros.trabalhadorId));
+            query.trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
         }
         if (filtros?.dataInicio || filtros?.dataFim) {
             query.dataInicio = {};
@@ -72,7 +80,6 @@ export class DoencaService {
         };
     }
     async atualizar(id, doencaData) {
-        console.log(`[DoencaService] Atualizando doença ID: ${id}, Payload:`, JSON.stringify(doencaData));
         // Não permitir alterar data de criação
         if ('dataCriacao' in doencaData) {
             delete doencaData.dataCriacao;
@@ -88,7 +95,6 @@ export class DoencaService {
         if (!doenca) {
             throw new AppError('Doença não encontrada', 404);
         }
-        console.log(`[DoencaService] Doença APÓS atualização:`, JSON.stringify(doenca));
         return doenca;
     }
     async deletar(id) {
@@ -169,4 +175,3 @@ export class DoencaService {
     }
 }
 export default new DoencaService();
-//# sourceMappingURL=DoencaService.js.map

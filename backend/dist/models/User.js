@@ -65,15 +65,22 @@ const UserSchema = new Schema({
         type: Boolean,
         default: true,
     },
-    dataCriacao: {
-        type: Date,
-        default: Date.now,
+    isVerified: {
+        type: Boolean,
     },
-    dataAtualizacao: {
-        type: Date,
-        default: Date.now,
+    verificationToken: {
+        type: String,
+        select: false,
     },
-}, { collection: 'usuarios', timestamps: true });
+    verificationTokenExpires: {
+        type: Date,
+        select: false,
+        index: { expires: 0 }, // Índice TTL: o MongoDB exclui a conta automaticamente se passar de 24h sem verificação
+    },
+}, {
+    collection: 'usuarios',
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' }
+});
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('senha'))
@@ -94,4 +101,3 @@ UserSchema.methods.comparePassword = async function (password) {
     return bcrypt.compare(password, this.senha);
 };
 export default mongoose.model('User', UserSchema);
-//# sourceMappingURL=User.js.map

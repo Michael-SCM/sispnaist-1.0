@@ -23,15 +23,9 @@ const UnidadeSchema = new Schema({
         type: Boolean,
         default: true,
     },
-    dataCriacao: {
-        type: Date,
-        default: Date.now,
-    },
-    dataAtualizacao: {
-        type: Date,
-        default: Date.now,
-    },
-}, { collection: 'unidades', timestamps: true });
+}, {
+    collection: 'unidades',
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' }
+});
 UnidadeSchema.index({ empresaId: 1 });
 export default mongoose.model('Unidade', UnidadeSchema);
-//# sourceMappingURL=Unidade.js.map

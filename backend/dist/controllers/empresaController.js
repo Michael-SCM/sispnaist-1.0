@@ -69,4 +69,3 @@ export const deleteEmpresa = asyncHandler(async (req, res) => {
         data: null,
     });
 });
-//# sourceMappingURL=empresaController.js.map

@@ -30,4 +30,3 @@ export const validateQuery = (schema) => {
         next();
     };
 };
-//# sourceMappingURL=validation.js.map

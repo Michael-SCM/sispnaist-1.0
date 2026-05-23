@@ -76,4 +76,14 @@ export const obterDashboardTrabalhador = asyncHandler(async (req, res) => {
         data: { dados },
     });
 });
-//# sourceMappingURL=analyticsController.js.map
+/**
+ * GET /api/analytics/monitoramento
+ * Obtém dados de inteligência em saúde e monitoramento clínico
+ */
+export const obterMonitoramento = asyncHandler(async (req, res) => {
+    const monitoramento = await analyticsService.obterMonitoramentoClinico();
+    res.status(200).json({
+        status: 'success',
+        data: { monitoramento },
+    });
+});

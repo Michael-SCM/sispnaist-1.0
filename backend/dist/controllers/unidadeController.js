@@ -82,4 +82,3 @@ export const getUnidadesPorEmpresa = asyncHandler(async (req, res) => {
         data: { unidades },
     });
 });
-//# sourceMappingURL=unidadeController.js.map

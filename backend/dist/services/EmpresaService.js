@@ -1,5 +1,6 @@
 import Empresa from '../models/Empresa.js';
 import { AppError } from '../middleware/errorHandler.js';
+import Unidade from '../models/Unidade.js';
 export class EmpresaService {
     async listar(page = 1, limit = 10, filtros) {
         const skip = (page - 1) * limit;
@@ -60,7 +61,8 @@ export class EmpresaService {
         if (!result) {
             throw new AppError('Empresa não encontrada', 404);
         }
+        // Remover em cascata todas as unidades vinculadas a esta empresa
+        await Unidade.deleteMany({ empresaId: id });
     }
 }
 export default new EmpresaService();
-//# sourceMappingURL=EmpresaService.js.map

@@ -1,6 +1,9 @@
 import User from '../models/User.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { sendResetPasswordEmail, sendVerificationEmail, validateEmailDomain } from '../utils/emailService.js';
+import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 export class AuthService {
     async register(userData) {
         // Check if user already exists
@@ -10,25 +13,49 @@ export class AuthService {
         if (existingUser) {
             throw new AppError('Email ou CPF já cadastrado', 400);
         }
-        // Create new user
-        const user = new User(userData);
-        await user.save();
-        // Generate token
-        const token = generateToken({
-            id: user._id.toString(),
-            cpf: user.cpf,
-            email: user.email,
-            perfil: user.perfil || 'trabalhador',
+        // Validar se o domínio do e-mail realmente existe e está ativo (registros MX)
+        const isDomainValid = await validateEmailDomain(userData.email);
+        if (!isDomainValid) {
+            throw new AppError('O domínio do e-mail informado não é válido ou não está configurado para receber mensagens. Por favor, informe um e-mail com domínio existente.', 400);
+        }
+        // Gerar token de verificação de e-mail (expira em 24 horas)
+        const verificationToken = jwt.sign({ email: userData.email, type: 'verify' }, config.jwtSecret, { expiresIn: '24h' });
+        const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+        // 1. Tentar enviar o e-mail de verificação primeiro
+        try {
+            await sendVerificationEmail(userData.email, verificationToken);
+        }
+        catch (emailError) {
+            console.error('ERRO NO ENVIO DO E-MAIL DE CADASTRO:', emailError);
+            throw new AppError('Não foi possível enviar o e-mail de confirmação. Por favor, verifique se o e-mail digitado realmente existe e está correto.', 400);
+        }
+        // 2. Criar e salvar o usuário no banco apenas se o envio do e-mail foi bem-sucedido
+        const user = new User({
+            ...userData,
+            isVerified: false,
+            verificationToken,
+            verificationTokenExpires,
         });
+        await user.save();
+        // Em desenvolvimento, logar o link para facilitar testes
+        if (process.env.NODE_ENV !== 'production') {
+            console.log(`\n=== LINK DE CONFIRMAÇÃO DE E-MAIL (DESENVOLVIMENTO) ===`);
+            console.log(`${config.frontendUrl}/verify-email?token=${verificationToken}`);
+            console.log(`======================================================\n`);
+        }
         const userObj = user.toObject();
         delete userObj.senha;
-        return { user: userObj, token };
+        return { user: userObj };
     }
     async login(email, password) {
         // Find user with password field
         const user = await User.findOne({ email }).select('+senha');
         if (!user) {
             throw new AppError('Email ou senha inválidos', 401);
+        }
+        // Verificar se o e-mail está verificado
+        if (user.isVerified === false) {
+            throw new AppError('O e-mail desta conta ainda não foi verificado! Por favor, verifique sua caixa de entrada (ou spam) para ativar sua conta.', 401);
         }
         // Compare password
         const isPasswordValid = await user.comparePassword(password);
@@ -73,6 +100,77 @@ export class AuthService {
         delete userObj.senha;
         return userObj;
     }
+    async forgotPassword(email, dataNascimento) {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new AppError('Usuário não encontrado', 404);
+        }
+        if (!user.dataNascimento) {
+            throw new AppError('Data de nascimento não cadastrada para este usuário. Entre em contato com o administrador.', 400);
+        }
+        // Verificar data de nascimento (comparar apenas YYYY-MM-DD)
+        const userBirthDate = new Date(user.dataNascimento).toISOString().split('T')[0];
+        const providedBirthDate = new Date(dataNascimento).toISOString().split('T')[0];
+        if (userBirthDate !== providedBirthDate) {
+            throw new AppError('Data de nascimento incorreta', 400);
+        }
+        // Gerar token de reset (expira em 1 hora)
+        const resetToken = jwt.sign({ id: user._id.toString(), email: user.email, type: 'reset' }, config.jwtSecret, { expiresIn: '1h' });
+        // Enviar e-mail de redefinição de senha
+        await sendResetPasswordEmail(user.email, resetToken);
+        return resetToken;
+    }
+    async resetPassword(token, novaSenha) {
+        try {
+            // Verificar token
+            const decoded = jwt.verify(token, config.jwtSecret);
+            if (decoded.type !== 'reset') {
+                throw new AppError('Token inválido', 400);
+            }
+            const user = await User.findById(decoded.id);
+            if (!user) {
+                throw new AppError('Usuário não encontrado', 404);
+            }
+            // Atualizar senha
+            user.senha = novaSenha;
+            await user.save();
+        }
+        catch (error) {
+            if (error instanceof AppError)
+                throw error;
+            throw new AppError('Token de recuperação inválido ou expirado', 400);
+        }
+    }
+    async verifyEmail(token) {
+        try {
+            // Verificar token JWT
+            const decoded = jwt.verify(token, config.jwtSecret);
+            if (decoded.type !== 'verify') {
+                throw new AppError('Token de verificação inválido', 400);
+            }
+            // Encontrar usuário com o token correspondente
+            const user = await User.findOne({
+                email: decoded.email,
+                verificationToken: token
+            }).select('+verificationToken +verificationTokenExpires');
+            if (!user) {
+                throw new AppError('Token inválido ou conta já ativada', 400);
+            }
+            // Verificar se expirou
+            if (user.verificationTokenExpires && user.verificationTokenExpires < new Date()) {
+                throw new AppError('Link de verificação expirado. Por favor, faça um novo cadastro.', 400);
+            }
+            // Ativar e salvar usuário
+            user.isVerified = true;
+            user.verificationToken = undefined;
+            user.verificationTokenExpires = undefined;
+            await user.save();
+        }
+        catch (error) {
+            if (error instanceof AppError)
+                throw error;
+            throw new AppError('Link de verificação inválido ou expirado', 400);
+        }
+    }
 }
 export default new AuthService();
-//# sourceMappingURL=AuthService.js.map

@@ -16,6 +16,8 @@ export class UserService {
         const total = await User.countDocuments(query);
         const usuarios = await User.find(query)
             .select('-senha') // Nunca retornar a senha
+            .populate('empresa', 'razaoSocial')
+            .populate('unidade', 'nome')
             .sort({ nome: 1 })
             .skip(skip)
             .limit(limit)
@@ -67,4 +69,3 @@ export class UserService {
     }
 }
 export default new UserService();
-//# sourceMappingURL=UserService.js.map

@@ -1,0 +1,473 @@
+import mongoose from 'mongoose';
+import Catalogo from '../models/Catalogo';
+/**
+ * Seeder para catálogos essenciais do sistema.
+ * Dados baseados nas tabelas auxiliares do sistema PHP original.
+ * Execute com: npx ts-node src/utils/seedCatalogos.ts
+ */
+const CATALOGO_DADOS = [
+    // Sexo
+    { entidade: 'sexo', itens: [
+            { nome: 'Masculino', sigla: 'M', ordem: 1 },
+            { nome: 'Feminino', sigla: 'F', ordem: 2 },
+        ] },
+    // Gênero
+    { entidade: 'genero', itens: [
+            { nome: 'Mulher cisgênero', ordem: 1 },
+            { nome: 'Homem cisgênero', ordem: 2 },
+            { nome: 'Mulher transgender', ordem: 3 },
+            { nome: 'Homem transgender', ordem: 4 },
+            { nome: 'Não-binário', ordem: 5 },
+            { nome: 'Agênero', ordem: 6 },
+            { nome: 'Gênero fluido', ordem: 7 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Estado Vacinal
+    { entidade: 'estadoVacinal', itens: [
+            { nome: 'Vacinado', ordem: 1 },
+            { nome: 'Parcialmente vacinado', ordem: 2 },
+            { nome: 'Não vacinado', ordem: 3 },
+            { nome: 'Aguardando vacinação', ordem: 4 },
+            { nome: 'Recusa da vacinação', ordem: 5 },
+        ] },
+    // Doença de Base
+    { entidade: 'doencaBase', itens: [
+            { nome: 'Hipertensão', ordem: 1 },
+            { nome: 'Diabetes', ordem: 2 },
+            { nome: 'Asma', ordem: 3 },
+            { nome: 'Artrite', ordem: 4 },
+            { nome: 'Cardiopatia', ordem: 5 },
+            { nome: 'Câncer', ordem: 6 },
+            { nome: 'HIV/AIDS', ordem: 7 },
+            { nome: 'Hepatite', ordem: 8 },
+            { nome: 'Nenhuma', ordem: 9 },
+            { nome: 'Outra', ordem: 99 },
+        ] },
+    // Tipo de Droga
+    { entidade: 'tipoDroga', itens: [
+            { nome: 'Álcool', ordem: 1 },
+            { nome: 'Cigarro', ordem: 2 },
+            { nome: 'Maconha', ordem: 3 },
+            { nome: 'Cocaína', ordem: 4 },
+            { nome: 'Crack', ordem: 5 },
+            { nome: 'Ecstasy', ordem: 6 },
+            { nome: 'Heroína', ordem: 7 },
+            { nome: 'Inalantes', ordem: 8 },
+            { nome: 'Anfetaminas', ordem: 9 },
+            { nome: 'Ansiolíticos', ordem: 10 },
+            { nome: 'Opioides', ordem: 11 },
+            { nome: 'Outra', ordem: 99 },
+        ] },
+    // Raça/Cor (classificação IBGE)
+    { entidade: 'racaCor', itens: [
+            { nome: 'Branca', ordem: 1 },
+            { nome: 'Preta', ordem: 2 },
+            { nome: 'Parda', ordem: 3 },
+            { nome: 'Amarela', ordem: 4 },
+            { nome: 'Indígena', ordem: 5 },
+            { nome: 'Não informada', ordem: 6 },
+        ] },
+    // Escolaridade
+    { entidade: 'escolaridade', itens: [
+            { nome: 'Analfabeto', ordem: 1 },
+            { nome: 'Fundamental Incompleto', ordem: 2 },
+            { nome: 'Fundamental Completo', ordem: 3 },
+            { nome: 'Médio Incompleto', ordem: 4 },
+            { nome: 'Médio Completo', ordem: 5 },
+            { nome: 'Superior Incompleto', ordem: 6 },
+            { nome: 'Superior Completo', ordem: 7 },
+            { nome: 'Pós-graduação', ordem: 8 },
+            { nome: 'Mestrado', ordem: 9 },
+            { nome: 'Doutorado', ordem: 10 },
+        ] },
+    // Estado Civil
+    { entidade: 'estadoCivil', itens: [
+            { nome: 'Solteiro(a)', sigla: 'S', ordem: 1 },
+            { nome: 'Casado(a)', sigla: 'C', ordem: 2 },
+            { nome: 'Divorciado(a)', sigla: 'D', ordem: 3 },
+            { nome: 'Viúvo(a)', sigla: 'V', ordem: 4 },
+            { nome: 'Separado(a)', sigla: 'SE', ordem: 5 },
+            { nome: 'União Estável', sigla: 'UE', ordem: 6 },
+        ] },
+    // Tipo Sanguíneo
+    { entidade: 'tipoSanguineo', itens: [
+            { nome: 'A Positivo', sigla: 'A+', ordem: 1 },
+            { nome: 'A Negativo', sigla: 'A-', ordem: 2 },
+            { nome: 'B Positivo', sigla: 'B+', ordem: 3 },
+            { nome: 'B Negativo', sigla: 'B-', ordem: 4 },
+            { nome: 'AB Positivo', sigla: 'AB+', ordem: 5 },
+            { nome: 'AB Negativo', sigla: 'AB-', ordem: 6 },
+            { nome: 'O Positivo', sigla: 'O+', ordem: 7 },
+            { nome: 'O Negativo', sigla: 'O-', ordem: 8 },
+        ] },
+    // Situação de Trabalho
+    { entidade: 'situacaoTrabalho', itens: [
+            { nome: 'Ativo', ordem: 1 },
+            { nome: 'Afastado', ordem: 2 },
+            { nome: 'Desligado', ordem: 3 },
+            { nome: 'Aposentado', ordem: 4 },
+            { nome: 'Transferido', ordem: 5 },
+            { nome: 'Licenciado', ordem: 6 },
+        ] },
+    // Tipo de Vínculo
+    { entidade: 'tipoVinculo', itens: [
+            { nome: 'Efetivo', ordem: 1 },
+            { nome: 'CLT', ordem: 2 },
+            { nome: 'Estágio', ordem: 3 },
+            { nome: 'Temporário', ordem: 4 },
+            { nome: 'Terceirizado', ordem: 5 },
+            { nome: 'Comissionado', ordem: 6 },
+            { nome: 'Pensionista', ordem: 7 },
+        ] },
+    // Função (área da saúde predominante)
+    { entidade: 'funcao', itens: [
+            { nome: 'Médico(a)', ordem: 1 },
+            { nome: 'Enfermeiro(a)', ordem: 2 },
+            { nome: 'Técnico(a) de Enfermagem', ordem: 3 },
+            { nome: 'Auxiliar de Enfermagem', ordem: 4 },
+            { nome: 'Dentista', ordem: 5 },
+            { nome: 'Farmacêutico(a)', ordem: 6 },
+            { nome: 'Fisioterapeuta', ordem: 7 },
+            { nome: 'Nutricionista', ordem: 8 },
+            { nome: 'Psicólogo(a)', ordem: 9 },
+            { nome: 'Assistente Social', ordem: 10 },
+            { nome: 'Técnico(a) em Saúde Bucal', ordem: 11 },
+            { nome: 'Agente Comunitário de Saúde', ordem: 12 },
+            { nome: 'Administrativo', ordem: 13 },
+            { nome: 'Motorista', ordem: 14 },
+            { nome: 'Segurança', ordem: 15 },
+            { nome: 'Serviços Gerais', ordem: 16 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Jornada de Trabalho
+    { entidade: 'jornadaTrabalho', itens: [
+            { nome: '20 horas semanais', sigla: '20h', ordem: 1 },
+            { nome: '30 horas semanais', sigla: '30h', ordem: 2 },
+            { nome: '40 horas semanais', sigla: '40h', ordem: 3 },
+            { nome: '44 horas semanais', sigla: '44h', ordem: 4 },
+        ] },
+    // Turno de Trabalho
+    { entidade: 'turnoTrabalho', itens: [
+            { nome: 'Diurno', ordem: 1 },
+            { nome: 'Noturno', ordem: 2 },
+            { nome: 'Misto', ordem: 3 },
+            { nome: 'Plantão 12h', ordem: 4 },
+            { nome: 'Plantão 24h', ordem: 5 },
+            { nome: 'Rodízio', ordem: 6 },
+        ] },
+    // Parentesco (para dependentes)
+    { entidade: 'parentesco', itens: [
+            { nome: 'Cônjuge', sigla: 'conjuge', ordem: 1 },
+            { nome: 'Filho(a)', sigla: 'filho', ordem: 2 },
+            { nome: 'Enteado(a)', sigla: 'enteado', ordem: 3 },
+            { nome: 'Irmão(ã)', sigla: 'irmao', ordem: 4 },
+            { nome: 'Mãe', sigla: 'mae', ordem: 5 },
+            { nome: 'Pai', sigla: 'pai', ordem: 6 },
+            { nome: 'Neto(a)', sigla: 'neto', ordem: 7 },
+            { nome: 'Sobrinho(a)', sigla: 'sobrinho', ordem: 8 },
+            { nome: 'Tutor(a)', sigla: 'tutor', ordem: 9 },
+            { nome: 'Outro', sigla: 'outro', ordem: 99 },
+        ] },
+    // Tipo de Violência
+    { entidade: 'tipoViolencia', itens: [
+            { nome: 'Física', ordem: 1 },
+            { nome: 'Psicológica/Moral', ordem: 2 },
+            { nome: 'Sexual', ordem: 3 },
+            { nome: 'Negligência/Abandono', ordem: 4 },
+            { nome: 'Patrimonial/Financeira', ordem: 5 },
+            { nome: 'Tortura', ordem: 6 },
+            { nome: 'Trabalho Infantil', ordem: 7 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Meio de Agressão
+    { entidade: 'meioAgressao', itens: [
+            { nome: 'Força física/Espancamento', ordem: 1 },
+            { nome: 'Envenenamento', ordem: 2 },
+            { nome: 'Objeto perfuro-cortante', ordem: 3 },
+            { nome: 'Objeto contundente', ordem: 4 },
+            { nome: 'Arma de fogo', ordem: 5 },
+            { nome: 'Ameaça', ordem: 6 },
+            { nome: 'Substância quente', ordem: 7 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Motivo da Violência
+    { entidade: 'motivoViolencia', itens: [
+            { nome: 'Conflito no trabalho', ordem: 1 },
+            { nome: 'Conflito familiar', ordem: 2 },
+            { nome: 'Roubo/Furto', ordem: 3 },
+            { nome: 'Discriminação', ordem: 4 },
+            { nome: 'Retaliação', ordem: 5 },
+            { nome: 'Abuso de poder', ordem: 6 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Tipo de Autor da Violência
+    { entidade: 'tipoAutorViolencia', itens: [
+            { nome: 'Superior hierárquico', ordem: 1 },
+            { nome: 'Colega de trabalho', ordem: 2 },
+            { nome: 'Subordinado', ordem: 3 },
+            { nome: 'Paciente', ordem: 4 },
+            { nome: 'Familiar', ordem: 5 },
+            { nome: 'Pessoa desconhecida', ordem: 6 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Agente (Causador de Acidente/Doença)
+    { entidade: 'agente', itens: [
+            { nome: 'Biológico', ordem: 1 },
+            { nome: 'Químico', ordem: 2 },
+            { nome: 'Físico', ordem: 3 },
+            { nome: 'Ergonômico', ordem: 4 },
+            { nome: 'Mecânico/Acidente', ordem: 5 },
+            { nome: 'Psicossocial', ordem: 6 },
+        ] },
+    // Causador de Trauma
+    { entidade: 'causadorTrauma', itens: [
+            { nome: 'Queda de mesmo nível', ordem: 1 },
+            { nome: 'Queda de altura', ordem: 2 },
+            { nome: 'Colisão/Atropelamento', ordem: 3 },
+            { nome: 'Esforço excessivo/Movimento brusco', ordem: 4 },
+            { nome: 'Agressão por pessoa', ordem: 5 },
+            { nome: 'Ataque de animal', ordem: 6 },
+            { nome: 'Ferramenta manual', ordem: 7 },
+            { nome: 'Máquina/Equipamento', ordem: 8 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Parte do Corpo Atingida
+    { entidade: 'parteCorpo', itens: [
+            { nome: 'Cabeça/Face', ordem: 1 },
+            { nome: 'Olhos', ordem: 2 },
+            { nome: 'Pescoço', ordem: 3 },
+            { nome: 'Tronco', ordem: 4 },
+            { nome: 'Mãos/Dedos', ordem: 5 },
+            { nome: 'Braços/Antebraços', ordem: 6 },
+            { nome: 'Pernas/Pés', ordem: 7 },
+            { nome: 'Múltiplas partes', ordem: 8 },
+            { nome: 'Órgãos internos', ordem: 9 },
+        ] },
+    // Resultados de Sorologia
+    { entidade: 'sorologia', itens: [
+            { nome: 'Não Reagente (Negativo)', sigla: 'NR', ordem: 1 },
+            { nome: 'Reagente (Positivo)', sigla: 'R', ordem: 2 },
+            { nome: 'Inconclusivo', sigla: 'INC', ordem: 3 },
+            { nome: 'Aguardando Resultado', sigla: 'AG', ordem: 4 },
+            { nome: 'Não Realizado', sigla: 'NA', ordem: 5 },
+        ] },
+    // Tipo de Exposição
+    { entidade: 'tipoExposicao', itens: [
+            { nome: 'Percutânea', ordem: 1 },
+            { nome: 'Mucosa', ordem: 2 },
+            { nome: 'Pele Íntegra', ordem: 3 },
+            { nome: 'Pele Não Íntegra', ordem: 4 },
+            { nome: 'Mordedura', ordem: 5 },
+        ] },
+    // Material Orgânico
+    { entidade: 'materialOrganico', itens: [
+            { nome: 'Sangue', ordem: 1 },
+            { nome: 'Líquido Amniótico', ordem: 2 },
+            { nome: 'Líquido Pleural', ordem: 3 },
+            { nome: 'Líquido Pericárdico', ordem: 4 },
+            { nome: 'Líquido Peritoneal', ordem: 5 },
+            { nome: 'Líquido Sinovial', ordem: 6 },
+            { nome: 'Líquido Cefalorraquidiano', ordem: 7 },
+            { nome: 'Outros Líquidos com Sangue', ordem: 8 },
+        ] },
+    // Circunstância do Acidente
+    { entidade: 'circunstanciaAcidente', itens: [
+            { nome: 'Durante procedimento cirúrgico', ordem: 1 },
+            { nome: 'Durante punção venosa/arterial', ordem: 2 },
+            { nome: 'Durante descarte de material', ordem: 3 },
+            { nome: 'Recapagem de agulha', ordem: 4 },
+            { nome: 'Limpeza de ambiente/instrumental', ordem: 5 },
+            { nome: 'Lavanderia', ordem: 6 },
+            { nome: 'Manutenção de equipamentos', ordem: 7 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Conduta Médica
+    { entidade: 'conduta', itens: [
+            { nome: 'Apenas acompanhamento', ordem: 1 },
+            { nome: 'Esquema PrEP (2 drogas)', ordem: 2 },
+            { nome: 'Esquema PrEP (3 drogas)', ordem: 3 },
+            { nome: 'Vacinação Hepatite B', ordem: 4 },
+            { nome: 'Imunoglobulina', ordem: 5 },
+        ] },
+    // Evolução do Caso
+    { entidade: 'evolucaoCaso', itens: [
+            { nome: 'Alta (Sem soroconversão)', ordem: 1 },
+            { nome: 'Soroconversão HIV', ordem: 2 },
+            { nome: 'Soroconversão HBV', ordem: 3 },
+            { nome: 'Soroconversão HCV', ordem: 4 },
+            { nome: 'Abandono de tratamento', ordem: 5 },
+            { nome: 'Óbito', ordem: 6 },
+        ] },
+    // Tipo de Afastamento
+    { entidade: 'tipoAfastamento', itens: [
+            { nome: 'Doença', ordem: 1 },
+            { nome: 'Acidente de trabalho', ordem: 2 },
+            { nome: 'Acidente de trajeto', ordem: 3 },
+            { nome: 'Licença maternidade', ordem: 4 },
+            { nome: 'Licença paternidade', ordem: 5 },
+            { nome: 'Falecimento', ordem: 6 },
+            { nome: 'Assistência à filho', ordem: 7 },
+            { nome: 'Assistência à familiar', ordem: 8 },
+            { nome: 'Licença para tratamento', ordem: 9 },
+            { nome: 'Suspensão disciplinar', ordem: 10 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Motivo de Afastamento
+    { entidade: 'motivoAfastamento', itens: [
+            { nome: 'Doença común', ordem: 1 },
+            { nome: 'Doença profissional', ordem: 2 },
+            { nome: 'COVID-19', ordem: 3 },
+            { nome: 'Cirurgia', ordem: 4 },
+            { nome: 'Tratamento oncológico', ordem: 5 },
+            { nome: 'Tratamento psiquiátrico', ordem: 6 },
+            { nome: 'Fisioterapia', ordem: 7 },
+            { nome: 'Acompanhamento pré-natal', ordem: 8 },
+            { nome: 'Parto', ordem: 9 },
+            { nome: 'Luto', ordem: 10 },
+            { nome: 'Acidente', ordem: 11 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Motivo de Readaptação
+    { entidade: 'motivoReadaptacao', itens: [
+            { nome: 'Limitação física', ordem: 1 },
+            { nome: 'Limitação visual', ordem: 2 },
+            { nome: 'Limitação auditiva', ordem: 3 },
+            { nome: 'Doença crônica', ordem: 4 },
+            { nome: 'Pós-cirúrgico', ordem: 5 },
+            { nome: 'Reabilitação', ordem: 6 },
+            { nome: 'Ajustamento funcional', ordem: 7 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Tempo de Readaptação
+    { entidade: 'tempoReadaptacao', itens: [
+            { nome: '30 dias', ordem: 1 },
+            { nome: '60 dias', ordem: 2 },
+            { nome: '90 dias', ordem: 3 },
+            { nome: '120 dias', ordem: 4 },
+            { nome: '180 dias', ordem: 5 },
+            { nome: '365 dias', ordem: 6 },
+            { nome: 'Indeterminado', ordem: 7 },
+        ] },
+    // Tipo de Deficiência
+    { entidade: 'tipoDeficiencia', itens: [
+            { nome: 'Física', ordem: 1 },
+            { nome: 'Visual', ordem: 2 },
+            { nome: 'Auditiva', ordem: 3 },
+            { nome: 'Intelectual', ordem: 4 },
+            { nome: 'Múltipla', ordem: 5 },
+            { nome: 'Psicossocial', ordem: 6 },
+            { nome: 'Reabilitado', ordem: 7 },
+        ] },
+    // Tempo de Deficiência
+    { entidade: 'tempoDeficiencia', itens: [
+            { nome: 'Congênita', ordem: 1 },
+            { nome: 'Adquirida', ordem: 2 },
+            { nome: 'Temporária', ordem: 3 },
+            { nome: 'Permanente', ordem: 4 },
+        ] },
+    // Grau de Deficiência
+    { entidade: 'grauDeficiencia', itens: [
+            { nome: 'Leve', ordem: 1 },
+            { nome: 'Moderada', ordem: 2 },
+            { nome: 'Severa', ordem: 3 },
+            { nome: 'Profunda', ordem: 4 },
+        ] },
+    // Tipo de Trauma
+    { entidade: 'tipoTrauma', itens: [
+            { nome: 'Contusão', ordem: 1 },
+            { nome: 'Corte/Laceração', ordem: 2 },
+            { nome: 'Fratura', ordem: 3 },
+            { nome: 'Entorse', ordem: 4 },
+            { nome: 'Luxação', ordem: 5 },
+            { nome: 'Queimadura', ordem: 6 },
+            { nome: 'Trauma Craniano', ordem: 7 },
+            { nome: 'Hemorragia', ordem: 8 },
+            { nome: 'Perfuração', ordem: 9 },
+            { nome: 'Amputação', ordem: 10 },
+            { nome: 'Intoxicação', ordem: 11 },
+            { nome: 'Hipotermia/Queimadura térmica', ordem: 12 },
+            { nome: 'Eletrocução', ordem: 13 },
+            { nome: 'Afogamento', ordem: 14 },
+            { nome: 'Outro', ordem: 99 },
+        ] },
+    // Regime de Acompanhamento
+    { entidade: 'regimeAcompanhamento', itens: [
+            { nome: 'Ambulatorial', ordem: 1 },
+            { nome: 'Internação', ordem: 2 },
+            { nome: 'Domiciliar', ordem: 3 },
+            { nome: 'Observação', ordem: 4 },
+        ] },
+    // Acompanhamento de Readaptação
+    { entidade: 'acompanhamentoReadaptacao', itens: [
+            { nome: 'Semanal', ordem: 1 },
+            { nome: 'Quinzenal', ordem: 2 },
+            { nome: 'Mensal', ordem: 3 },
+            { nome: 'Trimestral', ordem: 4 },
+            { nome: 'Semestral', ordem: 5 },
+            { nome: 'Anual', ordem: 6 },
+            { nome: 'Concluído', ordem: 7 },
+        ] },
+    // Grau de Satisfação
+    { entidade: 'grauSatisfacao', itens: [
+            { nome: 'Muito Satisfeito', ordem: 1 },
+            { nome: 'Satisfeito', ordem: 2 },
+            { nome: 'Indiferente', ordem: 3 },
+            { nome: 'Insatisfeito', ordem: 4 },
+            { nome: 'Muito Insatisfeito', ordem: 5 },
+        ] },
+    // Tipo de Violência Sexual
+    { entidade: 'tipoViolenciaSexual', itens: [
+            { nome: 'Assédio Sexual', ordem: 1 },
+            { nome: 'Estupro', ordem: 2 },
+            { nome: 'Atentado Violento ao Pudor', ordem: 3 },
+            { nome: 'Outro', ordem: 99 },
+            { nome: 'Não se aplica', ordem: 100 },
+        ] },
+];
+export async function seedCatalogos() {
+    console.log('🌱 Iniciando seed de catálogos...');
+    let criados = 0;
+    let pulados = 0;
+    try {
+        // Busca todos os catálogos existentes de uma vez
+        const existentes = await Catalogo.find({}, 'entidade nome').lean();
+        const existenteSet = new Set(existentes.map(item => `${item.entidade}:${item.nome}`));
+        const itensParaInserir = [];
+        for (const catalogo of CATALOGO_DADOS) {
+            for (const item of catalogo.itens) {
+                const chave = `${catalogo.entidade}:${item.nome}`;
+                if (existenteSet.has(chave)) {
+                    pulados++;
+                    continue;
+                }
+                itensParaInserir.push({
+                    entidade: catalogo.entidade,
+                    nome: item.nome,
+                    sigla: item.sigla || undefined,
+                    ordem: item.ordem,
+                    ativo: true,
+                });
+                criados++;
+            }
+        }
+        if (itensParaInserir.length > 0) {
+            await Catalogo.insertMany(itensParaInserir);
+        }
+        console.log(`✅ Seed concluído! ${criados} itens criados, ${pulados} pulados (já existiam).`);
+    }
+    catch (error) {
+        console.error('❌ Erro no seed de catálogos:', error);
+    }
+}
+// Se executado diretamente (não importado como módulo)
+if (import.meta.url === `file://${process.argv[1]}`) {
+    import('../config/database').then(({ default: connectDB }) => {
+        connectDB().then(() => {
+            seedCatalogos().then(() => {
+                console.log('🚀 Seed finalizado. Fechando conexão...');
+                mongoose.connection.close();
+                process.exit(0);
+            });
+        });
+    });
+}

@@ -7,7 +7,7 @@ const DoencaSchema = new Schema({
     dataFim: Date,
     trabalhadorId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Trabalhador',
         required: [true, 'Trabalhador é obrigatório'],
     },
     codigoDoenca: {
@@ -24,15 +24,9 @@ const DoencaSchema = new Schema({
         type: Boolean,
         default: true,
     },
-    dataCriacao: {
-        type: Date,
-        default: Date.now,
-    },
-    dataAtualizacao: {
-        type: Date,
-        default: Date.now,
-    },
-}, { collection: 'doencas', timestamps: true });
+}, {
+    collection: 'doencas',
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' }
+});
 DoencaSchema.index({ trabalhadorId: 1, dataInicio: -1 });
 export default mongoose.model('Doenca', DoencaSchema);
-//# sourceMappingURL=Doenca.js.map

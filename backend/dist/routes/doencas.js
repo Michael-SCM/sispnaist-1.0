@@ -33,4 +33,3 @@ router.delete('/:id', (req, res, next) => {
     next();
 }, doencaController.deletar);
 export default router;
-//# sourceMappingURL=doencas.js.map

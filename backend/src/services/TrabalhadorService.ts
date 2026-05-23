@@ -48,12 +48,14 @@ export class TrabalhadorService {
       query['trabalho.setor'] = { $regex: filtros.setor, $options: 'i' };
     }
 
-    const total = await Trabalhador.countDocuments(query);
-    const trabalhadores = await Trabalhador.find(query)
-      .sort({ nome: 1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    const [total, trabalhadores] = await Promise.all([
+      Trabalhador.countDocuments(query),
+      Trabalhador.find(query)
+        .sort({ nome: 1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+    ]);
 
     const pages = Math.ceil(total / limit);
 

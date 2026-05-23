@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { obterKPIs, obterDadosAcidentes, obterProximasVacinacoes, obterUltimosAcidentes, obterDashboardAdmin, obterDashboardTrabalhador, } from '../controllers/analyticsController.js';
+import { obterKPIs, obterDadosAcidentes, obterProximasVacinacoes, obterUltimosAcidentes, obterDashboardAdmin, obterDashboardTrabalhador, obterMonitoramento, } from '../controllers/analyticsController.js';
 import { authMiddleware, authorize } from '../middleware/auth.js';
 const router = Router();
 // Todas as rotas exigem autenticação
@@ -16,5 +16,6 @@ router.get('/acidentes/ultimos', obterUltimosAcidentes);
 router.get('/dashboard', authorize('admin', 'gestor'), obterDashboardAdmin);
 // Dashboard trabalhador (apenas trabalhador)
 router.get('/dashboard/trabalhador', obterDashboardTrabalhador);
+// Monitoramento clínico (admin e gestor)
+router.get('/monitoramento', authorize('admin', 'gestor'), obterMonitoramento);
 export default router;
-//# sourceMappingURL=analytics.js.map

@@ -34,4 +34,3 @@ router.delete('/:id', (req, res, next) => {
     next();
 }, acidenteController.deletar);
 export default router;
-//# sourceMappingURL=acidentes.js.map

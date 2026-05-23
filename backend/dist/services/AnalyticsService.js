@@ -1,31 +1,42 @@
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
+import Trabalhador from '../models/Trabalhador.js';
 import User from '../models/User.js';
+import mongoose from 'mongoose';
 export class AnalyticsService {
     /**
      * Obtém KPIs gerais do sistema
      */
     async obterKPIs() {
-        const totalAcidentes = await Acidente.countDocuments();
-        const acidentesAbertos = await Acidente.countDocuments({ status: 'Aberto' });
-        const acidentesEmAnalise = await Acidente.countDocuments({ status: 'Em Análise' });
-        const acidentesFechados = await Acidente.countDocuments({ status: 'Fechado' });
+        const trintaDias = new Date();
+        trintaDias.setDate(trintaDias.getDate() + 30);
+        const [totalAcidentes, acidentesAbertos, acidentesEmAnalise, acidentesFechados, totalTrabalhadores, totalDoencas, doencasAtivas, totalVacinacoes, proximasVacinacoes, trabalhadoresComVacina, acidentesComAfastamento] = await Promise.all([
+            Acidente.countDocuments(),
+            Acidente.countDocuments({ status: 'Aberto' }),
+            Acidente.countDocuments({ status: 'Em Análise' }),
+            Acidente.countDocuments({ status: 'Fechado' }),
+            Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' }),
+            Doenca.countDocuments(),
+            Doenca.countDocuments({ ativo: true }),
+            Vacinacao.countDocuments(),
+            Vacinacao.countDocuments({ proximoDose: { $lte: trintaDias } }),
+            Vacinacao.distinct('trabalhadorId'),
+            Acidente.aggregate([
+                { $match: { diasAfastamento: { $exists: true, $gt: 0 } } },
+                { $group: { _id: null, total: { $sum: '$diasAfastamento' } } }
+            ])
+        ]);
         // Taxa de resolução (acidentes fechados / total * 100)
         const taxaResolucao = totalAcidentes > 0
             ? Math.round((acidentesFechados / totalAcidentes) * 100)
             : 0;
-        const totalTrabalhadores = await User.countDocuments({ perfil: 'trabalhador', ativo: true });
-        const totalDoencas = await Doenca.countDocuments();
-        const doencasAtivas = await Doenca.countDocuments({ ativo: true });
-        const totalVacinacoes = await Vacinacao.countDocuments();
-        // Próximas vacinações (próximos 30 dias ou já vencidas)
-        const hoje = new Date();
-        const trintaDias = new Date();
-        trintaDias.setDate(trintaDias.getDate() + 30);
-        const proximasVacinacoes = await Vacinacao.countDocuments({
-            proximoDose: { $lte: trintaDias },
-        });
+        // Cobertura vacinal aproximada
+        const coberturaVacinal = totalTrabalhadores > 0
+            ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
+            : 0;
+        // Total absenteísmo (dias de afastamento)
+        const totalAbsenteismo = acidentesComAfastamento[0]?.total || 0;
         return {
             totalAcidentes,
             acidentesAbertos,
@@ -37,62 +48,64 @@ export class AnalyticsService {
             doencasAtivas,
             totalVacinacoes,
             proximasVacinacoes,
+            coberturaVacinal,
+            totalAbsenteismo
         };
     }
     /**
      * Obtém dados para gráficos de acidentes
      */
     async obterDadosAcidentes() {
-        // Acidentes por tipo
-        const porTipoAgg = await Acidente.aggregate([
-            {
-                $group: {
-                    _id: '$tipoAcidente',
-                    valor: { $sum: 1 },
+        const seisMesesAtras = new Date();
+        seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
+        // Executa as agregações em paralelo
+        const [porTipoAgg, porStatusAgg, ultimosMesesAgg] = await Promise.all([
+            Acidente.aggregate([
+                {
+                    $group: {
+                        _id: '$tipoAcidente',
+                        valor: { $sum: 1 },
+                    },
                 },
-            },
-            { $sort: { valor: -1 } },
+                { $sort: { valor: -1 } },
+            ]),
+            Acidente.aggregate([
+                {
+                    $group: {
+                        _id: '$status',
+                        valor: { $sum: 1 },
+                    },
+                },
+                { $sort: { valor: -1 } },
+            ]),
+            Acidente.aggregate([
+                {
+                    $match: {
+                        dataAcidente: { $gte: seisMesesAtras },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            ano: { $year: '$dataAcidente' },
+                            mes: { $month: '$dataAcidente' },
+                        },
+                        quantidade: { $sum: 1 },
+                    },
+                },
+                {
+                    $sort: { '_id.ano': 1, '_id.mes': 1 },
+                },
+            ])
         ]);
         const porTipo = porTipoAgg.map((item) => ({
             nome: item._id || 'Não informado',
             valor: item.valor,
         }));
-        // Acidentes por status
-        const porStatusAgg = await Acidente.aggregate([
-            {
-                $group: {
-                    _id: '$status',
-                    valor: { $sum: 1 },
-                },
-            },
-            { $sort: { valor: -1 } },
-        ]);
         const porStatus = porStatusAgg.map((item) => ({
             nome: item._id || 'Não informado',
             valor: item.valor,
         }));
-        // Últimos 6 meses
-        const seisMesesAtras = new Date();
-        seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
-        const ultimosMesesAgg = await Acidente.aggregate([
-            {
-                $match: {
-                    dataAcidente: { $gte: seisMesesAtras },
-                },
-            },
-            {
-                $group: {
-                    _id: {
-                        ano: { $year: '$dataAcidente' },
-                        mes: { $month: '$dataAcidente' },
-                    },
-                    quantidade: { $sum: 1 },
-                },
-            },
-            {
-                $sort: { '_id.ano': 1, '_id.mes': 1 },
-            },
-        ]);
         // Gerar array completo dos últimos 6 meses (incluindo meses com 0 acidentes)
         const ultimosMeses = [];
         const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -121,13 +134,39 @@ export class AnalyticsService {
         const hoje = new Date();
         const limite = new Date();
         limite.setDate(limite.getDate() + dias);
-        const vacinacoes = await Vacinacao.find({
+        const vacinacoesBrutas = await Vacinacao.find({
             proximoDose: { $lte: limite },
         })
             .populate('trabalhadorId', 'nome cpf email empresa unidade')
             .sort({ proximoDose: 1 })
             .limit(20)
             .lean();
+        const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao) => {
+            if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
+                const doc = await Vacinacao.findById(vacinacao._id).select('trabalhadorId').lean();
+                if (doc && doc.trabalhadorId) {
+                    const identifier = doc.trabalhadorId.toString();
+                    let t = null;
+                    if (mongoose.Types.ObjectId.isValid(identifier)) {
+                        const [trabalhadorObj, userObj] = await Promise.all([
+                            Trabalhador.findById(identifier).select('nome cpf').lean(),
+                            User.findById(identifier).select('nome cpf').lean()
+                        ]);
+                        t = trabalhadorObj || userObj;
+                    }
+                    else {
+                        const [trabalhadorObj, userObj] = await Promise.all([
+                            Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean(),
+                            User.findOne({ cpf: identifier }).select('nome cpf').lean()
+                        ]);
+                        t = trabalhadorObj || userObj;
+                    }
+                    if (t)
+                        vacinacao.trabalhadorId = t;
+                }
+            }
+            return vacinacao;
+        }));
         return vacinacoes.map((vac) => {
             const dataVencimento = new Date(vac.proximoDose);
             const diffDias = Math.ceil((dataVencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
@@ -149,43 +188,71 @@ export class AnalyticsService {
      * Obtém últimos acidentes registrados
      */
     async obterUltimosAcidentes(limit = 5) {
-        const acidentes = await Acidente.find()
+        const acidentesBrutos = await Acidente.find()
             .populate('trabalhadorId', 'nome cpf empresa unidade')
             .sort({ dataAcidente: -1 })
             .limit(limit)
             .lean();
+        const acidentes = await Promise.all(acidentesBrutos.map(async (acidente) => {
+            if (!acidente.trabalhadorId || typeof acidente.trabalhadorId === 'string' || !acidente.trabalhadorId.nome) {
+                const doc = await Acidente.findById(acidente._id).select('trabalhadorId').lean();
+                if (doc && doc.trabalhadorId) {
+                    const identifier = doc.trabalhadorId.toString();
+                    let t = null;
+                    if (mongoose.Types.ObjectId.isValid(identifier)) {
+                        const [trabalhadorObj, userObj] = await Promise.all([
+                            Trabalhador.findById(identifier).select('nome cpf').lean(),
+                            User.findById(identifier).select('nome cpf').lean()
+                        ]);
+                        t = trabalhadorObj || userObj;
+                    }
+                    else {
+                        const [trabalhadorObj, userObj] = await Promise.all([
+                            Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean(),
+                            User.findOne({ cpf: identifier }).select('nome cpf').lean()
+                        ]);
+                        t = trabalhadorObj || userObj;
+                    }
+                    if (t)
+                        acidente.trabalhadorId = t;
+                }
+            }
+            return acidente;
+        }));
         return acidentes;
     }
     /**
      * Obtém dados completos para dashboard admin
      */
     async obterDadosDashboardAdmin() {
-        const kpis = await this.obterKPIs();
-        const dadosAcidentes = await this.obterDadosAcidentes();
-        const proximasVacinacoes = await this.obterProximasVacinacoes(30);
-        const ultimosAcidentes = await this.obterUltimosAcidentes(5);
-        // Trabalhadores por empresa
-        const trabalhadoresPorEmpresa = await User.aggregate([
-            { $match: { perfil: 'trabalhador', ativo: true } },
-            {
-                $lookup: {
-                    from: 'empresas',
-                    localField: 'empresa',
-                    foreignField: '_id',
-                    as: 'empresaData',
+        const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa] = await Promise.all([
+            this.obterKPIs(),
+            this.obterDadosAcidentes(),
+            this.obterProximasVacinacoes(30),
+            this.obterUltimosAcidentes(5),
+            Trabalhador.aggregate([
+                { $match: { empresa: { $exists: true, $ne: null } } },
+                {
+                    $lookup: {
+                        from: 'empresas',
+                        localField: 'empresa',
+                        foreignField: '_id',
+                        as: 'empresaData',
+                    },
                 },
-            },
-            {
-                $group: {
-                    _id: '$empresaData.razaoSocial',
-                    total: { $sum: 1 },
+                { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
+                {
+                    $group: {
+                        _id: '$empresaData.razaoSocial',
+                        total: { $sum: 1 },
+                    },
                 },
-            },
-            { $sort: { total: -1 } },
-            { $limit: 10 },
+                { $sort: { total: -1 } },
+                { $limit: 10 },
+            ])
         ]);
         const empresasFormatadas = trabalhadoresPorEmpresa.map((item) => ({
-            nome: item._id?.[0] || 'Sem empresa',
+            nome: item._id || 'Sem empresa',
             total: item.total,
         }));
         return {
@@ -237,6 +304,54 @@ export class AnalyticsService {
                 .lean(),
         };
     }
+    /**
+     * Obtém dados detalhados de monitoramento clínico
+     */
+    async obterMonitoramentoClinico() {
+        const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
+        const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
+        // Alertas Críticos (Exemplo: 3+ acidentes ou vacina vencida há 90 dias)
+        const tresMesesAtras = new Date();
+        tresMesesAtras.setDate(tresMesesAtras.getDate() - 90);
+        const trabalhadoresEmRisco = await Acidente.aggregate([
+            { $group: { _id: '$trabalhadorId', count: { $sum: 1 } } },
+            { $match: { count: { $gte: 2 } } },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+            { $unwind: '$user' },
+            { $project: { nome: '$user.nome', total: '$count' } }
+        ]);
+        const alertasCriticos = trabalhadoresEmRisco.map(t => ({
+            trabalhador: t.nome,
+            motivo: `${t.total} acidentes registrados`,
+            nivel: t.total > 3 ? 'alto' : 'medio'
+        }));
+        // Absenteísmo por mês
+        const absenteismoAgg = await Acidente.aggregate([
+            { $match: { diasAfastamento: { $gt: 0 } } },
+            {
+                $group: {
+                    _id: { $month: '$dataAcidente' },
+                    dias: { $sum: '$diasAfastamento' }
+                }
+            },
+            { $sort: { '_id': 1 } }
+        ]);
+        const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        const porMes = absenteismoAgg.map(item => ({
+            mes: mesesNomes[item._id - 1],
+            dias: item.dias
+        }));
+        return {
+            coberturaVacinal: {
+                total: totalTrabalhadores > 0 ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) : 0,
+                porEmpresa: [] // Implementar se necessário
+            },
+            absenteismo: {
+                totalDias: absenteismoAgg.reduce((acc, curr) => acc + curr.dias, 0),
+                porMes
+            },
+            alertasCriticos
+        };
+    }
 }
 export default new AnalyticsService();
-//# sourceMappingURL=AnalyticsService.js.map

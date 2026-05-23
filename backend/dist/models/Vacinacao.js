@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 const VacinacaoSchema = new Schema({
     trabalhadorId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Trabalhador',
         required: [true, 'Trabalhador é obrigatório'],
     },
     vacina: {
@@ -17,15 +17,10 @@ const VacinacaoSchema = new Schema({
     unidadeSaude: String,
     profissional: String,
     certificado: String,
-    dataCriacao: {
-        type: Date,
-        default: Date.now,
-    },
-    dataAtualizacao: {
-        type: Date,
-        default: Date.now,
-    },
-}, { collection: 'vacinacoes', timestamps: true });
+}, {
+    collection: 'vacinacoes',
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' }
+});
 VacinacaoSchema.index({ trabalhadorId: 1, dataVacinacao: -1 });
+VacinacaoSchema.index({ proximoDose: 1 });
 export default mongoose.model('Vacinacao', VacinacaoSchema);
-//# sourceMappingURL=Vacinacao.js.map

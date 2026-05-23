@@ -436,21 +436,22 @@ export async function seedCatalogos() {
   let criados = 0;
   let pulados = 0;
 
-  for (const catalogo of CATALOGO_DADOS) {
-    for (const item of catalogo.itens) {
-      try {
-        // Verifica se já existe
-        const existente = await Catalogo.findOne({
-          entidade: catalogo.entidade,
-          nome: item.nome,
-        });
+  try {
+    // Busca todos os catálogos existentes de uma vez
+    const existentes = await Catalogo.find({}, 'entidade nome').lean();
+    const existenteSet = new Set(existentes.map(item => `${item.entidade}:${item.nome}`));
 
-        if (existente) {
+    const itensParaInserir = [];
+
+    for (const catalogo of CATALOGO_DADOS) {
+      for (const item of catalogo.itens) {
+        const chave = `${catalogo.entidade}:${item.nome}`;
+        if (existenteSet.has(chave)) {
           pulados++;
           continue;
         }
 
-        await Catalogo.create({
+        itensParaInserir.push({
           entidade: catalogo.entidade,
           nome: item.nome,
           sigla: item.sigla || undefined,
@@ -458,13 +459,17 @@ export async function seedCatalogos() {
           ativo: true,
         });
         criados++;
-      } catch (error) {
-        console.error(`Erro ao criar ${catalogo.entidade} - ${item.nome}:`, error);
       }
     }
-  }
 
-  console.log(`✅ Seed concluído! ${criados} itens criados, ${pulados} pulados (já existiam).`);
+    if (itensParaInserir.length > 0) {
+      await Catalogo.insertMany(itensParaInserir);
+    }
+
+    console.log(`✅ Seed concluído! ${criados} itens criados, ${pulados} pulados (já existiam).`);
+  } catch (error) {
+    console.error('❌ Erro no seed de catálogos:', error);
+  }
 }
 
 // Se executado diretamente (não importado como módulo)

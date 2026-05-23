@@ -1,5 +1,6 @@
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import userService from '../services/UserService.js';
+import { logAction } from '../utils/auditLogger.js';
 /**
  * @desc    Listar usuários com paginação e filtros
  * @route   GET /api/usuarios
@@ -40,6 +41,10 @@ export const getUser = asyncHandler(async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const usuario = await userService.atualizar(id, req.body);
+    await logAction(req, 'UPDATE', 'User', id, {
+        email: usuario.email,
+        perfil: usuario.perfil
+    });
     res.status(200).json({
         status: 'success',
         data: { usuario },
@@ -53,9 +58,9 @@ export const updateUser = asyncHandler(async (req, res) => {
 export const deleteUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     await userService.deletar(id);
+    await logAction(req, 'DELETE', 'User', id);
     res.status(204).json({
         status: 'success',
         data: null,
     });
 });
-//# sourceMappingURL=userController.js.map
