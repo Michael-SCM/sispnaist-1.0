@@ -430,29 +430,55 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
-    // Buscar TODOS afastamentos e calcular dias no JavaScript (mais confiavel que aggregation)
+    // DEBUG: buscar todos afastamentos e logar
     const afastamentos = await TrabalhadorAfastamento.find({}).lean();
+    console.log('[DEBUG] Afastamentos encontrados:', afastamentos.length);
+    if (afastamentos.length > 0) {
+      console.log('[DEBUG] Sample dataInicio:', afastamentos[0].dataInicio);
+      console.log('[DEBUG] Sample dataFim:', afastamentos[0].dataFim);
+      console.log('[DEBUG] Sample dataRetorno:', afastamentos[0].dataRetorno);
+    }
 
     const porMesMap: Record<string, number> = {};
     let totalDias = 0;
 
     for (const a of afastamentos) {
-      const dataInicio = new Date(a.dataInicio);
-      const dataFim = a.dataFim ? new Date(a.dataFim) : (a.dataRetorno ? new Date(a.dataRetorno) : null);
-      if (!dataFim) continue;
+      // Usar toISOString para evitar problemas de timezone
+      const inicioISO = new Date(a.dataInicio).toISOString(); // "2026-04-20T03:00:00.000Z"
+      const fimISO = a.dataFim
+        ? new Date(a.dataFim).toISOString()
+        : a.dataRetorno
+          ? new Date(a.dataRetorno).toISOString()
+          : null;
 
-      // Calculo de dias (diferenca em ms / ms por dia)
-      const diffMs = dataFim.getTime() - dataInicio.getTime();
-      const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24));
-      if (diffDias <= 0) continue;
+      if (!fimISO) continue;
 
-      totalDias += diffDias;
+      const [inicioDate] = inicioISO.split('T');
+      const [fimDate] = fimISO.split('T');
 
-      const mes = dataInicio.getMonth() + 1; // 1-12
-      const ano = dataInicio.getFullYear();
+      // Parse YYYY-MM-DD
+      const [iy, im, id] = inicioDate.split('-').map(Number);
+      const [fy, fm, fd] = fimDate.split('-').map(Number);
+
+      // Calcular dias (dataFim - dataInicio em dias)
+      const diffDias = (new Date(fy, fm - 1, fd).getTime() - new Date(iy, im - 1, id).getTime()) / (1000 * 60 * 60 * 24);
+      const diasArredondado = Math.round(diffDias);
+
+      console.log(`[DEBUG] Registro: inicio=${inicioDate}, fim=${fimDate}, diffDias=${diffDias}, arredondado=${diasArredondado}`);
+
+      if (diasArredondado <= 0) continue;
+
+      totalDias += diasArredondado;
+
+      // Mes e ano do inicio
+      const mes = im; // 1-12
+      const ano = iy;
       const key = `${ano}-${mes}`;
-      porMesMap[key] = (porMesMap[key] || 0) + diffDias;
+      porMesMap[key] = (porMesMap[key] || 0) + diasArredondado;
     }
+
+    console.log('[DEBUG] porMesMap:', porMesMap);
+    console.log('[DEBUG] totalDias:', totalDias);
 
     // Gerar últimos 12 meses com labels
     const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -460,7 +486,7 @@ export class AnalyticsService {
     for (let i = 11; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
-      const mes = d.getMonth() + 1;
+      const mes = d.getMonth() + 1; // 1-12
       const ano = d.getFullYear();
       const key = `${ano}-${mes}`;
       const label = `${mesesNomes[mes - 1]}/${ano.toString().slice(2)}`;
