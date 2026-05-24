@@ -75,8 +75,8 @@ export class PdfService {
     res: Response,
     filtros: Record<string, any> = {}
   ): Promise<void> {
-    // Buscar trabalhadores do MongoDB
-    const trabalhadores = await Trabalhador.find(filtros).lean();
+    // Buscar trabalhadores do MongoDB (ordenado por nome alfabético)
+    const trabalhadores = await Trabalhador.find(filtros).sort({ nome: 1 }).lean();
 
     // Buscar empresas para resolver referências
     const empresaIds = [...new Set(trabalhadores
