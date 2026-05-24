@@ -430,60 +430,41 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
-    // Afastamentos com dias > 0 (incluindo ativo=false para diagnostico)
-    const absenteismoAgg = await TrabalhadorAfastamento.aggregate([
-      {
-        $addFields: {
-          dataFimCalc: { $ifNull: ['$dataFim', '$dataRetorno'] },
-          // Forcar conversao para Date para garantir que $subtract funcione
-          dataInicioDate: { $toDate: '$dataInicio' },
-          dataFimCalcDate: { $toDate: '$dataFimCalc' },
-        },
-      },
-      {
-        $addFields: {
-          // Calculo de dias via diferenca de milliseconds, depois normalizar
-          diffMs: { $subtract: ['$dataFimCalcDate', '$dataInicioDate'] },
-        },
-      },
-      {
-        $addFields: {
-          dias: {
-            $cond: {
-              if: { $gt: ['$diffMs', 0] },
-              then: {
-                $add: [
-                  { $floor: { $divide: ['$diffMs', 1000 * 60 * 60 * 24] } },
-                  // Se diffMs é multiplo de 1 dia exatamente, nao soma 1. Senao soma 1 (arredondamento para cima)
-                  { $cond: [{ $eq: [{ $mod: ['$diffMs', 1000 * 60 * 60 * 24] }, 0] }, 0, 1] }
-                ]
-              },
-              else: 0
-            }
-          },
-        },
-      },
-      { $match: { dias: { $gt: 0 } } },
-      {
-        $group: {
-          _id: { mes: { $month: '$dataInicio' }, ano: { $year: '$dataInicio' } },
-          dias: { $sum: '$dias' },
-        },
-      },
-      { $sort: { '_id.ano': 1, '_id.mes': 1 } },
-    ]);
+    // Buscar TODOS afastamentos e calcular dias no JavaScript (mais confiavel que aggregation)
+    const afastamentos = await TrabalhadorAfastamento.find({}).lean();
 
-    // Gera últimos 12 meses com dados ou zeros
+    const porMesMap: Record<string, number> = {};
+    let totalDias = 0;
+
+    for (const a of afastamentos) {
+      const dataInicio = new Date(a.dataInicio);
+      const dataFim = a.dataFim ? new Date(a.dataFim) : (a.dataRetorno ? new Date(a.dataRetorno) : null);
+      if (!dataFim) continue;
+
+      // Calculo de dias (diferenca em ms / ms por dia)
+      const diffMs = dataFim.getTime() - dataInicio.getTime();
+      const diffDias = Math.round(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDias <= 0) continue;
+
+      totalDias += diffDias;
+
+      const mes = dataInicio.getMonth() + 1; // 1-12
+      const ano = dataInicio.getFullYear();
+      const key = `${ano}-${mes}`;
+      porMesMap[key] = (porMesMap[key] || 0) + diffDias;
+    }
+
+    // Gerar últimos 12 meses com labels
     const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const porMes: { mes: string; dias: number }[] = [];
     for (let i = 11; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
-      const mesNum = d.getMonth() + 1;
-      const anoNum = d.getFullYear();
-      const label = `${mesesNomes[mesNum - 1]}/${anoNum.toString().slice(2)}`;
-      const encontrado = absenteismoAgg.find((a: any) => a._id.mes === mesNum && a._id.ano === anoNum);
-      porMes.push({ mes: label, dias: encontrado ? encontrado.dias : 0 });
+      const mes = d.getMonth() + 1;
+      const ano = d.getFullYear();
+      const key = `${ano}-${mes}`;
+      const label = `${mesesNomes[mes - 1]}/${ano.toString().slice(2)}`;
+      porMes.push({ mes: label, dias: porMesMap[key] || 0 });
     }
 
 
@@ -598,7 +579,7 @@ export class AnalyticsService {
         porEmpresa,
       },
       absenteismo: {
-        totalDias: absenteismoAgg.reduce((acc, curr) => acc + curr.dias, 0),
+        totalDias,
         porMes,
       },
       alertasCriticos,
