@@ -581,6 +581,27 @@ export class AnalyticsService {
       })
       .sort((a: any, b: any) => (b.cobertura ?? 0) - (a.cobertura ?? 0));
 
+    // Mes atual (este mes e mes anterior)
+    const now = new Date();
+    const mesAtual = now.getMonth() + 1;
+    const anoAtual = now.getFullYear();
+    const mesAnterior = mesAtual === 1 ? 12 : mesAtual - 1;
+    const anoAnterior = mesAtual === 1 ? anoAtual - 1 : anoAtual;
+
+    const chaveMesAtual = `${anoAtual}-${mesAtual}`;
+    const chaveMesAnterior = `${anoAnterior}-${mesAnterior}`;
+
+    const diasMesAtual = porMesMap[chaveMesAtual] || 0;
+    const diasMesAnterior = porMesMap[chaveMesAnterior] || 0;
+
+    // Variacao percentual
+    let variacao = 0;
+    if (diasMesAnterior > 0) {
+      variacao = Math.round(((diasMesAtual - diasMesAnterior) / diasMesAnterior) * 100);
+    } else if (diasMesAtual > 0) {
+      variacao = 100; // primeira vez com dados
+    }
+
     return {
       coberturaVacinal: {
         total: totalTrabalhadores > 0
@@ -589,7 +610,8 @@ export class AnalyticsService {
         porEmpresa,
       },
       absenteismo: {
-        totalDias,
+        totalDias: diasMesAtual,
+        variacao,
         porMes,
       },
       alertasCriticos,

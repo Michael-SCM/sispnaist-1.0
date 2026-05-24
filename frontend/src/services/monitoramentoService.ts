@@ -13,6 +13,7 @@ export interface MonitoramentoData {
   };
   absenteismo: {
     totalDias: number;
+    variacao: number;
     porMes: { mes: string; dias: number }[];
   };
   alertasCriticos: AlertaCritico[];

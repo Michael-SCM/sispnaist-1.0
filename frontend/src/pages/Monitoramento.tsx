@@ -103,9 +103,9 @@ const Monitoramento: React.FC = () => {
               <div>
                 <p className="text-slate-500 font-medium">Absenteísmo Total</p>
                 <h3 className="text-4xl font-black text-slate-900 mt-1">{data?.absenteismo.totalDias}</h3>
-                <p className="text-sm text-slate-400 mt-1 flex items-center gap-1">
-                  <TrendingDown className="text-green-500" size={14} />
-                  -4% em relação ao mês anterior
+                <p className={`text-sm mt-1 flex items-center gap-1 ${(data?.absenteismo.variacao ?? 0) >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                  {(data?.absenteismo.variacao ?? 0) >= 0 ? <TrendingDown className="rotate-180" size={14} /> : <TrendingDown size={14} />}
+                  {Math.abs(data?.absenteismo.variacao ?? 0)}% em relação ao mês anterior
                 </p>
               </div>
               <div className="p-3 bg-slate-50 text-slate-400 rounded-2xl">
