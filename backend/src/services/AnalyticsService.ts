@@ -430,32 +430,36 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
-    // Afastamentos ativos com dias > 0
+    // Afastamentos com dias > 0 (incluindo ativo=false para diagnostico)
     const absenteismoAgg = await TrabalhadorAfastamento.aggregate([
       {
-        $match: {
-          $or: [
-            { ativo: true },
-            { ativo: { $exists: false } },
-            { ativo: null }
-          ],
+        $addFields: {
+          dataFimCalc: { $ifNull: ['$dataFim', '$dataRetorno'] },
+          // Forcar conversao para Date para garantir que $subtract funcione
+          dataInicioDate: { $toDate: '$dataInicio' },
+          dataFimCalcDate: { $toDate: '$dataFimCalc' },
         },
       },
       {
         $addFields: {
-          dataFimCalc: { $ifNull: ['$dataFim', '$dataRetorno'] },
+          // Calculo de dias via diferenca de milliseconds, depois normalizar
+          diffMs: { $subtract: ['$dataFimCalcDate', '$dataInicioDate'] },
+        },
+      },
+      {
+        $addFields: {
           dias: {
-            $max: [
-              0,
-              {
-                $ceil: {
-                  $divide: [
-                    { $subtract: ['$dataFimCalc', '$dataInicio'] },
-                    1000 * 60 * 60 * 24,
-                  ],
-                },
+            $cond: {
+              if: { $gt: ['$diffMs', 0] },
+              then: {
+                $add: [
+                  { $floor: { $divide: ['$diffMs', 1000 * 60 * 60 * 24] } },
+                  // Se diffMs é multiplo de 1 dia exatamente, nao soma 1. Senao soma 1 (arredondamento para cima)
+                  { $cond: [{ $eq: [{ $mod: ['$diffMs', 1000 * 60 * 60 * 24] }, 0] }, 0, 1] }
+                ]
               },
-            ],
+              else: 0
+            }
           },
         },
       },
