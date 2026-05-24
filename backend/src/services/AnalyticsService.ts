@@ -430,21 +430,13 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
-    // DEBUG: buscar todos afastamentos e logar
     const afastamentos = await TrabalhadorAfastamento.find({}).lean();
-    console.log('[DEBUG] Afastamentos encontrados:', afastamentos.length);
-    if (afastamentos.length > 0) {
-      console.log('[DEBUG] Sample dataInicio:', afastamentos[0].dataInicio);
-      console.log('[DEBUG] Sample dataFim:', afastamentos[0].dataFim);
-      console.log('[DEBUG] Sample dataRetorno:', afastamentos[0].dataRetorno);
-    }
 
     const porMesMap: Record<string, number> = {};
     let totalDias = 0;
 
     for (const a of afastamentos) {
-      // Usar toISOString para evitar problemas de timezone
-      const inicioISO = new Date(a.dataInicio).toISOString(); // "2026-04-20T03:00:00.000Z"
+      const inicioISO = new Date(a.dataInicio).toISOString();
       const fimISO = a.dataFim
         ? new Date(a.dataFim).toISOString()
         : a.dataRetorno
@@ -456,29 +448,21 @@ export class AnalyticsService {
       const [inicioDate] = inicioISO.split('T');
       const [fimDate] = fimISO.split('T');
 
-      // Parse YYYY-MM-DD
       const [iy, im, id] = inicioDate.split('-').map(Number);
       const [fy, fm, fd] = fimDate.split('-').map(Number);
 
-      // Calcular dias (dataFim - dataInicio em dias)
       const diffDias = (new Date(fy, fm - 1, fd).getTime() - new Date(iy, im - 1, id).getTime()) / (1000 * 60 * 60 * 24);
       const diasArredondado = Math.round(diffDias);
-
-      console.log(`[DEBUG] Registro: inicio=${inicioDate}, fim=${fimDate}, diffDias=${diffDias}, arredondado=${diasArredondado}`);
 
       if (diasArredondado <= 0) continue;
 
       totalDias += diasArredondado;
 
-      // Mes e ano do inicio
-      const mes = im; // 1-12
+      const mes = im;
       const ano = iy;
       const key = `${ano}-${mes}`;
       porMesMap[key] = (porMesMap[key] || 0) + diasArredondado;
     }
-
-    console.log('[DEBUG] porMesMap:', porMesMap);
-    console.log('[DEBUG] totalDias:', totalDias);
 
     // Gerar últimos 12 meses com labels
     const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];

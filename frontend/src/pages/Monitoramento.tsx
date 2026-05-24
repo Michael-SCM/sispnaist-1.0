@@ -15,6 +15,7 @@ import { MainLayout } from '../layouts/MainLayout';
 import monitoramentoService, { MonitoramentoData } from '../services/monitoramentoService';
 import { KPICard } from '../components/KPICard';
 import { BarChartComponent } from '../components/charts';
+import { AbsenteismoChart } from '../components/charts/AbsenteismoChart';
 import toast from 'react-hot-toast';
 
 const Monitoramento: React.FC = () => {
@@ -131,9 +132,8 @@ const Monitoramento: React.FC = () => {
           {/* Absenteísmo Chart */}
           <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <h3 className="text-xl font-bold text-slate-800 mb-6">Tendência de Absenteísmo (Dias)</h3>
-            <BarChartComponent 
-              dados={data?.absenteismo.porMes || []} 
-              titulo=""
+            <AbsenteismoChart
+              dados={data?.absenteismo.porMes || []}
               cor="#6366f1"
             />
           </div>
