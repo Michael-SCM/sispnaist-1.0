@@ -377,9 +377,10 @@ export class PdfService {
         .font('Helvetica')
         .text(cargoSetor, 277, yPos + 6, { width: 116 });
 
-      // Empresa
-      const empresaNome = trab.empresa
-        ? empresaMap.get(trab.empresa)?.razaoSocial || '-'
+      // Empresa - converter ObjectId para string antes de buscar no Map
+      const empresaIdStr = trab.empresa ? trab.empresa.toString() : null;
+      const empresaNome = empresaIdStr
+        ? empresaMap.get(empresaIdStr)?.razaoSocial || '-'
         : '-';
 
       doc
