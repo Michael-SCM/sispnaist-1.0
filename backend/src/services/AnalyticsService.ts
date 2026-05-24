@@ -433,16 +433,121 @@ export class AnalyticsService {
       dias: item.dias
     }));
 
+    // Cobertura vacinal por empresa
+    // Definição: percentual de trabalhadores ativos (vinculo.situacao === 'Ativo') que possuem pelo menos 1 registro em Vacinacao,
+    // agrupado por empresa do Trabalhador.
+    const totalAtivosPorEmpresa = await Trabalhador.aggregate([
+      {
+        $match: {
+          'vinculo.situacao': 'Ativo',
+          empresa: { $exists: true, $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: '$empresa',
+          totalAtivos: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: 'empresas',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'empresaData',
+        },
+      },
+      { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          empresaId: '$_id',
+          totalAtivos: 1,
+          nomeEmpresa: '$empresaData.razaoSocial',
+        },
+      },
+    ]);
+
+    const ativosComVacinaPorEmpresa = await Vacinacao.aggregate([
+      {
+        $lookup: {
+          from: 'trabalhadores',
+          localField: 'trabalhadorId',
+          foreignField: '_id',
+          as: 'trabalhadorData',
+        },
+      },
+      { $unwind: '$trabalhadorData' },
+      {
+        $match: {
+          'trabalhadorData.vinculo.situacao': 'Ativo',
+          'trabalhadorData.empresa': { $exists: true, $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            empresa: '$trabalhadorData.empresa',
+            trabalhador: '$trabalhadorId',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id.empresa',
+          totalComVacina: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from: 'empresas',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'empresaData',
+        },
+      },
+      { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          empresaId: '$_id',
+          totalComVacina: 1,
+          nomeEmpresa: '$empresaData.razaoSocial',
+        },
+      },
+    ]);
+
+    const mapVacina = new Map<string, number>(
+      ativosComVacinaPorEmpresa.map((item: any) => [
+        item.empresaId?.toString?.() ?? String(item.empresaId),
+        item.totalComVacina,
+      ])
+    );
+
+    const porEmpresa = totalAtivosPorEmpresa
+      .map((item: any) => {
+        const empresaKey = item.empresaId?.toString?.() ?? String(item.empresaId);
+        const totalAtivos = item.totalAtivos ?? 0;
+        const totalComVacina = mapVacina.get(empresaKey) ?? 0;
+        const cobertura = totalAtivos > 0 ? Math.round((totalComVacina / totalAtivos) * 100) : 0;
+
+        return {
+          nome: item.nomeEmpresa || 'Sem empresa',
+          cobertura,
+        };
+      })
+      .sort((a: any, b: any) => (b.cobertura ?? 0) - (a.cobertura ?? 0));
+
     return {
       coberturaVacinal: {
-        total: totalTrabalhadores > 0 ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) : 0,
-        porEmpresa: [] // Implementar se necessário
+        total: totalTrabalhadores > 0
+          ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
+          : 0,
+        porEmpresa,
       },
       absenteismo: {
         totalDias: absenteismoAgg.reduce((acc, curr) => acc + curr.dias, 0),
-        porMes
+        porMes,
       },
-      alertasCriticos
+      alertasCriticos,
     };
   }
 }
