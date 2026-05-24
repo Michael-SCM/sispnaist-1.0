@@ -13,6 +13,8 @@ import MaterialBiologico from '../models/MaterialBiologico.js';
 import Catalogo from '../models/Catalogo.js';
 import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
 
+const DB_DEBUG = true;
+
 interface CatalogoMap {
   [key: string]: string[];
 }
@@ -328,7 +330,13 @@ async function seedAcidentesDoencasVacinacoes() {
             try {
               // Simula duração entre 3 e 45 dias
               const dias = clampInt(3 + Math.random() * 42, 3, 45);
-              const dataInicio = getRandomDate(240);
+
+              // Normaliza para início do dia para evitar ceil resultar em 0 por timezone/milisegundos
+              const rawInicio = getRandomDate(240);
+              const dataInicio = new Date(rawInicio);
+              dataInicio.setHours(0, 0, 0, 0);
+
+              // Garante sempre dataFimCalc - dataInicio >= 1 dia inteiro
               const dataRetorno = new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000);
 
               await TrabalhadorAfastamento.create({

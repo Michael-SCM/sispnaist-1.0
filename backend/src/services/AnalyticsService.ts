@@ -430,6 +430,7 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
+    // Afastamentos ativos com dias > 0
     const absenteismoAgg = await TrabalhadorAfastamento.aggregate([
       {
         $match: {
@@ -438,7 +439,6 @@ export class AnalyticsService {
       },
       {
         $addFields: {
-          // Se houver dataFim, usa; senão, usa dataRetorno como aproximação.
           dataFimCalc: { $ifNull: ['$dataFim', '$dataRetorno'] },
           dias: {
             $max: [
@@ -458,18 +458,25 @@ export class AnalyticsService {
       { $match: { dias: { $gt: 0 } } },
       {
         $group: {
-          _id: { $month: '$dataInicio' },
+          _id: { mes: { $month: '$dataInicio' }, ano: { $year: '$dataInicio' } },
           dias: { $sum: '$dias' },
         },
       },
-      { $sort: { '_id': 1 } },
+      { $sort: { '_id.ano': 1, '_id.mes': 1 } },
     ]);
 
+    // Gera últimos 12 meses com dados ou zeros
     const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const porMes = absenteismoAgg.map((item: any) => ({
-      mes: mesesNomes[item._id - 1],
-      dias: item.dias,
-    }));
+    const porMes: { mes: string; dias: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const mesNum = d.getMonth() + 1;
+      const anoNum = d.getFullYear();
+      const label = `${mesesNomes[mesNum - 1]}/${anoNum.toString().slice(2)}`;
+      const encontrado = absenteismoAgg.find((a: any) => a._id.mes === mesNum && a._id.ano === anoNum);
+      porMes.push({ mes: label, dias: encontrado ? encontrado.dias : 0 });
+    }
 
 
     // Cobertura vacinal por empresa
