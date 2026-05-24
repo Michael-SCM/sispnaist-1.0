@@ -3,9 +3,10 @@ import Acidente from '../models/Acidente.js';
 import Trabalhador from '../models/Trabalhador.js';
 import MaterialBiologico from '../models/MaterialBiologico.js';
 import { Parser } from 'json2csv';
+import pdfService from '../services/PdfService.js';
 
 class ExportController {
-  
+
   async exportarAcidentesCSV(req: Request, res: Response, next: NextFunction) {
     try {
       const acidentes = await Acidente.find()
@@ -35,7 +36,7 @@ class ExportController {
   async exportarTrabalhadoresCSV(req: Request, res: Response, next: NextFunction) {
     try {
       const trabalhadores = await Trabalhador.find().lean();
-      
+
       const fields = ['nome', 'cpf', 'email', 'dataNascimento', 'sexo', 'empresa', 'unidade'];
       const json2csv = new Parser({ fields });
       const csv = json2csv.parse(trabalhadores);
@@ -75,6 +76,26 @@ class ExportController {
       res.header('Content-Type', 'text/csv');
       res.attachment('material_biologico_sispnaist.csv');
       return res.send(csv);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Exporta trabalhadores em formato PDF corporativo
+   * Usa streaming direto para res para não estourar memória
+   */
+  async exportarTrabalhadoresPDF(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Extrair filtros da query string
+      const filtros: Record<string, any> = {};
+
+      if (req.query.nome) filtros.nome = { $regex: req.query.nome, $options: 'i' };
+      if (req.query.cpf) filtros.cpf = req.query.cpf;
+      if (req.query.matricula) filtros.matricula = req.query.matricula;
+      if (req.query.setor) filtros['trabalho.setor'] = { $regex: req.query.setor, $options: 'i' };
+
+      await pdfService.gerarPdfTrabalhadores(res, filtros);
     } catch (error) {
       next(error);
     }

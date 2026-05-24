@@ -1,5 +1,8 @@
 import api from './api';
 
+/**
+ * Extrai o filename do header Content-Disposition
+ */
 const getFilenameFromContentDisposition = (contentDisposition?: string | null): string | null => {
   if (!contentDisposition) return null;
 
@@ -11,6 +14,9 @@ const getFilenameFromContentDisposition = (contentDisposition?: string | null): 
   return match2?.[1] ?? null;
 };
 
+/**
+ * Dispara o download de um blob no navegador do usuário
+ */
 const downloadBlob = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -23,22 +29,39 @@ const downloadBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
+/**
+ * Exporta trabalhadores em formato PDF corporativo
+ * Faz fetch da rota /export/trabalhadores/pdf, recebe o blob de PDF
+ * e dispara o download no navegador
+ */
+export const exportTrabalhadores = async (): Promise<void> => {
+  try {
+    const response = await api.get('/export/trabalhadores/pdf', {
+      responseType: 'blob', // Importante: diz ao axios para tratar como binary
+    });
+
+    // Nome do arquivo do header Content-Disposition ou gerado automaticamente
+    const filename =
+      getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+      `relatorio_trabalhadores_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    // Dispara o download no navegador
+    downloadBlob(response.data, filename);
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error);
+    throw new Error('Falha ao gerar relatório PDF');
+  }
+};
+
+/**
+ * Exporta acidentes em formato CSV (mantido para compatibilidade)
+ */
 export const exportAcidentes = async (): Promise<void> => {
   const response = await api.get('/export/acidentes', { responseType: 'blob' });
 
   const filename =
     getFilenameFromContentDisposition(response.headers['content-disposition']) ??
-    `acidentes_${new Date().toISOString().split('T')[0]}`;
-
-  downloadBlob(response.data, filename);
-};
-
-export const exportTrabalhadores = async (): Promise<void> => {
-  const response = await api.get('/export/trabalhadores', { responseType: 'blob' });
-
-  const filename =
-    getFilenameFromContentDisposition(response.headers['content-disposition']) ??
-    `trabalhadores_${new Date().toISOString().split('T')[0]}`;
+    `acidentes_${new Date().toISOString().split('T')[0]}.csv`;
 
   downloadBlob(response.data, filename);
 };
