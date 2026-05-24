@@ -434,7 +434,11 @@ export class AnalyticsService {
     const absenteismoAgg = await TrabalhadorAfastamento.aggregate([
       {
         $match: {
-          ativo: true,
+          $or: [
+            { ativo: true },
+            { ativo: { $exists: false } },
+            { ativo: null }
+          ],
         },
       },
       {
