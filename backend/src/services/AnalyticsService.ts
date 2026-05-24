@@ -397,41 +397,80 @@ export class AnalyticsService {
     const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
     const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
     
-    // Alertas Críticos (Exemplo: 3+ acidentes ou vacina vencida há 90 dias)
-    const tresMesesAtras = new Date();
-    tresMesesAtras.setDate(tresMesesAtras.getDate() - 90);
+    // Alertas Críticos
+    // Regra atual: trabalhadores com >= 2 acidentes
+    // Ajuste: buscar nome na coleção 'trabalhadores' (não em 'users')
 
     const trabalhadoresEmRisco = await Acidente.aggregate([
-      { $group: { _id: '$trabalhadorId', count: { $sum: 1 } } },
+      {
+        $group: { _id: '$trabalhadorId', count: { $sum: 1 } },
+      },
       { $match: { count: { $gte: 2 } } },
-      { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
-      { $unwind: '$user' },
-      { $project: { nome: '$user.nome', total: '$count' } }
+      {
+        $lookup: {
+          from: 'trabalhadores',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'trabalhador',
+        },
+      },
+      { $unwind: '$trabalhador' },
+      { $project: { nome: '$trabalhador.nome', total: '$count' } },
     ]);
 
-    const alertasCriticos = trabalhadoresEmRisco.map(t => ({
+    const alertasCriticos = trabalhadoresEmRisco.map((t) => ({
       trabalhador: t.nome,
       motivo: `${t.total} acidentes registrados`,
-      nivel: t.total > 3 ? 'alto' : 'medio' as 'alto' | 'medio' | 'baixo'
+      nivel: (t.total > 3 ? 'alto' : 'medio') as 'alto' | 'medio' | 'baixo',
     }));
 
     // Absenteísmo por mês
-    const absenteismoAgg = await Acidente.aggregate([
-      { $match: { diasAfastamento: { $gt: 0 } } },
+    // Ajuste: o campo diasAfastamento não existe no modelo 'Acidente'.
+    // Então calculamos por afastamentos do trabalhador (TrabalhadorAfastamento), somando dias entre dataInicio e dataFim (ou dataRetorno).
+
+    const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
+
+    const absenteismoAgg = await TrabalhadorAfastamento.aggregate([
+      {
+        $match: {
+          ativo: true,
+        },
+      },
+      {
+        $addFields: {
+          // Se houver dataFim, usa; senão, usa dataRetorno como aproximação.
+          dataFimCalc: { $ifNull: ['$dataFim', '$dataRetorno'] },
+          dias: {
+            $max: [
+              0,
+              {
+                $ceil: {
+                  $divide: [
+                    { $subtract: ['$dataFimCalc', '$dataInicio'] },
+                    1000 * 60 * 60 * 24,
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+      { $match: { dias: { $gt: 0 } } },
       {
         $group: {
-          _id: { $month: '$dataAcidente' },
-          dias: { $sum: '$diasAfastamento' }
-        }
+          _id: { $month: '$dataInicio' },
+          dias: { $sum: '$dias' },
+        },
       },
-      { $sort: { '_id': 1 } }
+      { $sort: { '_id': 1 } },
     ]);
 
     const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const porMes = absenteismoAgg.map(item => ({
+    const porMes = absenteismoAgg.map((item: any) => ({
       mes: mesesNomes[item._id - 1],
-      dias: item.dias
+      dias: item.dias,
     }));
+
 
     // Cobertura vacinal por empresa
     // Definição: percentual de trabalhadores ativos (vinculo.situacao === 'Ativo') que possuem pelo menos 1 registro em Vacinacao,
