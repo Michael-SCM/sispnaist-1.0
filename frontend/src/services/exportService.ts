@@ -72,3 +72,23 @@ export const exportAcidentes = async (): Promise<void> => {
     throw new Error('Falha ao gerar relatório PDF de acidentes');
   }
 };
+
+/**
+ * Exporta doenças em formato PDF corporativo
+ */
+export const exportDoencas = async (): Promise<void> => {
+  try {
+    const response = await api.get('/export/doencas/pdf', {
+      responseType: 'blob',
+    });
+
+    const filename =
+      getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+      `relatorio_doencas_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    downloadBlob(response.data, filename);
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error);
+    throw new Error('Falha ao gerar relatório PDF de doenças');
+  }
+};

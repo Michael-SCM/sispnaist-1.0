@@ -4,6 +4,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 import Acidente from '../models/Acidente.js';
+import Doenca from '../models/Doenca.js';
 
 interface TrabalhadorData {
   _id: string;
@@ -188,8 +189,9 @@ export class PdfService {
 
     doc
       .fillColor('#bfdbfe')
-      .fontSize(18)
-      .text('🛡️', 525, 13);
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('SIS', 527, 18);
 
     y = 70;
 
@@ -642,8 +644,9 @@ export class PdfService {
 
     doc
       .fillColor('#bfdbfe')
-      .fontSize(18)
-      .text('🛡️', 525, 13);
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('SIS', 527, 18);
 
     y = 70;
 
@@ -885,6 +888,338 @@ export class PdfService {
       }
 
       y = renderizarLinha(ac, y, index);
+    });
+
+    return y;
+  }
+
+  /**
+   * Gera PDF de doenças
+   */
+  async gerarPdfDoencas(
+    res: Response,
+    filtros: Record<string, any> = {}
+  ): Promise<void> {
+    // Buscar doenças do MongoDB (ordenado por data de início decrescente)
+    const doencas = await Doenca.find(filtros)
+      .sort({ dataInicio: -1 })
+      .populate('trabalhadorId', 'nome cpf empresa')
+      .lean();
+
+    // Configurar resposta como PDF
+    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+    const filename = `relatorio_doencas_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // Criar PDF com streaming
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 0,
+      bufferPages: true,
+    });
+
+    // Stream direto para a resposta
+    doc.pipe(res);
+
+    let yPos = this.MARGEM_TOPO;
+
+    // ========== CABEÇALHO ==========
+    yPos = this.renderizarCabecalhoDoencas(doc, dataEmissao);
+
+    // ========== INTRODUÇÃO ==========
+    yPos = this.renderizarIntroducaoDoencas(doc, doencas.length, yPos);
+
+    // ========== TABELA ==========
+    yPos = this.renderizarTabelaDoencas(doc, doencas, yPos);
+
+    // ========== RODAPÉ ==========
+    this.renderizarRodape(doc);
+
+    // Finalizar PDF
+    doc.end();
+  }
+
+  /**
+   * Renderiza o cabeçalho específico para doenças
+   */
+  private renderizarCabecalhoDoencas(
+    doc: PDFKit.PDFDocument,
+    dataEmissao: string
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = this.MARGEM_TOPO;
+
+    // Barra superior azul
+    doc
+      .fillColor(this.COR_PRIMARIA)
+      .rect(0, 0, this.LARGURA_PAGINA, 55)
+      .fill();
+
+    // Nome do sistema
+    doc
+      .fillColor('#ffffff')
+      .fontSize(22)
+      .font('Helvetica-Bold')
+      .text('SISPNAIST', x + 10, 15);
+
+    // Subtítulo
+    doc
+      .fillColor('#bfdbfe')
+      .fontSize(9)
+      .font('Helvetica')
+      .text('Sistema de Gerenciamento de Segurança e Saúde do Trabalhador', x + 10, 38);
+
+    // Logo placeholder
+    doc
+      .fillColor('#ffffff')
+      .rect(515, 10, 40, 35)
+      .strokeColor('#bfdbfe')
+      .lineWidth(1)
+      .stroke();
+
+    doc
+      .fillColor('#bfdbfe')
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('SIS', 527, 18);
+
+    y = 70;
+
+    // Linha separadora
+    doc
+      .moveTo(x, y)
+      .lineTo(x + this.larguraUtil, y)
+      .lineWidth(1)
+      .strokeColor(this.COR_BORDA)
+      .stroke();
+
+    y += 12;
+
+    // Título do relatório
+    doc
+      .fillColor(this.COR_TEXTO)
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('Relatório de Doenças Laborais', x, y);
+
+    y += 16;
+
+    // Data de emissão
+    doc
+      .fillColor(this.COR_TEXTO_CLARO)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(`Emitido em: ${dataEmissao}`, x, y);
+
+    y += 20;
+
+    return y;
+  }
+
+  /**
+   * Renderiza a introdução para doenças
+   */
+  private renderizarIntroducaoDoencas(
+    doc: PDFKit.PDFDocument,
+    totalRegistros: number,
+    yInicio: number
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    // Caixa de indicadores
+    doc
+      .fillColor(this.COR_SECUNDARIA)
+      .rect(x, y, this.larguraUtil, 35)
+      .fill();
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(9)
+      .font('Helvetica-Bold')
+      .text('TOTAL DE REGISTROS ENCONTRADOS', x + 10, y + 8);
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .text(`${totalRegistros} doenças`, x + 10, y + 18);
+
+    y += 45;
+
+    // Texto introdutório
+    doc
+      .fillColor(this.COR_TEXTO)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(
+        'Este relatório apresenta a relação completa de doenças laborais registradas no sistema SISPNAIST. ' +
+        'Os dados foram extraídos diretamente da base de dados e podem ser utilizados para fins de gestão, ' +
+        'auditoria e conformidade com as exigências regulamentadoras de segurança e saúde ocupacional.',
+        x,
+        y,
+        {
+          align: 'justify',
+          width: this.larguraUtil,
+          lineGap: 2,
+        }
+      );
+
+    const hTexto = doc.heightOfString(
+      'Este relatório apresenta a relação completa de doenças laborais registradas no sistema SISPNAIST. ' +
+      'Os dados foram extraídos diretamente da base de dados e podem ser utilizados para fins de gestão, ' +
+      'auditoria e conformidade com as exigências regulamentadoras de segurança e saúde ocupacional.',
+      { align: 'justify', width: this.larguraUtil, lineGap: 2 }
+    );
+
+    y += hTexto + 15;
+
+    return y;
+  }
+
+  /**
+   * Renderiza a tabela de doenças
+   */
+  private renderizarTabelaDoencas(
+    doc: PDFKit.PDFDocument,
+    doencas: any[],
+    yInicio: number
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    if (doencas.length === 0) {
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(11)
+        .font('Helvetica-Bold')
+        .text('Nenhuma doença encontrada.', x, y);
+      return y;
+    }
+
+    // Definição das colunas
+    const colunas = [
+      { x: 50, largura: 60, titulo: 'Data Início' },
+      { x: 110, largura: 55, titulo: 'Data Fim' },
+      { x: 165, largura: 100, titulo: 'Trabalhador' },
+      { x: 265, largura: 80, titulo: 'Cód. Doença' },
+      { x: 345, largura: 120, titulo: 'Nome da Doença' },
+      { x: 465, largura: 80, titulo: 'Status' },
+    ];
+
+    // ===== CABEÇALHO DA TABELA =====
+    const renderizarCabecalhoTabela = (yPos: number) => {
+      doc
+        .fillColor(this.COR_PRIMARIA)
+        .rect(x, yPos, this.larguraUtil, this.ALTURA_CABECALHO_TABELA)
+        .fill();
+
+      doc
+        .fillColor('#ffffff')
+        .fontSize(7)
+        .font('Helvetica-Bold');
+
+      colunas.forEach(col => {
+        doc.text(col.titulo, col.x, yPos + 7, { width: col.largura });
+      });
+
+      return yPos + this.ALTURA_CABECALHO_TABELA;
+    };
+
+    // ===== LINHA DE DADOS =====
+    const renderizarLinha = (
+      dc: any,
+      yPos: number,
+      index: number
+    ): number => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+
+      // Fundo da linha
+      doc
+        .fillColor(corFundo)
+        .rect(x, yPos, this.larguraUtil, this.ALTURA_LINHA)
+        .fill();
+
+      // Data Início
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(this.formatarData(dc.dataInicio), 52, yPos + 6, { width: 56 });
+
+      // Data Fim
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(dc.dataFim ? this.formatarData(dc.dataFim) : '-', 112, yPos + 6, { width: 51 });
+
+      // Trabalhador
+      const nomeTrab = dc.trabalhadorId?.nome || '-';
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica-Bold')
+        .text(nomeTrab, 167, yPos + 6, { width: 96 });
+
+      // Código da Doença
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(dc.codigoDoenca || '-', 267, yPos + 6, { width: 76 });
+
+      // Nome da Doença
+      const nomeDoenca = dc.nomeDoenca ? dc.nomeDoenca.substring(0, 20) + (dc.nomeDoenca.length > 20 ? '...' : '') : '-';
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(nomeDoenca, 347, yPos + 6, { width: 116 });
+
+      // Status (Ativo/Inativo)
+      const status = dc.ativo ? 'Ativo' : 'Inativo';
+      const corStatus = dc.ativo ? '#059669' : '#dc2626';
+
+      doc
+        .fillColor(corStatus)
+        .fontSize(7)
+        .font('Helvetica-Bold')
+        .text(status, 467, yPos + 6, { width: 76 });
+
+      // Linha divisória inferior
+      doc
+        .moveTo(x, yPos + this.ALTURA_LINHA)
+        .lineTo(x + this.larguraUtil, yPos + this.ALTURA_LINHA)
+        .lineWidth(0.5)
+        .strokeColor(this.COR_BORDA)
+        .stroke();
+
+      return yPos + this.ALTURA_LINHA;
+    };
+
+    // Renderizar cabeçalho inicial
+    y = renderizarCabecalhoTabela(y);
+
+    // Renderizar linhas
+    doencas.forEach((dc, index) => {
+      // Verificar se precisa de nova página
+      const espacoDisponivel = this.yMax - y;
+      const espacoNecessario = this.ALTURA_LINHA + 10;
+
+      if (espacoDisponivel < espacoNecessario) {
+        doc.addPage();
+        y = this.MARGEM_TOPO + 30;
+        y = renderizarCabecalhoTabela(y);
+      }
+
+      y = renderizarLinha(dc, y, index);
     });
 
     return y;

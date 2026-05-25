@@ -4,21 +4,23 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { doencaService } from '../../services/doencaService.js';
 import { IDoenca } from '../../types/index.js';
-import { 
-  HeartPulse, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
-  Filter, 
-  Calendar, 
-  Stethoscope, 
+import {
+  HeartPulse,
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Filter,
+  Calendar,
+  Stethoscope,
   Activity,
   ChevronRight,
-  ClipboardList
+  ClipboardList,
+  Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
+import { exportDoencas } from '../../services/exportService.js';
 
 
 
@@ -104,13 +106,29 @@ export const ListaDoencas: React.FC = () => {
               <p className="text-slate-500 font-medium">Gestão de diagnósticos e monitoramento de saúde</p>
             </div>
           </div>
-          <button
-            onClick={() => navigate('/doencas/novo')}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Nova Doença
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  await exportDoencas();
+                } catch (e) {
+                  toast.error('Erro ao exportar doenças');
+                  console.error(e);
+                }
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"
+            >
+              <Download size={18} />
+              Exportar
+            </button>
+            <button
+              onClick={() => navigate('/doencas/novo')}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Nova Doença
+            </button>
+          </div>
         </div>
 
         {/* Search & Filters Toggle */}

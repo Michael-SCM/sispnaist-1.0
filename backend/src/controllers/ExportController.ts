@@ -116,6 +116,21 @@ class ExportController {
       next(error);
     }
   }
+
+  /**
+   * Exporta doenças em formato PDF corporativo
+   */
+  async exportarDoencasPDF(req: Request, res: Response, next: NextFunction) {
+    try {
+      const filtros: Record<string, any> = {};
+
+      if (req.query.ativo !== undefined) filtros.ativo = req.query.ativo === 'true';
+
+      await pdfService.gerarPdfDoencas(res, filtros);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new ExportController();
