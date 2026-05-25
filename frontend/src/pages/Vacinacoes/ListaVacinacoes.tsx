@@ -3,21 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useVacinacaoStore } from '../../store/vacinacaoStore.js';
 import { vacinacaoService } from '../../services/vacinacaoService.js';
-import { 
-  Syringe, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search, 
-  Filter, 
-  Calendar, 
-  Building2, 
+import {
+  Syringe,
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  Filter,
+  Calendar,
+  Building2,
   UserCircle,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
+import { exportVacinacoes } from '../../services/exportService.js';
 
 
 export const ListaVacinacoes: React.FC = () => {
@@ -103,13 +105,29 @@ export const ListaVacinacoes: React.FC = () => {
               <p className="text-slate-500 font-medium">Controle de imunização e doses preventivas</p>
             </div>
           </div>
-          <button
-            onClick={() => navigate('/vacinacoes/novo')}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Nova Vacinação
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={async () => {
+                try {
+                  await exportVacinacoes();
+                } catch (e) {
+                  toast.error('Erro ao exportar vacinações');
+                  console.error(e);
+                }
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"
+            >
+              <Download size={18} />
+              Exportar
+            </button>
+            <button
+              onClick={() => navigate('/vacinacoes/novo')}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Nova Vacinação
+            </button>
+          </div>
         </div>
 
         {/* Search & Filters */}

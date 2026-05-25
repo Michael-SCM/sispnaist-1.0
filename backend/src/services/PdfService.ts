@@ -5,6 +5,7 @@ import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
+import Vacinacao from '../models/Vacinacao.js';
 
 interface TrabalhadorData {
   _id: string;
@@ -1220,6 +1221,334 @@ export class PdfService {
       }
 
       y = renderizarLinha(dc, y, index);
+    });
+
+    return y;
+  }
+
+  /**
+   * Gera PDF de vacinações
+   */
+  async gerarPdfVacinacoes(
+    res: Response,
+    filtros: Record<string, any> = {}
+  ): Promise<void> {
+    // Buscar vacinações do MongoDB (ordenado por data decrescente)
+    const vacinacoes = await Vacinacao.find(filtros)
+      .sort({ dataVacinacao: -1 })
+      .populate('trabalhadorId', 'nome cpf')
+      .lean();
+
+    // Configurar resposta como PDF
+    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+    const filename = `relatorio_vacinacoes_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // Criar PDF com streaming
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 0,
+      bufferPages: true,
+    });
+
+    // Stream direto para a resposta
+    doc.pipe(res);
+
+    let yPos = this.MARGEM_TOPO;
+
+    // ========== CABEÇALHO ==========
+    yPos = this.renderizarCabecalhoVacinacoes(doc, dataEmissao);
+
+    // ========== INTRODUÇÃO ==========
+    yPos = this.renderizarIntroducaoVacinacoes(doc, vacinacoes.length, yPos);
+
+    // ========== TABELA ==========
+    yPos = this.renderizarTabelaVacinacoes(doc, vacinacoes, yPos);
+
+    // ========== RODAPÉ ==========
+    this.renderizarRodape(doc);
+
+    // Finalizar PDF
+    doc.end();
+  }
+
+  /**
+   * Renderiza o cabeçalho específico para vacinações
+   */
+  private renderizarCabecalhoVacinacoes(
+    doc: PDFKit.PDFDocument,
+    dataEmissao: string
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = this.MARGEM_TOPO;
+
+    // Barra superior azul
+    doc
+      .fillColor(this.COR_PRIMARIA)
+      .rect(0, 0, this.LARGURA_PAGINA, 55)
+      .fill();
+
+    // Nome do sistema
+    doc
+      .fillColor('#ffffff')
+      .fontSize(22)
+      .font('Helvetica-Bold')
+      .text('SISPNAIST', x + 10, 15);
+
+    // Subtítulo
+    doc
+      .fillColor('#bfdbfe')
+      .fontSize(9)
+      .font('Helvetica')
+      .text('Sistema de Gerenciamento de Segurança e Saúde do Trabalhador', x + 10, 38);
+
+    // Logo placeholder
+    doc
+      .fillColor('#ffffff')
+      .rect(515, 10, 40, 35)
+      .strokeColor('#bfdbfe')
+      .lineWidth(1)
+      .stroke();
+
+    doc
+      .fillColor('#bfdbfe')
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('SIS', 527, 18);
+
+    y = 70;
+
+    // Linha separadora
+    doc
+      .moveTo(x, y)
+      .lineTo(x + this.larguraUtil, y)
+      .lineWidth(1)
+      .strokeColor(this.COR_BORDA)
+      .stroke();
+
+    y += 12;
+
+    // Título do relatório
+    doc
+      .fillColor(this.COR_TEXTO)
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('Relatório de Vacinações', x, y);
+
+    y += 16;
+
+    // Data de emissão
+    doc
+      .fillColor(this.COR_TEXTO_CLARO)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(`Emitido em: ${dataEmissao}`, x, y);
+
+    y += 20;
+
+    return y;
+  }
+
+  /**
+   * Renderiza a introdução para vacinações
+   */
+  private renderizarIntroducaoVacinacoes(
+    doc: PDFKit.PDFDocument,
+    totalRegistros: number,
+    yInicio: number
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    // Caixa de indicadores
+    doc
+      .fillColor(this.COR_SECUNDARIA)
+      .rect(x, y, this.larguraUtil, 35)
+      .fill();
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(9)
+      .font('Helvetica-Bold')
+      .text('TOTAL DE REGISTROS ENCONTRADOS', x + 10, y + 8);
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(18)
+      .font('Helvetica-Bold')
+      .text(`${totalRegistros} vacinações`, x + 10, y + 18);
+
+    y += 45;
+
+    // Texto introdutório
+    doc
+      .fillColor(this.COR_TEXTO)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(
+        'Este relatório apresenta a relação completa de vacinações registradas no sistema SISPNAIST. ' +
+        'Os dados foram extraídos diretamente da base de dados e podem ser utilizados para fins de gestão, ' +
+        'auditoria e conformidade com as exigências regulamentadoras de segurança e saúde ocupacional.',
+        x,
+        y,
+        {
+          align: 'justify',
+          width: this.larguraUtil,
+          lineGap: 2,
+        }
+      );
+
+    const hTexto = doc.heightOfString(
+      'Este relatório apresenta a relação completa de vacinações registradas no sistema SISPNAIST. ' +
+      'Os dados foram extraídos diretamente da base de dados e podem ser utilizados para fins de gestão, ' +
+      'auditoria e conformidade com as exigências regulamentadoras de segurança e saúde ocupacional.',
+      { align: 'justify', width: this.larguraUtil, lineGap: 2 }
+    );
+
+    y += hTexto + 15;
+
+    return y;
+  }
+
+  /**
+   * Renderiza a tabela de vacinações
+   */
+  private renderizarTabelaVacinacoes(
+    doc: PDFKit.PDFDocument,
+    vacinacoes: any[],
+    yInicio: number
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    if (vacinacoes.length === 0) {
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(11)
+        .font('Helvetica-Bold')
+        .text('Nenhuma vacinação encontrada.', x, y);
+      return y;
+    }
+
+    // Definição das colunas
+    const colunas = [
+      { x: 50, largura: 70, titulo: 'Data Vacina' },
+      { x: 120, largura: 100, titulo: 'Trabalhador' },
+      { x: 220, largura: 100, titulo: 'Vacina' },
+      { x: 320, largura: 70, titulo: 'Próx. Dose' },
+      { x: 390, largura: 100, titulo: 'Unidade Saúde' },
+      { x: 490, largura: 60, titulo: 'Profissional' },
+    ];
+
+    // ===== CABEÇALHO DA TABELA =====
+    const renderizarCabecalhoTabela = (yPos: number) => {
+      doc
+        .fillColor(this.COR_PRIMARIA)
+        .rect(x, yPos, this.larguraUtil, this.ALTURA_CABECALHO_TABELA)
+        .fill();
+
+      doc
+        .fillColor('#ffffff')
+        .fontSize(7)
+        .font('Helvetica-Bold');
+
+      colunas.forEach(col => {
+        doc.text(col.titulo, col.x, yPos + 7, { width: col.largura });
+      });
+
+      return yPos + this.ALTURA_CABECALHO_TABELA;
+    };
+
+    // ===== LINHA DE DADOS =====
+    const renderizarLinha = (
+      vac: any,
+      yPos: number,
+      index: number
+    ): number => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+
+      // Fundo da linha
+      doc
+        .fillColor(corFundo)
+        .rect(x, yPos, this.larguraUtil, this.ALTURA_LINHA)
+        .fill();
+
+      // Data Vacinação
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(this.formatarData(vac.dataVacinacao), 52, yPos + 6, { width: 66 });
+
+      // Trabalhador
+      const nomeTrab = vac.trabalhadorId?.nome || '-';
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica-Bold')
+        .text(nomeTrab, 122, yPos + 6, { width: 96 });
+
+      // Vacina
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(vac.vacina || '-', 222, yPos + 6, { width: 96 });
+
+      // Próxima Dose
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(7)
+        .font('Helvetica')
+        .text(vac.proximoDose ? this.formatarData(vac.proximoDose) : '-', 322, yPos + 6, { width: 66 });
+
+      // Unidade de Saúde
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(6)
+        .font('Helvetica')
+        .text(vac.unidadeSaude || '-', 392, yPos + 6, { width: 96 });
+
+      // Profissional
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(6)
+        .font('Helvetica')
+        .text(vac.profissional || '-', 492, yPos + 6, { width: 56 });
+
+      // Linha divisória inferior
+      doc
+        .moveTo(x, yPos + this.ALTURA_LINHA)
+        .lineTo(x + this.larguraUtil, yPos + this.ALTURA_LINHA)
+        .lineWidth(0.5)
+        .strokeColor(this.COR_BORDA)
+        .stroke();
+
+      return yPos + this.ALTURA_LINHA;
+    };
+
+    // Renderizar cabeçalho inicial
+    y = renderizarCabecalhoTabela(y);
+
+    // Renderizar linhas
+    vacinacoes.forEach((vac, index) => {
+      // Verificar se precisa de nova página
+      const espacoDisponivel = this.yMax - y;
+      const espacoNecessario = this.ALTURA_LINHA + 10;
+
+      if (espacoDisponivel < espacoNecessario) {
+        doc.addPage();
+        y = this.MARGEM_TOPO + 30;
+        y = renderizarCabecalhoTabela(y);
+      }
+
+      y = renderizarLinha(vac, y, index);
     });
 
     return y;

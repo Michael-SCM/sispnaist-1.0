@@ -131,6 +131,17 @@ class ExportController {
       next(error);
     }
   }
+
+  /**
+   * Exporta vacinações em formato PDF corporativo
+   */
+  async exportarVacinacoesPDF(req: Request, res: Response, next: NextFunction) {
+    try {
+      await pdfService.gerarPdfVacinacoes(res, {});
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new ExportController();
