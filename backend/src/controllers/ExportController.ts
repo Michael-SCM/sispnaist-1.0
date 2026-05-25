@@ -4,6 +4,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import MaterialBiologico from '../models/MaterialBiologico.js';
 import { Parser } from 'json2csv';
 import pdfService from '../services/PdfService.js';
+import analyticsService from '../services/AnalyticsService.js';
 
 class ExportController {
 
@@ -138,6 +139,18 @@ class ExportController {
   async exportarVacinacoesPDF(req: Request, res: Response, next: NextFunction) {
     try {
       await pdfService.gerarPdfVacinacoes(res, {});
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Exporta monitoramento clínico em formato PDF corporativo
+   */
+  async exportarMonitoramentoPDF(req: Request, res: Response, next: NextFunction) {
+    try {
+      const monitoramento = await analyticsService.obterMonitoramentoClinico();
+      await pdfService.gerarPdfMonitoramento(res, monitoramento);
     } catch (error) {
       next(error);
     }

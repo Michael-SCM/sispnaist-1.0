@@ -71,6 +71,23 @@ export class PdfService {
     return this.ALTURA_PAGINA - this.MARGEM_INFERIOR;
   }
 
+  // Retorna a data e hora atual no fuso de Brasília (UTC-3)
+  private getDataBrasilia(): Date {
+    const agora = new Date();
+    const brasiliaOffset = -3 * 60; // UTC-3 em minutos
+    const offsetBrasilia = agora.getTimezoneOffset() + brasiliaOffset;
+    return new Date(agora.getTime() + offsetBrasilia * 60 * 1000);
+  }
+
+  // Retorna a data formatada em português (Brasil)
+  private formatarDataBrasil(date: Date): string {
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+
   /**
    * Gera e faz stream do PDF diretamente para a resposta
    */
@@ -94,12 +111,8 @@ export class PdfService {
     );
 
     // Configurar resposta como PDF
-    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-    const filename = `relatorio_trabalhadores_${new Date().toISOString().split('T')[0]}.pdf`;
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `relatorio_trabalhadores_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -554,6 +567,27 @@ export class PdfService {
   }
 
   /**
+   * Retorna a data atual no fuso horário de Brasília (America/Sao_Paulo)
+   * Ajuste: UTC-3 (horário de Brasília)
+   */
+  private getDataAtualBrasil(): Date {
+    const now = new Date();
+    // Subtquir 3 horas para obter o horário de Brasília (UTC-3)
+    return new Date(now.getTime() - 3 * 60 * 60 * 1000);
+  }
+
+  /**
+   * Retorna a data formatada ISO (YYYY-MM-DD) no fuso de Brasília
+   */
+  private getDataBrasilISO(): string {
+    const dataBrasil = this.getDataAtualBrasil();
+    const ano = dataBrasil.getUTCFullYear();
+    const mes = String(dataBrasil.getUTCMonth() + 1).padStart(2, '0');
+    const dia = String(dataBrasil.getUTCDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  /**
    * Gera PDF de acidentes
    */
   async gerarPdfAcidentes(
@@ -567,12 +601,8 @@ export class PdfService {
       .lean();
 
     // Configurar resposta como PDF
-    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-    const filename = `relatorio_acidentes_${new Date().toISOString().split('T')[0]}.pdf`;
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `relatorio_acidentes_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -908,12 +938,8 @@ export class PdfService {
       .lean();
 
     // Configurar resposta como PDF
-    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-    const filename = `relatorio_doencas_${new Date().toISOString().split('T')[0]}.pdf`;
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `relatorio_doencas_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -1240,12 +1266,8 @@ export class PdfService {
       .lean();
 
     // Configurar resposta como PDF
-    const dataEmissao = new Date().toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-    const filename = `relatorio_vacinacoes_${new Date().toISOString().split('T')[0]}.pdf`;
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `relatorio_vacinacoes_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -1550,6 +1572,211 @@ export class PdfService {
 
       y = renderizarLinha(vac, y, index);
     });
+
+    return y;
+  }
+
+  /**
+   * Gera PDF de monitoramento clínico
+   */
+  async gerarPdfMonitoramento(
+    res: Response,
+    dados: {
+      coberturaVacinal: { total: number; porEmpresa: { nome: string; cobertura: number }[] };
+      absenteismo: { totalDias: number; variacao: number; porMes: { mes: string; dias: number }[] };
+      alertasCriticos: { trabalhador: string; motivo: string; nivel: string }[];
+    }
+  ): Promise<void> {
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `relatorio_monitoramento_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 0,
+      bufferPages: true,
+    });
+
+    doc.pipe(res);
+
+    let yPos = this.MARGEM_TOPO;
+
+    // ========== CABEÇALHO ==========
+    yPos = this.renderizarCabecalhoMonitoramento(doc, dataEmissao);
+
+    // ========== KPIs ==========
+    yPos = this.renderizarKPIsMonitoramento(doc, dados, yPos);
+
+    // ========== TABELA COBERTURA VACINAL ==========
+    yPos = this.renderizarTabelaCoberturaVacinal(doc, dados.coberturaVacinal.porEmpresa, yPos);
+
+    // ========== TABELA ABSENTEÍSMO POR MÊS ==========
+    yPos = this.renderizarTabelaAbsenteismo(doc, dados.absenteismo.porMes, yPos);
+
+    // ========== ALERTAS CRÍTICOS ==========
+    yPos = this.renderizarAlertasCriticos(doc, dados.alertasCriticos, yPos);
+
+    // ========== RODAPÉ ==========
+    this.renderizarRodape(doc);
+
+    doc.end();
+  }
+
+  private renderizarCabecalhoMonitoramento(doc: PDFKit.PDFDocument, dataEmissao: string): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = this.MARGEM_TOPO;
+
+    doc.fillColor(this.COR_PRIMARIA).rect(0, 0, this.LARGURA_PAGINA, 55).fill();
+    doc.fillColor('#ffffff').fontSize(22).font('Helvetica-Bold').text('SISPNAIST', x + 10, 15);
+    doc.fillColor('#bfdbfe').fontSize(9).font('Helvetica').text('Sistema de Gerenciamento de Segurança e Saúde do Trabalhador', x + 10, 38);
+    doc.fillColor('#ffffff').rect(515, 10, 40, 35).strokeColor('#bfdbfe').lineWidth(1).stroke();
+    doc.fillColor('#bfdbfe').fontSize(14).font('Helvetica-Bold').text('SIS', 527, 18);
+
+    y = 70;
+    doc.moveTo(x, y).lineTo(x + this.larguraUtil, y).lineWidth(1).strokeColor(this.COR_BORDA).stroke();
+
+    y += 12;
+    doc.fillColor(this.COR_TEXTO).fontSize(14).font('Helvetica-Bold').text('Relatório de Monitoramento Clínico Avançado', x, y);
+
+    y += 16;
+    doc.fillColor(this.COR_TEXTO_CLARO).fontSize(9).font('Helvetica').text(`Emitido em: ${dataEmissao}`, x, y);
+
+    y += 20;
+    return y;
+  }
+
+  private renderizarKPIsMonitoramento(doc: PDFKit.PDFDocument, dados: any, yInicio: number): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+    const larguraBox = (this.larguraUtil - 20) / 3;
+
+    // Box Cobertura Vacinal
+    doc.fillColor(this.COR_PRIMARIA).rect(x, y, larguraBox, 60).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold').text('COBERTURA VACINAL', x + 10, y + 10);
+    doc.fillColor('#ffffff').fontSize(22).font('Helvetica-Bold').text(`${dados.coberturaVacinal.total}%`, x + 10, y + 25);
+
+    // Box Absenteísmo
+    doc.fillColor(this.COR_SECUNDARIA).rect(x + larguraBox + 10, y, larguraBox, 60).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold').text('ABSENTEÍSMO TOTAL', x + larguraBox + 20, y + 10);
+    doc.fillColor('#ffffff').fontSize(22).font('Helvetica-Bold').text(`${dados.absenteismo.totalDias} dias`, x + larguraBox + 20, y + 25);
+
+    // Box Alertas
+    const corAlertas = dados.alertasCriticos.length > 0 ? '#dc2626' : '#059669';
+    doc.fillColor(corAlertas).rect(x + (larguraBox + 10) * 2, y, larguraBox, 60).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold').text('ALERTAS CRÍTICOS', x + (larguraBox + 10) * 2 + 10, y + 10);
+    doc.fillColor('#ffffff').fontSize(22).font('Helvetica-Bold').text(`${dados.alertasCriticos.length}`, x + (larguraBox + 10) * 2 + 10, y + 25);
+
+    y += 70;
+    return y;
+  }
+
+  private renderizarTabelaCoberturaVacinal(doc: PDFKit.PDFDocument, porEmpresa: { nome: string; cobertura: number }[], yInicio: number): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Cobertura Vacinal por Empresa', x, y);
+    y += 18;
+
+    const colunas = [
+      { x: 50, largura: 300, titulo: 'Empresa' },
+      { x: 350, largura: 100, titulo: 'Cobertura (%)' },
+      { x: 450, largura: 100, titulo: 'Status' },
+    ];
+
+    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
+    y += this.ALTURA_CABECALHO_TABELA;
+
+    porEmpresa.forEach((item, index) => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+      doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
+
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.nome, 52, y + 6, { width: 296 });
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(`${item.cobertura}%`, 352, y + 6, { width: 96 });
+
+      const corStatus = item.cobertura >= 80 ? '#059669' : (item.cobertura >= 50 ? '#d97706' : '#dc2626');
+      const status = item.cobertura >= 80 ? 'Ótimo' : (item.cobertura >= 50 ? 'Regular' : 'Crítico');
+      doc.fillColor(corStatus).fontSize(8).font('Helvetica-Bold').text(status, 452, y + 6, { width: 96 });
+
+      doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+      y += this.ALTURA_LINHA;
+    });
+
+    y += 15;
+    return y;
+  }
+
+  private renderizarTabelaAbsenteismo(doc: PDFKit.PDFDocument, porMes: { mes: string; dias: number }[], yInicio: number): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Absenteísmo por Mês', x, y);
+    y += 18;
+
+    const colunas = [
+      { x: 50, largura: 300, titulo: 'Mês' },
+      { x: 350, largura: 200, titulo: 'Dias de Absentismo' },
+    ];
+
+    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
+    y += this.ALTURA_CABECALHO_TABELA;
+
+    porMes.forEach((item, index) => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+      doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
+
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.mes, 52, y + 6, { width: 296 });
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(`${item.dias} dias`, 352, y + 6, { width: 196 });
+
+      doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+      y += this.ALTURA_LINHA;
+    });
+
+    y += 15;
+    return y;
+  }
+
+  private renderizarAlertasCriticos(doc: PDFKit.PDFDocument, alertas: { trabalhador: string; motivo: string; nivel: string }[], yInicio: number): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Alertas Críticos', x, y);
+    y += 18;
+
+    const colunas = [
+      { x: 50, largura: 200, titulo: 'Trabalhador' },
+      { x: 250, largura: 250, titulo: 'Motivo' },
+      { x: 500, largura: 100, titulo: 'Nível' },
+    ];
+
+    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
+    y += this.ALTURA_CABECALHO_TABELA;
+
+    if (!alertas || alertas.length === 0) {
+      doc.fillColor(this.COR_TEXTO_CLARO).fontSize(9).font('Helvetica').text('Nenhum alerta crítico no momento.', x, y + 6);
+      y += this.ALTURA_LINHA;
+    } else {
+      alertas.forEach((alerta, index) => {
+        const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+        doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
+
+        doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(alerta.trabalhador, 52, y + 6, { width: 196 });
+        doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(alerta.motivo, 252, y + 6, { width: 246 });
+
+        const corNivel = alerta.nivel === 'alto' ? '#dc2626' : '#d97706';
+        doc.fillColor(corNivel).fontSize(8).font('Helvetica-Bold').text(alerta.nivel.toUpperCase(), 502, y + 6, { width: 96 });
+
+        doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+        y += this.ALTURA_LINHA;
+      });
+    }
 
     return y;
   }

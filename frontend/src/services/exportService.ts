@@ -94,7 +94,7 @@ export const exportDoencas = async (): Promise<void> => {
 };
 
 /**
- * Exporta vacinações em formato PDF corporativo
+ * Exporta vaccineções em formato PDF corporativo
  */
 export const exportVacinacoes = async (): Promise<void> => {
   try {
@@ -110,5 +110,25 @@ export const exportVacinacoes = async (): Promise<void> => {
   } catch (error) {
     console.error('Erro ao exportar PDF:', error);
     throw new Error('Falha ao gerar relatório PDF de vacinações');
+  }
+};
+
+/**
+ * Exporta monitoramento clínico em formato PDF corporativo
+ */
+export const exportMonitoramento = async (): Promise<void> => {
+  try {
+    const response = await api.get('/export/monitoramento/pdf', {
+      responseType: 'blob',
+    });
+
+    const filename =
+      getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+      `relatorio_monitoramento_${new Date().toISOString().split('T')[0]}.pdf`;
+
+    downloadBlob(response.data, filename);
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error);
+    throw new Error('Falha ao gerar relatório PDF de monitoramento');
   }
 };

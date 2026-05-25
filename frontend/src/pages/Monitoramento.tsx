@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Activity, 
-  AlertTriangle, 
-  ShieldCheck, 
+import {
+  Activity,
+  AlertTriangle,
+  ShieldCheck,
   Calendar,
   TrendingDown,
   UserX,
@@ -13,6 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import monitoramentoService, { MonitoramentoData } from '../services/monitoramentoService';
+import { exportMonitoramento } from '../services/exportService';
 import { KPICard } from '../components/KPICard';
 import { BarChartComponent } from '../components/charts';
 import { AbsenteismoChart } from '../components/charts/AbsenteismoChart';
@@ -68,8 +69,16 @@ const Monitoramento: React.FC = () => {
               <ArrowLeft size={18} />
               Voltar
             </button>
-            <button 
-              onClick={() => toast.success('Gerando relatório PDF...')}
+            <button
+              onClick={async () => {
+                try {
+                  toast.loading('Gerando relatório PDF...', { id: 'pdf' });
+                  await exportMonitoramento();
+                  toast.success('Relatório PDF gerado com sucesso!', { id: 'pdf' });
+                } catch {
+                  toast.error('Falha ao gerar relatório PDF', { id: 'pdf' });
+                }
+              }}
               className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
             >
               <Download size={18} />
