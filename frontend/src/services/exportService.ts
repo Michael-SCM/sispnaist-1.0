@@ -54,14 +54,21 @@ export const exportTrabalhadores = async (): Promise<void> => {
 };
 
 /**
- * Exporta acidentes em formato CSV (mantido para compatibilidade)
+ * Exporta acidentes em formato PDF corporativo
  */
 export const exportAcidentes = async (): Promise<void> => {
-  const response = await api.get('/export/acidentes', { responseType: 'blob' });
+  try {
+    const response = await api.get('/export/acidentes/pdf', {
+      responseType: 'blob',
+    });
 
-  const filename =
-    getFilenameFromContentDisposition(response.headers['content-disposition']) ??
-    `acidentes_${new Date().toISOString().split('T')[0]}.csv`;
+    const filename =
+      getFilenameFromContentDisposition(response.headers['content-disposition']) ??
+      `relatorio_acidentes_${new Date().toISOString().split('T')[0]}.pdf`;
 
-  downloadBlob(response.data, filename);
+    downloadBlob(response.data, filename);
+  } catch (error) {
+    console.error('Erro ao exportar PDF:', error);
+    throw new Error('Falha ao gerar relatório PDF de acidentes');
+  }
 };

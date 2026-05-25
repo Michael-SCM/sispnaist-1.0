@@ -100,6 +100,22 @@ class ExportController {
       next(error);
     }
   }
+
+  /**
+   * Exporta acidentes em formato PDF corporativo
+   */
+  async exportarAcidentesPDF(req: Request, res: Response, next: NextFunction) {
+    try {
+      const filtros: Record<string, any> = {};
+
+      if (req.query.status) filtros.status = req.query.status;
+      if (req.query.tipo) filtros.tipoAcidente = { $regex: req.query.tipo, $options: 'i' };
+
+      await pdfService.gerarPdfAcidentes(res, filtros);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new ExportController();
