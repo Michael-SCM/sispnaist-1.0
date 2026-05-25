@@ -1652,6 +1652,12 @@ export class PdfService {
     let y = yInicio;
     const larguraBox = (this.larguraUtil - 20) / 3;
 
+    // Verificar se há espaço para os 3 boxes (altura 60 + folga 10 = 70)
+    if (this.yMax - y < 70) {
+      doc.addPage();
+      y = this.MARGEM_TOPO + 30;
+    }
+
     // Box Cobertura Vacinal
     doc.fillColor(this.COR_PRIMARIA).rect(x, y, larguraBox, 60).fill();
     doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold').text('COBERTURA VACINAL', x + 10, y + 10);
@@ -1676,6 +1682,12 @@ export class PdfService {
     const x = this.MARGEM_ESQUERDA;
     let y = yInicio;
 
+    // Verificar espaço para título + cabeçalho mínimo
+    if (this.yMax - y < 40) {
+      doc.addPage();
+      y = this.MARGEM_TOPO;
+    }
+
     doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Cobertura Vacinal por Empresa', x, y);
     y += 18;
 
@@ -1685,24 +1697,36 @@ export class PdfService {
       { x: 450, largura: 100, titulo: 'Status' },
     ];
 
-    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
-    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
-    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
-    y += this.ALTURA_CABECALHO_TABELA;
+    const renderizarCabecalho = (yPos: number) => {
+      doc.fillColor(this.COR_PRIMARIA).rect(x, yPos, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+      doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+      colunas.forEach(col => doc.text(col.titulo, col.x, yPos + 7, { width: col.largura }));
+      return yPos + this.ALTURA_CABECALHO_TABELA;
+    };
 
-    porEmpresa.forEach((item, index) => {
+    const renderizarLinha = (item: { nome: string; cobertura: number }, yPos: number, index: number) => {
       const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
-      doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
-
-      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.nome, 52, y + 6, { width: 296 });
-      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(`${item.cobertura}%`, 352, y + 6, { width: 96 });
-
+      doc.fillColor(corFundo).rect(x, yPos, this.larguraUtil, this.ALTURA_LINHA).fill();
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.nome, 52, yPos + 6, { width: 296 });
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(`${item.cobertura}%`, 352, yPos + 6, { width: 96 });
       const corStatus = item.cobertura >= 80 ? '#059669' : (item.cobertura >= 50 ? '#d97706' : '#dc2626');
       const status = item.cobertura >= 80 ? 'Ótimo' : (item.cobertura >= 50 ? 'Regular' : 'Crítico');
-      doc.fillColor(corStatus).fontSize(8).font('Helvetica-Bold').text(status, 452, y + 6, { width: 96 });
+      doc.fillColor(corStatus).fontSize(8).font('Helvetica-Bold').text(status, 452, yPos + 6, { width: 96 });
+      doc.moveTo(x, yPos + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, yPos + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+      return yPos + this.ALTURA_LINHA;
+    };
 
-      doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
-      y += this.ALTURA_LINHA;
+    y = renderizarCabecalho(y);
+
+    porEmpresa.forEach((item, index) => {
+      const espacoDisponivel = this.yMax - y;
+      const espacoNecessario = this.ALTURA_LINHA + 10;
+      if (espacoDisponivel < espacoNecessario) {
+        doc.addPage();
+        y = this.MARGEM_TOPO + 30;
+        y = renderizarCabecalho(y);
+      }
+      y = renderizarLinha(item, y, index);
     });
 
     y += 15;
@@ -1713,6 +1737,11 @@ export class PdfService {
     const x = this.MARGEM_ESQUERDA;
     let y = yInicio;
 
+    if (this.yMax - y < 40) {
+      doc.addPage();
+      y = this.MARGEM_TOPO;
+    }
+
     doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Absenteísmo por Mês', x, y);
     y += 18;
 
@@ -1721,20 +1750,33 @@ export class PdfService {
       { x: 350, largura: 200, titulo: 'Dias de Absentismo' },
     ];
 
-    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
-    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
-    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
-    y += this.ALTURA_CABECALHO_TABELA;
+    const renderizarCabecalho = (yPos: number) => {
+      doc.fillColor(this.COR_PRIMARIA).rect(x, yPos, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+      doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+      colunas.forEach(col => doc.text(col.titulo, col.x, yPos + 7, { width: col.largura }));
+      return yPos + this.ALTURA_CABECALHO_TABELA;
+    };
+
+    const renderizarLinha = (item: { mes: string; dias: number }, yPos: number, index: number) => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+      doc.fillColor(corFundo).rect(x, yPos, this.larguraUtil, this.ALTURA_LINHA).fill();
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.mes, 52, yPos + 6, { width: 296 });
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(`${item.dias} dias`, 352, yPos + 6, { width: 196 });
+      doc.moveTo(x, yPos + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, yPos + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+      return yPos + this.ALTURA_LINHA;
+    };
+
+    y = renderizarCabecalho(y);
 
     porMes.forEach((item, index) => {
-      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
-      doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
-
-      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(item.mes, 52, y + 6, { width: 296 });
-      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(`${item.dias} dias`, 352, y + 6, { width: 196 });
-
-      doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
-      y += this.ALTURA_LINHA;
+      const espacoDisponivel = this.yMax - y;
+      const espacoNecessario = this.ALTURA_LINHA + 10;
+      if (espacoDisponivel < espacoNecessario) {
+        doc.addPage();
+        y = this.MARGEM_TOPO + 30;
+        y = renderizarCabecalho(y);
+      }
+      y = renderizarLinha(item, y, index);
     });
 
     y += 15;
@@ -1745,6 +1787,11 @@ export class PdfService {
     const x = this.MARGEM_ESQUERDA;
     let y = yInicio;
 
+    if (this.yMax - y < 40) {
+      doc.addPage();
+      y = this.MARGEM_TOPO;
+    }
+
     doc.fillColor(this.COR_TEXTO).fontSize(12).font('Helvetica-Bold').text('Alertas Críticos', x, y);
     y += 18;
 
@@ -1754,27 +1801,39 @@ export class PdfService {
       { x: 500, largura: 100, titulo: 'Nível' },
     ];
 
-    doc.fillColor(this.COR_PRIMARIA).rect(x, y, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
-    doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
-    colunas.forEach(col => doc.text(col.titulo, col.x, y + 7, { width: col.largura }));
-    y += this.ALTURA_CABECALHO_TABELA;
+    const renderizarCabecalho = (yPos: number) => {
+      doc.fillColor(this.COR_PRIMARIA).rect(x, yPos, this.larguraUtil, this.ALTURA_CABECALHO_TABELA).fill();
+      doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+      colunas.forEach(col => doc.text(col.titulo, col.x, yPos + 7, { width: col.largura }));
+      return yPos + this.ALTURA_CABECALHO_TABELA;
+    };
+
+    const renderizarLinha = (alerta: { trabalhador: string; motivo: string; nivel: string }, yPos: number, index: number) => {
+      const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
+      doc.fillColor(corFundo).rect(x, yPos, this.larguraUtil, this.ALTURA_LINHA).fill();
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(alerta.trabalhador, 52, yPos + 6, { width: 196 });
+      doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(alerta.motivo, 252, yPos + 6, { width: 246 });
+      const corNivel = alerta.nivel === 'alto' ? '#dc2626' : '#d97706';
+      doc.fillColor(corNivel).fontSize(8).font('Helvetica-Bold').text(alerta.nivel.toUpperCase(), 502, yPos + 6, { width: 96 });
+      doc.moveTo(x, yPos + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, yPos + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
+      return yPos + this.ALTURA_LINHA;
+    };
+
+    y = renderizarCabecalho(y);
 
     if (!alertas || alertas.length === 0) {
       doc.fillColor(this.COR_TEXTO_CLARO).fontSize(9).font('Helvetica').text('Nenhum alerta crítico no momento.', x, y + 6);
       y += this.ALTURA_LINHA;
     } else {
       alertas.forEach((alerta, index) => {
-        const corFundo = index % 2 === 0 ? '#ffffff' : this.COR_LINHA_ALTERNADA;
-        doc.fillColor(corFundo).rect(x, y, this.larguraUtil, this.ALTURA_LINHA).fill();
-
-        doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica-Bold').text(alerta.trabalhador, 52, y + 6, { width: 196 });
-        doc.fillColor(this.COR_TEXTO).fontSize(8).font('Helvetica').text(alerta.motivo, 252, y + 6, { width: 246 });
-
-        const corNivel = alerta.nivel === 'alto' ? '#dc2626' : '#d97706';
-        doc.fillColor(corNivel).fontSize(8).font('Helvetica-Bold').text(alerta.nivel.toUpperCase(), 502, y + 6, { width: 96 });
-
-        doc.moveTo(x, y + this.ALTURA_LINHA).lineTo(x + this.larguraUtil, y + this.ALTURA_LINHA).lineWidth(0.5).strokeColor(this.COR_BORDA).stroke();
-        y += this.ALTURA_LINHA;
+        const espacoDisponivel = this.yMax - y;
+        const espacoNecessario = this.ALTURA_LINHA + 10;
+        if (espacoDisponivel < espacoNecessario) {
+          doc.addPage();
+          y = this.MARGEM_TOPO + 30;
+          y = renderizarCabecalho(y);
+        }
+        y = renderizarLinha(alerta, y, index);
       });
     }
 
