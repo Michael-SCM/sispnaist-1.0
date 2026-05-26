@@ -29,11 +29,10 @@ interface AuditLog {
   acao: string;
   entidade: string;
   entidadeId: string;
-  detalhes?: any;
+  detalhes: any;
   ip: string;
   createdAt: string;
 }
-
 
 export const Auditoria: React.FC = () => {
   const navigate = useNavigate();
@@ -398,41 +397,10 @@ export const Auditoria: React.FC = () => {
 
               <div className="space-y-3">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
-                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden space-y-4">
-                  {(() => {
-                    const d: any = selectedLog.detalhes || {};
-
-                    const itens: Array<{ label: string; value: any }> = [
-                      { label: 'Ação Descritiva', value: d.acaoDescricao },
-                      { label: 'Tipo (Doença/Item)', value: d.tipoDoenca },
-                      { label: 'CID/ Código', value: d.cid || d.codigoDoenca },
-                      { label: 'CPF do Trabalhador', value: d.cpfTrabalhador },
-                      { label: 'ID do Trabalhador', value: d.idTrabalhador },
-                    ];
-
-                    const hasAlgumCampo = itens.some((i) => i.value !== undefined && i.value !== null && String(i.value).trim() !== '');
-
-                    if (hasAlgumCampo) {
-                      return (
-                        <div className="grid grid-cols-2 gap-4">
-                          {itens.map((item: any, idx: number) => (
-                            <div key={idx} className="space-y-1">
-                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</span>
-                              <p className="text-sm font-bold text-emerald-300">
-                                {item.value ? String(item.value) : '—'}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                        // Nenhum detalhe adicional registrado.
-                      </pre>
-                    );
-                  })()}
+                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
+                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                  </pre>
                 </div>
               </div>
             </div>

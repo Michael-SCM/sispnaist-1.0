@@ -7,9 +7,8 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
   const ficha = await materialBiologicoService.criar(req.body);
 
   await logAction(req, 'CREATE', 'MaterialBiologico', ficha._id!.toString(), {
-    acaoDescricao: 'Criou Material Biológico',
     acidenteId: ficha.acidenteId.toString(),
-    agente: ficha.agente,
+    agente: ficha.agente
   });
 
   res.status(201).json({
@@ -63,7 +62,6 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const ficha = await materialBiologicoService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'MaterialBiologico', id, {
-    acaoDescricao: 'Atualizou Material Biológico',
     agente: ficha.agente
   });
 
@@ -77,12 +75,7 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await materialBiologicoService.deletar(id);
 
-  const fichaExcluida: any = await materialBiologicoService.obter(id);
-
-  await logAction(req, 'DELETE', 'MaterialBiologico', id, {
-    acaoDescricao: 'Excluiu Material Biológico',
-    acidenteId: fichaExcluida?.acidenteId?.toString?.(),
-  });
+  await logAction(req, 'DELETE', 'MaterialBiologico', id);
 
   res.status(204).send();
 });

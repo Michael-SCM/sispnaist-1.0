@@ -51,7 +51,6 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const usuario = await userService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'User', id, {
-    acaoDescricao: 'Atualizou Usuário',
     email: usuario.email,
     perfil: usuario.perfil
   });
@@ -69,15 +68,9 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
  */
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const usuarioExcluido = await userService.obter(id);
   await userService.deletar(id);
 
-  await logAction(req, 'DELETE', 'User', id, {
-    acaoDescricao: 'Excluiu Usuário',
-    email: usuarioExcluido?.email,
-  });
-
-
+  await logAction(req, 'DELETE', 'User', id);
 
   res.status(204).json({
     status: 'success',
