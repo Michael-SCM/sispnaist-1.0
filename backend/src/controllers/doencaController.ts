@@ -17,8 +17,21 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   const doenca = await doencaService.criar(doencaData);
 
+  // Enriquecimento do log com dados do trabalhador
+  const trabalhadorId = (doenca as any)?.trabalhadorId?._id
+    ? (doenca as any).trabalhadorId._id.toString()
+    : (doenca as any)?.trabalhadorId?.toString?.() || (doenca as any)?.trabalhadorId;
+
+  const trabalhador = trabalhadorId ? await Trabalhador.findById(trabalhadorId).select('cpf') : null;
+
   await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), {
-    cid: doenca.cid
+    acaoDescricao: 'Criou Doença',
+    tipoDoenca: doenca.nomeDoenca || doenca.codigoDoenca,
+    codigoDoenca: doenca.codigoDoenca,
+    nomeDoenca: doenca.nomeDoenca,
+    cid: doenca.codigoDoenca,
+    cpfTrabalhador: trabalhador?.cpf,
+    idTrabalhador: trabalhadorId?.toString?.() || undefined
   });
 
   res.status(201).json({ sucesso: true, dados: doenca });
@@ -95,8 +108,34 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const doenca = await doencaService.atualizar(id, req.body);
 
+  // Busca dados relacionados para enriquecer o log
+  const doencaAtualizada: any = await doencaService.obter(id);
+  const trabalhadorId = doencaAtualizada?.trabalhadorId?._id
+    ? doencaAtualizada.trabalhadorId._id.toString()
+    : (doencaAtualizada?.trabalhadorId?.toString?.() || undefined);
+
+
+  let cpfTrabalhador: string | undefined;
+  if (trabalhadorId) {
+    const trabalhador = await Trabalhador.findById(trabalhadorId).select('cpf');
+    cpfTrabalhador = trabalhador?.cpf;
+  }
+
   await logAction(req, 'UPDATE', 'Doenca', id, {
-    cid: doenca.cid
+    acaoDescricao: 'Atualizou Doença',
+    tipoDoenca: doencaAtualizada?.nomeDoenca || doencaAtualizada?.codigoDoenca,
+    codigoDoenca: doencaAtualizada?.codigoDoenca,
+    nomeDoenca: doencaAtualizada?.nomeDoenca,
+    cid: doencaAtualizada?.codigoDoenca,
+    cpfTrabalhador,
+    idTrabalhador: trabalhadorId,
+    // Ao menos alguns campos prováveis alterados (se existirem no documento)
+    camposAlterados: {
+      ativo: doencaAtualizada?.ativo,
+      dataInicio: doencaAtualizada?.dataInicio,
+      dataFim: doencaAtualizada?.dataFim,
+      relatoClinico: doencaAtualizada?.relatoClinico,
+    }
   });
 
   res.status(200).json({ sucesso: true, dados: doenca });
@@ -110,7 +149,26 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await doencaService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Doenca', id);
+  // Tenta buscar dados para enriquecer o log antes de deletar
+  const doencaExcluida: any = await doencaService.obter(id);
+  const trabalhadorId = doencaExcluida?.trabalhadorId?._id
+    ? doencaExcluida.trabalhadorId._id.toString()
+    : (doencaExcluida?.trabalhadorId?.toString?.() || undefined);
+
+
+  let cpfTrabalhador: string | undefined;
+  if (trabalhadorId) {
+    const trabalhador = await Trabalhador.findById(trabalhadorId).select('cpf');
+    cpfTrabalhador = trabalhador?.cpf;
+  }
+
+  await logAction(req, 'DELETE', 'Doenca', id, {
+    acaoDescricao: 'Excluiu Doença',
+    tipoDoenca: doencaExcluida?.nomeDoenca || doencaExcluida?.codigoDoenca,
+    cid: doencaExcluida?.codigoDoenca,
+    cpfTrabalhador,
+    idTrabalhador: trabalhadorId,
+  });
 
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });

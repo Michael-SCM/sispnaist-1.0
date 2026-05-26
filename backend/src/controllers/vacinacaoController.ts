@@ -13,9 +13,18 @@ export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 
   const vacinacao = await vacinacaoService.criar(req.body);
 
+  const trabalhadorId = (vacinacao as any)?.trabalhadorId?._id
+    ? (vacinacao as any).trabalhadorId._id.toString()
+    : (vacinacao as any)?.trabalhadorId?.toString?.() || (vacinacao as any)?.trabalhadorId;
+
+  const trabalhador = trabalhadorId ? await Trabalhador.findById(trabalhadorId).select('cpf') : null;
+
   await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), {
+    acaoDescricao: 'Criou Vacinação',
     vacina: vacinacao.vacina,
-    lote: vacinacao.lote
+    lote: vacinacao.lote,
+    cpfTrabalhador: trabalhador?.cpf,
+    idTrabalhador: trabalhadorId,
   });
 
   res.status(201).json({
@@ -92,8 +101,17 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
 
   const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
 
+  const trabalhadorId = (vacinacao as any)?.trabalhadorId?._id
+    ? (vacinacao as any).trabalhadorId._id.toString()
+    : (vacinacao as any)?.trabalhadorId?.toString?.() || (vacinacao as any)?.trabalhadorId;
+
+  const trabalhador = trabalhadorId ? await Trabalhador.findById(trabalhadorId).select('cpf') : null;
+
   await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, {
-    vacina: vacinacao.vacina
+    acaoDescricao: 'Atualizou Vacinação',
+    vacina: vacinacao.vacina,
+    cpfTrabalhador: trabalhador?.cpf,
+    idTrabalhador: trabalhadorId,
   });
 
   res.status(200).json({
@@ -109,7 +127,24 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
 
   await vacinacaoService.deletar(req.params.id);
 
-  await logAction(req, 'DELETE', 'Vacinacao', req.params.id);
+  const vacinacaoExcluida: any = await vacinacaoService.obter(req.params.id);
+
+  const trabalhadorId = vacinacaoExcluida?.trabalhadorId?._id
+    ? vacinacaoExcluida.trabalhadorId._id.toString()
+    : (vacinacaoExcluida?.trabalhadorId?.toString?.() || vacinacaoExcluida?.trabalhadorId);
+
+  let cpfTrabalhador: string | undefined;
+  if (trabalhadorId) {
+    const trabalhador = await Trabalhador.findById(trabalhadorId).select('cpf');
+    cpfTrabalhador = trabalhador?.cpf;
+  }
+
+  await logAction(req, 'DELETE', 'Vacinacao', req.params.id, {
+    acaoDescricao: 'Excluiu Vacinação',
+    vacina: vacinacaoExcluida?.vacina,
+    cpfTrabalhador,
+    idTrabalhador: trabalhadorId,
+  });
 
   res.status(204).send();
 });

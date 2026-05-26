@@ -51,6 +51,7 @@ class AtoMunicipalInovacaoController {
       const novoItem = await AtoMunicipalInovacao.create(req.body);
       
       await logAction(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), {
+        acaoDescricao: 'Criou Ato Municipal',
         nr_ato: novoItem.nr_ato,
         ano_ato: novoItem.ano_ato
       });
@@ -77,6 +78,7 @@ class AtoMunicipalInovacaoController {
       }
 
       await logAction(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), {
+        acaoDescricao: 'Atualizou Ato Municipal',
         nr_ato: item.nr_ato,
         ano_ato: item.ano_ato
       });
@@ -100,6 +102,7 @@ class AtoMunicipalInovacaoController {
       }
 
       await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
+        acaoDescricao: 'Excluiu Ato Municipal',
         nr_ato: item.nr_ato,
         ano_ato: item.ano_ato
       });

@@ -126,9 +126,11 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
   const { id } = req.params;
   const trabalhador = await trabalhadorService.atualizar(id, req.body);
 
-  await logAction(req, 'UPDATE', 'Trabalhador', id, {
-    nome: trabalhador.nome
-  });
+    await logAction(req, 'UPDATE', 'Trabalhador', id, {
+      acaoDescricao: 'Atualizou Trabalhador',
+      nome: trabalhador.nome,
+      cpf: trabalhador.cpf,
+    });
 
   res.status(200).json({
     status: 'success',
@@ -149,7 +151,14 @@ export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response
   const { id } = req.params;
   await trabalhadorService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Trabalhador', id);
+  const trabalhadorExcluido = await trabalhadorService.obter(id);
+
+  await logAction(req, 'DELETE', 'Trabalhador', id, {
+    acaoDescricao: 'Excluiu Trabalhador',
+    nome: trabalhadorExcluido?.nome,
+    cpf: trabalhadorExcluido?.cpf,
+  });
+
 
   res.status(204).json({
     status: 'success',

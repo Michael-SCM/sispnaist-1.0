@@ -12,9 +12,17 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   const acidente = await acidenteService.criar(req.body);
 
+  const trabalhadorId = (acidente as any)?.trabalhadorId?._id
+    ? (acidente as any).trabalhadorId._id.toString()
+    : (acidente as any)?.trabalhadorId?.toString?.() || (acidente as any)?.trabalhadorId;
+  const trabalhador = trabalhadorId ? await Trabalhador.findById(trabalhadorId).select('cpf') : null;
+
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
+    acaoDescricao: 'Criou Acidente',
     tipoAcidente: acidente.tipoAcidente,
-    dataAcidente: acidente.dataAcidente
+    dataAcidente: acidente.dataAcidente,
+    cpfTrabalhador: trabalhador?.cpf,
+    idTrabalhador: trabalhadorId,
   });
 
   res.status(201).json({
@@ -99,8 +107,17 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const acidente = await acidenteService.atualizar(id, req.body);
 
+  const trabalhadorId = (acidente as any)?.trabalhadorId?._id
+    ? (acidente as any).trabalhadorId._id.toString()
+    : (acidente as any)?.trabalhadorId?.toString?.() || (acidente as any)?.trabalhadorId;
+  const trabalhador = trabalhadorId ? await Trabalhador.findById(trabalhadorId).select('cpf') : null;
+
   await logAction(req, 'UPDATE', 'Acidente', id, {
-    status: acidente.status
+    acaoDescricao: 'Atualizou Acidente',
+    tipoAcidente: (acidente as any)?.tipoAcidente,
+    status: acidente.status,
+    cpfTrabalhador: trabalhador?.cpf,
+    idTrabalhador: trabalhadorId,
   });
 
   res.status(200).json({
@@ -117,7 +134,24 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await acidenteService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Acidente', id);
+  const acidenteExcluido: any = await acidenteService.obter(id);
+
+  const trabalhadorId = acidenteExcluido?.trabalhadorId?._id
+    ? acidenteExcluido.trabalhadorId._id.toString()
+    : (acidenteExcluido?.trabalhadorId?.toString?.() || acidenteExcluido?.trabalhadorId);
+
+  let cpfTrabalhador: string | undefined;
+  if (trabalhadorId) {
+    const trabalhador = await Trabalhador.findById(trabalhadorId).select('cpf');
+    cpfTrabalhador = trabalhador?.cpf;
+  }
+
+  await logAction(req, 'DELETE', 'Acidente', id, {
+    acaoDescricao: 'Excluiu Acidente',
+    tipoAcidente: acidenteExcluido?.tipoAcidente,
+    cpfTrabalhador,
+    idTrabalhador: trabalhadorId,
+  });
 
   res.status(204).send();
 });
