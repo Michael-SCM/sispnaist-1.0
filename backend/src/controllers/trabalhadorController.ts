@@ -127,8 +127,7 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
   const trabalhador = await trabalhadorService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Trabalhador', id, {
-    nome: trabalhador.nome,
-    cpf: trabalhador.cpf
+    nome: trabalhador.nome
   });
 
   res.status(200).json({

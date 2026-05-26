@@ -15,8 +15,7 @@ export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 
   await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), {
     vacina: vacinacao.vacina,
-
-    trabalhadorId: vacinacao.trabalhadorId?.toString?.() || String(vacinacao.trabalhadorId)
+    lote: vacinacao.lote
   });
 
   res.status(201).json({
@@ -94,8 +93,7 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
   const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
 
   await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, {
-    vacina: vacinacao.vacina,
-    trabalhadorId: vacinacao.trabalhadorId?.toString?.() || String(vacinacao.trabalhadorId)
+    vacina: vacinacao.vacina
   });
 
   res.status(200).json({
@@ -111,13 +109,7 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
 
   await vacinacaoService.deletar(req.params.id);
 
-  const vacinacao = await vacinacaoService.obter(req.params.id);
-  await logAction(req, 'DELETE', 'Vacinacao', req.params.id, {
-    trabalhadorId: vacinacao?.trabalhadorId?.toString?.() || vacinacao?.trabalhadorId,
-    vacina: vacinacao?.vacina,
-    // lote não existe neste modelo/ types atuais
-    // lote: vacinacao?.lote
-  });
+  await logAction(req, 'DELETE', 'Vacinacao', req.params.id);
 
   res.status(204).send();
 });
