@@ -403,6 +403,32 @@ export const Auditoria: React.FC = () => {
                   </pre>
                 </div>
               </div>
+
+              {/* Ações detalhadas padronizadas (quando disponível no detalhes) */}
+              {(() => {
+                const d = selectedLog.detalhes || {};
+                const items: Array<{ label: string; value: any }> = [];
+
+                // Campos pedidos para evidência no modal
+                if (d.tipoDoenca) items.push({ label: 'Tipo da doença alterada', value: d.tipoDoenca });
+                if (d.trabalhadorIdCpf || d.cpfTrabalhador || d.cpf) items.push({ label: 'CPF do trabalhador vinculado', value: d.trabalhadorIdCpf || d.cpfTrabalhador || d.cpf });
+
+                if (items.length === 0) return null;
+
+                return (
+                  <div className="space-y-3">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resumo da ação</span>
+                    <div className="grid grid-cols-2 gap-6">
+                      {items.map((it, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{it.label}</span>
+                          <p className="font-bold text-slate-700 break-words">{String(it.value ?? '—')}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="p-6 bg-slate-50 flex justify-end">

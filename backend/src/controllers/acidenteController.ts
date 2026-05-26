@@ -14,7 +14,8 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
     tipoAcidente: acidente.tipoAcidente,
-    dataAcidente: acidente.dataAcidente
+    dataAcidente: acidente.dataAcidente,
+    trabalhadorId: acidente.trabalhadorId?.toString?.() || String(acidente.trabalhadorId)
   });
 
   res.status(201).json({
@@ -100,7 +101,8 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const acidente = await acidenteService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Acidente', id, {
-    status: acidente.status
+    status: acidente.status,
+    trabalhadorId: acidente.trabalhadorId?.toString?.() || String(acidente.trabalhadorId)
   });
 
   res.status(200).json({
@@ -117,7 +119,13 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   await acidenteService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Acidente', id);
+  const acidente = await acidenteService.obter(id);
+  await logAction(req, 'DELETE', 'Acidente', id, {
+    trabalhadorId: acidente?.trabalhadorId?.toString?.() || acidente?.trabalhadorId,
+    tipoAcidente: acidente?.tipoAcidente,
+    dataAcidente: acidente?.dataAcidente,
+    status: acidente?.status
+  });
 
   res.status(204).send();
 });

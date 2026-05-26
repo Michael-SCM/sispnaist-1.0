@@ -18,7 +18,10 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
   const doenca = await doencaService.criar(doencaData);
 
   await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), {
-    cid: doenca.cid
+    cid: doenca.cid,
+    tipoDoenca: doenca.codigoDoenca,
+    nomeDoenca: doenca.nomeDoenca,
+    trabalhadorId: doenca.trabalhadorId?.toString?.() || String(doenca.trabalhadorId),
   });
 
   res.status(201).json({ sucesso: true, dados: doenca });
@@ -96,7 +99,10 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const doenca = await doencaService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Doenca', id, {
-    cid: doenca.cid
+    cid: doenca.cid,
+    tipoDoenca: doenca.codigoDoenca,
+    nomeDoenca: doenca.nomeDoenca,
+    trabalhadorId: doenca.trabalhadorId?.toString?.() || String(doenca.trabalhadorId),
   });
 
   res.status(200).json({ sucesso: true, dados: doenca });
@@ -108,9 +114,15 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const doenca = await doencaService.obter(id);
   await doencaService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Doenca', id);
+  await logAction(req, 'DELETE', 'Doenca', id, {
+    tipoDoenca: doenca?.codigoDoenca,
+    nomeDoenca: doenca?.nomeDoenca,
+    trabalhadorId: doenca?.trabalhadorId?.toString?.() || doenca?.trabalhadorId,
+    cid: doenca?.cid,
+  });
 
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
