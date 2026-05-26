@@ -20,19 +20,23 @@ import api from '../../services/api.js';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
+type AuditLogUsuario = {
+  nome?: string;
+  login?: string;
+} | string;
+
 interface AuditLog {
   _id: string;
-  usuarioId: {
-    nome: string;
-    login: string;
-  } | string;
+  usuarioId: AuditLogUsuario;
   acao: string;
   entidade: string;
   entidadeId: string;
-  detalhes: any;
-  ip: string;
+  detalhes?: any;
+  ip?: string;
   createdAt: string;
 }
+
+
 
 export const Auditoria: React.FC = () => {
   const navigate = useNavigate();
@@ -396,11 +400,96 @@ export const Auditoria: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
-                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
-                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
-                  </pre>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resumo da Ação (por dados do log)</span>
+
+                <div className="bg-white border border-slate-100 rounded-3xl p-6">
+                  {(() => {
+                    const d = selectedLog.detalhes ?? {};
+                    const get = (...keys: string[]) => {
+                      for (const k of keys) {
+                        const v = (d as any)[k];
+                        if (v !== undefined && v !== null && v !== '') return v;
+                      }
+                      return null;
+                    };
+                    const lines: Array<{ label: string; value: any; mono?: boolean; badge?: string }> = [];
+
+                    // Campos gerais que você pediu (quando existirem dentro de detalhes)
+                    // Doença
+                    lines.push({ label: 'Tipo da Doença (do log)', value: get('tipoDoenca', 'tipo', 'nomeDoenca', 'doencaTipo') ?? '— não informado no log —', badge: 'bg-emerald-50 text-emerald-700 border-emerald-100' });
+                    lines.push({ label: 'CPF do Trabalhador Vinculado (do log)', value: get('cpfTrabalhador', 'cpf', 'trabalhadorCpf') ?? '— não informado no log —', mono: true, badge: 'bg-indigo-50 text-indigo-700 border-indigo-100' });
+
+                    // Acidente
+                    const tipoAcidente = get('tipoAcidente');
+                    if (tipoAcidente !== null) {
+                      lines.push({ label: 'Tipo de Acidente (do log)', value: tipoAcidente, badge: 'bg-amber-50 text-amber-700 border-amber-100' });
+                    }
+                    const status = get('status');
+                    if (status !== null) {
+                      lines.push({ label: 'Status (do log)', value: status, badge: 'bg-blue-50 text-blue-700 border-blue-100' });
+                    }
+
+                    // Vacinação
+                    const vacina = get('vacina');
+                    if (vacina !== null) {
+                      lines.push({ label: 'Vacina (do log)', value: vacina, badge: 'bg-emerald-50 text-emerald-700 border-emerald-100' });
+                    }
+                    const lote = get('lote');
+                    if (lote !== null) {
+                      lines.push({ label: 'Lote (do log)', value: lote, mono: true, badge: 'bg-slate-50 text-slate-700 border-slate-100' });
+                    }
+
+                    // Trabalhado / Usuário
+                    const nome = get('nome');
+                    if (nome !== null) {
+                      lines.push({ label: 'Nome (do log)', value: nome, badge: 'bg-slate-50 text-slate-700 border-slate-100' });
+                    }
+
+                    // Material biológico
+                    const agente = get('agente');
+                    if (agente !== null) {
+                      lines.push({ label: 'Agente (do log)', value: agente, badge: 'bg-emerald-50 text-emerald-700 border-emerald-100' });
+                    }
+                    const acidenteId = get('acidenteId');
+                    if (acidenteId !== null) {
+                      lines.push({ label: 'Acidente ID (do log)', value: acidenteId, mono: true, badge: 'bg-slate-50 text-slate-700 border-slate-100' });
+                    }
+
+                    // Ato municipal
+                    const nrAto = get('nr_ato');
+                    if (nrAto !== null) {
+                      lines.push({ label: 'Nº Ato (do log)', value: nrAto, mono: true, badge: 'bg-slate-50 text-slate-700 border-slate-100' });
+                    }
+                    const anoAto = get('ano_ato');
+                    if (anoAto !== null) {
+                      lines.push({ label: 'Ano do Ato (do log)', value: anoAto, mono: true, badge: 'bg-slate-50 text-slate-700 border-slate-100' });
+                    }
+
+                    // Se não houver nada útil no resumo além dos campos padrão
+                    return (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {lines.map((l, idx) => (
+                            <div key={idx} className="space-y-1">
+                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{l.label}</span>
+                              <div className={`px-3 py-2 rounded-2xl border ${l.badge ?? 'bg-slate-50 text-slate-700 border-slate-100'} ${l.mono ? 'font-mono' : ''} text-sm font-bold text-slate-700 break-words`}>
+                                {String(l.value)}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="space-y-2">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">JSON do log (audit trail completo)</span>
+                          <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
+                            <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                              {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                            </pre>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
