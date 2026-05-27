@@ -315,7 +315,6 @@ export const Auditoria: React.FC = () => {
                             {pageNum}
                           </button>
                         )}
-                      })}
 
 
                       {totalPages > 7 && page < totalPages - 2 && (
