@@ -398,9 +398,31 @@ export const Auditoria: React.FC = () => {
               <div className="space-y-3">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
                 <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
-                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
-                  </pre>
+                  {selectedLog.detalhes && (selectedLog.detalhes.cpfTrabalhador || selectedLog.detalhes.tipoAcidenteDetalhe) ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-6">
+                        {selectedLog.detalhes.cpfTrabalhador && (
+                          <div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                            <p className="font-bold text-emerald-400">{selectedLog.detalhes.cpfTrabalhador}</p>
+                          </div>
+                        )}
+                        {selectedLog.detalhes.tipoAcidenteDetalhe && (
+                          <div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
+                            <p className="font-bold text-emerald-400">{selectedLog.detalhes.tipoAcidenteDetalhe}</p>
+                          </div>
+                        )}
+                      </div>
+                      <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                        {JSON.stringify(selectedLog.detalhes, null, 2)}
+                      </pre>
+                    </div>
+                  ) : (
+                    <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                      {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                    </pre>
+                  )}
                 </div>
               </div>
             </div>

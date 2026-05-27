@@ -14,7 +14,9 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
     tipoAcidente: acidente.tipoAcidente,
-    dataAcidente: acidente.dataAcidente
+    dataAcidente: acidente.dataAcidente,
+    cpfTrabalhador: (acidente.trabalhadorId as any)?.cpf,
+    tipoAcidenteDetalhe: acidente.tipoAcidente,
   });
 
   res.status(201).json({
@@ -100,7 +102,10 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const acidente = await acidenteService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Acidente', id, {
-    status: acidente.status
+    status: acidente.status,
+    tipoAcidente: acidente.tipoAcidente,
+    cpfTrabalhador: (acidente.trabalhadorId as any)?.cpf,
+    tipoAcidenteDetalhe: acidente.tipoAcidente,
   });
 
   res.status(200).json({
@@ -115,9 +120,17 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+
+  // Para registrar CPF/tipo no log de exclusão, buscamos o registro antes de deletar
+  const acidenteParaLog = await acidenteService.obter(id);
+  await logAction(req, 'DELETE', 'Acidente', id, {
+    tipoAcidente: (acidenteParaLog as any)?.tipoAcidente,
+    cpfTrabalhador: (acidenteParaLog as any)?.trabalhadorId?.cpf,
+    tipoAcidenteDetalhe: (acidenteParaLog as any)?.tipoAcidente,
+  });
+
   await acidenteService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Acidente', id);
 
   res.status(204).send();
 });
