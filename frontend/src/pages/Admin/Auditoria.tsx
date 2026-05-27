@@ -394,6 +394,19 @@ export const Auditoria: React.FC = () => {
                   <p className="font-mono text-sm text-slate-500">{selectedLog.ip || 'Não registrado'}</p>
                 </div>
 
+                {selectedLog.detalhes?.cpfTrabalhador && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhador}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.tipoAcidenteDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.tipoAcidenteDetalhe}</p>
+                  </div>
+                )}
 
               </div>
 
@@ -404,9 +417,10 @@ export const Auditoria: React.FC = () => {
                     {selectedLog.detalhes
                       ? JSON.stringify(
                           Object.fromEntries(
-                            Object.entries(selectedLog.detalhes).filter(
-                              ([key]) => key !== 'cpfTrabalhador' && key !== 'tipoAcidenteDetalhe'
-                            )
+                            Object.entries(selectedLog.detalhes).filter(([key]) => {
+                              // remove os campos que NÃO devem mais aparecer em Metadados
+                              return key !== 'cpfTrabalhador' && key !== 'tipoAcidenteDetalhe' && key !== 'tipoAcidente';
+                            })
                           ),
                           null,
                           2
