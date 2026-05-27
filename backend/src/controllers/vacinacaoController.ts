@@ -107,9 +107,18 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
     throw new AppError('Sem permissão para deletar registros de vacinação', 403);
   }
 
+  // Busca a vacinação antes de deletar para registrar detalhes
+  const vacinacao = await vacinacaoService.obter(req.params.id);
+  if (!vacinacao) {
+    throw new AppError('Vacinação não encontrada', 404);
+  }
+
   await vacinacaoService.deletar(req.params.id);
 
-  await logAction(req, 'DELETE', 'Vacinacao', req.params.id);
+  await logAction(req, 'DELETE', 'Vacinacao', req.params.id, {
+    cpf: (vacinacao as any).cpf ?? (vacinacao.trabalhadorId as any)?.cpf ?? 'N/A',
+    vacina: vacinacao.vacina
+  });
 
   res.status(204).send();
 });

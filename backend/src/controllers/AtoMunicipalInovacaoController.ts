@@ -99,10 +99,11 @@ class AtoMunicipalInovacaoController {
         throw new AppError('Ato Municipal não encontrado', 404);
       }
 
-      await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
-        nr_ato: item.nr_ato,
-        ano_ato: item.ano_ato
-      });
+await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
+          nr_ato: item.nr_ato,
+          ano_ato: item.ano_ato,
+          cidade: (item as any).nm_cidade ?? 'N/A'
+        });
 
       return res.status(204).send();
     } catch (error) {

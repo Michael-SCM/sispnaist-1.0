@@ -147,9 +147,18 @@ export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response
   }
 
   const { id } = req.params;
+  // Busca o trabalhador antes de deletar para registrar detalhes
+  const trabalhador = await trabalhadorService.obter(id);
+  if (!trabalhador) {
+    throw new AppError('Trabalhador não encontrado', 404);
+  }
+
   await trabalhadorService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Trabalhador', id);
+  await logAction(req, 'DELETE', 'Trabalhador', id, {
+    nome: trabalhador.nome,
+    cpf: trabalhador.cpf
+  });
 
   res.status(204).json({
     status: 'success',

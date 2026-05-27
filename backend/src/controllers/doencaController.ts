@@ -108,9 +108,17 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const doenca = await doencaService.obter(id);
+  if (!doenca) {
+    throw new AppError('Doença não encontrada', 404);
+  }
+
   await doencaService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Doenca', id);
+  await logAction(req, 'DELETE', 'Doenca', id, {
+    cpf: (doenca as any).cpf ?? (doenca.trabalhadorId as any)?.cpf ?? 'N/A',
+    nome: doenca.nome ?? 'N/A'
+  });
 
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });

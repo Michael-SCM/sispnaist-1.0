@@ -115,9 +115,19 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  // Busca o acidente para registrar detalhes antes da remoção
+  const acidente = await acidenteService.obter(id);
+  if (!acidente) {
+    throw new AppError('Acidente não encontrado', 404);
+  }
+
   await acidenteService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Acidente', id);
+  await logAction(req, 'DELETE', 'Acidente', id, {
+    tipoAcidente: acidente.tipoAcidente,
+    // Supondo que acidente.trabalhadorId seja populado ou contenha CPF
+    cpf: (acidente as any).cpf ?? (acidente.trabalhadorId as any)?.cpf ?? 'N/A'
+  });
 
   res.status(204).send();
 });
