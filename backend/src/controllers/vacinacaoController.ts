@@ -15,9 +15,7 @@ export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 
   await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), {
     vacina: vacinacao.vacina,
-    lote: vacinacao.lote,
-    cpfTrabalhadorVacinacao: (vacinacao.trabalhadorId as any)?.cpf,
-    nomeVacinaDetalhe: vacinacao.vacina,
+    lote: vacinacao.lote
   });
 
   res.status(201).json({
@@ -95,9 +93,7 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
   const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
 
   await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, {
-    vacina: vacinacao.vacina,
-    cpfTrabalhadorVacinacao: (vacinacao.trabalhadorId as any)?.cpf,
-    nomeVacinaDetalhe: vacinacao.vacina,
+    vacina: vacinacao.vacina
   });
 
   res.status(200).json({
@@ -111,15 +107,9 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
     throw new AppError('Sem permissão para deletar registros de vacinação', 403);
   }
 
-  // Para registrar CPF/nome da vacina no log de exclusão, buscamos antes de deletar
-  const vacinacaoParaLog = await vacinacaoService.obter(req.params.id);
-
-  await logAction(req, 'DELETE', 'Vacinacao', req.params.id, {
-    cpfTrabalhadorVacinacao: (vacinacaoParaLog as any)?.trabalhadorId?.cpf,
-    nomeVacinaDetalhe: (vacinacaoParaLog as any)?.vacina,
-  });
-
   await vacinacaoService.deletar(req.params.id);
+
+  await logAction(req, 'DELETE', 'Vacinacao', req.params.id);
 
   res.status(204).send();
 });
