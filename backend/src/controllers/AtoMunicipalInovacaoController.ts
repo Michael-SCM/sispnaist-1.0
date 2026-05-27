@@ -52,7 +52,9 @@ class AtoMunicipalInovacaoController {
       
       await logAction(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), {
         nr_ato: novoItem.nr_ato,
-        ano_ato: novoItem.ano_ato
+        ano_ato: novoItem.ano_ato,
+        cpfTrabalhador: (req as any).user?.cpf,
+        numeroAtoDetalhe: novoItem.nr_ato
       });
 
       return res.status(201).json(novoItem);
@@ -78,7 +80,8 @@ class AtoMunicipalInovacaoController {
 
       await logAction(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), {
         nr_ato: item.nr_ato,
-        ano_ato: item.ano_ato
+        ano_ato: item.ano_ato,
+        numeroAtoDetalhe: item.nr_ato
       });
 
       return res.status(200).json(item);
@@ -101,7 +104,8 @@ class AtoMunicipalInovacaoController {
 
       await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
         nr_ato: item.nr_ato,
-        ano_ato: item.ano_ato
+        ano_ato: item.ano_ato,
+        numeroAtoDetalhe: item.nr_ato
       });
 
       return res.status(204).send();

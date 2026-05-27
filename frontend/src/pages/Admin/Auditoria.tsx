@@ -408,6 +408,13 @@ export const Auditoria: React.FC = () => {
                   </div>
                 )}
 
+                {selectedLog.detalhes?.numeroAtoDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.numeroAtoDetalhe}</p>
+                  </div>
+                )}
+
                 {selectedLog.detalhes?.cpfTrabalhadorDoenca && (
                   <div className="space-y-1">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
@@ -422,24 +429,36 @@ export const Auditoria: React.FC = () => {
                   </div>
                 )}
 
+                {selectedLog.detalhes?.cpfTrabalhadorVacinacao && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorVacinacao}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.nomeVacinaDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Vacina</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeVacinaDetalhe}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.cpfTrabalhador && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhador}</p>
+                  </div>
+                )}
+
               </div>
 
               <div className="space-y-3">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
                 <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
                   <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                    {selectedLog.detalhes
-                      ? JSON.stringify(
-                          Object.fromEntries(
-                            Object.entries(selectedLog.detalhes).filter(([key]) => {
-                              // remove os campos que NÃO devem mais aparecer em Metadados
-                              return key !== 'cpfTrabalhador' && key !== 'tipoAcidenteDetalhe' && key !== 'tipoAcidente' && key !== 'cpfTrabalhadorDoenca' && key !== 'nomeDoencaDetalhe';
-                            })
-                          ),
-                          null,
-                          2
-                        )
-                      : '// Nenhum detalhe adicional registrado.'}
+                  {selectedLog.detalhes
+                    ? JSON.stringify(selectedLog.detalhes, null, 2)
+                    : '// Nenhum detalhe adicional registrado.'}
                   </pre>
                 </div>
               </div>
