@@ -408,7 +408,7 @@ export const Auditoria: React.FC = () => {
                       <p className="font-bold text-slate-700">{selectedLog.detalhes?.tipo ?? 'N/A'}</p>
                     </div>
                   </>
-                )
+                  )}
                 {selectedLog.entidade === 'AtosMunicipais' && (
                   <>
                     <div className="space-y-1">
