@@ -279,13 +279,13 @@ export const Auditoria: React.FC = () => {
                         >
                           1
                         </button>
-                      )}
+                      )}}
 
                       {totalPages > 7 && page > 3 && (
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                      )}
+                      )}}
 
                       {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
                         let pageNum: number;
@@ -312,14 +312,14 @@ export const Auditoria: React.FC = () => {
                           >
                             {pageNum}
                           </button>
-                        );
+                        )};
                       })}
 
                       {totalPages > 7 && page < totalPages - 2 && (
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                      )}
+                      )}}
 
                       {totalPages > 5 && (
                         <button
@@ -328,7 +328,7 @@ export const Auditoria: React.FC = () => {
                         >
                           {totalPages}
                         </button>
-                      )}
+                      )}}
                     </div>
                   </div>
 
@@ -388,7 +388,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
                         </div>
                       </>
-                    )}
+                    )}}
                 <div className="space-y-1">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
                   <p className="font-bold text-slate-700">{selectedLog.acao}</p>
@@ -408,7 +408,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
                         </div>
                       </>
-                    )
+                    )}
                     {selectedLog.entidade === 'Vacinacao' && (
                       <>
                         <div className="space-y-1">
@@ -420,7 +420,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.vacina ?? 'N/A'}</p>
                         </div>
                       </>
-                    )
+                    )}
                     {selectedLog.entidade === 'Empresa' && (
                       <>
                         <div className="space-y-1">
@@ -432,7 +432,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.cnpj ?? 'N/A'}</p>
                         </div>
                       </>
-                    )
+                    )}
                     {selectedLog.entidade === 'Unidade' && (
                       <>
                         <div className="space-y-1">
@@ -444,7 +444,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
                         </div>
                       </>
-                    )
+                    )}
                     {selectedLog.entidade === 'User' && (
                       <>
                         <div className="space-y-1">
@@ -452,7 +452,7 @@ export const Auditoria: React.FC = () => {
                           <p className="font-bold text-slate-700">{selectedLog.detalhes?.nomeCompleto ?? 'N/A'}</p>
                         </div>
                       </>
-                    )
+                    )}
                   <>
                     <div className="space-y-1">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
@@ -481,13 +481,13 @@ export const Auditoria: React.FC = () => {
                       <ul className="list-disc list-inside text-emerald-400 font-mono text-sm">
                         {Object.entries(selectedLog.detalhes).map(([key, value]) => (
                           <li key={key}>{key}: {JSON.stringify(value)}</li>
-                        ))}
+                        )})}
                       </ul>
-                    ) : (
+                    )} : (
                       <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
                         // Nenhum detalhe adicional registrado.
                       </pre>
-                    )}
+                    )}}
                   </div>
                 </div>
             </div>
