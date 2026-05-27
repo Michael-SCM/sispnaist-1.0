@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Shield, 
-  Search, 
-  Clock, 
-  User, 
+import {
+  Shield,
+  Search,
+  Clock,
+  User,
   Terminal,
   Filter,
   Eye,
@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Activity,
   UserCheck,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
@@ -53,12 +53,12 @@ export const Auditoria: React.FC = () => {
     setLoading(true);
     try {
       const response = await api.get('/audit/logs', {
-        params: { 
-          page, 
-          limit: 15, 
+        params: {
+          page,
+          limit: 15,
           entidade: entidade || undefined,
-          usuario: searchUser || undefined
-        }
+          usuario: searchUser || undefined,
+        },
       });
       setLogs(response.data.data.items);
       setTotalPages(response.data.data.pages);
@@ -85,11 +85,16 @@ export const Auditoria: React.FC = () => {
 
   const getBadgeColor = (acao: string) => {
     switch (acao) {
-      case 'CREATE': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-      case 'UPDATE': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'DELETE': return 'bg-rose-100 text-rose-700 border-rose-200';
-      case 'LOGIN': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
-      default: return 'bg-slate-100 text-slate-600 border-slate-200';
+      case 'CREATE':
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+      case 'UPDATE':
+        return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'DELETE':
+        return 'bg-rose-100 text-rose-700 border-rose-200';
+      case 'LOGIN':
+        return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+      default:
+        return 'bg-slate-100 text-slate-600 border-slate-200';
     }
   };
 
@@ -110,12 +115,16 @@ export const Auditoria: React.FC = () => {
                 <div className="p-2 bg-slate-900 text-white rounded-xl shadow-lg">
                   <Shield size={20} />
                 </div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight text-gradient">Auditoria do Sistema</h1>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight text-gradient">
+                  Auditoria do Sistema
+                </h1>
               </div>
-              <p className="text-slate-500 font-medium ml-1">Rastreamento global de atividades e segurança.</p>
+              <p className="text-slate-500 font-medium ml-1">
+                Rastreamento global de atividades e segurança.
+              </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
             <div className="px-4 py-2 bg-slate-50 rounded-xl flex items-center gap-2">
               <Activity size={16} className="text-indigo-500" />
@@ -128,10 +137,15 @@ export const Auditoria: React.FC = () => {
         <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-xl">
           <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-4 p-2">
             <div className="flex-1 min-w-[280px]">
-              <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Módulo / Entidade</label>
+              <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">
+                Módulo / Entidade
+              </label>
               <div className="relative">
-                <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
+                <Terminal
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={18}
+                />
+                <input
                   type="text"
                   placeholder="Ex: Acidente, Trabalhador, Ato..."
                   value={entidade}
@@ -140,12 +154,15 @@ export const Auditoria: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex-1 min-w-[280px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Usuário</label>
               <div className="relative">
-                <UserCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
+                <UserCheck
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={18}
+                />
+                <input
                   type="text"
                   placeholder="Nome ou login do usuário..."
                   value={searchUser}
@@ -155,7 +172,7 @@ export const Auditoria: React.FC = () => {
               </div>
             </div>
 
-            <button 
+            <button
               type="submit"
               className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all font-bold shadow-lg shadow-slate-100 active:scale-95"
             >
@@ -171,12 +188,24 @@ export const Auditoria: React.FC = () => {
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Data e Hora</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Usuário</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Ação Realizada</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Módulo</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Endereço IP</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Detalhes</th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Data e Hora
+                  </th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Usuário
+                  </th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Ação Realizada
+                  </th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Módulo
+                  </th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Endereço IP
+                  </th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
+                    Detalhes
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -213,21 +242,27 @@ export const Auditoria: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${getBadgeColor(log.acao)}`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-[10px] font-black border ${getBadgeColor(log.acao)}`}
+                        >
                           {log.acao}
                         </span>
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-2">
                           <Terminal size={14} className="text-slate-300" />
-                          <span className="text-sm font-bold text-slate-600 uppercase tracking-tight">{log.entidade}</span>
+                          <span className="text-sm font-bold text-slate-600 uppercase tracking-tight">
+                            {log.entidade}
+                          </span>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <code className="text-xs font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{log.ip || '0.0.0.0'}</code>
+                        <code className="text-xs font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-md">
+                          {log.ip || '0.0.0.0'}
+                        </code>
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedLog(log);
                             setShowModal(true);
@@ -343,8 +378,8 @@ export const Auditoria: React.FC = () => {
 
                 {/* Texto abaixo da numeração no mobile */}
                 <p className="text-sm text-slate-500 font-medium md:order-none">
-                  Página{" "}
-                  <span className="text-slate-900 font-bold">{page}</span> de{" "}
+                  Página{' '}
+                  <span className="text-slate-900 font-bold">{page}</span> de{' '}
                   <span className="text-slate-900 font-bold">{totalPages}</span>
                 </p>
               </div>
@@ -367,14 +402,14 @@ export const Auditoria: React.FC = () => {
                   <p className="text-sm text-slate-500 font-medium">ID do Registro: {selectedLog.entidadeId}</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => setShowModal(false)}
                 className="p-2 hover:bg-white rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-slate-200"
               >
                 <ArrowLeft className="rotate-90" size={24} />
               </button>
             </div>
-            
+
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1">
@@ -393,104 +428,22 @@ export const Auditoria: React.FC = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Endereço IP</span>
                   <p className="font-mono text-sm text-slate-500">{selectedLog.ip || 'Não registrado'}</p>
                 </div>
-
-                {selectedLog.detalhes?.nomeTrabalhador && selectedLog.detalhes?.cpfTrabalhador && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trabalhador</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeTrabalhador}</p>
-                    <p className="font-bold text-emerald-600 font-mono text-xs">CPF: {selectedLog.detalhes.cpfTrabalhador}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.cpfTrabalhadorDoenca && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorDoenca}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.nomeDoencaDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Doença</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeDoencaDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.tipoAcidenteDetalhe && (
-
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.tipoAcidenteDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.numeroAtoDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.numeroAtoDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.cidadeDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cidade</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.cidadeDetalhe}</p>
-                  </div>
-                )}
-
-
-                {selectedLog.detalhes?.cpfTrabalhadorDoenca && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorDoenca}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.nomeDoencaDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Doença</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeDoencaDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.cpfTrabalhadorVacinacao && (
-
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorVacinacao}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.nomeVacinaDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Vacina</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeVacinaDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.cpfTrabalhador && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhador}</p>
-                  </div>
-                )}
-
               </div>
 
               <div className="space-y-3">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
                 <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
                   <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                  {selectedLog.detalhes
-                    ? JSON.stringify(selectedLog.detalhes, null, 2)
-                    : '// Nenhum detalhe adicional registrado.'}
+                    {selectedLog.detalhes
+                      ? JSON.stringify(selectedLog.detalhes, null, 2)
+                      : '// Nenhum detalhe adicional registrado.'}
                   </pre>
                 </div>
               </div>
             </div>
 
             <div className="p-6 bg-slate-50 flex justify-end">
-              <button 
+              <button
                 onClick={() => setShowModal(false)}
                 className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg"
               >
@@ -505,3 +458,4 @@ export const Auditoria: React.FC = () => {
 };
 
 export default Auditoria;
+
