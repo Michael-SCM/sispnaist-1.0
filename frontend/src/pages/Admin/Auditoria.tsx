@@ -279,13 +279,15 @@ export const Auditoria: React.FC = () => {
                         >
                           1
                         </button>
-                      )}}
+                       )}
+
 
                       {totalPages > 7 && page > 3 && (
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                      )}}
+                       )}
+
 
                       {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
                         let pageNum: number;
@@ -312,14 +314,16 @@ export const Auditoria: React.FC = () => {
                           >
                             {pageNum}
                           </button>
-                        )};
+                        )}
                       })}
+
 
                       {totalPages > 7 && page < totalPages - 2 && (
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                      )}}
+                       )}
+
 
                       {totalPages > 5 && (
                         <button
@@ -328,7 +332,8 @@ export const Auditoria: React.FC = () => {
                         >
                           {totalPages}
                         </button>
-                      )}}
+                       )}
+
                     </div>
                   </div>
 
