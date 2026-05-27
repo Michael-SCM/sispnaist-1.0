@@ -377,6 +377,18 @@ export const Auditoria: React.FC = () => {
             
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
+                    {selectedLog.entidade === 'Trabalhador' && (
+                      <>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome</span>
+                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF</span>
+                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
+                        </div>
+                      </>
+                    )}
                 <div className="space-y-1">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
                   <p className="font-bold text-slate-700">{selectedLog.acao}</p>
@@ -385,6 +397,30 @@ export const Auditoria: React.FC = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
                   <p className="font-bold text-slate-700">{selectedLog.entidade}</p>
                 </div>
+                {selectedLog.entidade === 'Acidente' && (
+                  <>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                      <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
+                      <p className="font-bold text-slate-700">{selectedLog.detalhes?.tipo ?? 'N/A'}</p>
+                    </div>
+                  </>
+                )
+                {selectedLog.entidade === 'AtosMunicipais' && (
+                  <>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
+                      <p className="font-bold text-slate-700">{selectedLog.detalhes?.numeroAto ?? 'N/A'}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cidade</span>
+                      <p className="font-bold text-slate-700">{selectedLog.detalhes?.cidade ?? 'N/A'}</p>
+                    </div>
+                  </>
+                )
                 <div className="space-y-1">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
                   <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
@@ -395,14 +431,22 @@ export const Auditoria: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
-                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
-                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
-                  </pre>
+<div className="space-y-3">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
+                  <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
+                    {selectedLog.detalhes && Object.keys(selectedLog.detalhes).length > 0 ? (
+                      <ul className="list-disc list-inside text-emerald-400 font-mono text-sm">
+                        {Object.entries(selectedLog.detalhes).map(([key, value]) => (
+                          <li key={key}>{key}: {JSON.stringify(value)}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                        // Nenhum detalhe adicional registrado.
+                      </pre>
+                    )}
+                  </div>
                 </div>
-              </div>
             </div>
 
             <div className="p-6 bg-slate-50 flex justify-end">
