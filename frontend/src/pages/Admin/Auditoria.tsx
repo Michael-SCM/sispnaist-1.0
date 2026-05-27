@@ -279,10 +279,11 @@ export const Auditoria: React.FC = () => {
                         >
                           1
                         </button>
-                       )}
+                      )}
 
 
                       {totalPages > 7 && page > 3 && (
+
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
@@ -467,8 +468,9 @@ export const Auditoria: React.FC = () => {
                       <p className="font-bold text-slate-700">{selectedLog.detalhes?.cidade ?? 'N/A'}</p>
                     </div>
                   </>
-                )}
+                    )}
                 <div className="space-y-1">
+
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
                   <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
                 </div>
