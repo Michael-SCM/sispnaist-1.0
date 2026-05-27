@@ -394,24 +394,11 @@ export const Auditoria: React.FC = () => {
                   <p className="font-mono text-sm text-slate-500">{selectedLog.ip || 'Não registrado'}</p>
                 </div>
 
-                {selectedLog.detalhes?.cpfTrabalhador && (
+                {selectedLog.detalhes?.nomeTrabalhador && selectedLog.detalhes?.cpfTrabalhador && (
                   <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhador}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.tipoAcidenteDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.tipoAcidenteDetalhe}</p>
-                  </div>
-                )}
-
-                {selectedLog.detalhes?.numeroAtoDetalhe && (
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
-                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.numeroAtoDetalhe}</p>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trabalhador</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeTrabalhador}</p>
+                    <p className="font-bold text-emerald-600 font-mono text-xs">CPF: {selectedLog.detalhes.cpfTrabalhador}</p>
                   </div>
                 )}
 
@@ -429,7 +416,45 @@ export const Auditoria: React.FC = () => {
                   </div>
                 )}
 
+                {selectedLog.detalhes?.tipoAcidenteDetalhe && (
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Acidente</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.tipoAcidenteDetalhe}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.numeroAtoDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.numeroAtoDetalhe}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.cidadeDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cidade</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.cidadeDetalhe}</p>
+                  </div>
+                )}
+
+
+                {selectedLog.detalhes?.cpfTrabalhadorDoenca && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                    <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorDoenca}</p>
+                  </div>
+                )}
+
+                {selectedLog.detalhes?.nomeDoencaDetalhe && (
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Doença</span>
+                    <p className="font-bold text-emerald-600 text-sm">{selectedLog.detalhes.nomeDoencaDetalhe}</p>
+                  </div>
+                )}
+
                 {selectedLog.detalhes?.cpfTrabalhadorVacinacao && (
+
                   <div className="space-y-1">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
                     <p className="font-bold text-emerald-600 font-mono text-sm">{selectedLog.detalhes.cpfTrabalhadorVacinacao}</p>
