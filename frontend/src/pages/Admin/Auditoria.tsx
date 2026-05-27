@@ -420,7 +420,7 @@ export const Auditoria: React.FC = () => {
                       <p className="font-bold text-slate-700">{selectedLog.detalhes?.cidade ?? 'N/A'}</p>
                     </div>
                   </>
-                )
+                )}
                 <div className="space-y-1">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
                   <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
