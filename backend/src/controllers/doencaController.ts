@@ -18,7 +18,9 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
   const doenca = await doencaService.criar(doencaData);
 
   await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), {
-    cid: doenca.cid
+    cid: (doenca as any).cid,
+    cpfTrabalhador: (doenca as any).trabalhadorId?.cpf,
+    nomeDoencaDetalhe: (doenca as any).nomeDoenca,
   });
 
   res.status(201).json({ sucesso: true, dados: doenca });
@@ -96,7 +98,9 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const doenca = await doencaService.atualizar(id, req.body);
 
   await logAction(req, 'UPDATE', 'Doenca', id, {
-    cid: doenca.cid
+    cid: (doenca as any).cid,
+    cpfTrabalhador: (doenca as any).trabalhadorId?.cpf,
+    nomeDoencaDetalhe: (doenca as any).nomeDoenca,
   });
 
   res.status(200).json({ sucesso: true, dados: doenca });
@@ -108,9 +112,16 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
-  await doencaService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Doenca', id);
+  // Para registrar CPF/nome da doença no log de exclusão, buscamos o registro antes de deletar
+  const doencaParaLog = await doencaService.obter(id);
+
+  await logAction(req, 'DELETE', 'Doenca', id, {
+    cpfTrabalhador: (doencaParaLog as any)?.trabalhadorId?.cpf,
+    nomeDoencaDetalhe: (doencaParaLog as any)?.nomeDoenca,
+  });
+
+  await doencaService.deletar(id);
 
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
