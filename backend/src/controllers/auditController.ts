@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import AuditLog from '../models/AuditLog.js';
 import auditService from '../services/AuditService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 
@@ -37,16 +38,10 @@ export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
  * Estatísticas de auditoria
  */
 export const obterEstatisticas = asyncHandler(async (req: Request, res: Response) => {
-  const totalLogs = await AuditLog.countDocuments();
-  const logsPorAcao = await AuditLog.aggregate([
-    { $group: { _id: '$acao', count: { $sum: 1 } } }
-  ]);
+  const result = await auditService.obterEstatisticas();
 
   res.status(200).json({
     status: 'success',
-    data: {
-      totalLogs,
-      logsPorAcao
-    }
+    data: result
   });
 });

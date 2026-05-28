@@ -42,6 +42,9 @@ export const Auditoria: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [entidade, setEntidade] = useState('');
   const [searchUser, setSearchUser] = useState('');
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
+  const [acao, setAcao] = useState('');
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -57,7 +60,10 @@ export const Auditoria: React.FC = () => {
           page, 
           limit: 15, 
           entidade: entidade || undefined,
-          usuario: searchUser || undefined
+          usuario: searchUser || undefined,
+          acao: acao || undefined,
+          dataInicio: dataInicio || undefined,
+          dataFim: dataFim || undefined
         }
       });
       setLogs(response.data.data.items);
@@ -153,6 +159,42 @@ export const Auditoria: React.FC = () => {
                   className="w-full pl-12 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
                 />
               </div>
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Tipo de Ação</label>
+              <select 
+                value={acao}
+                onChange={(e) => setAcao(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
+              >
+                <option value="">Todas as ações</option>
+                <option value="CREATE">Criar</option>
+                <option value="UPDATE">Atualizar</option>
+                <option value="DELETE">Deletar</option>
+                <option value="LOGIN">Login</option>
+                <option value="LOGOUT">Logout</option>
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Data Início</label>
+              <input 
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
+              />
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Data Fim</label>
+              <input 
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
+              />
             </div>
 
             <button 

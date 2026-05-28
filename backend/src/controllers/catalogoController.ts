@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import CatalogoService from '../services/CatalogoService';
 import { AppError } from '../middleware/errorHandler';
+import { logAction } from '../utils/auditLogger.js';
 
 class CatalogoController {
   /**
@@ -60,6 +61,9 @@ class CatalogoController {
       const dados = req.body;
 
       const item = await CatalogoService.criar(entidade, dados);
+      
+      // Registra auditoria
+      await logAction(req, 'CREATE', `Catalogo_${entidade}`, item._id?.toString() || '', dados);
 
       return res.status(201).json(item);
     } catch (error) {
@@ -74,6 +78,9 @@ class CatalogoController {
       const dados = req.body;
 
       const item = await CatalogoService.atualizar(entidade, id, dados);
+      
+      // Registra auditoria
+      await logAction(req, 'UPDATE', `Catalogo_${entidade}`, id, dados);
 
       return res.status(200).json(item);
     } catch (error) {
@@ -85,6 +92,9 @@ class CatalogoController {
   async deletar(req: Request, res: Response, next: NextFunction) {
     try {
       const { entidade, id } = req.params;
+      
+      // Registra auditoria
+      await logAction(req, 'DELETE', `Catalogo_${entidade}`, id);
 
       await CatalogoService.deletar(entidade, id);
 
