@@ -90,6 +90,10 @@ class VideoAulaController {
         { new: true, runValidators: true }
       );
 
+      if (!videoAula) {
+        throw new AppError('Video-aula não encontrada', 404);
+      }
+
       const mudancas = compararDados(
         {
           titulo: videoAulaAntiga.titulo,
@@ -100,20 +104,7 @@ class VideoAulaController {
           ativo: videoAulaAntiga.ativo
         },
         {
-          tivideoAula = await VideoAula.findById(id);
-      if (!videoAula) {
-        throw new AppError('Video-aula não encontrada', 404);
-      }
-
-      await logAction(req, 'DELETE', 'VideoAula', id, {
-        titulo: videoAula.titulo,
-        url: videoAula.url,
-        categoria: videoAula.categoria,
-        duracao: videoAula.duracao,
-        visualizacoes: videoAula.visualizacoes
-      });
-
-      const tulo: videoAula.titulo,
+          titulo: videoAula.titulo,
           url: videoAula.url,
           categoria: videoAula.categoria,
           descricao: videoAula.descricao,
