@@ -124,16 +124,8 @@ export const deleteTrabalhador = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar trabalhadores', 403);
     }
     const { id } = req.params;
-    // Busca o trabalhador antes de deletar para registrar detalhes
-    const trabalhador = await trabalhadorService.obter(id);
-    if (!trabalhador) {
-        throw new AppError('Trabalhador não encontrado', 404);
-    }
     await trabalhadorService.deletar(id);
-    await logAction(req, 'DELETE', 'Trabalhador', id, {
-        nome: trabalhador.nome,
-        cpf: trabalhador.cpf
-    });
+    await logAction(req, 'DELETE', 'Trabalhador', id);
     res.status(204).json({
         status: 'success',
         data: null,

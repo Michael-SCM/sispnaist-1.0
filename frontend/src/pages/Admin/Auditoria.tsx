@@ -281,14 +281,11 @@ export const Auditoria: React.FC = () => {
                         </button>
                       )}
 
-
                       {totalPages > 7 && page > 3 && (
-
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                       )}
-
+                      )}
 
                       {Array.from({ length: Math.min(totalPages, 7) }).map((_, i) => {
                         let pageNum: number;
@@ -318,13 +315,11 @@ export const Auditoria: React.FC = () => {
                         );
                       })}
 
-
                       {totalPages > 7 && page < totalPages - 2 && (
                         <span className="w-10 h-10 flex items-center justify-center text-slate-400 flex-none">
                           ...
                         </span>
-                       )}
-
+                      )}
 
                       {totalPages > 5 && (
                         <button
@@ -333,8 +328,7 @@ export const Auditoria: React.FC = () => {
                         >
                           {totalPages}
                         </button>
-                       )}
-
+                      )}
                     </div>
                   </div>
 
@@ -383,18 +377,6 @@ export const Auditoria: React.FC = () => {
             
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
-                    {selectedLog.entidade === 'Trabalhador' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
                 <div className="space-y-1">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
                   <p className="font-bold text-slate-700">{selectedLog.acao}</p>
@@ -403,88 +385,7 @@ export const Auditoria: React.FC = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
                   <p className="font-bold text-slate-700">{selectedLog.entidade}</p>
                 </div>
-{selectedLog.entidade === 'Acidente' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpfTrabalhador ?? selectedLog.detalhes?.cpf ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo do Acidente</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.tipoAcidente ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'Doenca' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Doença</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'Vacinacao' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpf ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vacina Aplicada</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.vacina ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'Empresa' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Razão Social</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.razaoSocial ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CNPJ</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cnpj ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'Unidade' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Razão Social da Empresa</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.razaoSocial ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome da Unidade</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.nome ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'User' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome Completo</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.nomeCompleto ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
-                    {selectedLog.entidade === 'AtoMunicipal' && (
-                      <>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Número do Ato</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.numeroAto ?? 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cidade</span>
-                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cidade ?? 'N/A'}</p>
-                        </div>
-                      </>
-                    )}
                 <div className="space-y-1">
-
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
                   <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
                 </div>
@@ -494,22 +395,14 @@ export const Auditoria: React.FC = () => {
                 </div>
               </div>
 
-<div className="space-y-3">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
-                  <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
-                    {selectedLog.detalhes && Object.keys(selectedLog.detalhes).length > 0 ? (
-                      <ul className="list-disc list-inside text-emerald-400 font-mono text-sm">
-                        {Object.entries(selectedLog.detalhes).map(([key, value]) => (
-                          <li key={key}>{key}: {JSON.stringify(value)}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                        // Nenhum detalhe adicional registrado.
-                      </pre>
-                    )}
-                  </div>
+              <div className="space-y-3">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
+                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
+                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
+                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                  </pre>
                 </div>
+              </div>
             </div>
 
             <div className="p-6 bg-slate-50 flex justify-end">

@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import unidadeService from '../services/UnidadeService.js';
-import { logAction } from '../utils/auditLogger.js';
-import { AppError } from '../middleware/errorHandler.js';
 
 /**
  * @desc    Listar unidades com paginação e filtros
@@ -77,18 +75,7 @@ export const updateUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const deleteUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const unidade = await unidadeService.obter(id);
-  if (!unidade) {
-    throw new AppError('Unidade não encontrada', 404);
-  }
-
   await unidadeService.deletar(id);
-
-  // Log com detalhes da unidade
-  await logAction(req, 'DELETE', 'Unidade', id, {
-    razaoSocial: unidade.razaoSocial ?? 'N/A',
-    nome: unidade.nome ?? 'N/A'
-  });
 
   res.status(204).json({
     status: 'success',

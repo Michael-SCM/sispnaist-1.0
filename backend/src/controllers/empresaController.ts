@@ -75,18 +75,7 @@ export const updateEmpresa = asyncHandler(async (req: Request, res: Response) =>
  */
 export const deleteEmpresa = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const empresa = await empresaService.obter(id);
-  if (!empresa) {
-    throw new AppError('Empresa não encontrada', 404);
-  }
-
   await empresaService.deletar(id);
-
-  // Log com detalhes da empresa
-  await logAction(req, 'DELETE', 'Empresa', id, {
-    razaoSocial: empresa.razaoSocial ?? 'N/A',
-    cnpj: empresa.cnpj ?? 'N/A'
-  });
 
   res.status(204).json({
     status: 'success',

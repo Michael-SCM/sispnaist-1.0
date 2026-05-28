@@ -8,15 +8,8 @@ export const criar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para criar acidentes', 403);
     }
     const acidente = await acidenteService.criar(req.body);
-    // Garantir CPF do trabalhador no audit log
-    // (acidente.trabalhadorId pode vir como ObjectId, documento populado, ou string)
-    const trabalhadorId = acidente?.trabalhadorId;
-    const trabalhador = typeof trabalhadorId === 'object'
-        ? trabalhadorId
-        : await Trabalhador.findById(trabalhadorId);
     await logAction(req, 'CREATE', 'Acidente', acidente._id.toString(), {
         tipoAcidente: acidente.tipoAcidente,
-        cpfTrabalhador: trabalhador?.cpf ?? acidente?.cpf ?? acidente.trabalhadorId?.cpf ?? 'N/A',
         dataAcidente: acidente.dataAcidente
     });
     res.status(201).json({
@@ -86,14 +79,7 @@ export const atualizar = asyncHandler(async (req, res) => {
     }
     const { id } = req.params;
     const acidente = await acidenteService.atualizar(id, req.body);
-    // Garantir CPF do trabalhador e tipo no audit log
-    const trabalhadorId = acidente?.trabalhadorId;
-    const trabalhador = typeof trabalhadorId === 'object'
-        ? trabalhadorId
-        : await Trabalhador.findById(trabalhadorId);
     await logAction(req, 'UPDATE', 'Acidente', id, {
-        tipoAcidente: acidente.tipoAcidente,
-        cpfTrabalhador: trabalhador?.cpf ?? acidente?.cpf ?? acidente.trabalhadorId?.cpf ?? 'N/A',
         status: acidente.status
     });
     res.status(200).json({
@@ -106,21 +92,8 @@ export const deletar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar acidentes', 403);
     }
     const { id } = req.params;
-    // Busca o acidente para registrar detalhes antes da remoção
-    const acidente = await acidenteService.obter(id);
-    if (!acidente) {
-        throw new AppError('Acidente não encontrado', 404);
-    }
     await acidenteService.deletar(id);
-    // Garantir CPF do trabalhador e tipo no audit log
-    const trabalhadorId = acidente?.trabalhadorId;
-    const trabalhador = typeof trabalhadorId === 'object'
-        ? trabalhadorId
-        : await Trabalhador.findById(trabalhadorId);
-    await logAction(req, 'DELETE', 'Acidente', id, {
-        tipoAcidente: acidente.tipoAcidente,
-        cpfTrabalhador: trabalhador?.cpf ?? acidente?.cpf ?? acidente.trabalhadorId?.cpf ?? 'N/A'
-    });
+    await logAction(req, 'DELETE', 'Acidente', id);
     res.status(204).send();
 });
 export const obterPorTrabalhador = asyncHandler(async (req, res) => {

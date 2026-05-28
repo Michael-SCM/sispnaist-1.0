@@ -68,17 +68,9 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
  */
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const usuario = await userService.obter(id);
-  if (!usuario) {
-    throw new AppError('Usuário não encontrado', 404);
-  }
-
   await userService.deletar(id);
 
-  await logAction(req, 'DELETE', 'User', id, {
-    nomeCompleto: usuario.nomeCompleto ?? usuario.nome ?? 'N/A',
-    email: usuario.email ?? 'N/A'
-  });
+  await logAction(req, 'DELETE', 'User', id);
 
   res.status(204).json({
     status: 'success',

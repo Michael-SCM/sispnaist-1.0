@@ -57,15 +57,7 @@ export const atualizar = asyncHandler(async (req, res) => {
 });
 export const deletar = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const ficha = await materialBiologicoService.obter(id);
-    if (!ficha) {
-        throw new AppError('Ficha não encontrada', 404);
-    }
     await materialBiologicoService.deletar(id);
-    // Log com detalhes da ficha
-    await logAction(req, 'DELETE', 'MaterialBiologico', id, {
-        acidenteId: ficha.acidenteId?.toString() ?? 'N/A',
-        agente: ficha.agente ?? 'N/A'
-    });
+    await logAction(req, 'DELETE', 'MaterialBiologico', id);
     res.status(204).send();
 });

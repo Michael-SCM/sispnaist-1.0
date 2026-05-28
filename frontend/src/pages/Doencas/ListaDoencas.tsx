@@ -107,15 +107,12 @@ export const ListaDoencas: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-<button
+            <button
               onClick={async () => {
-                const toastId = 'export-doencas';
                 try {
-                  toast.loading('Exportando doenças...', { id: toastId });
                   await exportDoencas();
-                  toast.success('Exportação pronta!', { id: toastId });
                 } catch (e) {
-                  toast.error('Erro ao exportar doenças', { id: toastId });
+                  toast.error('Erro ao exportar doenças');
                   console.error(e);
                 }
               }}
