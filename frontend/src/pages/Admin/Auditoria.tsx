@@ -403,7 +403,19 @@ export const Auditoria: React.FC = () => {
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
                   <p className="font-bold text-slate-700">{selectedLog.entidade}</p>
                 </div>
-{selectedLog.entidade === 'Doenca' && (
+{selectedLog.entidade === 'Acidente' && (
+                      <>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>
+                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.cpfTrabalhador ?? selectedLog.detalhes?.cpf ?? 'N/A'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo do Acidente</span>
+                          <p className="font-bold text-slate-700">{selectedLog.detalhes?.tipoAcidente ?? 'N/A'}</p>
+                        </div>
+                      </>
+                    )}
+                    {selectedLog.entidade === 'Doenca' && (
                       <>
                         <div className="space-y-1">
                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CPF do Trabalhador</span>

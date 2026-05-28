@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
+// Quando VITE_API_URL não estiver definida, usa o proxy do Vite em /api
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,

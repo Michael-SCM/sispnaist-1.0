@@ -79,7 +79,8 @@ class AtoMunicipalInovacaoController {
             }
             await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
                 nr_ato: item.nr_ato,
-                ano_ato: item.ano_ato
+                ano_ato: item.ano_ato,
+                cidade: item.nm_cidade ?? 'N/A'
             });
             return res.status(204).send();
         }

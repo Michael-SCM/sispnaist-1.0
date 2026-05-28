@@ -10,10 +10,28 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Sem permissão para criar acidentes', 403);
   }
 
-  const acidente = await acidenteService.criar(req.body);
+  const acidenteCriado = await acidenteService.criar(req.body);
+
+  // Rebuscar com populate confiável para garantir CPF e consistência do tipo
+  const acidente = await acidenteService.obter(acidenteCriado._id!.toString());
+
+  const trabalhadorIdObj = (acidente.trabalhadorId as any);
+  const cpfTrabalhador =
+    trabalhadorIdObj?.cpf ??
+    // se veio populado, mas sem cpf, tenta por _id
+    (trabalhadorIdObj?._id ? (trabalhadorIdObj as any)._id : undefined) ??
+    // se veio como id direto
+    (typeof acidente.trabalhadorId === 'string' ? acidente.trabalhadorId : undefined) ??
+    undefined;
+
+  const cpfFinal =
+    typeof cpfTrabalhador === 'string' && cpfTrabalhador.length > 0
+      ? (await Trabalhador.findById(cpfTrabalhador).select('cpf').lean())?.cpf ?? 'N/A'
+      : 'N/A';
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
     tipoAcidente: acidente.tipoAcidente,
+    cpfTrabalhador: cpfFinal,
     dataAcidente: acidente.dataAcidente
   });
 
@@ -97,9 +115,34 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
-  const acidente = await acidenteService.atualizar(id, req.body);
+  const acidenteAtualizado = await acidenteService.atualizar(id, req.body);
+
+  // Rebuscar com populate confiável para garantir CPF e consistência do tipo
+  const acidente = await acidenteService.obter(acidenteAtualizado._id!.toString());
+
+  const trabalhadorIdObjU = (acidente.trabalhadorId as any);
+  const cpfTrabalhadorU =
+    trabalhadorIdObjU?.cpf ??
+    (trabalhadorIdObjU?._id ? (trabalhadorIdObjU as any)._id : undefined) ??
+    (typeof acidente.trabalhadorId === 'string' ? acidente.trabalhadorId : undefined) ??
+    undefined;
+
+  const cpfFinalU =
+    typeof cpfTrabalhadorU === 'string' && cpfTrabalhadorU.length > 0
+      ? (await Trabalhador.findById(cpfTrabalhadorU).select('cpf').lean())?.cpf ?? 'N/A'
+      : 'N/A';
+
+  console.log('[AUDIT DEBUG] UPDATE Acidente', {
+    acidenteId: id,
+    tipoAcidente: acidente.tipoAcidente,
+    cpfTrabalhador: cpfFinalU,
+    status: acidente.status,
+    trabalhadorId: (acidente.trabalhadorId as any)?._id ?? acidente.trabalhadorId,
+  });
 
   await logAction(req, 'UPDATE', 'Acidente', id, {
+    tipoAcidente: acidente.tipoAcidente,
+    cpfTrabalhador: cpfFinalU,
     status: acidente.status
   });
 
@@ -123,10 +166,27 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
 
   await acidenteService.deletar(id);
 
+  // Garantir CPF do trabalhador e tipo no audit log
+  const trabalhadorId = (acidente as any)?.trabalhadorId;
+  const trabalhador = typeof trabalhadorId === 'object'
+    ? trabalhadorId
+    : await Trabalhador.findById(trabalhadorId);
+
+  const cpfTrabalhador =
+    (trabalhador as any)?.cpf ??
+    (acidente as any)?.cpf ??
+    (typeof (acidente as any)?.trabalhadorId === 'object'
+      ? (acidente as any)?.trabalhadorId?.cpf
+      : undefined) ??
+    // fallback final: se tiver _id do objeto populado, busca no Trabalhador
+    ((typeof (acidente as any)?.trabalhadorId === 'object' && (acidente as any)?.trabalhadorId?._id)
+      ? (await Trabalhador.findById((acidente as any)?.trabalhadorId._id).select('cpf').lean())?.cpf
+      : undefined) ??
+    'N/A';
+
   await logAction(req, 'DELETE', 'Acidente', id, {
     tipoAcidente: acidente.tipoAcidente,
-    // Supondo que acidente.trabalhadorId seja populado ou contenha CPF
-    cpf: (acidente as any).cpf ?? (acidente.trabalhadorId as any)?.cpf ?? 'N/A'
+    cpfTrabalhador,
   });
 
   res.status(204).send();

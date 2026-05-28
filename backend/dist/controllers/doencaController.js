@@ -85,8 +85,15 @@ export const deletar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar registros de doenças', 403);
     }
     const { id } = req.params;
+    const doenca = await doencaService.obter(id);
+    if (!doenca) {
+        throw new AppError('Doença não encontrada', 404);
+    }
     await doencaService.deletar(id);
-    await logAction(req, 'DELETE', 'Doenca', id);
+    await logAction(req, 'DELETE', 'Doenca', id, {
+        cpf: doenca.cpf ?? doenca.trabalhadorId?.cpf ?? 'N/A',
+        nome: doenca.nome ?? 'N/A'
+    });
     res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
 export const obterPorTrabalhador = asyncHandler(async (req, res) => {

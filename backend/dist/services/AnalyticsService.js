@@ -310,47 +310,199 @@ export class AnalyticsService {
     async obterMonitoramentoClinico() {
         const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
         const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
-        // Alertas Críticos (Exemplo: 3+ acidentes ou vacina vencida há 90 dias)
-        const tresMesesAtras = new Date();
-        tresMesesAtras.setDate(tresMesesAtras.getDate() - 90);
+        // Alertas Críticos
+        // Regra atual: trabalhadores com >= 2 acidentes
+        // Ajuste: buscar nome na coleção 'trabalhadores' (não em 'users')
         const trabalhadoresEmRisco = await Acidente.aggregate([
-            { $group: { _id: '$trabalhadorId', count: { $sum: 1 } } },
+            {
+                $group: { _id: '$trabalhadorId', count: { $sum: 1 } },
+            },
             { $match: { count: { $gte: 2 } } },
-            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
-            { $unwind: '$user' },
-            { $project: { nome: '$user.nome', total: '$count' } }
+            {
+                $lookup: {
+                    from: 'trabalhadores',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'trabalhador',
+                },
+            },
+            { $unwind: '$trabalhador' },
+            { $project: { nome: '$trabalhador.nome', total: '$count' } },
         ]);
-        const alertasCriticos = trabalhadoresEmRisco.map(t => ({
+        const alertasCriticos = trabalhadoresEmRisco.map((t) => ({
             trabalhador: t.nome,
             motivo: `${t.total} acidentes registrados`,
-            nivel: t.total > 3 ? 'alto' : 'medio'
+            nivel: (t.total > 3 ? 'alto' : 'medio'),
         }));
         // Absenteísmo por mês
-        const absenteismoAgg = await Acidente.aggregate([
-            { $match: { diasAfastamento: { $gt: 0 } } },
+        // Ajuste: o campo diasAfastamento não existe no modelo 'Acidente'.
+        // Então calculamos por afastamentos do trabalhador (TrabalhadorAfastamento), somando dias entre dataInicio e dataFim (ou dataRetorno).
+        const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
+        const afastamentos = await TrabalhadorAfastamento.find({}).lean();
+        const porMesMap = {};
+        let totalDias = 0;
+        for (const a of afastamentos) {
+            const inicioISO = new Date(a.dataInicio).toISOString();
+            const fimISO = a.dataFim
+                ? new Date(a.dataFim).toISOString()
+                : a.dataRetorno
+                    ? new Date(a.dataRetorno).toISOString()
+                    : null;
+            if (!fimISO)
+                continue;
+            const [inicioDate] = inicioISO.split('T');
+            const [fimDate] = fimISO.split('T');
+            const [iy, im, id] = inicioDate.split('-').map(Number);
+            const [fy, fm, fd] = fimDate.split('-').map(Number);
+            const diffDias = (new Date(fy, fm - 1, fd).getTime() - new Date(iy, im - 1, id).getTime()) / (1000 * 60 * 60 * 24);
+            const diasArredondado = Math.round(diffDias);
+            if (diasArredondado <= 0)
+                continue;
+            totalDias += diasArredondado;
+            const mes = im;
+            const ano = iy;
+            const key = `${ano}-${mes}`;
+            porMesMap[key] = (porMesMap[key] || 0) + diasArredondado;
+        }
+        // Gerar últimos 12 meses com labels
+        const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        const porMes = [];
+        for (let i = 11; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const mes = d.getMonth() + 1; // 1-12
+            const ano = d.getFullYear();
+            const key = `${ano}-${mes}`;
+            const label = `${mesesNomes[mes - 1]}/${ano.toString().slice(2)}`;
+            porMes.push({ mes: label, dias: porMesMap[key] || 0 });
+        }
+        // Cobertura vacinal por empresa
+        // Definição: percentual de trabalhadores ativos (vinculo.situacao === 'Ativo') que possuem pelo menos 1 registro em Vacinacao,
+        // agrupado por empresa do Trabalhador.
+        const totalAtivosPorEmpresa = await Trabalhador.aggregate([
+            {
+                $match: {
+                    'vinculo.situacao': 'Ativo',
+                    empresa: { $exists: true, $ne: null },
+                },
+            },
             {
                 $group: {
-                    _id: { $month: '$dataAcidente' },
-                    dias: { $sum: '$diasAfastamento' }
-                }
+                    _id: '$empresa',
+                    totalAtivos: { $sum: 1 },
+                },
             },
-            { $sort: { '_id': 1 } }
+            {
+                $lookup: {
+                    from: 'empresas',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'empresaData',
+                },
+            },
+            { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    empresaId: '$_id',
+                    totalAtivos: 1,
+                    nomeEmpresa: '$empresaData.razaoSocial',
+                },
+            },
         ]);
-        const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        const porMes = absenteismoAgg.map(item => ({
-            mes: mesesNomes[item._id - 1],
-            dias: item.dias
-        }));
+        const ativosComVacinaPorEmpresa = await Vacinacao.aggregate([
+            {
+                $lookup: {
+                    from: 'trabalhadores',
+                    localField: 'trabalhadorId',
+                    foreignField: '_id',
+                    as: 'trabalhadorData',
+                },
+            },
+            { $unwind: '$trabalhadorData' },
+            {
+                $match: {
+                    'trabalhadorData.vinculo.situacao': 'Ativo',
+                    'trabalhadorData.empresa': { $exists: true, $ne: null },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        empresa: '$trabalhadorData.empresa',
+                        trabalhador: '$trabalhadorId',
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: '$_id.empresa',
+                    totalComVacina: { $sum: 1 },
+                },
+            },
+            {
+                $lookup: {
+                    from: 'empresas',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'empresaData',
+                },
+            },
+            { $unwind: { path: '$empresaData', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    empresaId: '$_id',
+                    totalComVacina: 1,
+                    nomeEmpresa: '$empresaData.razaoSocial',
+                },
+            },
+        ]);
+        const mapVacina = new Map(ativosComVacinaPorEmpresa.map((item) => [
+            item.empresaId?.toString?.() ?? String(item.empresaId),
+            item.totalComVacina,
+        ]));
+        const porEmpresa = totalAtivosPorEmpresa
+            .map((item) => {
+            const empresaKey = item.empresaId?.toString?.() ?? String(item.empresaId);
+            const totalAtivos = item.totalAtivos ?? 0;
+            const totalComVacina = mapVacina.get(empresaKey) ?? 0;
+            const cobertura = totalAtivos > 0 ? Math.round((totalComVacina / totalAtivos) * 100) : 0;
+            return {
+                nome: item.nomeEmpresa || 'Sem empresa',
+                cobertura,
+            };
+        })
+            .sort((a, b) => (b.cobertura ?? 0) - (a.cobertura ?? 0));
+        // Mes atual (este mes e mes anterior)
+        const now = new Date();
+        const mesAtual = now.getMonth() + 1;
+        const anoAtual = now.getFullYear();
+        const mesAnterior = mesAtual === 1 ? 12 : mesAtual - 1;
+        const anoAnterior = mesAtual === 1 ? anoAtual - 1 : anoAtual;
+        const chaveMesAtual = `${anoAtual}-${mesAtual}`;
+        const chaveMesAnterior = `${anoAnterior}-${mesAnterior}`;
+        const diasMesAtual = porMesMap[chaveMesAtual] || 0;
+        const diasMesAnterior = porMesMap[chaveMesAnterior] || 0;
+        // Variacao percentual
+        let variacao = 0;
+        if (diasMesAnterior > 0) {
+            variacao = Math.round(((diasMesAtual - diasMesAnterior) / diasMesAnterior) * 100);
+        }
+        else if (diasMesAtual > 0) {
+            variacao = 100; // primeira vez com dados
+        }
         return {
             coberturaVacinal: {
-                total: totalTrabalhadores > 0 ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) : 0,
-                porEmpresa: [] // Implementar se necessário
+                total: totalTrabalhadores > 0
+                    ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
+                    : 0,
+                porEmpresa,
             },
             absenteismo: {
-                totalDias: absenteismoAgg.reduce((acc, curr) => acc + curr.dias, 0),
-                porMes
+                totalDias: diasMesAtual,
+                variacao,
+                porMes,
             },
-            alertasCriticos
+            alertasCriticos,
         };
     }
 }
