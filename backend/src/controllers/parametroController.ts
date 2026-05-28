@@ -100,6 +100,10 @@ class ParametroController {
         { new: true, runValidators: true }
       );
 
+      if (!parametro) {
+        throw new AppError('Parâmetro não encontrado', 404);
+      }
+
       const mudancas = compararDados(
         {
           chave: parametroAntigo.chave,
@@ -110,19 +114,7 @@ class ParametroController {
         },
         {
           chave: parametro.chave,
-          vaparametro = await Parametro.findById(id);
-      if (!parametro) {
-        throw new AppError('Parâmetro não encontrado', 404);
-      }
-
-      await logAction(req, 'DELETE', 'Parametro', id, {
-        chave: parametro.chave,
-        valor: parametro.valor,
-        categoria: parametro.categoria,
-        descricao: parametro.descricao
-      });
-
-      const lor: parametro.valor,
+          valor: parametro.valor,
           categoria: parametro.categoria,
           descricao: parametro.descricao,
           ativo: parametro.ativo
