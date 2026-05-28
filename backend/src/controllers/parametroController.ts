@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Parametro from '../models/Parametro';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 class ParametroController {
   // GET /api/parametros - Listar todos os parâmetros
@@ -69,6 +70,14 @@ class ParametroController {
     try {
       const parametro = await Parametro.create(req.body);
 
+      await logAction(req, 'CREATE', 'Parametro', parametro._id.toString(), {
+        chave: parametro.chave,
+        valor: parametro.valor,
+        categoria: parametro.categoria,
+        descricao: parametro.descricao,
+        ativo: parametro.ativo
+      });
+
       return res.status(201).json(parametro);
     } catch (error) {
       next(error);
@@ -80,15 +89,47 @@ class ParametroController {
     try {
       const { id } = req.params;
 
+      const parametroAntigo = await Parametro.findById(id);
+      if (!parametroAntigo) {
+        throw new AppError('Parâmetro não encontrado', 404);
+      }
+
       const parametro = await Parametro.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
       );
 
+      const mudancas = compararDados(
+        {
+          chave: parametroAntigo.chave,
+          valor: parametroAntigo.valor,
+          categoria: parametroAntigo.categoria,
+          descricao: parametroAntigo.descricao,
+          ativo: parametroAntigo.ativo
+        },
+        {
+          chave: parametro.chave,
+          vaparametro = await Parametro.findById(id);
       if (!parametro) {
         throw new AppError('Parâmetro não encontrado', 404);
       }
+
+      await logAction(req, 'DELETE', 'Parametro', id, {
+        chave: parametro.chave,
+        valor: parametro.valor,
+        categoria: parametro.categoria,
+        descricao: parametro.descricao
+      });
+
+      const lor: parametro.valor,
+          categoria: parametro.categoria,
+          descricao: parametro.descricao,
+          ativo: parametro.ativo
+        }
+      );
+
+      await logAction(req, 'UPDATE', 'Parametro', id, mudancas);
 
       return res.status(200).json(parametro);
     } catch (error) {

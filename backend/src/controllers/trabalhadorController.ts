@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import trabalhadorService from '../services/TrabalhadorService.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 /**
  * @desc    Listar trabalhadores com paginação e filtros
@@ -97,7 +97,15 @@ export const createTrabalhador = asyncHandler(async (req: Request, res: Response
 
     await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), {
       nome: trabalhador.nome,
-      cpf: trabalhador.cpf
+      cpf: trabalhador.cpf,
+      email: trabalhador.email,
+      telefone: trabalhador.telefone,
+      matricula: trabalhador.matricula,
+      departamento: trabalhador.departamento,
+      funcao: trabalhador.funcao,
+      setor: trabalhador.setor,
+      ativo: trabalhador.ativo,
+      dataAdmissao: trabalhador.dataAdmissao
     });
 
     res.status(201).json({
@@ -124,15 +132,35 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
   }
 
   const { id } = req.params;
-  const trabalhador = await trabalhadorService.atualizar(id, req.body);
+  const trabalhadorAntigo = await trabalhadorService.obter(id);
+  const trabalhadorNovo = await trabalhadorService.atualizar(id, req.body);
 
-  await logAction(req, 'UPDATE', 'Trabalhador', id, {
-    nome: trabalhador.nome
-  });
+  const mudancas = compararDados(
+    {
+      nome: trabalhadorAntigo.nome,
+      email: trabalhadorAntigo.email,
+      telefone: trabalhadorAntigo.telefone,
+      departamento: trabalhadorAntigo.departamento,
+      funcao: trabalhadorAntigo.funcao,
+      setor: trabalhadorAntigo.setor,
+      ativo: trabalhadorAntigo.ativo
+    },
+    {
+      nome: trabalhadorNovo.nome,
+      email: trabalhadorNovo.email,
+      telefone: trabalhadorNovo.telefone,
+      departamento: trabalhadorNovo.departamento,
+      funcao: trabalhadorNovo.funcao,
+      setor: trabalhadorNovo.setor,
+      ativo: trabalhadorNovo.ativo
+    }
+  );
+
+  await logAction(req, 'UPDATE', 'Trabalhador', id, mudancas);
 
   res.status(200).json({
     status: 'success',
-    data: { trabalhador },
+    data: { trabalhador: trabalhadorNovo },
   });
 });
 
@@ -147,9 +175,20 @@ export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response
   }
 
   const { id } = req.params;
-  await trabalhadorService.deletar(id);
+  const trabalhador = await trabalhadorService.obter(id);
 
-  await logAction(req, 'DELETE', 'Trabalhador', id);
+  await logAction(req, 'DELETE', 'Trabalhador', id, {
+    nome: trabalhador.nome,
+    cpf: trabalhador.cpf,
+    email: trabalhador.email,
+    telefone: trabalhador.telefone,
+    matricula: trabalhador.matricula,
+    departamento: trabalhador.departamento,
+    funcao: trabalhador.funcao,
+    setor: trabalhador.setor
+  });
+
+  await trabalhadorService.deletar(id);
 
   res.status(204).json({
     status: 'success',

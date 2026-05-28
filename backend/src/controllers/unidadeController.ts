@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import unidadeService from '../services/UnidadeService.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
+import { AppError } from '../middleware/errorHandler.js';
 
 /**
  * @desc    Listar unidades com paginação e filtros
@@ -47,6 +49,13 @@ export const getUnidade = asyncHandler(async (req: Request, res: Response) => {
 export const createUnidade = asyncHandler(async (req: Request, res: Response) => {
   const unidade = await unidadeService.criar(req.body);
 
+  await logAction(req, 'CREATE', 'Unidade', unidade._id!.toString(), {
+    nome: unidade.nome,
+    empresaId: unidade.empresaId,
+    descricao: unidade.descricao,
+    ativo: unidade.ativo
+  });
+
   res.status(201).json({
     status: 'success',
     data: { unidade },
@@ -60,11 +69,27 @@ export const createUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const updateUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const unidade = await unidadeService.atualizar(id, req.body);
+  const unidadeAntiga = await unidadeService.obter(id);
+  const unidadeNova = await unidadeService.atualizar(id, req.body);
+
+  const mudancas = compararDados(
+    {
+      nome: unidadeAntiga.nome,
+      descricao: unidadeAntiga.descricao,
+      ativo: unidadeAntiga.ativo
+    },
+    {
+      nome: unidadeNova.nome,
+      descricao: unidadeNova.descricao,
+      ativo: unidadeNova.ativo
+    }
+  );
+
+  await logAction(req, 'UPDATE', 'Unidade', id, mudancas);
 
   res.status(200).json({
     status: 'success',
-    data: { unidade },
+    data: { unidade: unidadeNova },
   });
 });
 
@@ -75,6 +100,14 @@ export const updateUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const deleteUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const unidade = await unidadeService.obter(id);
+
+  await logAction(req, 'DELETE', 'Unidade', id, {
+    nome: unidade.nome,
+    empresaId: unidade.empresaId,
+    descricao: unidade.descricao
+  });
+
   await unidadeService.deletar(id);
 
   res.status(204).json({

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import VideoAula from '../models/VideoAula';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 class VideoAulaController {
   // GET /api/video-aulas - Listar video-aulas
@@ -58,6 +59,15 @@ class VideoAulaController {
     try {
       const videoAula = await VideoAula.create(req.body);
 
+      await logAction(req, 'CREATE', 'VideoAula', videoAula._id.toString(), {
+        titulo: videoAula.titulo,
+        url: videoAula.url,
+        categoria: videoAula.categoria,
+        descricao: videoAula.descricao,
+        duracao: videoAula.duracao,
+        ativo: videoAula.ativo
+      });
+
       return res.status(201).json(videoAula);
     } catch (error) {
       next(error);
@@ -69,15 +79,50 @@ class VideoAulaController {
     try {
       const { id } = req.params;
 
+      const videoAulaAntiga = await VideoAula.findById(id);
+      if (!videoAulaAntiga) {
+        throw new AppError('Video-aula não encontrada', 404);
+      }
+
       const videoAula = await VideoAula.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
       );
 
+      const mudancas = compararDados(
+        {
+          titulo: videoAulaAntiga.titulo,
+          url: videoAulaAntiga.url,
+          categoria: videoAulaAntiga.categoria,
+          descricao: videoAulaAntiga.descricao,
+          duracao: videoAulaAntiga.duracao,
+          ativo: videoAulaAntiga.ativo
+        },
+        {
+          tivideoAula = await VideoAula.findById(id);
       if (!videoAula) {
         throw new AppError('Video-aula não encontrada', 404);
       }
+
+      await logAction(req, 'DELETE', 'VideoAula', id, {
+        titulo: videoAula.titulo,
+        url: videoAula.url,
+        categoria: videoAula.categoria,
+        duracao: videoAula.duracao,
+        visualizacoes: videoAula.visualizacoes
+      });
+
+      const tulo: videoAula.titulo,
+          url: videoAula.url,
+          categoria: videoAula.categoria,
+          descricao: videoAula.descricao,
+          duracao: videoAula.duracao,
+          ativo: videoAula.ativo
+        }
+      );
+
+      await logAction(req, 'UPDATE', 'VideoAula', id, mudancas);
 
       return res.status(200).json(videoAula);
     } catch (error) {

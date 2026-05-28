@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import Questionario from '../models/Questionario';
 import QuestionarioItem from '../models/QuestionarioItem';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 class QuestionarioController {
   // GET /api/questionarios - Listar todos os questionários
@@ -56,6 +57,13 @@ class QuestionarioController {
     try {
       const questionario = await Questionario.create(req.body);
 
+      await logAction(req, 'CREATE', 'Questionario', questionario._id.toString(), {
+        nome: questionario.nome,
+        tipo: questionario.tipo,
+        descricao: questionario.descricao,
+        ativo: questionario.ativo
+      });
+
       return res.status(201).json(questionario);
     } catch (error) {
       next(error);
@@ -67,15 +75,45 @@ class QuestionarioController {
     try {
       const { id } = req.params;
 
+      const questionarioAntigo = await Questionario.findById(id);
+      if (!questionarioAntigo) {
+        throw new AppError('Questionário não encontrado', 404);
+      }
+
       const questionario = await Questionario.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
       );
 
+      const mudancas = compararDados(
+        {
+          nome: questionarioAntigo.nome,
+          tipo: questionarioAntigo.tipo,
+          descricao: questionarioAntigo.descricao,
+          ativo: questionarioAntigo.ativo
+        },
+        {
+          nome: questionario.nome,
+          tipo: questionario.tipo,
+          dequestionario = await Questionario.findById(id);
       if (!questionario) {
         throw new AppError('Questionário não encontrado', 404);
       }
+
+      await logAction(req, 'DELETE', 'Questionario', id, {
+        nome: questionario.nome,
+        tipo: questionario.tipo,
+        descricao: questionario.descricao,
+        totalItens: (await QuestionarioItem.countDocuments({ questionarioId: id, ativo: true }))
+      });
+
+      const scricao: questionario.descricao,
+          ativo: questionario.ativo
+        }
+      );
+
+      await logAction(req, 'UPDATE', 'Questionario', id, mudancas);
 
       return res.status(200).json(questionario);
     } catch (error) {
