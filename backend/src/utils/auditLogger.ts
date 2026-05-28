@@ -67,7 +67,10 @@ export const logAction = async (
  *   }
  * }
  */
-export const compararDados = (\n  datosAntigos: Record<string, any>,\n  datosNovos: Record<string, any>\n): Record<string, any> => {
+export const compararDados = (
+  datosAntigos: Record<string, any>,
+  datosNovos: Record<string, any>
+): Record<string, any> => {
   const mudancas: Record<string, any> = {};
   const camposMudados: string[] = [];
 

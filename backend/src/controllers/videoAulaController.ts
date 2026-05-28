@@ -84,13 +84,13 @@ class VideoAulaController {
         throw new AppError('Video-aula não encontrada', 404);
       }
 
-      const videoAula = await VideoAula.findByIdAndUpdate(
+      const videoAulaAtualizada = await VideoAula.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
       );
 
-      if (!videoAula) {
+      if (!videoAulaAtualizada) {
         throw new AppError('Video-aula não encontrada', 404);
       }
 
@@ -104,18 +104,18 @@ class VideoAulaController {
           ativo: videoAulaAntiga.ativo
         },
         {
-          titulo: videoAula.titulo,
-          url: videoAula.url,
-          categoria: videoAula.categoria,
-          descricao: videoAula.descricao,
-          duracao: videoAula.duracao,
-          ativo: videoAula.ativo
+          titulo: videoAulaAtualizada.titulo,
+          url: videoAulaAtualizada.url,
+          categoria: videoAulaAtualizada.categoria,
+          descricao: videoAulaAtualizada.descricao,
+          duracao: videoAulaAtualizada.duracao,
+          ativo: videoAulaAtualizada.ativo
         }
       );
 
       await logAction(req, 'UPDATE', 'VideoAula', id, mudancas);
 
-      return res.status(200).json(videoAula);
+      return res.status(200).json(videoAulaAtualizada);
     } catch (error) {
       next(error);
     }
