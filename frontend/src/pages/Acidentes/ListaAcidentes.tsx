@@ -122,9 +122,11 @@ export const ListaAcidentes: React.FC = () => {
             <button
               onClick={async () => {
                 try {
+                  toast.loading('Gerando relatório PDF...', { id: 'export-acidentes' });
                   await exportAcidentes();
+                  toast.success('Relatório PDF gerado com sucesso!', { id: 'export-acidentes' });
                 } catch (e) {
-                  toast.error('Erro ao exportar acidentes');
+                  toast.error('Erro ao exportar acidentes', { id: 'export-acidentes' });
                   console.error(e);
                 }
               }}

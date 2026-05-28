@@ -107,9 +107,11 @@ export const ListaTrabalhadores: React.FC = () => {
             <button
               onClick={async () => {
                 try {
+                  toast.loading('Gerando relatório PDF...', { id: 'export-trabalhadores' });
                   await exportTrabalhadores();
+                  toast.success('Relatório PDF gerado com sucesso!', { id: 'export-trabalhadores' });
                 } catch (e) {
-                  toast.error('Erro ao exportar trabalhadores');
+                  toast.error('Erro ao exportar trabalhadores', { id: 'export-trabalhadores' });
                   console.error(e);
                 }
               }}

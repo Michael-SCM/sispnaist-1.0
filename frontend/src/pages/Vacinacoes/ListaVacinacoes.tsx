@@ -109,9 +109,11 @@ export const ListaVacinacoes: React.FC = () => {
             <button
               onClick={async () => {
                 try {
+                  toast.loading('Gerando relatório PDF...', { id: 'export-vacinacoes' });
                   await exportVacinacoes();
+                  toast.success('Relatório PDF gerado com sucesso!', { id: 'export-vacinacoes' });
                 } catch (e) {
-                  toast.error('Erro ao exportar vacinações');
+                  toast.error('Erro ao exportar vacinações', { id: 'export-vacinacoes' });
                   console.error(e);
                 }
               }}

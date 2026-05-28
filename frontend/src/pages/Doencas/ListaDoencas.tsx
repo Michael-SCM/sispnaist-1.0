@@ -110,9 +110,11 @@ export const ListaDoencas: React.FC = () => {
             <button
               onClick={async () => {
                 try {
+                  toast.loading('Gerando relatório PDF...', { id: 'export-doencas' });
                   await exportDoencas();
+                  toast.success('Relatório PDF gerado com sucesso!', { id: 'export-doencas' });
                 } catch (e) {
-                  toast.error('Erro ao exportar doenças');
+                  toast.error('Erro ao exportar doenças', { id: 'export-doencas' });
                   console.error(e);
                 }
               }}
