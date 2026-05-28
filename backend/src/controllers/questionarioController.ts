@@ -86,6 +86,10 @@ class QuestionarioController {
         { new: true, runValidators: true }
       );
 
+      if (!questionario) {
+        throw new AppError('Questionário não encontrado', 404);
+      }
+
       const mudancas = compararDados(
         {
           nome: questionarioAntigo.nome,
@@ -96,19 +100,7 @@ class QuestionarioController {
         {
           nome: questionario.nome,
           tipo: questionario.tipo,
-          dequestionario = await Questionario.findById(id);
-      if (!questionario) {
-        throw new AppError('Questionário não encontrado', 404);
-      }
-
-      await logAction(req, 'DELETE', 'Questionario', id, {
-        nome: questionario.nome,
-        tipo: questionario.tipo,
-        descricao: questionario.descricao,
-        totalItens: (await QuestionarioItem.countDocuments({ questionarioId: id, ativo: true }))
-      });
-
-      const scricao: questionario.descricao,
+          descricao: questionario.descricao,
           ativo: questionario.ativo
         }
       );
