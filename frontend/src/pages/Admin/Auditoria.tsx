@@ -397,62 +397,70 @@ export const Auditoria: React.FC = () => {
 
       {/* Details Modal */}
       {showModal && selectedLog && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-2xl border ${getBadgeColor(selectedLog.acao)}`}>
-                  <Terminal size={24} />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto">
+          <div className="bg-white w-full max-w-4xl rounded-2xl sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 my-4 flex flex-col max-h-[90vh]">
+            {/* Header fixo */}
+            <div className="p-4 sm:p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border flex-shrink-0 ${getBadgeColor(selectedLog.acao)}`}>
+                  <Terminal size={20} className="sm:block hidden" />
+                  <Terminal size={16} className="sm:hidden" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900">Detalhes da Ação</h3>
-                  <p className="text-sm text-slate-500 font-medium">ID do Registro: {selectedLog.entidadeId}</p>
+                <div className="min-w-0">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 truncate">Detalhes da Ação</h3>
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium truncate">ID: {selectedLog.entidadeId}</p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowModal(false)}
-                className="p-2 hover:bg-white rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-slate-200"
+                className="p-2 hover:bg-white rounded-xl transition-all active:scale-90 shadow-sm border border-transparent hover:border-slate-200 flex-shrink-0"
               >
-                <ArrowLeft className="rotate-90" size={24} />
+                <ArrowLeft className="rotate-90" size={20} />
               </button>
             </div>
             
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
-                  <p className="font-bold text-slate-700">{selectedLog.acao}</p>
+            {/* Conteúdo com scroll */}
+            <div className="overflow-y-auto flex-grow custom-scrollbar">
+              <div className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                {/* Grid responsivo - 1 coluna mobile, 2 colunas tablet, 4 desktop */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ação</span>
+                    <p className="font-bold text-slate-700 break-words">{selectedLog.acao}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
+                    <p className="font-bold text-slate-700 break-words">{selectedLog.entidade}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
+                    <p className="font-bold text-slate-700 break-words">{formatarUsuario(selectedLog.usuarioId)}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IP</span>
+                    <p className="font-mono text-xs sm:text-sm text-slate-500 break-all">{selectedLog.ip || 'Não registrado'}</p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Módulo</span>
-                  <p className="font-bold text-slate-700">{selectedLog.entidade}</p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</span>
-                  <p className="font-bold text-slate-700">{formatarUsuario(selectedLog.usuarioId)}</p>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Endereço IP</span>
-                  <p className="font-mono text-sm text-slate-500">{selectedLog.ip || 'Não registrado'}</p>
-                </div>
-              </div>
 
-              <div className="space-y-3">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
-                <div className="bg-slate-900 rounded-3xl p-6 overflow-hidden">
-                  <pre className="text-emerald-400 font-mono text-sm overflow-x-auto custom-scrollbar max-h-[300px]">
-                    {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
-                  </pre>
+                {/* Dados alterados com scroll horizontal */}
+                <div className="space-y-2 sm:space-y-3">
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Metadados / Dados Alterados</span>
+                  <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-3 sm:p-6 overflow-hidden border border-slate-800">
+                    <pre className="text-emerald-400 font-mono text-xs sm:text-sm overflow-auto max-h-[40vh] custom-scrollbar whitespace-pre-wrap break-words">
+                      {selectedLog.detalhes ? JSON.stringify(selectedLog.detalhes, null, 2) : '// Nenhum detalhe adicional registrado.'}
+                    </pre>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 bg-slate-50 flex justify-end">
+            {/* Footer fixo */}
+            <div className="p-4 sm:p-6 bg-slate-50 flex justify-end border-t border-slate-100 flex-shrink-0">
               <button 
                 onClick={() => setShowModal(false)}
-                className="px-8 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg"
+                className="px-6 sm:px-8 py-2 sm:py-3 bg-slate-900 text-white text-sm sm:text-base rounded-xl sm:rounded-2xl font-bold hover:bg-slate-800 transition-all active:scale-95 shadow-lg"
               >
-                Fechar Detalhes
+                Fechar
               </button>
             </div>
           </div>
