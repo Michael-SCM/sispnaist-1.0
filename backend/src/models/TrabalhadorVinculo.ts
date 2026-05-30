@@ -6,7 +6,7 @@ import mongoose, { Document, Schema } from 'mongoose';
  */
 
 export interface ITrabalhadorVinculo extends Document {
-  trabalhadorId: string;
+  trabalhadorId: mongoose.Types.ObjectId;
   tipoVinculo: string;        // vinculado a tb_tipo_vinculo
   funcao?: string;            // vinculado a tb_funcao
   matricula: string;
@@ -27,9 +27,11 @@ export interface ITrabalhadorVinculo extends Document {
   dataAtualizacao: Date;
 }
 
-const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculo>(
+export interface ITrabalhadorVinculoDocument extends ITrabalhadorVinculo {}
+
+const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
     tipoVinculo: { type: String, required: true, trim: true },
     matricula: { type: String, required: true, trim: true },
     funcao: { type: String, trim: true },
@@ -57,4 +59,6 @@ TrabalhadorVinculoSchema.index({ trabalhadorId: 1, dataInicio: -1 });
 TrabalhadorVinculoSchema.index({ trabalhadorId: 1, ativo: 1 });
 
 export default mongoose.model<ITrabalhadorVinculo>('TrabalhadorVinculo', TrabalhadorVinculoSchema);
+
+
 

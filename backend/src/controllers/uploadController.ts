@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ArquivoUpload from '../models/ArquivoUpload';
 import { AppError } from '../middleware/errorHandler';
+import { IAuthRequest } from '../types/index.js';
 import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
@@ -50,7 +51,7 @@ class UploadController {
   }
 
   // POST /api/uploads - Registrar upload (o arquivo em si é enviado via multer)
-  async criar(req: Request, res: Response, next: NextFunction) {
+  async criar(req: IAuthRequest, res: Response, next: NextFunction) {
     try {
       const { entidade, entidadeId, descricao } = req.body;
       const file = req.file;

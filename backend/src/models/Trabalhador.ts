@@ -1,7 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { ITrabalhador } from '../types/index.js';
 
-export interface ITrabalhadorDocument extends ITrabalhador, Document {}
+export interface ITrabalhadorDocument extends Omit<ITrabalhador, '_id' | 'empresa' | 'unidade'>, Document {
+  empresa?: mongoose.Types.ObjectId;
+  unidade?: mongoose.Types.ObjectId;
+}
 
 const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
   {
@@ -52,11 +55,11 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
 
     // Vínculo com Empresa/Unidade
     empresa: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Empresa',
     },
     unidade: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Unidade',
     },
 

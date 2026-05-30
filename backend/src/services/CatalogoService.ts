@@ -40,7 +40,7 @@ class CatalogoService {
     ]);
 
     return {
-      data,
+      data: data as unknown as ICatalogoItem[],
       total,
       page,
       limit,

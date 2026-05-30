@@ -70,13 +70,7 @@ class ParametroController {
     try {
       const parametro = await Parametro.create(req.body);
 
-      await logAction(req, 'CREATE', 'Parametro', parametro._id.toString(), {
-        chave: parametro.chave,
-        valor: parametro.valor,
-        categoria: parametro.categoria,
-        descricao: parametro.descricao,
-        ativo: parametro.ativo
-      });
+      await logAction(req, 'CREATE', 'Parametro', parametro._id.toString(), parametro);
 
       return res.status(201).json(parametro);
     } catch (error) {
@@ -104,22 +98,7 @@ class ParametroController {
         throw new AppError('Parâmetro não encontrado', 404);
       }
 
-      const mudancas = compararDados(
-        {
-          chave: parametroAntigo.chave,
-          valor: parametroAntigo.valor,
-          categoria: parametroAntigo.categoria,
-          descricao: parametroAntigo.descricao,
-          ativo: parametroAntigo.ativo
-        },
-        {
-          chave: parametro.chave,
-          valor: parametro.valor,
-          categoria: parametro.categoria,
-          descricao: parametro.descricao,
-          ativo: parametro.ativo
-        }
-      );
+      const mudancas = compararDados(parametroAntigo, parametro);
 
       await logAction(req, 'UPDATE', 'Parametro', id, mudancas);
 
@@ -134,11 +113,14 @@ class ParametroController {
     try {
       const { id } = req.params;
 
-      const resultado = await Parametro.updateOne({ _id: id }, { ativo: false });
-
-      if (resultado.matchedCount === 0) {
+      const parametroAntigo = await Parametro.findById(id);
+      if (!parametroAntigo) {
         throw new AppError('Parâmetro não encontrado', 404);
       }
+
+      await Parametro.updateOne({ _id: id }, { ativo: false });
+
+      await logAction(req, 'DELETE', 'Parametro', id, parametroAntigo);
 
       return res.status(204).send();
     } catch (error) {

@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IUnidade } from '../types/index.js';
 
-export interface IUnidadeDocument extends IUnidade, Document {}
+export interface IUnidadeDocument extends Omit<IUnidade, '_id' | 'empresaId'>, Document {
+  empresaId: mongoose.Types.ObjectId;
+}
 
 const UnidadeSchema = new Schema<IUnidadeDocument>(
   {
@@ -10,7 +12,7 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
       required: [true, 'Nome da unidade é obrigatório'],
     },
     empresaId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Empresa',
       required: [true, 'Empresa é obrigatória'],
     },

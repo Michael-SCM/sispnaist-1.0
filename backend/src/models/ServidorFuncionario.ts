@@ -26,7 +26,7 @@ export interface IServidorFuncionario extends Document {
 
 const ServidorFuncionarioSchema = new Schema<IServidorFuncionario>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, unique: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, unique: true },
     matriculaFuncional: { type: String, required: true, unique: true },
     dataPosse: { type: Date, required: true },
     dataExercicio: { type: Date, required: true },

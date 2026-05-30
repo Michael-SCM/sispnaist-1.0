@@ -106,7 +106,7 @@ async function registerAudit(
   detalhes?: Record<string, any>
 ) {
   try {
-    const usuarioId = req.user?.id || req.user?._id || 'system';
+    const usuarioId = req.user?._id || 'system';
     const ip = (req.ip || req.connection?.remoteAddress || '0.0.0.0').replace('::ffff:', '');
     const userAgent = req.get('User-Agent') || 'Unknown';
 

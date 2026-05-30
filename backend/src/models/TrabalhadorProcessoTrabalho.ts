@@ -5,15 +5,15 @@ import mongoose, { Document, Schema } from 'mongoose';
  * Equivalente a: tb_trabalhador_processo_trabalho no PHP original.
  */
 
-export interface ITrabalhadorProcessoTrabalho extends Document {
-  trabalhadorId: string;
+export interface ITrabalhadorProcessoTrabalho {
+  trabalhadorId: mongoose.Types.ObjectId;
   setor: string;
   cargo: string;
   funcao: string;
   jornadaTrabalho?: string;
   turnoTrabalho?: string;
   jornadaSemanal?: string;
-  questionarioId?: string;
+  questionarioId?: mongoose.Types.ObjectId;
   dataInicio: Date;
   dataFim?: Date;
   observacoes?: string;
@@ -22,16 +22,18 @@ export interface ITrabalhadorProcessoTrabalho extends Document {
   dataAtualizacao: Date;
 }
 
-const TrabalhadorProcessoTrabalhoSchema = new Schema<ITrabalhadorProcessoTrabalho>(
+export interface ITrabalhadorProcessoTrabalhoDocument extends ITrabalhadorProcessoTrabalho, Document {}
+
+const TrabalhadorProcessoTrabalhoSchema = new Schema<ITrabalhadorProcessoTrabalhoDocument>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
     setor: { type: String, required: true },
     cargo: { type: String, required: true },
     funcao: { type: String, required: true },
     jornadaTrabalho: { type: String, trim: true },
     turnoTrabalho: { type: String, trim: true },
     jornadaSemanal: { type: String, trim: true },
-    questionarioId: { type: Schema.Types.ObjectId, ref: 'Questionario', required: true },
+    questionarioId: { type: Schema.Types.ObjectId as any, ref: 'Questionario', required: true },
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },
     observacoes: { type: String, trim: true },
@@ -46,3 +48,5 @@ const TrabalhadorProcessoTrabalhoSchema = new Schema<ITrabalhadorProcessoTrabalh
 TrabalhadorProcessoTrabalhoSchema.index({ trabalhadorId: 1, dataInicio: -1 });
 
 export default mongoose.model<ITrabalhadorProcessoTrabalho>('TrabalhadorProcessoTrabalho', TrabalhadorProcessoTrabalhoSchema);
+
+

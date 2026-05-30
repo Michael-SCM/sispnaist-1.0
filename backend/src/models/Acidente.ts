@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IAcidente } from '../types/index.js';
 
-export interface IAcidenteDocument extends IAcidente, Document {}
+export interface IAcidenteDocument extends Omit<IAcidente, '_id'>, Document {}
 
 const AcidenteSchema = new Schema<IAcidenteDocument>(
   {
@@ -12,7 +12,7 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
     horario: String,
     horarioAposInicioJornada: String,
     trabalhadorId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },

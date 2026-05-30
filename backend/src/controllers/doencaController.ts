@@ -3,7 +3,7 @@ import doencaService from '../services/DoencaService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../middleware/errorHandler.js';
 import Trabalhador from '../models/Trabalhador.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -17,9 +17,7 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   const doenca = await doencaService.criar(doencaData);
 
-  await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), {
-    cid: doenca.cid
-  });
+  await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), doenca);
 
   res.status(201).json({ sucesso: true, dados: doenca });
 });
@@ -93,11 +91,16 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const doencaAntiga = await doencaService.obter(id);
+  
+  if (!doencaAntiga) {
+    throw new AppError('Doença não encontrada', 404);
+  }
+
   const doenca = await doencaService.atualizar(id, req.body);
 
-  await logAction(req, 'UPDATE', 'Doenca', id, {
-    cid: doenca.cid
-  });
+  const mudancas = compararDados(doencaAntiga, doenca);
+  await logAction(req, 'UPDATE', 'Doenca', id, mudancas);
 
   res.status(200).json({ sucesso: true, dados: doenca });
 });
@@ -108,9 +111,15 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const doencaAntiga = await doencaService.obter(id);
+  
+  if (!doencaAntiga) {
+    throw new AppError('Doença não encontrada', 404);
+  }
+
   await doencaService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Doenca', id);
+  await logAction(req, 'DELETE', 'Doenca', id, doencaAntiga);
 
   res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });

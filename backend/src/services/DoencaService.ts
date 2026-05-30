@@ -33,7 +33,7 @@ export class DoencaService {
 
     const doenca = new Doenca(doencaData);
     await doenca.save();
-    return doenca.toObject() as IDoenca;
+    return { ...doenca.toObject(), _id: doenca._id?.toString() } as IDoenca;
   }
 
   async obter(id: string): Promise<IDoenca> {
@@ -103,7 +103,7 @@ export class DoencaService {
     const pages = Math.ceil(total / limit);
 
     return {
-      doencas: doencas as IDoenca[],
+      doencas: doencas.map(d => ({ ...d, _id: d._id?.toString() })) as IDoenca[],
       total,
       pages,
     };
@@ -163,7 +163,7 @@ export class DoencaService {
     const pages = Math.ceil(total / limit);
 
     return {
-      doencas: doencas as IDoenca[],
+      doencas: doencas.map(d => ({ ...d, _id: d._id?.toString() })) as IDoenca[],
       total,
       pages,
     };

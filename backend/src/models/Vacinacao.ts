@@ -1,12 +1,14 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IVacinacao } from '../types/index.js';
 
-export interface IVacinacaoDocument extends IVacinacao, Document {}
+export interface IVacinacaoDocument extends Omit<IVacinacao, '_id' | 'trabalhadorId'>, Document {
+  trabalhadorId: mongoose.Types.ObjectId;
+}
 
 const VacinacaoSchema = new Schema<IVacinacaoDocument>(
   {
     trabalhadorId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },

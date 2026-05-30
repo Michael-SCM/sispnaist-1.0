@@ -22,7 +22,7 @@ export class MaterialBiologicoService {
 
     const ficha = new MaterialBiologico(data);
     await ficha.save();
-    return ficha.toObject() as IMaterialBiologico;
+    return { ...ficha.toObject(), _id: ficha._id?.toString() } as IMaterialBiologico;
   }
 
   async obter(id: string): Promise<IMaterialBiologico> {

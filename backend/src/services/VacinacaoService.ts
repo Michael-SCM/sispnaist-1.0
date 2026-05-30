@@ -16,7 +16,7 @@ export class VacinacaoService {
     });
 
     await vacinacao.save();
-    return vacinacao.toObject() as IVacinacao;
+    return vacinacao.toObject() as unknown as IVacinacao;
   }
 
   async obter(id: string): Promise<IVacinacao> {
@@ -47,7 +47,7 @@ export class VacinacaoService {
       }
     }
 
-    return vacinacao as unknown as IVacinacao;
+    return vacinacao as unknown as unknown as IVacinacao;
   }
 
   async listar(filtros: {
@@ -138,7 +138,7 @@ export class VacinacaoService {
       throw new AppError('Vacinação não encontrada', 404);
     }
 
-    return vacinacao as unknown as IVacinacao;
+    return vacinacao as unknown as unknown as IVacinacao;
   }
 
   async deletar(id: string): Promise<void> {
@@ -239,3 +239,4 @@ export class VacinacaoService {
 }
 
 export default new VacinacaoService();
+

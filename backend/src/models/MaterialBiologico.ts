@@ -24,12 +24,12 @@ export interface IMaterialBiologico {
   dataAtualizacao?: Date;
 }
 
-export interface IMaterialBiologicoDocument extends IMaterialBiologico, Document {}
+export interface IMaterialBiologicoDocument extends Omit<IMaterialBiologico, '_id'>, Document {}
 
 const MaterialBiologicoSchema = new Schema<IMaterialBiologicoDocument>(
   {
     acidenteId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Acidente',
       required: [true, 'Vínculo com acidente é obrigatório'],
       index: true,

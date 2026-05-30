@@ -12,9 +12,9 @@ class TrabalhadorInformacaoService {
     return resultados as unknown as ITrabalhadorInformacao[];
   }
 
-  // Obter uma informação específica
   async obterPorId(id: string): Promise<ITrabalhadorInformacao | null> {
-    return await TrabalhadorInformacao.findById(id).lean();
+    const item = await TrabalhadorInformacao.findById(id).lean();
+    return item as unknown as ITrabalhadorInformacao | null;
   }
 
   // Criar nova informação

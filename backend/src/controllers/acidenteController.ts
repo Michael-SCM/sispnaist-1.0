@@ -3,7 +3,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -12,10 +12,7 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   const acidente = await acidenteService.criar(req.body);
 
-  await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), {
-    tipoAcidente: acidente.tipoAcidente,
-    dataAcidente: acidente.dataAcidente
-  });
+  await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), acidente);
 
   res.status(201).json({
     status: 'success',
@@ -97,11 +94,16 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const acidenteAntigo = await acidenteService.obter(id);
+  
+  if (!acidenteAntigo) {
+    throw new AppError('Acidente não encontrado', 404);
+  }
+  
   const acidente = await acidenteService.atualizar(id, req.body);
 
-  await logAction(req, 'UPDATE', 'Acidente', id, {
-    status: acidente.status
-  });
+  const mudancas = compararDados(acidenteAntigo, acidente);
+  await logAction(req, 'UPDATE', 'Acidente', id, mudancas);
 
   res.status(200).json({
     status: 'success',
@@ -115,9 +117,15 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const { id } = req.params;
+  const acidenteAntigo = await acidenteService.obter(id);
+  
+  if (!acidenteAntigo) {
+    throw new AppError('Acidente não encontrado', 404);
+  }
+  
   await acidenteService.deletar(id);
 
-  await logAction(req, 'DELETE', 'Acidente', id);
+  await logAction(req, 'DELETE', 'Acidente', id, acidenteAntigo);
 
   res.status(204).send();
 });

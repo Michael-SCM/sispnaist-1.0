@@ -6,13 +6,14 @@ import Unidade from '../models/Unidade.js';
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
+import mongoose from 'mongoose';
 
 interface TrabalhadorData {
-  _id: string;
+  _id: string | mongoose.Types.ObjectId;
   nome: string;
   cpf: string;
   email?: string;
-  dataNascimento?: string;
+  dataNascimento?: string | Date;
   sexo?: string;
   matricula?: string;
   telefone?: string;
@@ -26,8 +27,8 @@ interface TrabalhadorData {
     setor?: string;
     funcao?: string;
   };
-  empresa?: string;
-  unidade?: string;
+  empresa?: string | mongoose.Types.ObjectId;
+  unidade?: string | mongoose.Types.ObjectId;
 }
 
 interface EmpresaData {
@@ -101,13 +102,13 @@ export class PdfService {
     // Buscar empresas para resolver referências
     const empresaIds = [...new Set(trabalhadores
       .filter(t => t.empresa)
-      .map(t => t.empresa as string)
+      .map(t => t.empresa?.toString() as string)
     )];
 
     const empresas = await Empresa.find({ _id: { $in: empresaIds } }).lean();
 
     const empresaMap = new Map<string, EmpresaData>(
-      empresas.map(e => [e._id.toString(), e])
+      empresas.map(e => [e._id.toString(), { ...e.toObject ? e.toObject() : e } as EmpresaData])
     );
 
     // Configurar resposta como PDF

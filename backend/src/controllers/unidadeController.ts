@@ -49,12 +49,7 @@ export const getUnidade = asyncHandler(async (req: Request, res: Response) => {
 export const createUnidade = asyncHandler(async (req: Request, res: Response) => {
   const unidade = await unidadeService.criar(req.body);
 
-  await logAction(req, 'CREATE', 'Unidade', unidade._id!.toString(), {
-    nome: unidade.nome,
-    empresaId: unidade.empresaId,
-    descricao: unidade.descricao,
-    ativo: unidade.ativo
-  });
+  await logAction(req, 'CREATE', 'Unidade', unidade._id!.toString(), unidade);
 
   res.status(201).json({
     status: 'success',
@@ -72,18 +67,7 @@ export const updateUnidade = asyncHandler(async (req: Request, res: Response) =>
   const unidadeAntiga = await unidadeService.obter(id);
   const unidadeNova = await unidadeService.atualizar(id, req.body);
 
-  const mudancas = compararDados(
-    {
-      nome: unidadeAntiga.nome,
-      descricao: unidadeAntiga.descricao,
-      ativo: unidadeAntiga.ativo
-    },
-    {
-      nome: unidadeNova.nome,
-      descricao: unidadeNova.descricao,
-      ativo: unidadeNova.ativo
-    }
-  );
+  const mudancas = compararDados(unidadeAntiga, unidadeNova);
 
   await logAction(req, 'UPDATE', 'Unidade', id, mudancas);
 
@@ -102,11 +86,7 @@ export const deleteUnidade = asyncHandler(async (req: Request, res: Response) =>
   const { id } = req.params;
   const unidade = await unidadeService.obter(id);
 
-  await logAction(req, 'DELETE', 'Unidade', id, {
-    nome: unidade.nome,
-    empresaId: unidade.empresaId,
-    descricao: unidade.descricao
-  });
+  await logAction(req, 'DELETE', 'Unidade', id, unidade);
 
   await unidadeService.deletar(id);
 

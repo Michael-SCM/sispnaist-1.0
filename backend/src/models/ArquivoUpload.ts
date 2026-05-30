@@ -21,14 +21,14 @@ export interface IArquivoUpload extends Document {
 const ArquivoUploadSchema = new Schema<IArquivoUpload>(
   {
     entidade: { type: String, required: true, index: true },
-    entidadeId: { type: Schema.Types.ObjectId, required: true, index: true },
+    entidadeId: { type: Schema.Types.ObjectId as any, required: true, index: true },
     nomeOriginal: { type: String, required: true },
     nomeArmazenado: { type: String, required: true },
     caminho: { type: String, required: true },
     mimeType: { type: String, required: true },
     tamanho: { type: Number, required: true },
     descricao: { type: String, trim: true },
-    enviadoPor: { type: Schema.Types.ObjectId, ref: 'User', required: true }
+    enviadoPor: { type: Schema.Types.ObjectId as any, ref: 'User', required: true }
   },
   {
     timestamps: { createdAt: 'dataCriacao' },

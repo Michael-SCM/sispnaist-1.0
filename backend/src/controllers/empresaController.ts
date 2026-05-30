@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import empresaService from '../services/EmpresaService.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 /**
  * @desc    Listar empresas com paginação e filtros
@@ -48,10 +48,7 @@ export const getEmpresa = asyncHandler(async (req: Request, res: Response) => {
 export const createEmpresa = asyncHandler(async (req: Request, res: Response) => {
   const empresa = await empresaService.criar(req.body);
   
-  await logAction(req, 'CREATE', 'Empresa', empresa._id!.toString(), {
-    razaoSocial: empresa.razaoSocial,
-    cnpj: empresa.cnpj,
-  });
+  await logAction(req, 'CREATE', 'Empresa', empresa._id!.toString(), empresa);
 
   res.status(201).json({
     status: 'success',
@@ -66,12 +63,11 @@ export const createEmpresa = asyncHandler(async (req: Request, res: Response) =>
  */
 export const updateEmpresa = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const empresaAntiga = await empresaService.obter(id);
   const empresa = await empresaService.atualizar(id, req.body);
   
-  await logAction(req, 'UPDATE', 'Empresa', id, {
-    razaoSocial: empresa.razaoSocial,
-    cnpj: empresa.cnpj,
-  });
+  const mudancas = compararDados(empresaAntiga, empresa);
+  await logAction(req, 'UPDATE', 'Empresa', id, mudancas);
 
   res.status(200).json({
     status: 'success',
@@ -87,9 +83,10 @@ export const updateEmpresa = asyncHandler(async (req: Request, res: Response) =>
 export const deleteEmpresa = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   
-  await logAction(req, 'DELETE', 'Empresa', id);
-  
+  const empresaAntiga = await empresaService.obter(id);
   await empresaService.deletar(id);
+
+  await logAction(req, 'DELETE', 'Empresa', id, empresaAntiga);
 
   res.status(204).json({
     status: 'success',

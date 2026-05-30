@@ -25,7 +25,7 @@ const QuestionarioSchema = new Schema<IQuestionario>(
     ativo: { type: Boolean, default: true },
     dataInicio: { type: Date },
     dataFim: { type: Date },
-    criadoPor: { type: Schema.Types.ObjectId, ref: 'User' }
+    criadoPor: { type: Schema.Types.ObjectId as any, ref: 'User' }
   },
   {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },

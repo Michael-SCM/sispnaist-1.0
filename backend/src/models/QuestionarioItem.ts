@@ -23,7 +23,7 @@ export interface IQuestionarioItem extends Document {
 
 const QuestionarioItemSchema = new Schema<IQuestionarioItem>(
   {
-    questionarioId: { type: Schema.Types.ObjectId, ref: 'Questionario', required: true, index: true },
+    questionarioId: { type: Schema.Types.ObjectId as any, ref: 'Questionario', required: true, index: true },
     pergunta: { type: String, required: true, trim: true },
     tipoResposta: { type: String, required: true, enum: ['texto', 'unica', 'multipla', 'escala', 'data'] },
     obrigatorio: { type: Boolean, default: true },

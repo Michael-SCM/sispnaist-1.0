@@ -57,7 +57,7 @@ export class EmpresaService {
 
     const empresa = new Empresa(empresaData);
     await empresa.save();
-    return empresa.toObject() as IEmpresa;
+    return { ...empresa.toObject(), _id: empresa._id?.toString() } as IEmpresa;
   }
 
   async atualizar(id: string, empresaData: Partial<IEmpresa>): Promise<IEmpresa> {

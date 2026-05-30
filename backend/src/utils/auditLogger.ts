@@ -68,20 +68,43 @@ export const logAction = async (
  * }
  */
 export const compararDados = (
-  datosAntigos: Record<string, any>,
-  datosNovos: Record<string, any>
+  datosAntigosRaw: Record<string, any>,
+  datosNovosRaw: Record<string, any>
 ): Record<string, any> => {
+  // Converte documentos Mongoose para objetos puros se necessário
+  const datosAntigos = typeof datosAntigosRaw?.toObject === 'function' ? datosAntigosRaw.toObject() : JSON.parse(JSON.stringify(datosAntigosRaw || {}));
+  const datosNovos = typeof datosNovosRaw?.toObject === 'function' ? datosNovosRaw.toObject() : JSON.parse(JSON.stringify(datosNovosRaw || {}));
+
+  const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt'];
+
   const mudancas: Record<string, any> = {};
   const camposMudados: string[] = [];
 
-  // Detecta campos que mudaram
+  // Detecta campos que mudaram (existentes ou novos)
   for (const campo in datosNovos) {
+    if (ignoreFields.includes(campo)) continue;
+
     if (JSON.stringify(datosAntigos[campo]) !== JSON.stringify(datosNovos[campo])) {
       mudancas[campo] = {
-        antes: datosAntigos[campo],
+        antes: datosAntigos[campo] !== undefined ? datosAntigos[campo] : null,
         depois: datosNovos[campo]
       };
       camposMudados.push(campo);
+    }
+  }
+
+  // Detecta campos que foram removidos
+  for (const campo in datosAntigos) {
+    if (ignoreFields.includes(campo)) continue;
+
+    if (!(campo in datosNovos) && datosAntigos[campo] !== undefined && datosAntigos[campo] !== null) {
+      mudancas[campo] = {
+        antes: datosAntigos[campo],
+        depois: null
+      };
+      if (!camposMudados.includes(campo)) {
+        camposMudados.push(campo);
+      }
     }
   }
 
@@ -93,14 +116,24 @@ export const compararDados = (
 };
 
 /**
- * Remove dados sensíveis antes de registrar
+ * Remove dados sensíveis e campos internos do Mongoose antes de registrar
  */
-function sanitizeDetails(data: Record<string, any>): Record<string, any> {
+function sanitizeDetails(dataRaw: Record<string, any>): Record<string, any> {
+  if (!dataRaw) return {};
+  
+  const data = typeof dataRaw?.toObject === 'function' ? dataRaw.toObject() : dataRaw;
   const sensitiveFields = ['senha', 'password', 'token', 'secret', 'apiKey', 'refreshToken'];
+  const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt'];
+
   const sanitized = JSON.parse(JSON.stringify(data)); // deep copy
 
   const removeSensitive = (obj: any) => {
     for (const field of sensitiveFields) {
+      if (field in obj) {
+        delete obj[field];
+      }
+    }
+    for (const field of ignoreFields) {
       if (field in obj) {
         delete obj[field];
       }

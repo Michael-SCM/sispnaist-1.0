@@ -4,7 +4,7 @@ import vacinacaoService from '../services/VacinacaoService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user?.perfil === 'trabalhador') {
@@ -13,10 +13,7 @@ export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 
   const vacinacao = await vacinacaoService.criar(req.body);
 
-  await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), {
-    vacina: vacinacao.vacina,
-    lote: vacinacao.lote
-  });
+  await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), vacinacao);
 
   res.status(201).json({
     status: 'success',
@@ -90,11 +87,11 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
     throw new AppError('Sem permissão para atualizar registros de vacinação', 403);
   }
 
+  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
   const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
 
-  await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, {
-    vacina: vacinacao.vacina
-  });
+  const mudancas = compararDados(vacinacaoAntiga, vacinacao);
+  await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, mudancas);
 
   res.status(200).json({
     status: 'success',
@@ -107,9 +104,10 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
     throw new AppError('Sem permissão para deletar registros de vacinação', 403);
   }
 
+  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
   await vacinacaoService.deletar(req.params.id);
 
-  await logAction(req, 'DELETE', 'Vacinacao', req.params.id);
+  await logAction(req, 'DELETE', 'Vacinacao', req.params.id, vacinacaoAntiga);
 
   res.status(204).send();
 });

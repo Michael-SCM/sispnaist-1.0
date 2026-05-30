@@ -6,7 +6,7 @@ import mongoose, { Document, Schema } from 'mongoose';
  */
 
 export interface ITrabalhadorOcorrenciaViolencia extends Document {
-  trabalhadorId: string;
+  trabalhadorId: mongoose.Types.ObjectId;
   dataOcorrencia: Date;
   localOcorrencia?: string;
   tipoViolencia: string;          // vinculado a tb_tipo_violencia
@@ -28,9 +28,11 @@ export interface ITrabalhadorOcorrenciaViolencia extends Document {
   dataAtualizacao: Date;
 }
 
-const TrabalhadorOcorrenciaViolenciaSchema = new Schema<ITrabalhadorOcorrenciaViolencia>(
+export interface ITrabalhadorOcorrenciaViolenciaDocument extends ITrabalhadorOcorrenciaViolencia {}
+
+const TrabalhadorOcorrenciaViolenciaSchema = new Schema<ITrabalhadorOcorrenciaViolenciaDocument>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
     dataOcorrencia: { type: Date, required: true },
     localOcorrencia: { type: String, trim: true },
     tipoViolencia: { type: String, required: true },
@@ -58,3 +60,5 @@ const TrabalhadorOcorrenciaViolenciaSchema = new Schema<ITrabalhadorOcorrenciaVi
 TrabalhadorOcorrenciaViolenciaSchema.index({ trabalhadorId: 1, dataOcorrencia: -1 });
 
 export default mongoose.model<ITrabalhadorOcorrenciaViolencia>('TrabalhadorOcorrenciaViolencia', TrabalhadorOcorrenciaViolenciaSchema);
+
+

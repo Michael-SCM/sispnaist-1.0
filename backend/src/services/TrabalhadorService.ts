@@ -126,7 +126,7 @@ export class TrabalhadorService {
 
     const trabalhador = new Trabalhador(trabalhadorData);
     await trabalhador.save();
-    return trabalhador.toObject() as ITrabalhador;
+    return trabalhador.toObject() as unknown as ITrabalhador;
   }
 
   async atualizar(id: string, trabalhadorData: Partial<ITrabalhador>): Promise<ITrabalhador> {

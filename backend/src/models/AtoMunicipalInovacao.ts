@@ -31,7 +31,7 @@ const AtoMunicipalInovacaoSchema = new Schema<IAtoMunicipalInovacao>(
     nm_classe_categoria: { type: String, trim: true },
     texto_legal: { type: String, trim: true },
     texto_ementa: { type: String, trim: true },
-    papeisModoGovernanca: [{ type: Schema.Types.ObjectId, ref: 'Catalogo' }],
+    papeisModoGovernanca: [{ type: Schema.Types.ObjectId as any, ref: 'Catalogo' }],
     ativo: { type: Boolean, default: true }
   },
   {

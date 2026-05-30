@@ -59,14 +59,7 @@ class VideoAulaController {
     try {
       const videoAula = await VideoAula.create(req.body);
 
-      await logAction(req, 'CREATE', 'VideoAula', videoAula._id.toString(), {
-        titulo: videoAula.titulo,
-        url: videoAula.url,
-        categoria: videoAula.categoria,
-        descricao: videoAula.descricao,
-        duracao: videoAula.duracao,
-        ativo: videoAula.ativo
-      });
+      await logAction(req, 'CREATE', 'VideoAula', videoAula._id.toString(), videoAula);
 
       return res.status(201).json(videoAula);
     } catch (error) {
@@ -94,24 +87,7 @@ class VideoAulaController {
         throw new AppError('Video-aula não encontrada', 404);
       }
 
-      const mudancas = compararDados(
-        {
-          titulo: videoAulaAntiga.titulo,
-          url: videoAulaAntiga.url,
-          categoria: videoAulaAntiga.categoria,
-          descricao: videoAulaAntiga.descricao,
-          duracao: videoAulaAntiga.duracao,
-          ativo: videoAulaAntiga.ativo
-        },
-        {
-          titulo: videoAulaAtualizada.titulo,
-          url: videoAulaAtualizada.url,
-          categoria: videoAulaAtualizada.categoria,
-          descricao: videoAulaAtualizada.descricao,
-          duracao: videoAulaAtualizada.duracao,
-          ativo: videoAulaAtualizada.ativo
-        }
-      );
+      const mudancas = compararDados(videoAulaAntiga, videoAulaAtualizada);
 
       await logAction(req, 'UPDATE', 'VideoAula', id, mudancas);
 
@@ -126,11 +102,14 @@ class VideoAulaController {
     try {
       const { id } = req.params;
 
-      const resultado = await VideoAula.updateOne({ _id: id }, { ativo: false });
-
-      if (resultado.matchedCount === 0) {
+      const videoAulaAntiga = await VideoAula.findById(id);
+      if (!videoAulaAntiga) {
         throw new AppError('Video-aula não encontrada', 404);
       }
+
+      await VideoAula.updateOne({ _id: id }, { ativo: false });
+
+      await logAction(req, 'DELETE', 'VideoAula', id, videoAulaAntiga);
 
       return res.status(204).send();
     } catch (error) {

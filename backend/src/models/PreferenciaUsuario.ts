@@ -21,7 +21,7 @@ export interface IPreferenciaUsuario extends Document {
 
 const PreferenciaUsuarioSchema = new Schema<IPreferenciaUsuario>(
   {
-    usuarioId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    usuarioId: { type: Schema.Types.ObjectId as any, ref: 'User', required: true, unique: true },
     tema: { type: String, default: 'claro' },
     idioma: { type: String, default: 'pt-BR' },
     notificacoesEmail: { type: Boolean, default: true },

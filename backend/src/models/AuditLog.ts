@@ -12,12 +12,12 @@ export interface IAuditLog {
   dataCriacao?: Date;
 }
 
-export interface IAuditLogDocument extends IAuditLog, Document {}
+export interface IAuditLogDocument extends Omit<IAuditLog, '_id'>, Document {}
 
 const AuditLogSchema = new Schema<IAuditLogDocument>(
   {
     usuarioId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'User',
       index: true,
     },

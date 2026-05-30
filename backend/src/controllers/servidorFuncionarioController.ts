@@ -59,14 +59,7 @@ class ServidorFuncionarioController {
     try {
       const servidor = await ServidorFuncionario.create(req.body);
 
-      await logAction(req, 'CREATE', 'ServidorFuncionario', servidor._id.toString(), {
-        matriculaFuncional: servidor.matriculaFuncional,
-        nome: servidor.nome,
-        cargo: servidor.cargo,
-        situacaoFuncional: servidor.situacaoFuncional,
-        lotacao: servidor.lotacao,
-        ativo: servidor.ativo
-      });
+      await logAction(req, 'CREATE', 'ServidorFuncionario', servidor._id.toString(), servidor);
 
       return res.status(201).json(servidor);
     } catch (error) {
@@ -90,22 +83,11 @@ class ServidorFuncionarioController {
         { new: true, runValidators: true }
       );
 
-      const mudancas = compararDados(
-        {
-          nome: servidorAntigo.nome,
-          cargo: servidorAntigo.cargo,
-          situacaoFuncional: servidorAntigo.situacaoFuncional,
-          lotacao: servidorAntigo.lotacao,
-          ativo: servidorAntigo.ativo
-        },
-        {
-          nome: servidor.nome,
-          cargo: servidor.cargo,
-          situacaoFuncional: servidor.situacaoFuncional,
-          lotacao: servidor.lotacao,
-          ativo: servidor.ativo
-        }
-      );
+      if (!servidor) {
+        throw new AppError('Servidor não encontrado', 404);
+      }
+
+      const mudancas = compararDados(servidorAntigo, servidor);
 
       await logAction(req, 'UPDATE', 'ServidorFuncionario', id, mudancas);
 
@@ -125,13 +107,7 @@ class ServidorFuncionarioController {
         throw new AppError('Servidor não encontrado', 404);
       }
 
-      await logAction(req, 'DELETE', 'ServidorFuncionario', id, {
-        matriculaFuncional: servidor.matriculaFuncional,
-        nome: servidor.nome,
-        cargo: servidor.cargo,
-        situacaoFuncional: servidor.situacaoFuncional,
-        lotacao: servidor.lotacao
-      });
+      await logAction(req, 'DELETE', 'ServidorFuncionario', id, servidor);
 
       const resultado = await ServidorFuncionario.updateOne({ _id: id }, { ativo: false });
 

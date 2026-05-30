@@ -106,6 +106,7 @@ export class AcidenteService {
       dataInicio?: string;
       dataFim?: string;
       descricao?: string;
+      cpfTrabalhador?: string;
     }
   ): Promise<{ acidentes: IAcidente[]; total: number; pages: number }> {
     const skip = (page - 1) * limit;
@@ -267,7 +268,7 @@ export class AcidenteService {
     const pages = Math.ceil(total / limit);
 
     return {
-      acidentes: acidentes as IAcidente[],
+      acidentes: acidentes.map(a => ({ ...a.toObject(), _id: a._id?.toString() })) as IAcidente[],
       total,
       pages,
     };

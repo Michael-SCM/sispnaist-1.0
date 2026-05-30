@@ -1,7 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IUser } from '../types/index.js';
 
-export interface IUserDocument extends IUser, Document {
+export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade' | 'senha'>, Document {
+  empresa?: mongoose.Types.ObjectId;
+  unidade?: mongoose.Types.ObjectId;
+  senha?: string;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -53,11 +56,11 @@ const UserSchema = new Schema<IUserDocument>(
       cep: String,
     },
     empresa: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Empresa',
     },
     unidade: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Unidade',
     },
     departamento: String,
@@ -98,7 +101,8 @@ UserSchema.pre('save', async function (next) {
   try {
     const bcrypt = await import('bcryptjs').then(m => m.default);
     const salt = await bcrypt.genSalt(10);
-    this.senha = await bcrypt.hash(this.senha!, salt);
+    const userDoc = this as any;
+    userDoc.senha = await bcrypt.hash(userDoc.senha, salt);
     next();
   } catch (error) {
     next(error as Error);

@@ -61,7 +61,7 @@ export class AuthService {
       console.log(`======================================================\n`);
     }
 
-    const userObj = user.toObject() as IUser;
+    const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
     return { user: userObj };
@@ -95,7 +95,7 @@ export class AuthService {
       perfil: user.perfil || 'trabalhador',
     });
 
-    const userObj = user.toObject() as IUser;
+    const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
     return { user: userObj, token };
@@ -110,7 +110,7 @@ export class AuthService {
       throw new AppError('Usuário não encontrado', 404);
     }
 
-    const userObj = user.toObject() as IUser;
+    const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
     return userObj;
@@ -131,7 +131,7 @@ export class AuthService {
       throw new AppError('Usuário não encontrado', 404);
     }
 
-    const userObj = user.toObject() as IUser;
+    const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
     return userObj;
@@ -231,3 +231,4 @@ export class AuthService {
 }
 
 export default new AuthService();
+

@@ -6,7 +6,7 @@ import mongoose, { Document, Schema } from 'mongoose';
  */
 
 export interface ITrabalhadorAfastamento extends Document {
-  trabalhadorId: string;
+  trabalhadorId: mongoose.Types.ObjectId;
   tipoAfastamento: string;      // vinculado a tb_tipo_afastamento
   motivoAfastamento: string;    // vinculado a tb_motivo_afastamento
   cid?: string;                  // CID-10
@@ -23,9 +23,11 @@ export interface ITrabalhadorAfastamento extends Document {
   dataAtualizacao: Date;
 }
 
-const TrabalhadorAfastamentoSchema = new Schema<ITrabalhadorAfastamento>(
+export interface ITrabalhadorAfastamentoDocument extends ITrabalhadorAfastamento {}
+
+const TrabalhadorAfastamentoSchema = new Schema<ITrabalhadorAfastamentoDocument>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
     tipoAfastamento: { type: String, required: true },
     motivoAfastamento: { type: String, required: true },
     cid: { type: String, trim: true },
@@ -49,3 +51,5 @@ TrabalhadorAfastamentoSchema.index({ trabalhadorId: 1, dataInicio: -1 });
 TrabalhadorAfastamentoSchema.index({ trabalhadorId: 1, ativo: 1 });
 
 export default mongoose.model<ITrabalhadorAfastamento>('TrabalhadorAfastamento', TrabalhadorAfastamentoSchema);
+
+

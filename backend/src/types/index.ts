@@ -508,3 +508,10 @@ export interface IVideoAula {
   ativo?: boolean;
   visualizacoes?: number;
 }
+
+// Auth Request com usuário autenticado
+import { Request } from 'express';
+export interface IAuthRequest extends Request {
+  user?: IUser;
+  file?: any;
+}

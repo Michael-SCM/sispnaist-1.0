@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import userService from '../services/UserService.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 /**
  * @desc    Listar usuários com paginação e filtros
@@ -48,12 +48,11 @@ export const getUser = asyncHandler(async (req: Request, res: Response) => {
  */
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const usuarioAntigo = await userService.obter(id);
   const usuario = await userService.atualizar(id, req.body);
 
-  await logAction(req, 'UPDATE', 'User', id, {
-    email: usuario.email,
-    perfil: usuario.perfil
-  });
+  const mudancas = compararDados(usuarioAntigo, usuario);
+  await logAction(req, 'UPDATE', 'User', id, mudancas);
 
   res.status(200).json({
     status: 'success',
@@ -68,9 +67,10 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
  */
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const usuarioAntigo = await userService.obter(id);
   await userService.deletar(id);
 
-  await logAction(req, 'DELETE', 'User', id);
+  await logAction(req, 'DELETE', 'User', id, usuarioAntigo);
 
   res.status(204).json({
     status: 'success',

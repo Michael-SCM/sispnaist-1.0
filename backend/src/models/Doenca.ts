@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IDoenca } from '../types/index.js';
 
-export interface IDoencaDocument extends IDoenca, Document {}
+export interface IDoencaDocument extends Omit<IDoenca, '_id'>, Document {}
 
 const DoencaSchema = new Schema<IDoencaDocument>(
   {
@@ -11,7 +11,7 @@ const DoencaSchema = new Schema<IDoencaDocument>(
     },
     dataFim: Date,
     trabalhadorId: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId as any,
       ref: 'Trabalhador',
       required: [true, 'Trabalhador é obrigatório'],
     },

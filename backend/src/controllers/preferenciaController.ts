@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import PreferenciaUsuario from '../models/PreferenciaUsuario';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { IAuthRequest } from '../types/index.js';
 
 class PreferenciaController {
   // GET /api/preferencias/minhas - Obter preferências do usuário logado
-  async obterMinhas(req: Request, res: Response, next: NextFunction) {
+  async obterMinhas(req: IAuthRequest, res: Response, next: NextFunction) {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -27,7 +28,7 @@ class PreferenciaController {
   }
 
   // PUT /api/preferencias/minhas - Atualizar preferências do usuário logado
-  async atualizarMinhas(req: Request, res: Response, next: NextFunction) {
+  async atualizarMinhas(req: IAuthRequest, res: Response, next: NextFunction) {
     try {
       if (!req.user) {
         throw new AppError('Usuário não autenticado', 401);
@@ -42,26 +43,11 @@ class PreferenciaController {
       );
 
       if (preferenciasAntiga) {
-        const mudancas = compararDados(
-          {
-            tema: preferenciasAntiga.tema,
-            idioma: preferenciasAntiga.idioma,
-            notificacoes: preferenciasAntiga.notificacoes
-          },
-          {
-            tema: preferencia.tema,
-            idioma: preferencia.idioma,
-            notificacoes: preferencia.notificacoes
-          }
-        );
+        const mudancas = compararDados(preferenciasAntiga, preferencia);
 
         await logAction(req, 'UPDATE', 'Preferencia', preferencia._id.toString(), mudancas);
       } else {
-        await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), {
-          tema: preferencia.tema,
-          idioma: preferencia.idioma,
-          notificacoes: preferencia.notificacoes
-        });
+        await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
       }
 
       return res.status(200).json(preferencia);
@@ -101,26 +87,11 @@ class PreferenciaController {
       );
 
       if (preferenciasAntiga) {
-        const mudancas = compararDados(
-          {
-            tema: preferenciasAntiga.tema,
-            idioma: preferenciasAntiga.idioma,
-            notificacoes: preferenciasAntiga.notificacoes
-          },
-          {
-            tema: preferencia.tema,
-            idioma: preferencia.idioma,
-            notificacoes: preferencia.notificacoes
-          }
-        );
+        const mudancas = compararDados(preferenciasAntiga, preferencia);
 
         await logAction(req, 'UPDATE', 'Preferencia', preferencia._id.toString(), mudancas);
       } else {
-        await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), {
-          tema: preferencia.tema,
-          idioma: preferencia.idioma,
-          notificacoes: preferencia.notificacoes
-        });
+        await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
       }
 
       return res.status(200).json(preferencia);

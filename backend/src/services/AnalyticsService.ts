@@ -29,6 +29,7 @@ export interface IMonitoramentoClinico {
   };
   absenteismo: {
     totalDias: number;
+    variacao: number;
     porMes: { mes: string; dias: number }[];
   };
   alertasCriticos: {
@@ -430,7 +431,7 @@ export class AnalyticsService {
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
-    const afastamentos = await TrabalhadorAfastamento.find({}).lean();
+    const afastamentos = await TrabalhadorAfastamento.find({}).lean() as any[];
 
     const porMesMap: Record<string, number> = {};
     let totalDias = 0;

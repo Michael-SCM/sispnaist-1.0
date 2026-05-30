@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import CatalogoService from '../services/CatalogoService';
 import { AppError } from '../middleware/errorHandler';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 class CatalogoController {
   /**
@@ -62,8 +62,7 @@ class CatalogoController {
 
       const item = await CatalogoService.criar(entidade, dados);
       
-      // Registra auditoria
-      await logAction(req, 'CREATE', `Catalogo_${entidade}`, item._id?.toString() || '', dados);
+      await logAction(req, 'CREATE', `Catalogo_${entidade}`, item._id?.toString() || '', item);
 
       return res.status(201).json(item);
     } catch (error) {
@@ -77,10 +76,12 @@ class CatalogoController {
       const { entidade, id } = req.params;
       const dados = req.body;
 
+      const oldItem = await CatalogoService.obter(entidade, id);
       const item = await CatalogoService.atualizar(entidade, id, dados);
       
+      const mudancas = compararDados(oldItem, item);
       // Registra auditoria
-      await logAction(req, 'UPDATE', `Catalogo_${entidade}`, id, dados);
+      await logAction(req, 'UPDATE', `Catalogo_${entidade}`, id, mudancas);
 
       return res.status(200).json(item);
     } catch (error) {
@@ -93,10 +94,11 @@ class CatalogoController {
     try {
       const { entidade, id } = req.params;
       
-      // Registra auditoria
-      await logAction(req, 'DELETE', `Catalogo_${entidade}`, id);
-
+      const oldItem = await CatalogoService.obter(entidade, id);
       await CatalogoService.deletar(entidade, id);
+      
+      // Registra auditoria
+      await logAction(req, 'DELETE', `Catalogo_${entidade}`, id, oldItem);
 
       return res.status(204).send();
     } catch (error) {

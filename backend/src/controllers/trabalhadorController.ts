@@ -95,18 +95,7 @@ export const createTrabalhador = asyncHandler(async (req: Request, res: Response
   try {
     const trabalhador = await trabalhadorService.criar(req.body);
 
-    await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), {
-      nome: trabalhador.nome,
-      cpf: trabalhador.cpf,
-      email: trabalhador.email,
-      telefone: trabalhador.telefone,
-      matricula: trabalhador.matricula,
-      departamento: trabalhador.departamento,
-      funcao: trabalhador.funcao,
-      setor: trabalhador.setor,
-      ativo: trabalhador.ativo,
-      dataAdmissao: trabalhador.dataAdmissao
-    });
+    await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id!.toString(), trabalhador);
 
     res.status(201).json({
       status: 'success',
@@ -135,26 +124,7 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
   const trabalhadorAntigo = await trabalhadorService.obter(id);
   const trabalhadorNovo = await trabalhadorService.atualizar(id, req.body);
 
-  const mudancas = compararDados(
-    {
-      nome: trabalhadorAntigo.nome,
-      email: trabalhadorAntigo.email,
-      telefone: trabalhadorAntigo.telefone,
-      departamento: trabalhadorAntigo.departamento,
-      funcao: trabalhadorAntigo.funcao,
-      setor: trabalhadorAntigo.setor,
-      ativo: trabalhadorAntigo.ativo
-    },
-    {
-      nome: trabalhadorNovo.nome,
-      email: trabalhadorNovo.email,
-      telefone: trabalhadorNovo.telefone,
-      departamento: trabalhadorNovo.departamento,
-      funcao: trabalhadorNovo.funcao,
-      setor: trabalhadorNovo.setor,
-      ativo: trabalhadorNovo.ativo
-    }
-  );
+  const mudancas = compararDados(trabalhadorAntigo, trabalhadorNovo);
 
   await logAction(req, 'UPDATE', 'Trabalhador', id, mudancas);
 
@@ -177,16 +147,7 @@ export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response
   const { id } = req.params;
   const trabalhador = await trabalhadorService.obter(id);
 
-  await logAction(req, 'DELETE', 'Trabalhador', id, {
-    nome: trabalhador.nome,
-    cpf: trabalhador.cpf,
-    email: trabalhador.email,
-    telefone: trabalhador.telefone,
-    matricula: trabalhador.matricula,
-    departamento: trabalhador.departamento,
-    funcao: trabalhador.funcao,
-    setor: trabalhador.setor
-  });
+  await logAction(req, 'DELETE', 'Trabalhador', id, trabalhador);
 
   await trabalhadorService.deletar(id);
 

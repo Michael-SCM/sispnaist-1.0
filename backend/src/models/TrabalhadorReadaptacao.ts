@@ -6,7 +6,7 @@ import mongoose, { Document, Schema } from 'mongoose';
  */
 
 export interface ITrabalhadorReadaptacao extends Document {
-  trabalhadorId: string;
+  trabalhadorId: mongoose.Types.ObjectId;
   dataReadaptacao: Date;
   motivo: string;
   cid?: string;
@@ -29,9 +29,11 @@ export interface ITrabalhadorReadaptacao extends Document {
   dataAtualizacao: Date;
 }
 
-const TrabalhadorReadaptacaoSchema = new Schema<ITrabalhadorReadaptacao>(
+export interface ITrabalhadorReadaptacaoDocument extends ITrabalhadorReadaptacao {}
+
+const TrabalhadorReadaptacaoSchema = new Schema<ITrabalhadorReadaptacaoDocument>(
   {
-    trabalhadorId: { type: Schema.Types.ObjectId, ref: 'Trabalhador', required: true, index: true },
+    trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
     dataReadaptacao: { type: Date, required: true },
     motivo: { type: String, required: true },
     cid: { type: String, trim: true },
@@ -60,3 +62,5 @@ const TrabalhadorReadaptacaoSchema = new Schema<ITrabalhadorReadaptacao>(
 TrabalhadorReadaptacaoSchema.index({ trabalhadorId: 1, dataReadaptacao: -1 });
 
 export default mongoose.model<ITrabalhadorReadaptacao>('TrabalhadorReadaptacao', TrabalhadorReadaptacaoSchema);
+
+
