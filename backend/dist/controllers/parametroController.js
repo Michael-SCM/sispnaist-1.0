@@ -1,5 +1,6 @@
 import Parametro from '../models/Parametro';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class ParametroController {
     // GET /api/parametros - Listar todos os parâmetros
     async listar(req, res, next) {
@@ -60,6 +61,7 @@ class ParametroController {
     async criar(req, res, next) {
         try {
             const parametro = await Parametro.create(req.body);
+            await logAction(req, 'CREATE', 'Parametro', parametro._id.toString(), parametro);
             return res.status(201).json(parametro);
         }
         catch (error) {
@@ -70,10 +72,16 @@ class ParametroController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
+            const parametroAntigo = await Parametro.findById(id);
+            if (!parametroAntigo) {
+                throw new AppError('Parâmetro não encontrado', 404);
+            }
             const parametro = await Parametro.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!parametro) {
                 throw new AppError('Parâmetro não encontrado', 404);
             }
+            const mudancas = compararDados(parametroAntigo, parametro);
+            await logAction(req, 'UPDATE', 'Parametro', id, mudancas);
             return res.status(200).json(parametro);
         }
         catch (error) {
@@ -84,10 +92,12 @@ class ParametroController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
-            const resultado = await Parametro.updateOne({ _id: id }, { ativo: false });
-            if (resultado.matchedCount === 0) {
+            const parametroAntigo = await Parametro.findById(id);
+            if (!parametroAntigo) {
                 throw new AppError('Parâmetro não encontrado', 404);
             }
+            await Parametro.updateOne({ _id: id }, { ativo: false });
+            await logAction(req, 'DELETE', 'Parametro', id, parametroAntigo);
             return res.status(204).send();
         }
         catch (error) {

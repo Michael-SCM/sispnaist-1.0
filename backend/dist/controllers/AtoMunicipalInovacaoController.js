@@ -1,6 +1,6 @@
 import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class AtoMunicipalInovacaoController {
     async listar(req, res, next) {
         try {
@@ -42,10 +42,7 @@ class AtoMunicipalInovacaoController {
     async criar(req, res, next) {
         try {
             const novoItem = await AtoMunicipalInovacao.create(req.body);
-            await logAction(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), {
-                nr_ato: novoItem.nr_ato,
-                ano_ato: novoItem.ano_ato
-            });
+            await logAction(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), novoItem);
             return res.status(201).json(novoItem);
         }
         catch (error) {
@@ -57,14 +54,13 @@ class AtoMunicipalInovacaoController {
     }
     async atualizar(req, res, next) {
         try {
-            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-            if (!item) {
+            const oldItem = await AtoMunicipalInovacao.findById(req.params.id);
+            if (!oldItem) {
                 throw new AppError('Ato Municipal não encontrado', 404);
             }
-            await logAction(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), {
-                nr_ato: item.nr_ato,
-                ano_ato: item.ano_ato
-            });
+            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+            const mudancas = compararDados(oldItem, item);
+            await logAction(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), mudancas);
             return res.status(200).json(item);
         }
         catch (error) {
@@ -73,14 +69,12 @@ class AtoMunicipalInovacaoController {
     }
     async deletar(req, res, next) {
         try {
-            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, { ativo: false }, { new: true });
-            if (!item) {
+            const oldItem = await AtoMunicipalInovacao.findById(req.params.id);
+            if (!oldItem) {
                 throw new AppError('Ato Municipal não encontrado', 404);
             }
-            await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), {
-                nr_ato: item.nr_ato,
-                ano_ato: item.ano_ato
-            });
+            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, { ativo: false }, { new: true });
+            await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), oldItem);
             return res.status(204).send();
         }
         catch (error) {

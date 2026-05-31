@@ -28,15 +28,9 @@ export const obterLogs = asyncHandler(async (req, res) => {
  * Estatísticas de auditoria
  */
 export const obterEstatisticas = asyncHandler(async (req, res) => {
-    const totalLogs = await AuditLog.countDocuments();
-    const logsPorAcao = await AuditLog.aggregate([
-        { $group: { _id: '$acao', count: { $sum: 1 } } }
-    ]);
+    const result = await auditService.obterEstatisticas();
     res.status(200).json({
         status: 'success',
-        data: {
-            totalLogs,
-            logsPorAcao
-        }
+        data: result
     });
 });

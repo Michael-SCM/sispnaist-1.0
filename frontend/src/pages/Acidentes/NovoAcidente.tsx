@@ -163,6 +163,11 @@ export const NovoAcidente: React.FC = () => {
     if (!formData.trabalhadorId) newErrors.trabalhadorId = 'Trabalhador é obrigatório';
     if (!formData.dataAcidente) newErrors.dataAcidente = 'Data é obrigatória';
     if (!formData.tipoAcidente) newErrors.tipoAcidente = 'Tipo é obrigatório';
+    if (!formData.tipoTrauma) newErrors.tipoTrauma = 'Tipo de trauma é obrigatório';
+    if (!formData.agenteCausador) newErrors.agenteCausador = 'Agente causador é obrigatório';
+    if (!formData.parteCorpo) newErrors.parteCorpo = 'Parte do corpo é obrigatória';
+    if (!formData.local) newErrors.local = 'Local é obrigatório';
+    if (!formData.lesoes || formData.lesoes.length === 0) newErrors.lesoes = 'Adicione pelo menos uma lesão';
     if (!formData.descricao || formData.descricao.length < 10) {
       newErrors.descricao = 'Descrição deve ter pelo menos 10 caracteres';
     }
@@ -233,8 +238,12 @@ export const NovoAcidente: React.FC = () => {
         return date.toISOString();
       };
 
+      // Remove campos vazios para evitar erros de validação no backend
+      const payload = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => value !== '')
+      );
       const acidenteData: Partial<IAcidente> = {
-        ...formData,
+        ...payload,
         // Backend valida CPF no formato XXX.XXX.XXX-XX
         trabalhadorId: maskCPF(formData.trabalhadorId || user?._id || ''),
         dataAcidente: formData.dataAcidente ? converterDataLocal(formData.dataAcidente) : undefined,
@@ -386,8 +395,9 @@ export const NovoAcidente: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Trauma</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Trauma <span className="text-red-500">*</span></label>
                     <select
+                      required
                       name="tipoTrauma"
                       value={formData.tipoTrauma}
                       onChange={handleChange}
@@ -398,10 +408,12 @@ export const NovoAcidente: React.FC = () => {
                         <option key={t.nome} value={t.nome}>{t.nome}</option>
                       ))}
                     </select>
+                    {errors.tipoTrauma && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoTrauma}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Agente Causador</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Agente Causador <span className="text-red-500">*</span></label>
                     <select
+                      required
                       name="agenteCausador"
                       value={formData.agenteCausador}
                       onChange={handleChange}
@@ -412,10 +424,12 @@ export const NovoAcidente: React.FC = () => {
                         <option key={a.nome} value={a.nome}>{a.nome}</option>
                       ))}
                     </select>
+                    {errors.agenteCausador && <p className="mt-1 text-xs text-red-500 font-bold">{errors.agenteCausador}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Parte do Corpo</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Parte do Corpo <span className="text-red-500">*</span></label>
                     <select
+                      required
                       name="parteCorpo"
                       value={formData.parteCorpo}
                       onChange={handleChange}
@@ -426,6 +440,7 @@ export const NovoAcidente: React.FC = () => {
                         <option key={p.nome} value={p.nome}>{p.nome}</option>
                       ))}
                     </select>
+                    {errors.parteCorpo && <p className="mt-1 text-xs text-red-500 font-bold">{errors.parteCorpo}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Estado (UF)</label>
@@ -474,17 +489,19 @@ export const NovoAcidente: React.FC = () => {
                 <div className="p-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Local do Acidente</label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Local do Acidente <span className="text-red-500">*</span></label>
                       <input
+                        required
                         name="local"
                         value={formData.local}
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
                         placeholder="Ex: Almoxarifado Central"
                       />
+                      {errors.local && <p className="mt-1 text-xs text-red-500 font-bold">{errors.local}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Lesões Identificadas</label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Lesões Identificadas <span className="text-red-500">*</span></label>
                       <div className="flex flex-wrap gap-2 mb-3">
                         {formData.lesoes.map(lesao => (
                           <span key={lesao} className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold flex items-center gap-2 border border-amber-100">
@@ -502,6 +519,7 @@ export const NovoAcidente: React.FC = () => {
                         className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
                         placeholder="Digite a lesão e pressione Enter..."
                       />
+                      {errors.lesoes && <p className="mt-1 text-xs text-red-500 font-bold">{errors.lesoes}</p>}
                     </div>
                   </div>
                 </div>

@@ -10,12 +10,27 @@ const UnidadeSchema = new Schema({
         required: [true, 'Empresa é obrigatória'],
     },
     endereco: {
-        logradouro: String,
-        numero: String,
+        logradouro: {
+            type: String,
+            required: [true, 'Logradouro é obrigatório'],
+        },
+        numero: {
+            type: String,
+            required: [true, 'Número é obrigatório'],
+        },
         complemento: String,
-        bairro: String,
-        cidade: String,
-        estado: String,
+        bairro: {
+            type: String,
+            required: [true, 'Bairro é obrigatório'],
+        },
+        cidade: {
+            type: String,
+            required: [true, 'Cidade é obrigatória'],
+        },
+        estado: {
+            type: String,
+            required: [true, 'Estado é obrigatório'],
+        },
         cep: String,
     },
     gestor: String,

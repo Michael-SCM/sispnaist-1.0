@@ -28,7 +28,7 @@ export class DoencaService {
         }
         const doenca = new Doenca(doencaData);
         await doenca.save();
-        return doenca.toObject();
+        return { ...doenca.toObject(), _id: doenca._id?.toString() };
     }
     async obter(id) {
         const doenca = await Doenca.findById(id)
@@ -74,7 +74,7 @@ export class DoencaService {
             .lean();
         const pages = Math.ceil(total / limit);
         return {
-            doencas: doencas,
+            doencas: doencas.map(d => ({ ...d, _id: d._id?.toString() })),
             total,
             pages,
         };
@@ -114,7 +114,7 @@ export class DoencaService {
             .lean();
         const pages = Math.ceil(total / limit);
         return {
-            doencas: doencas,
+            doencas: doencas.map(d => ({ ...d, _id: d._id?.toString() })),
             total,
             pages,
         };

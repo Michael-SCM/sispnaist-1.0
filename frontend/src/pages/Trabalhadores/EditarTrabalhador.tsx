@@ -201,6 +201,9 @@ export const EditarTrabalhador: React.FC = () => {
       'endereco.bairro': 'Bairro',
       'endereco.cidade': 'Cidade',
       'endereco.estado': 'Estado',
+      'dataNascimento': 'Data de Nascimento',
+      'empresa': 'Empresa',
+      'unidade': 'Unidade',
       'trabalho.dataEntrada': 'Data de Entrada em Serviço',
       'vinculo.tipo': 'Tipo de Vínculo',
       'trabalho.setor': 'Setor de Trabalho',
@@ -274,9 +277,13 @@ export const EditarTrabalhador: React.FC = () => {
     try {
       setIsSaving(true);
 
+      // Remove campos vazios para evitar erros de validação no backend
+      const cleaned = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => value !== '')
+      );
       // Garantir que campos críticos sejam enviados
       const payload = {
-        ...formData,
+        ...cleaned,
         genero: formData.genero
       };
       
@@ -401,7 +408,7 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '', { required: true })}
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
                 {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
-                {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date' })}
+                {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date', required: true })}
               </div>
               <div>
                 <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500">*</span></label>
@@ -468,8 +475,8 @@ export const EditarTrabalhador: React.FC = () => {
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className={labelCls}>Empresa</label>
-                  <select name="empresa" value={formData.empresa || ''} onChange={handleChange} className={selectCls}>
+                  <label className={labelCls}>Empresa <span className="text-red-500">*</span></label>
+                  <select required name="empresa" value={formData.empresa || ''} onChange={handleChange} className={selectCls}>
                     <option value="">Selecione...</option>
                     {empresas.map(e => <option key={e._id} value={e._id}>{e.razaoSocial}</option>)}
                   </select>
@@ -478,7 +485,7 @@ export const EditarTrabalhador: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <label className={labelCls}>Unidade</label>
+                  <label className={labelCls}>Unidade <span className="text-red-500">*</span></label>
                   <select name="unidade" value={formData.unidade || ''} onChange={handleChange} className={selectCls} disabled={!formData.empresa}>
                     <option value="">{formData.empresa ? 'Selecione...' : 'Selecione uma empresa primeiro'}</option>
                     {unidadesFiltradas.map(u => <option key={u._id} value={u._id}>{u.nome}</option>)}
@@ -495,7 +502,7 @@ export const EditarTrabalhador: React.FC = () => {
                 </label>
                 {checks.terceirizado && (
                   <div className="pl-8">
-                    {renderInput('trabalho.empresaTerceirizada', 'Nome da Empresa Terceirizada *', formData.trabalho?.empresaTerceirizada || '')}
+                    {renderInput('trabalho.empresaTerceirizada', 'Nome da Empresa Terceirizada', formData.trabalho?.empresaTerceirizada || '', { required: true })}
                   </div>
                 )}
               </div>
@@ -515,11 +522,11 @@ export const EditarTrabalhador: React.FC = () => {
             <SectionHeader icon={Briefcase} title="Trabalho" />
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {renderInput('trabalho.setor', 'Setor de Trabalho *', formData.trabalho?.setor || '')}
-                {renderInput('trabalho.cargo', 'Cargo *', formData.trabalho?.cargo || '')}
-                {renderInput('trabalho.funcao', 'Função *', formData.trabalho?.funcao || '')}
+                {renderInput('trabalho.setor', 'Setor de Trabalho', formData.trabalho?.setor || '', { required: true })}
+                {renderInput('trabalho.cargo', 'Cargo', formData.trabalho?.cargo || '', { required: true })}
+                {renderInput('trabalho.funcao', 'Função', formData.trabalho?.funcao || '', { required: true })}
               </div>
-              {renderInput('trabalho.ocupacao', 'Ocupação *', formData.trabalho?.ocupacao || '')}
+              {renderInput('trabalho.ocupacao', 'Ocupação', formData.trabalho?.ocupacao || '', { required: true })}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {renderSelect('vinculo.turno', 'Turno de Trabalho *', turnosTrabalho, formData.vinculo?.turno || '')}
                 {renderSelect('vinculo.jornada', 'Jornada de Trabalho *', jornadasTrabalho, formData.vinculo?.jornada || '')}
@@ -535,7 +542,7 @@ export const EditarTrabalhador: React.FC = () => {
               {renderCheckDate('aposentadoria', 'Se aposentou?', 'historico.dataAposentadoria', formData.historico?.dataAposentadoria || '')}
               {renderCheckDate('obito', 'Foi a óbito?', 'historico.dataObito', formData.historico?.dataObito || '')}
               {renderCheckDate('remocao', 'Foi removido?', 'historico.dataRemocao', formData.historico?.dataRemocao || '',
-                <div>{renderInput('historico.novoServico', 'Novo serviço pós-remoção *', formData.historico?.novoServico || '')}</div>
+                <div>{renderInput('historico.novoServico', 'Novo serviço pós-remoção', formData.historico?.novoServico || '', { required: true })}</div>
               )}
               {renderCheckDate('retorno', 'Retornou ao serviço?', 'historico.dataRetorno', formData.historico?.dataRetorno || '')}
               {renderCheckDate('relotacao', 'Foi relotado?', 'historico.dataRelotacao', formData.historico?.dataRelotacao || '')}

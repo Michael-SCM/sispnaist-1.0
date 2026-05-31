@@ -88,7 +88,8 @@ UserSchema.pre('save', async function (next) {
     try {
         const bcrypt = await import('bcryptjs').then(m => m.default);
         const salt = await bcrypt.genSalt(10);
-        this.senha = await bcrypt.hash(this.senha, salt);
+        const userDoc = this;
+        userDoc.senha = await bcrypt.hash(userDoc.senha, salt);
         next();
     }
     catch (error) {

@@ -2,7 +2,7 @@ import doencaService from '../services/DoencaService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../middleware/errorHandler.js';
 import Trabalhador from '../models/Trabalhador.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 export const criar = asyncHandler(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para criar registros de doenças', 403);
@@ -12,9 +12,7 @@ export const criar = asyncHandler(async (req, res) => {
         trabalhadorId: req.body.trabalhadorId,
     };
     const doenca = await doencaService.criar(doencaData);
-    await logAction(req, 'CREATE', 'Doenca', doenca._id.toString(), {
-        cid: doenca.cid
-    });
+    await logAction(req, 'CREATE', 'Doenca', doenca._id.toString(), doenca);
     res.status(201).json({ sucesso: true, dados: doenca });
 });
 export const obter = asyncHandler(async (req, res) => {
@@ -74,10 +72,13 @@ export const atualizar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para atualizar registros de doenças', 403);
     }
     const { id } = req.params;
+    const doencaAntiga = await doencaService.obter(id);
+    if (!doencaAntiga) {
+        throw new AppError('Doença não encontrada', 404);
+    }
     const doenca = await doencaService.atualizar(id, req.body);
-    await logAction(req, 'UPDATE', 'Doenca', id, {
-        cid: doenca.cid
-    });
+    const mudancas = compararDados(doencaAntiga, doenca);
+    await logAction(req, 'UPDATE', 'Doenca', id, mudancas);
     res.status(200).json({ sucesso: true, dados: doenca });
 });
 export const deletar = asyncHandler(async (req, res) => {
@@ -85,8 +86,12 @@ export const deletar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar registros de doenças', 403);
     }
     const { id } = req.params;
+    const doencaAntiga = await doencaService.obter(id);
+    if (!doencaAntiga) {
+        throw new AppError('Doença não encontrada', 404);
+    }
     await doencaService.deletar(id);
-    await logAction(req, 'DELETE', 'Doenca', id);
+    await logAction(req, 'DELETE', 'Doenca', id, doencaAntiga);
     res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
 export const obterPorTrabalhador = asyncHandler(async (req, res) => {

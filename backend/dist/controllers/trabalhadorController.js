@@ -1,7 +1,7 @@
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import trabalhadorService from '../services/TrabalhadorService.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 /**
  * @desc    Listar trabalhadores com paginação e filtros
  * @route   GET /api/trabalhadores
@@ -78,10 +78,7 @@ export const createTrabalhador = asyncHandler(async (req, res) => {
     }
     try {
         const trabalhador = await trabalhadorService.criar(req.body);
-        await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id.toString(), {
-            nome: trabalhador.nome,
-            cpf: trabalhador.cpf
-        });
+        await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id.toString(), trabalhador);
         res.status(201).json({
             status: 'success',
             data: { trabalhador },
@@ -105,13 +102,13 @@ export const updateTrabalhador = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para atualizar dados de trabalhadores', 403);
     }
     const { id } = req.params;
-    const trabalhador = await trabalhadorService.atualizar(id, req.body);
-    await logAction(req, 'UPDATE', 'Trabalhador', id, {
-        nome: trabalhador.nome
-    });
+    const trabalhadorAntigo = await trabalhadorService.obter(id);
+    const trabalhadorNovo = await trabalhadorService.atualizar(id, req.body);
+    const mudancas = compararDados(trabalhadorAntigo, trabalhadorNovo);
+    await logAction(req, 'UPDATE', 'Trabalhador', id, mudancas);
     res.status(200).json({
         status: 'success',
-        data: { trabalhador },
+        data: { trabalhador: trabalhadorNovo },
     });
 });
 /**
@@ -124,8 +121,9 @@ export const deleteTrabalhador = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar trabalhadores', 403);
     }
     const { id } = req.params;
+    const trabalhador = await trabalhadorService.obter(id);
+    await logAction(req, 'DELETE', 'Trabalhador', id, trabalhador);
     await trabalhadorService.deletar(id);
-    await logAction(req, 'DELETE', 'Trabalhador', id);
     res.status(204).json({
         status: 'success',
         data: null,

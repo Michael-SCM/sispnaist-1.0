@@ -1,4 +1,5 @@
 import CatalogoService from '../services/CatalogoService';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class CatalogoController {
     /**
      * Controller genérico para TODAS as tabelas auxiliares/catalogos.
@@ -44,6 +45,7 @@ class CatalogoController {
             const { entidade } = req.params;
             const dados = req.body;
             const item = await CatalogoService.criar(entidade, dados);
+            await logAction(req, 'CREATE', `Catalogo_${entidade}`, item._id?.toString() || '', item);
             return res.status(201).json(item);
         }
         catch (error) {
@@ -55,7 +57,11 @@ class CatalogoController {
         try {
             const { entidade, id } = req.params;
             const dados = req.body;
+            const oldItem = await CatalogoService.obter(entidade, id);
             const item = await CatalogoService.atualizar(entidade, id, dados);
+            const mudancas = compararDados(oldItem, item);
+            // Registra auditoria
+            await logAction(req, 'UPDATE', `Catalogo_${entidade}`, id, mudancas);
             return res.status(200).json(item);
         }
         catch (error) {
@@ -66,7 +72,10 @@ class CatalogoController {
     async deletar(req, res, next) {
         try {
             const { entidade, id } = req.params;
+            const oldItem = await CatalogoService.obter(entidade, id);
             await CatalogoService.deletar(entidade, id);
+            // Registra auditoria
+            await logAction(req, 'DELETE', `Catalogo_${entidade}`, id, oldItem);
             return res.status(204).send();
         }
         catch (error) {

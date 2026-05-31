@@ -1,5 +1,6 @@
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import unidadeService from '../services/UnidadeService.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 /**
  * @desc    Listar unidades com paginação e filtros
  * @route   GET /api/unidades
@@ -38,6 +39,7 @@ export const getUnidade = asyncHandler(async (req, res) => {
  */
 export const createUnidade = asyncHandler(async (req, res) => {
     const unidade = await unidadeService.criar(req.body);
+    await logAction(req, 'CREATE', 'Unidade', unidade._id.toString(), unidade);
     res.status(201).json({
         status: 'success',
         data: { unidade },
@@ -50,10 +52,13 @@ export const createUnidade = asyncHandler(async (req, res) => {
  */
 export const updateUnidade = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const unidade = await unidadeService.atualizar(id, req.body);
+    const unidadeAntiga = await unidadeService.obter(id);
+    const unidadeNova = await unidadeService.atualizar(id, req.body);
+    const mudancas = compararDados(unidadeAntiga, unidadeNova);
+    await logAction(req, 'UPDATE', 'Unidade', id, mudancas);
     res.status(200).json({
         status: 'success',
-        data: { unidade },
+        data: { unidade: unidadeNova },
     });
 });
 /**
@@ -63,6 +68,8 @@ export const updateUnidade = asyncHandler(async (req, res) => {
  */
 export const deleteUnidade = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const unidade = await unidadeService.obter(id);
+    await logAction(req, 'DELETE', 'Unidade', id, unidade);
     await unidadeService.deletar(id);
     res.status(204).json({
         status: 'success',

@@ -165,8 +165,9 @@ const FormEmpresa: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Logradouro</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Logradouro <span className="text-red-500">*</span></label>
                     <input
+                      required
                       name="endereco.logradouro"
                       value={formData.endereco.logradouro}
                       onChange={handleChange}
@@ -174,8 +175,9 @@ const FormEmpresa: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Número</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Número <span className="text-red-500">*</span></label>
                     <input
+                      required
                       name="endereco.numero"
                       value={formData.endereco.numero}
                       onChange={handleChange}
@@ -183,8 +185,9 @@ const FormEmpresa: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Bairro</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Bairro <span className="text-red-500">*</span></label>
                     <input
+                      required
                       name="endereco.bairro"
                       value={formData.endereco.bairro}
                       onChange={handleChange}
@@ -192,8 +195,9 @@ const FormEmpresa: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Cidade</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Cidade <span className="text-red-500">*</span></label>
                     <input
+                      required
                       name="endereco.cidade"
                       value={formData.endereco.cidade}
                       onChange={handleChange}
@@ -201,8 +205,9 @@ const FormEmpresa: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Estado (UF)</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Estado (UF) <span className="text-red-500">*</span></label>
                     <input
+                      required
                       name="endereco.estado"
                       maxLength={2}
                       value={formData.endereco.estado}
@@ -236,9 +241,10 @@ const FormEmpresa: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Mail size={14} /> E-mail
+                      <Mail size={14} /> E-mail <span className="text-red-500">*</span>
                     </label>
                     <input
+                      required
                       type="email"
                       name="email"
                       value={formData.email}

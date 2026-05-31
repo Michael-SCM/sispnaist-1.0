@@ -43,15 +43,20 @@ const TrabalhadorSchema = new Schema({
         lowercase: true,
         match: [/^[\w\.-]+@[\w\.-]+\.\w+$/, 'Email inválido'],
     },
-    dataNascimento: Date,
+    dataNascimento: {
+        type: Date,
+        required: [true, 'Data de nascimento é obrigatória'],
+    },
     // Vínculo com Empresa/Unidade
     empresa: {
         type: Schema.Types.ObjectId,
         ref: 'Empresa',
+        required: [true, 'Empresa é obrigatória'],
     },
     unidade: {
         type: Schema.Types.ObjectId,
         ref: 'Unidade',
+        required: [true, 'Unidade é obrigatória'],
     },
     // Dados Pessoais/Diversos
     sexo: {

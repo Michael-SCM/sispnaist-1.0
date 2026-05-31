@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: parseInt(config.maxFileSize || '10485760') // 10MB default
+        fileSize: config.maxFileSize || 10485760 // 10MB default
     },
     fileFilter: function (req, file, cb) {
         // Aceita tipos comuns de arquivos

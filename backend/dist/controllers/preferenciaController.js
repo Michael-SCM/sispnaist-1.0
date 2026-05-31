@@ -1,5 +1,6 @@
 import PreferenciaUsuario from '../models/PreferenciaUsuario';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class PreferenciaController {
     // GET /api/preferencias/minhas - Obter preferências do usuário logado
     async obterMinhas(req, res, next) {
@@ -26,7 +27,15 @@ class PreferenciaController {
             if (!req.user) {
                 throw new AppError('Usuário não autenticado', 401);
             }
+            const preferenciasAntiga = await PreferenciaUsuario.findOne({ usuarioId: req.user.id });
             const preferencia = await PreferenciaUsuario.findOneAndUpdate({ usuarioId: req.user.id }, req.body, { new: true, runValidators: true, upsert: true });
+            if (preferenciasAntiga) {
+                const mudancas = compararDados(preferenciasAntiga, preferencia);
+                await logAction(req, 'UPDATE', 'Preferencia', preferencia._id.toString(), mudancas);
+            }
+            else {
+                await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
+            }
             return res.status(200).json(preferencia);
         }
         catch (error) {
@@ -51,7 +60,15 @@ class PreferenciaController {
     async atualizar(req, res, next) {
         try {
             const { usuarioId } = req.params;
+            const preferenciasAntiga = await PreferenciaUsuario.findOne({ usuarioId });
             const preferencia = await PreferenciaUsuario.findOneAndUpdate({ usuarioId }, req.body, { new: true, runValidators: true, upsert: true });
+            if (preferenciasAntiga) {
+                const mudancas = compararDados(preferenciasAntiga, preferencia);
+                await logAction(req, 'UPDATE', 'Preferencia', preferencia._id.toString(), mudancas);
+            }
+            else {
+                await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
+            }
             return res.status(200).json(preferencia);
         }
         catch (error) {

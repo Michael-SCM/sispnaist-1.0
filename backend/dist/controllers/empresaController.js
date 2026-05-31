@@ -1,5 +1,6 @@
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import empresaService from '../services/EmpresaService.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 /**
  * @desc    Listar empresas com paginação e filtros
  * @route   GET /api/empresas
@@ -38,6 +39,7 @@ export const getEmpresa = asyncHandler(async (req, res) => {
  */
 export const createEmpresa = asyncHandler(async (req, res) => {
     const empresa = await empresaService.criar(req.body);
+    await logAction(req, 'CREATE', 'Empresa', empresa._id.toString(), empresa);
     res.status(201).json({
         status: 'success',
         data: { empresa },
@@ -50,7 +52,10 @@ export const createEmpresa = asyncHandler(async (req, res) => {
  */
 export const updateEmpresa = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const empresaAntiga = await empresaService.obter(id);
     const empresa = await empresaService.atualizar(id, req.body);
+    const mudancas = compararDados(empresaAntiga, empresa);
+    await logAction(req, 'UPDATE', 'Empresa', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { empresa },
@@ -63,9 +68,24 @@ export const updateEmpresa = asyncHandler(async (req, res) => {
  */
 export const deleteEmpresa = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const empresaAntiga = await empresaService.obter(id);
     await empresaService.deletar(id);
+    await logAction(req, 'DELETE', 'Empresa', id, empresaAntiga);
     res.status(204).json({
         status: 'success',
         data: null,
+    });
+});
+/**
+ * @desc    Buscar empresa vinculada a uma unidade
+ * @route   GET /api/empresas/unidade/:unidadeId
+ * @access  Private
+ */
+export const getEmpresaPorUnidade = asyncHandler(async (req, res) => {
+    const { unidadeId } = req.params;
+    const empresa = await empresaService.listarPorUnidade(unidadeId);
+    res.status(200).json({
+        status: 'success',
+        data: { empresa },
     });
 });

@@ -28,6 +28,7 @@ import enderecosRoutes from './routes/enderecos.js';
 import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import auditMiddleware from './middleware/auditMiddleware.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
 const app = express();
 // Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
@@ -53,6 +54,8 @@ app.use(helmet());
 // Parser de requisições
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+// Middleware de auditoria automática (registra todas as operações CREATE, UPDATE, DELETE)
+app.use('/api', auditMiddleware);
 // Conectar ao MongoDB e rodar seeds
 connectDB().then(() => {
     // Executa o seed apenas se não estiver em ambiente de teste

@@ -38,7 +38,7 @@ export class EmpresaService {
         }
         const empresa = new Empresa(empresaData);
         await empresa.save();
-        return empresa.toObject();
+        return { ...empresa.toObject(), _id: empresa._id?.toString() };
     }
     async atualizar(id, empresaData) {
         if (empresaData.cnpj) {
@@ -63,6 +63,19 @@ export class EmpresaService {
         }
         // Remover em cascata todas as unidades vinculadas a esta empresa
         await Unidade.deleteMany({ empresaId: id });
+    }
+    async listarPorUnidade(unidadeId) {
+        // Busca a unidade para encontrar qual empresa ela pertence
+        const unidade = await Unidade.findById(unidadeId).lean();
+        if (!unidade) {
+            throw new AppError('Unidade não encontrada', 404);
+        }
+        // Busca a empresa vinculada à unidade
+        const empresa = await Empresa.findById(unidade.empresaId).lean();
+        if (!empresa) {
+            throw new AppError('Empresa não encontrada', 404);
+        }
+        return empresa;
     }
 }
 export default new EmpresaService();

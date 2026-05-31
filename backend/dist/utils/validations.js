@@ -138,9 +138,15 @@ export const criarAcidenteSchema = Joi.object({
         'any.required': 'Tipo de acidente é obrigatório',
         'any.only': 'Tipo de acidente inválido',
     }),
-    tipoTrauma: Joi.string().trim().max(100).optional(),
-    agenteCausador: Joi.string().trim().max(100).optional(),
-    parteCorpo: Joi.string().trim().max(100).optional(),
+    tipoTrauma: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Tipo de trauma é obrigatório',
+    }),
+    agenteCausador: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Agente causador é obrigatório',
+    }),
+    parteCorpo: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Parte do corpo é obrigatória',
+    }),
     descricao: Joi.string()
         .trim()
         .min(10)
@@ -197,9 +203,15 @@ export const atualizarAcidenteSchema = Joi.object({
     tipoAcidente: Joi.string()
         .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
         .optional(),
-    tipoTrauma: Joi.string().trim().max(100).optional(),
-    agenteCausador: Joi.string().trim().max(100).optional(),
-    parteCorpo: Joi.string().trim().max(100).optional(),
+    tipoTrauma: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Tipo de trauma é obrigatório',
+    }),
+    agenteCausador: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Agente causador é obrigatório',
+    }),
+    parteCorpo: Joi.string().trim().max(100).required().messages({
+        'any.required': 'Parte do corpo é obrigatória',
+    }),
     descricao: Joi.string()
         .trim()
         .min(10)
@@ -209,11 +221,19 @@ export const atualizarAcidenteSchema = Joi.object({
     local: Joi.string()
         .trim()
         .max(200)
-        .optional(),
+        .required()
+        .messages({
+        'any.required': 'Local do acidente é obrigatório',
+    }),
     estado: Joi.string().trim().max(2).optional(),
     lesoes: Joi.array()
         .items(Joi.string().trim())
-        .optional(),
+        .min(1)
+        .required()
+        .messages({
+        'array.min': 'Adicione pelo menos uma lesão',
+        'any.required': 'Lesões são obrigatórias',
+    }),
     feriado: Joi.boolean().optional(),
     comunicado: Joi.boolean().optional(),
     dataComunicacao: Joi.date().optional().allow('', null),
@@ -389,7 +409,9 @@ export const criarTrabalhadorSchema = Joi.object({
     celular: Joi.string().trim().allow('', null),
     telefoneContato: Joi.string().trim().allow('', null),
     email: Joi.string().email().allow('', null),
-    dataNascimento: Joi.date().optional(),
+    dataNascimento: Joi.date().required().messages({
+        'any.required': 'Data de nascimento é obrigatória',
+    }),
     sexo: Joi.string().trim().allow('', null),
     genero: Joi.string().trim().allow('', null),
     raca: Joi.string().trim().allow('', null),
@@ -401,8 +423,12 @@ export const criarTrabalhadorSchema = Joi.object({
         tempo: Joi.string().trim().allow('', null),
         grau: Joi.string().trim().allow('', null),
     }).optional(),
-    empresa: Joi.string().trim().allow('', null),
-    unidade: Joi.string().trim().allow('', null),
+    empresa: Joi.string().trim().required().messages({
+        'any.required': 'Empresa é obrigatória',
+    }),
+    unidade: Joi.string().trim().required().messages({
+        'any.required': 'Unidade é obrigatória',
+    }),
     vinculo: Joi.object({
         tipo: Joi.string().trim().allow('', null),
         outro: Joi.string().trim().allow('', null),
@@ -456,7 +482,9 @@ export const atualizarTrabalhadorSchema = Joi.object({
     celular: Joi.string().trim().allow('', null),
     telefoneContato: Joi.string().trim().allow('', null),
     email: Joi.string().email().allow('', null),
-    dataNascimento: Joi.date().optional(),
+    dataNascimento: Joi.date().required().messages({
+        'any.required': 'Data de nascimento é obrigatória',
+    }),
     sexo: Joi.string().trim().allow('', null),
     genero: Joi.string().trim().allow('', null),
     raca: Joi.string().trim().allow('', null),
@@ -468,8 +496,12 @@ export const atualizarTrabalhadorSchema = Joi.object({
         tempo: Joi.string().trim().allow('', null),
         grau: Joi.string().trim().allow('', null),
     }).optional(),
-    empresa: Joi.string().trim().allow('', null),
-    unidade: Joi.string().trim().allow('', null),
+    empresa: Joi.string().trim().required().messages({
+        'any.required': 'Empresa é obrigatória',
+    }),
+    unidade: Joi.string().trim().required().messages({
+        'any.required': 'Unidade é obrigatória',
+    }),
     vinculo: Joi.object({
         tipo: Joi.string().trim().allow('', null),
         outro: Joi.string().trim().allow('', null),

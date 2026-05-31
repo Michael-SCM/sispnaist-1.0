@@ -210,7 +210,7 @@ export class AcidenteService {
             .lean();
         const pages = Math.ceil(total / limit);
         return {
-            acidentes: acidentes,
+            acidentes: acidentes.map(a => ({ ...a.toObject(), _id: a._id?.toString() })),
             total,
             pages,
         };

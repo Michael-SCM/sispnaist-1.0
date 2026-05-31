@@ -110,8 +110,12 @@ export const EditarDoenca: React.FC = () => {
 
     try {
       setIsSaving(true);
+      // Remove campos vazios para evitar erros de validação no backend
+      const cleaned = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => value !== '')
+      );
       const doencaAtualizar: Partial<FormData> = {
-        ...formData,
+        ...cleaned,
         dataFim: formData.dataFim ? formData.dataFim : undefined,
       };
 

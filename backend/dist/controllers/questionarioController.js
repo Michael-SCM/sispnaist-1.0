@@ -1,6 +1,7 @@
 import Questionario from '../models/Questionario';
 import QuestionarioItem from '../models/QuestionarioItem';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class QuestionarioController {
     // GET /api/questionarios - Listar todos os questionários
     async listar(req, res, next) {
@@ -50,6 +51,7 @@ class QuestionarioController {
     async criar(req, res, next) {
         try {
             const questionario = await Questionario.create(req.body);
+            await logAction(req, 'CREATE', 'Questionario', questionario._id.toString(), questionario);
             return res.status(201).json(questionario);
         }
         catch (error) {
@@ -60,10 +62,16 @@ class QuestionarioController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
+            const questionarioAntigo = await Questionario.findById(id);
+            if (!questionarioAntigo) {
+                throw new AppError('Questionário não encontrado', 404);
+            }
             const questionario = await Questionario.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!questionario) {
                 throw new AppError('Questionário não encontrado', 404);
             }
+            const mudancas = compararDados(questionarioAntigo, questionario);
+            await logAction(req, 'UPDATE', 'Questionario', id, mudancas);
             return res.status(200).json(questionario);
         }
         catch (error) {
@@ -74,13 +82,15 @@ class QuestionarioController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
+            const questionarioAntigo = await Questionario.findById(id);
+            if (!questionarioAntigo) {
+                throw new AppError('Questionário não encontrado', 404);
+            }
             const resultado = await Promise.all([
                 Questionario.updateOne({ _id: id }, { ativo: false }),
                 QuestionarioItem.updateMany({ questionarioId: id }, { ativo: false })
             ]);
-            if (resultado[0].matchedCount === 0) {
-                throw new AppError('Questionário não encontrado', 404);
-            }
+            await logAction(req, 'DELETE', 'Questionario', id, questionarioAntigo);
             return res.status(204).send();
         }
         catch (error) {
@@ -96,6 +106,7 @@ class QuestionarioController {
                 throw new AppError('Questionário não encontrado', 404);
             }
             const item = await QuestionarioItem.create({ ...req.body, questionarioId: id });
+            await logAction(req, 'CREATE', 'QuestionarioItem', item._id.toString(), item);
             return res.status(201).json(item);
         }
         catch (error) {
@@ -106,10 +117,13 @@ class QuestionarioController {
     async atualizarItem(req, res, next) {
         try {
             const { id, itemId } = req.params;
-            const item = await QuestionarioItem.findOneAndUpdate({ _id: itemId, questionarioId: id }, req.body, { new: true, runValidators: true });
-            if (!item) {
+            const oldItem = await QuestionarioItem.findOne({ _id: itemId, questionarioId: id });
+            if (!oldItem) {
                 throw new AppError('Item não encontrado', 404);
             }
+            const item = await QuestionarioItem.findOneAndUpdate({ _id: itemId, questionarioId: id }, req.body, { new: true, runValidators: true });
+            const mudancas = compararDados(oldItem, item);
+            await logAction(req, 'UPDATE', 'QuestionarioItem', itemId, mudancas);
             return res.status(200).json(item);
         }
         catch (error) {
@@ -120,10 +134,12 @@ class QuestionarioController {
     async deletarItem(req, res, next) {
         try {
             const { id, itemId } = req.params;
-            const resultado = await QuestionarioItem.updateOne({ _id: itemId, questionarioId: id }, { ativo: false });
-            if (resultado.matchedCount === 0) {
+            const oldItem = await QuestionarioItem.findOne({ _id: itemId, questionarioId: id });
+            if (!oldItem) {
                 throw new AppError('Item não encontrado', 404);
             }
+            await QuestionarioItem.updateOne({ _id: itemId, questionarioId: id }, { ativo: false });
+            await logAction(req, 'DELETE', 'QuestionarioItem', itemId, oldItem);
             return res.status(204).send();
         }
         catch (error) {

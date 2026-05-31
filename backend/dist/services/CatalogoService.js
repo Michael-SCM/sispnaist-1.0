@@ -21,7 +21,7 @@ class CatalogoService {
             Catalogo.countDocuments(filtro)
         ]);
         return {
-            data,
+            data: data,
             total,
             page,
             limit,

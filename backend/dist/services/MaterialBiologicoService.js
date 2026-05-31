@@ -18,7 +18,7 @@ export class MaterialBiologicoService {
         }
         const ficha = new MaterialBiologico(data);
         await ficha.save();
-        return ficha.toObject();
+        return { ...ficha.toObject(), _id: ficha._id?.toString() };
     }
     async obter(id) {
         const ficha = await MaterialBiologico.findById(id).populate({

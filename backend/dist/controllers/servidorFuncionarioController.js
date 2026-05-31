@@ -1,5 +1,6 @@
 import ServidorFuncionario from '../models/ServidorFuncionario';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class ServidorFuncionarioController {
     // GET /api/servidores - Listar servidores
     async listar(req, res, next) {
@@ -53,6 +54,7 @@ class ServidorFuncionarioController {
     async criar(req, res, next) {
         try {
             const servidor = await ServidorFuncionario.create(req.body);
+            await logAction(req, 'CREATE', 'ServidorFuncionario', servidor._id.toString(), servidor);
             return res.status(201).json(servidor);
         }
         catch (error) {
@@ -63,10 +65,16 @@ class ServidorFuncionarioController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
+            const servidorAntigo = await ServidorFuncionario.findById(id);
+            if (!servidorAntigo) {
+                throw new AppError('Servidor não encontrado', 404);
+            }
             const servidor = await ServidorFuncionario.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!servidor) {
                 throw new AppError('Servidor não encontrado', 404);
             }
+            const mudancas = compararDados(servidorAntigo, servidor);
+            await logAction(req, 'UPDATE', 'ServidorFuncionario', id, mudancas);
             return res.status(200).json(servidor);
         }
         catch (error) {
@@ -77,6 +85,11 @@ class ServidorFuncionarioController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
+            const servidor = await ServidorFuncionario.findById(id);
+            if (!servidor) {
+                throw new AppError('Servidor não encontrado', 404);
+            }
+            await logAction(req, 'DELETE', 'ServidorFuncionario', id, servidor);
             const resultado = await ServidorFuncionario.updateOne({ _id: id }, { ativo: false });
             if (resultado.matchedCount === 0) {
                 throw new AppError('Servidor não encontrado', 404);

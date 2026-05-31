@@ -1,5 +1,6 @@
 import VideoAula from '../models/VideoAula';
 import { AppError } from '../middleware/errorHandler';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 class VideoAulaController {
     // GET /api/video-aulas - Listar video-aulas
     async listar(req, res, next) {
@@ -50,6 +51,7 @@ class VideoAulaController {
     async criar(req, res, next) {
         try {
             const videoAula = await VideoAula.create(req.body);
+            await logAction(req, 'CREATE', 'VideoAula', videoAula._id.toString(), videoAula);
             return res.status(201).json(videoAula);
         }
         catch (error) {
@@ -60,11 +62,17 @@ class VideoAulaController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
-            const videoAula = await VideoAula.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-            if (!videoAula) {
+            const videoAulaAntiga = await VideoAula.findById(id);
+            if (!videoAulaAntiga) {
                 throw new AppError('Video-aula não encontrada', 404);
             }
-            return res.status(200).json(videoAula);
+            const videoAulaAtualizada = await VideoAula.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+            if (!videoAulaAtualizada) {
+                throw new AppError('Video-aula não encontrada', 404);
+            }
+            const mudancas = compararDados(videoAulaAntiga, videoAulaAtualizada);
+            await logAction(req, 'UPDATE', 'VideoAula', id, mudancas);
+            return res.status(200).json(videoAulaAtualizada);
         }
         catch (error) {
             next(error);
@@ -74,10 +82,12 @@ class VideoAulaController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
-            const resultado = await VideoAula.updateOne({ _id: id }, { ativo: false });
-            if (resultado.matchedCount === 0) {
+            const videoAulaAntiga = await VideoAula.findById(id);
+            if (!videoAulaAntiga) {
                 throw new AppError('Video-aula não encontrada', 404);
             }
+            await VideoAula.updateOne({ _id: id }, { ativo: false });
+            await logAction(req, 'DELETE', 'VideoAula', id, videoAulaAntiga);
             return res.status(204).send();
         }
         catch (error) {

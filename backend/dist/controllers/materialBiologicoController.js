@@ -1,12 +1,9 @@
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import materialBiologicoService from '../services/MaterialBiologicoService.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 export const criar = asyncHandler(async (req, res) => {
     const ficha = await materialBiologicoService.criar(req.body);
-    await logAction(req, 'CREATE', 'MaterialBiologico', ficha._id.toString(), {
-        acidenteId: ficha.acidenteId.toString(),
-        agente: ficha.agente
-    });
+    await logAction(req, 'CREATE', 'MaterialBiologico', ficha._id.toString(), ficha);
     res.status(201).json({
         status: 'success',
         data: { ficha },
@@ -46,10 +43,10 @@ export const listar = asyncHandler(async (req, res) => {
 });
 export const atualizar = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const fichaAntiga = await materialBiologicoService.obter(id);
     const ficha = await materialBiologicoService.atualizar(id, req.body);
-    await logAction(req, 'UPDATE', 'MaterialBiologico', id, {
-        agente: ficha.agente
-    });
+    const mudancas = compararDados(fichaAntiga, ficha);
+    await logAction(req, 'UPDATE', 'MaterialBiologico', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { ficha },
@@ -57,7 +54,8 @@ export const atualizar = asyncHandler(async (req, res) => {
 });
 export const deletar = asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const fichaAntiga = await materialBiologicoService.obter(id);
     await materialBiologicoService.deletar(id);
-    await logAction(req, 'DELETE', 'MaterialBiologico', id);
+    await logAction(req, 'DELETE', 'MaterialBiologico', id, fichaAntiga);
     res.status(204).send();
 });

@@ -8,9 +8,9 @@ class TrabalhadorInformacaoService {
         }).sort({ createdAt: -1 }).lean();
         return resultados;
     }
-    // Obter uma informação específica
     async obterPorId(id) {
-        return await TrabalhadorInformacao.findById(id).lean();
+        const item = await TrabalhadorInformacao.findById(id).lean();
+        return item;
     }
     // Criar nova informação
     async criar(dados) {

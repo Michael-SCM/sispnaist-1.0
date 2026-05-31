@@ -20,16 +20,35 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
       type: String,
       required: [true, 'Tipo de acidente é obrigatório'],
     },
-    tipoTrauma: String,
-    agenteCausador: String,
-    parteCorpo: String,
+    tipoTrauma: {
+      type: String,
+      required: [true, 'Tipo de trauma é obrigatório'],
+    },
+    agenteCausador: {
+      type: String,
+      required: [true, 'Agente causador é obrigatório'],
+    },
+    parteCorpo: {
+      type: String,
+      required: [true, 'Parte do corpo é obrigatória'],
+    },
     descricao: {
       type: String,
       required: [true, 'Descrição é obrigatória'],
     },
     descricaoTrauma: String,
-    local: String,
-    lesoes: [String],
+    local: {
+      type: String,
+      required: [true, 'Local do acidente é obrigatório'],
+    },
+    lesoes: {
+      type: [String],
+      required: [true, 'Lesões são obrigatórias'],
+      validate: {
+        validator: (v: string[]) => v.length > 0,
+        message: 'Adicione pelo menos uma lesão',
+      },
+    },
     feriado: {
       type: Boolean,
       default: false,

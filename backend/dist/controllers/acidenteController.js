@@ -2,16 +2,13 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
-import { logAction } from '../utils/auditLogger.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 export const criar = asyncHandler(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para criar acidentes', 403);
     }
     const acidente = await acidenteService.criar(req.body);
-    await logAction(req, 'CREATE', 'Acidente', acidente._id.toString(), {
-        tipoAcidente: acidente.tipoAcidente,
-        dataAcidente: acidente.dataAcidente
-    });
+    await logAction(req, 'CREATE', 'Acidente', acidente._id.toString(), acidente);
     res.status(201).json({
         status: 'success',
         data: { acidente },
@@ -78,10 +75,13 @@ export const atualizar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para atualizar acidentes', 403);
     }
     const { id } = req.params;
+    const acidenteAntigo = await acidenteService.obter(id);
+    if (!acidenteAntigo) {
+        throw new AppError('Acidente não encontrado', 404);
+    }
     const acidente = await acidenteService.atualizar(id, req.body);
-    await logAction(req, 'UPDATE', 'Acidente', id, {
-        status: acidente.status
-    });
+    const mudancas = compararDados(acidenteAntigo, acidente);
+    await logAction(req, 'UPDATE', 'Acidente', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { acidente },
@@ -92,8 +92,12 @@ export const deletar = asyncHandler(async (req, res) => {
         throw new AppError('Sem permissão para deletar acidentes', 403);
     }
     const { id } = req.params;
+    const acidenteAntigo = await acidenteService.obter(id);
+    if (!acidenteAntigo) {
+        throw new AppError('Acidente não encontrado', 404);
+    }
     await acidenteService.deletar(id);
-    await logAction(req, 'DELETE', 'Acidente', id);
+    await logAction(req, 'DELETE', 'Acidente', id, acidenteAntigo);
     res.status(204).send();
 });
 export const obterPorTrabalhador = asyncHandler(async (req, res) => {

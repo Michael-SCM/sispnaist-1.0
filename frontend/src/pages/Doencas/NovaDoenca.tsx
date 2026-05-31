@@ -87,8 +87,12 @@ export const NovaDoenca: React.FC = () => {
     try {
       setIsLoading(true);
 
+      // Remove campos vazios para evitar erros de validação no backend
+      const cleaned = Object.fromEntries(
+        Object.entries(formData).filter(([_, value]) => value !== '')
+      );
       const doencaData: Partial<IDoenca> = {
-        ...formData,
+        ...cleaned,
         trabalhadorId: maskCPF(formData.trabalhadorId || user?._id || ''),
         dataFim: formData.dataFim ? formData.dataFim : undefined,
       };
