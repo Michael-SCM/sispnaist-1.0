@@ -131,7 +131,7 @@ export const FormVideoAula: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextInput
-                label="Título do Vídeo *"
+                label="Título do Vídeo"
                 name="titulo"
                 value={formData.titulo || ''}
                 onChange={handleChange}
@@ -173,7 +173,7 @@ export const FormVideoAula: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <TextInput
-                  label="URL do Vídeo (YouTube, Vimeo, etc) *"
+                  label="URL do Vídeo (YouTube, Vimeo, etc)"
                   name="url"
                   value={formData.url || ''}
                   onChange={handleChange}

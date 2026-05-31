@@ -322,7 +322,7 @@ export const EditarTrabalhador: React.FC = () => {
 
   const renderSelect = (name: string, label: string, items: any[], value: string) => (
     <div>
-      <label className={labelCls}>{label}</label>
+      <label className={labelCls}>{label.replace(' *', '')}{label.includes(' *') ? <span className="text-red-500"> *</span> : ''}</label>
       <select name={name} value={value} onChange={handleChange} className={selectCls}>
         <option value="">Selecione...</option>
         {items.map((i) => <option key={i.nome} value={i.nome}>{i.nome}</option>)}
@@ -332,7 +332,7 @@ export const EditarTrabalhador: React.FC = () => {
 
   const renderInput = (name: string, label: string, value: string, opts?: { required?: boolean; type?: string; placeholder?: string; disabled?: boolean }) => (
     <div>
-      <label className={labelCls}>{label}{opts?.required ? ' *' : ''}</label>
+      <label className={labelCls}>{label}{opts?.required ? <span className="text-red-500"> *</span> : ''}</label>
       <input
         type={opts?.type || 'text'}
         required={opts?.required}
@@ -362,7 +362,7 @@ export const EditarTrabalhador: React.FC = () => {
       {checks[checkKey] && (
         <div className="pl-8 space-y-3">
           <div>
-            <label className={labelCls}>Data *</label>
+            <label className={labelCls}>Data <span className="text-red-500">*</span></label>
             <input type="date" name={dateName} value={formatDateValue(dateValue)} onChange={handleChange} className={inputCls} />
           </div>
           {extra}
@@ -404,13 +404,13 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date' })}
               </div>
               <div>
-                <label className={labelCls}><Mail size={14} className="inline mr-1" />Email *</label>
+                <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500">*</span></label>
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className={inputCls} />
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
                 <div>
-                  <label className={labelCls}>Gênero *</label>
+                  <label className={labelCls}>Gênero <span className="text-red-500">*</span></label>
                   <select 
                     name="genero" 
                     value={formData.genero || ''} 
@@ -502,7 +502,7 @@ export const EditarTrabalhador: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className={labelCls}>Data de Entrada em Serviço *</label>
+                  <label className={labelCls}>Data de Entrada em Serviço <span className="text-red-500">*</span></label>
                   <input type="date" name="trabalho.dataEntrada" value={formatDateValue(formData.trabalho?.dataEntrada)} onChange={handleChange} className={inputCls} />
                 </div>
                 {renderSelect('vinculo.tipo', 'Tipo de Vínculo *', tiposVinculo, formData.vinculo?.tipo || '')}

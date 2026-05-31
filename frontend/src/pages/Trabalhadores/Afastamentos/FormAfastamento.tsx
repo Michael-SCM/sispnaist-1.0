@@ -222,7 +222,7 @@ export const FormAfastamento: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoAfastamento"
@@ -238,7 +238,7 @@ export const FormAfastamento: React.FC = () => {
                     {errors.tipoAfastamento && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAfastamento}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="motivoAfastamento"
@@ -274,7 +274,7 @@ export const FormAfastamento: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Desfecho *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Desfecho <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="desfecho"
@@ -286,7 +286,7 @@ export const FormAfastamento: React.FC = () => {
                     {errors.desfecho && <p className="mt-1 text-xs text-red-500 font-bold">{errors.desfecho}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Afastamento *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Afastamento <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="tempoAfastamento"
@@ -308,7 +308,7 @@ export const FormAfastamento: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Início *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Início <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -329,7 +329,7 @@ export const FormAfastamento: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Retorno Efetivo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Retorno Efetivo <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -341,7 +341,7 @@ export const FormAfastamento: React.FC = () => {
                     {errors.dataRetorno && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataRetorno}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Perícia *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Perícia <span className="text-red-500">*</span></label>
                     <input
                       required
                       type="date"

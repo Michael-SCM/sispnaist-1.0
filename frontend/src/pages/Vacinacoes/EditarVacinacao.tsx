@@ -163,7 +163,7 @@ export const EditarVacinacao: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Vacina Aplicada *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Vacina Aplicada <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="vacina"
@@ -173,7 +173,7 @@ export const EditarVacinacao: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Aplicação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Aplicação <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required

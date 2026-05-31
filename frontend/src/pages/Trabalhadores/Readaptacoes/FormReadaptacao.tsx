@@ -257,7 +257,7 @@ export const FormReadaptacao: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Readaptação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Readaptação <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -269,7 +269,7 @@ export const FormReadaptacao: React.FC = () => {
                     {errors.dataReadaptacao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.dataReadaptacao}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="motivo"
@@ -295,7 +295,7 @@ export const FormReadaptacao: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Readaptação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tempo de Readaptação <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tempoReadaptacao"
@@ -341,7 +341,7 @@ export const FormReadaptacao: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Origem *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Origem <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="setorOrigem"
@@ -353,7 +353,7 @@ export const FormReadaptacao: React.FC = () => {
                     {errors.setorOrigem && <p className="mt-1 text-xs text-red-500 font-bold">{errors.setorOrigem}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Readaptação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor de Readaptação <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="setorReadaptacao"
@@ -365,7 +365,7 @@ export const FormReadaptacao: React.FC = () => {
                     {errors.setorReadaptacao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.setorReadaptacao}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Anterior *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Anterior <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="funcaoAnterior"
@@ -377,7 +377,7 @@ export const FormReadaptacao: React.FC = () => {
                     {errors.funcaoAnterior && <p className="mt-1 text-xs text-red-500 font-bold">{errors.funcaoAnterior}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Nova *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Função Nova <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="funcaoNova"
@@ -390,7 +390,7 @@ export const FormReadaptacao: React.FC = () => {
                   </div>
                   <div className="md:col-span-2 space-y-6 pt-4 border-t border-slate-50">
                     <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Restrição *</label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Restrição <span className="text-red-500">*</span></label>
                       <textarea
                         required
                         name="restricao"
@@ -403,7 +403,7 @@ export const FormReadaptacao: React.FC = () => {
                       {errors.restricao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.restricao}</p>}
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Novas Atribuições *</label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Novas Atribuições <span className="text-red-500">*</span></label>
                       <textarea
                         required
                         name="novasAtribuicoes"
@@ -417,7 +417,7 @@ export const FormReadaptacao: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Acompanhamento *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Acompanhamento <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="acompanhamento"
@@ -433,7 +433,7 @@ export const FormReadaptacao: React.FC = () => {
                     {errors.acompanhamento && <p className="mt-1 text-xs text-red-500 font-bold">{errors.acompanhamento}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Grau de Satisfação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Grau de Satisfação <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="grauSatisfacao"

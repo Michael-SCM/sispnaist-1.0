@@ -178,7 +178,7 @@ export const EditarDoenca: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Código CID *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Código CID <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="codigoDoenca"
@@ -188,7 +188,7 @@ export const EditarDoenca: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Início dos Sintomas *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Início dos Sintomas <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -199,7 +199,7 @@ export const EditarDoenca: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Doença *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Doença <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nomeDoenca"

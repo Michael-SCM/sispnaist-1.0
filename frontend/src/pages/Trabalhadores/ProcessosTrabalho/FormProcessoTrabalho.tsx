@@ -224,7 +224,7 @@ export const FormProcessoTrabalho: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Setor <span className="text-red-500">*</span></label>
                     <input
                       name="setor"
                       required
@@ -236,7 +236,7 @@ export const FormProcessoTrabalho: React.FC = () => {
                     {errors.setor && <p className="mt-1 text-xs text-red-500 font-bold">{errors.setor}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Cargo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Cargo <span className="text-red-500">*</span></label>
                     <input
                       name="cargo"
                       required
@@ -248,7 +248,7 @@ export const FormProcessoTrabalho: React.FC = () => {
                     {errors.cargo && <p className="mt-1 text-xs text-red-500 font-bold">{errors.cargo}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Função *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Função <span className="text-red-500">*</span></label>
                     <input
                       name="funcao"
                       required
@@ -270,7 +270,7 @@ export const FormProcessoTrabalho: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Questionário *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Questionário <span className="text-red-500">*</span></label>
                     <input
                       name="questionarioId"
                       required
@@ -330,7 +330,7 @@ export const FormProcessoTrabalho: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Início *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Início <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required

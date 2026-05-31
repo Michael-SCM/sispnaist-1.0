@@ -128,7 +128,7 @@ const FormUnidade: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Unidade *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Unidade <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nome"
@@ -140,7 +140,7 @@ const FormUnidade: React.FC = () => {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Building2 size={14} /> Empresa Vinculada *
+                      <Building2 size={14} /> Empresa Vinculada <span className="text-red-500">*</span>
                     </label>
                     <select
                       required

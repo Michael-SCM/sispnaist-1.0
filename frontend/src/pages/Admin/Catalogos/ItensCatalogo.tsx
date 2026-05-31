@@ -120,7 +120,7 @@ const ItensCatalogo: React.FC = () => {
             </div>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Valor do Termo *</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Valor do Termo <span className="text-red-500">*</span></label>
                 <input
                   required
                   value={formData.valor}

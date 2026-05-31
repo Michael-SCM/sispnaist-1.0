@@ -126,7 +126,7 @@ export const NovaVacinacao: React.FC = () => {
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Fingerprint size={14} /> Trabalhador (CPF) *
+                      <Fingerprint size={14} /> Trabalhador (CPF) <span className="text-red-500">*</span>
                     </label>
                     <input
                       required
@@ -143,7 +143,7 @@ export const NovaVacinacao: React.FC = () => {
 
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Vacina Aplicada *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Vacina Aplicada <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="vacina"
@@ -154,7 +154,7 @@ export const NovaVacinacao: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Aplicação *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Aplicação <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required

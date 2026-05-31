@@ -200,7 +200,7 @@ export const FormDependente: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome Completo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome Completo <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nome"
@@ -222,7 +222,7 @@ export const FormDependente: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Nascimento *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data de Nascimento <span className="text-red-500">*</span></label>
                     <input
                       required
                       type="date"
@@ -244,7 +244,7 @@ export const FormDependente: React.FC = () => {
                 </div>
                 <div className="p-8">
                   <div className="max-w-md">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Grau de Parentesco *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Grau de Parentesco <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="parentesco"

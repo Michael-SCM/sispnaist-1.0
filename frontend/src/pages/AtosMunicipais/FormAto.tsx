@@ -113,7 +113,7 @@ const FormAto: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Número do Ato *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Número do Ato <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nr_ato"
@@ -124,7 +124,7 @@ const FormAto: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Ano *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Ano <span className="text-red-500">*</span></label>
                     <input
                       required
                       type="number"
@@ -191,7 +191,7 @@ const FormAto: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Cidade *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Cidade <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nm_cidade"
@@ -201,7 +201,7 @@ const FormAto: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Estado (UF) *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Estado (UF) <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nm_estado"

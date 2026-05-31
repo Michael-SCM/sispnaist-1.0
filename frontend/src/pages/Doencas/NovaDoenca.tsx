@@ -134,7 +134,7 @@ export const NovaDoenca: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Trabalhador (CPF) *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Trabalhador (CPF) <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="trabalhadorId"
@@ -150,7 +150,7 @@ export const NovaDoenca: React.FC = () => {
 
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Código CID *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Código CID <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="codigoDoenca"
@@ -161,7 +161,7 @@ export const NovaDoenca: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Início dos Sintomas *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Início dos Sintomas <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -172,7 +172,7 @@ export const NovaDoenca: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Doença *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome da Doença <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nomeDoenca"

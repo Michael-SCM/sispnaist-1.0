@@ -176,7 +176,7 @@ const EditarUsuario: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome Completo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Nome Completo <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="nome"
@@ -188,7 +188,7 @@ const EditarUsuario: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Mail size={14} /> E-mail de Acesso *
+                      <Mail size={14} /> E-mail de Acesso <span className="text-red-500">*</span>
                     </label>
                     <input
                       required
@@ -201,7 +201,7 @@ const EditarUsuario: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Key size={14} /> {isEditing ? 'Alterar Senha' : 'Senha *'}
+                      <Key size={14} /> {isEditing ? 'Alterar Senha' : <>Senha <span className="text-red-500">*</span></>}
                     </label>
                     <input
                       type="password"

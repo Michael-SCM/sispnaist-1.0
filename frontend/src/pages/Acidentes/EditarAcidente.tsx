@@ -385,7 +385,7 @@ export const EditarAcidente: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data do Acidente *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data do Acidente <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -426,7 +426,7 @@ export const EditarAcidente: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Acidente *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Acidente <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoAcidente"
@@ -493,7 +493,7 @@ export const EditarAcidente: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2 text-amber-600">Descrição do Acidente *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 text-amber-600">Descrição do Acidente <span className="text-red-500">*</span></label>
                     <textarea
                       required
                       name="descricao"

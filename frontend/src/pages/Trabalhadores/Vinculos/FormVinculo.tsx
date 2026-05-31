@@ -231,7 +231,7 @@ export const FormVinculo: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Matrícula *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Matrícula <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="matricula"
@@ -293,7 +293,7 @@ export const FormVinculo: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Vínculo *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Vínculo <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoVinculo"
@@ -308,7 +308,7 @@ export const FormVinculo: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Jornada *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Jornada <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="jornadaTrabalho"
@@ -362,7 +362,7 @@ export const FormVinculo: React.FC = () => {
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
-                      <Calendar size={14} /> Início *
+                      <Calendar size={14} /> Início <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"

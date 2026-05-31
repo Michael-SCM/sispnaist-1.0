@@ -236,7 +236,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Ocorrência *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data da Ocorrência <span className="text-red-500">*</span></label>
                     <input
                       type="date"
                       required
@@ -258,7 +258,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Violência *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Violência <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoViolencia"
@@ -274,7 +274,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.tipoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolencia}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoViolenciaSexual"
@@ -290,7 +290,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.tipoViolenciaSexual && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolenciaSexual}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas <span className="text-red-500">*</span></label>
                     <input
                       name="pessoasEnvolvidas"
                       required
@@ -302,7 +302,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.pessoasEnvolvidas && <p className="mt-1 text-xs text-red-500 font-bold">{errors.pessoasEnvolvidas}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="motivoViolencia"
@@ -318,7 +318,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.motivoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.motivoViolencia}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Meio de Agressão *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Meio de Agressão <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="meioAgressao"
@@ -334,7 +334,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.meioAgressao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.meioAgressao}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Autor *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Autor <span className="text-red-500">*</span></label>
                     <select
                       required
                       name="tipoAutorViolencia"
@@ -350,7 +350,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.tipoAutorViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAutorViolencia}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Conduta de Violência *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Conduta de Violência <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="condutaViolencia"
@@ -362,7 +362,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     {errors.condutaViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.condutaViolencia}</p>}
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição do Atendimento Realizado *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição do Atendimento Realizado <span className="text-red-500">*</span></label>
                     <input
                       required
                       name="atendimentoRealizado"
@@ -384,7 +384,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Ocorrência *</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Ocorrência <span className="text-red-500">*</span></label>
                     <textarea
                       required
                       name="descricaoOcorrencia"
