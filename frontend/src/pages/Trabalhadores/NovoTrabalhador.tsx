@@ -7,6 +7,14 @@ import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
 import { useEmpresaStore } from '../../store/empresaStore.js';
 import { useUnidadeStore } from '../../store/unidadeStore.js';
+
+const empresaIdToString = (v: any): string => {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v._id) return String(v._id);
+  return '';
+};
+
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import {
@@ -87,7 +95,8 @@ export const NovoTrabalhador: React.FC = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    let { name, value } = e.target;
+    let { name, value } = e.target as { name: string; value: string };
+
     
     // Máscara de CPF
     if (name === 'cpf') {
@@ -101,8 +110,9 @@ export const NovoTrabalhador: React.FC = () => {
     if (name === 'empresa' && value) {
       const empresaSelecionada = empresas.find(e => e._id === value);
       if (empresaSelecionada) {
-        // Filtrar unidades da empresa selecionada
-        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === value);
+        // Filtrar unidades da empresa selecionada (empresaId pode vir como objeto populado)
+        const unidadesDaEmpresa = unidades.filter(u => empresaIdToString((u as any).empresaId) === value);
+
         setUnidadesFiltradas(unidadesDaEmpresa);
         // Limpar seleção de unidade
         setFormData((prev) => ({ ...prev, unidade: '' }));

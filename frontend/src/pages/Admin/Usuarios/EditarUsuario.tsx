@@ -7,6 +7,13 @@ import { ArrowLeft, Save, User, Shield, Building2, MapPin, Mail, Key } from 'luc
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import toast from 'react-hot-toast';
 
+const empresaIdToString = (v: any): string => {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v._id) return String(v._id);
+  return '';
+};
+
 const EditarUsuario: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -71,8 +78,9 @@ const EditarUsuario: React.FC = () => {
     if (name === 'empresa' && value) {
       const empresaSelecionada = empresas.find(e => e._id === value);
       if (empresaSelecionada) {
-        // Filtrar unidades da empresa selecionada
-        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === value);
+        // Filtrar unidades da empresa selecionada (empresaId pode vir como objeto populado)
+        const unidadesDaEmpresa = unidades.filter(u => empresaIdToString((u as any).empresaId) === empresaIdToString(value));
+
         setUnidadesFiltradas(unidadesDaEmpresa);
         // Limpar seleção de unidade
         setFormData(prev => ({ ...prev, unidade: '' }));

@@ -15,6 +15,13 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const empresaIdToString = (v: any): string => {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v._id) return String(v._id);
+  return '';
+};
+
 const inputCls = "w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all";
 const labelCls = "block text-sm font-bold text-slate-600 mb-2";
 const selectCls = `${inputCls} font-medium`;
@@ -84,7 +91,8 @@ export const EditarTrabalhador: React.FC = () => {
         
         // Inicializar unidades filtradas com base na empresa do trabalhador
         if (t.empresa && unidades.length > 0) {
-          const unidadesDaEmpresa = unidades.filter(u => u.empresaId === t.empresa);
+          const unidadesDaEmpresa = unidades.filter(u => empresaIdToString((u as any).empresaId) === empresaIdToString(t.empresa as any));
+
           setUnidadesFiltradas(unidadesDaEmpresa);
         }
         
@@ -126,8 +134,9 @@ export const EditarTrabalhador: React.FC = () => {
     if (name === 'empresa' && value) {
       const empresaSelecionada = empresas.find(e => e._id === value);
       if (empresaSelecionada) {
-        // Filtrar unidades da empresa selecionada
-        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === value);
+        // Filtrar unidades da empresa selecionada (empresaId pode vir como objeto populado)
+        const unidadesDaEmpresa = unidades.filter(u => empresaIdToString((u as any).empresaId) === value);
+
         setUnidadesFiltradas(unidadesDaEmpresa);
         // Limpar seleção de unidade
         setFormData((prev) => ({ ...prev, unidade: '' }));
