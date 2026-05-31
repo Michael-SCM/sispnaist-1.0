@@ -107,29 +107,41 @@ export const NovoTrabalhador: React.FC = () => {
     }
 
     // Filtro em cascata: quando empresa muda, atualiza unidades filtradas
-    if (name === 'empresa' && value) {
-      const empresaSelecionada = empresas.find(e => e._id === value);
-      if (empresaSelecionada) {
-        // Filtrar unidades da empresa selecionada (empresaId pode vir como objeto populado)
-        const unidadesDaEmpresa = unidades.filter(u => empresaIdToString((u as any).empresaId) === value);
-
+    if (name === 'empresa') {
+      if (value) {
+        const unidadesDaEmpresa = unidades.filter(
+          (u) => empresaIdToString((u as any).empresaId) === value
+        );
         setUnidadesFiltradas(unidadesDaEmpresa);
-        // Limpar seleção de unidade
-        setFormData((prev) => ({ ...prev, unidade: '' }));
+        // Ao trocar empresa, limpa apenas unidade
+        setFormData((prev) => ({ ...prev, empresa: value, unidade: '' }));
+      } else {
+        setUnidadesFiltradas([]);
+        setFormData((prev) => ({ ...prev, empresa: '', unidade: '' }));
       }
+      return;
     }
 
     // Filtro em cascata: quando unidade muda, atualiza empresa selecionada
-    if (name === 'unidade' && value) {
-      const unidadeSelecionada = unidades.find(u => u._id === value);
-      if (unidadeSelecionada) {
-        // Atualizar empresa automaticamente
-        setFormData((prev) => ({ ...prev, empresa: unidadeSelecionada.empresaId }));
-        // Atualizar unidades filtradas da empresa da unidade selecionada
-        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === unidadeSelecionada.empresaId);
-        setUnidadesFiltradas(unidadesDaEmpresa);
+    if (name === 'unidade') {
+      if (value) {
+        const unidadeSelecionada = unidades.find((u) => u._id === value);
+        if (unidadeSelecionada) {
+          const empresaId = empresaIdToString((unidadeSelecionada as any).empresaId);
+          setUnidadesFiltradas(
+            unidades.filter(
+              (u) => empresaIdToString((u as any).empresaId) === empresaId
+            )
+          );
+          // Unidade determina empresa, mas não desmarca a unidade que acabou de ser escolhida
+          setFormData((prev) => ({ ...prev, empresa: empresaId, unidade: value }));
+        }
+      } else {
+        setFormData((prev) => ({ ...prev, unidade: '' }));
       }
+      return;
     }
+
 
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
