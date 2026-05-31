@@ -5,6 +5,8 @@ import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
+import { useEmpresaStore } from '../../store/empresaStore.js';
+import { useUnidadeStore } from '../../store/unidadeStore.js';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import {
@@ -22,10 +24,13 @@ export const EditarTrabalhador: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { atualizarTrabalhador } = useTrabalhadorStore();
+  const { fetchEmpresaPorUnidade } = useEmpresaStore();
+  const { fetchUnidadesFiltradas } = useUnidadeStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
+  const [unidadesFiltradas, setUnidadesFiltradas] = useState<IUnidade[]>([]);
   const [formData, setFormData] = useState<Partial<ITrabalhador>>({});
 
   // Catálogos
@@ -76,12 +81,19 @@ export const EditarTrabalhador: React.FC = () => {
       try {
         const t = await trabalhadorService.obterPorId(id);
         setFormData(t);
+        
+        // Inicializar unidades filtradas com base na empresa do trabalhador
+        if (t.empresa && unidades.length > 0) {
+          const unidadesDaEmpresa = unidades.filter(u => u.empresaId === t.empresa);
+          setUnidadesFiltradas(unidadesDaEmpresa);
+        }
+        
         // Inicializar checkboxes baseado nos dados existentes
         setChecks({
           deficiencia: !!(t.deficiencia?.tipo || t.deficiencia?.tempo || t.deficiencia?.grau),
           posse: !!t.trabalho?.dataPosse,
           terceirizado: !!t.trabalho?.empresaTerceirizada,
-          aposentadoria: !!t.historico?.dataAposentadoria,
+          aporentadoria: !!t.historico?.dataAposentadoria,
           obito: !!t.historico?.dataObito,
           remocao: !!t.historico?.dataRemocao,
           retorno: !!t.historico?.dataRetorno,
@@ -97,7 +109,7 @@ export const EditarTrabalhador: React.FC = () => {
       }
     };
     carregarTrabalhador();
-  }, [id, navigate]);
+  }, [id, navigate, unidades]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     let { name, value } = e.target;
@@ -107,6 +119,30 @@ export const EditarTrabalhador: React.FC = () => {
       value = value.replace(/\D/g, '');
       if (value.length <= 11) {
         value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+      }
+    }
+
+    // Filtro em cascata: quando empresa muda, atualiza unidades filtradas
+    if (name === 'empresa' && value) {
+      const empresaSelecionada = empresas.find(e => e._id === value);
+      if (empresaSelecionada) {
+        // Filtrar unidades da empresa selecionada
+        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === value);
+        setUnidadesFiltradas(unidadesDaEmpresa);
+        // Limpar seleção de unidade
+        setFormData((prev) => ({ ...prev, unidade: '' }));
+      }
+    }
+
+    // Filtro em cascata: quando unidade muda, atualiza empresa selecionada
+    if (name === 'unidade' && value) {
+      const unidadeSelecionada = unidades.find(u => u._id === value);
+      if (unidadeSelecionada) {
+        // Atualizar empresa automaticamente
+        setFormData((prev) => ({ ...prev, empresa: unidadeSelecionada.empresaId }));
+        // Atualizar unidades filtradas da empresa da unidade selecionada
+        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === unidadeSelecionada.empresaId);
+        setUnidadesFiltradas(unidadesDaEmpresa);
       }
     }
 
@@ -416,12 +452,15 @@ export const EditarTrabalhador: React.FC = () => {
                     <option value="">Selecione...</option>
                     {empresas.map(e => <option key={e._id} value={e._id}>{e.razaoSocial}</option>)}
                   </select>
+                  {formData.empresa && unidadesFiltradas.length === 0 && (
+                    <p className="text-xs text-amber-600 mt-1">⚠️ Nenhuma unidade vinculada a esta empresa</p>
+                  )}
                 </div>
                 <div>
                   <label className={labelCls}>Unidade</label>
-                  <select name="unidade" value={formData.unidade || ''} onChange={handleChange} className={selectCls}>
-                    <option value="">Selecione...</option>
-                    {unidades.map(u => <option key={u._id} value={u._id}>{u.nome}</option>)}
+                  <select name="unidade" value={formData.unidade || ''} onChange={handleChange} className={selectCls} disabled={!formData.empresa}>
+                    <option value="">{formData.empresa ? 'Selecione...' : 'Selecione uma empresa primeiro'}</option>
+                    {unidadesFiltradas.map(u => <option key={u._id} value={u._id}>{u.nome}</option>)}
                   </select>
                 </div>
               </div>

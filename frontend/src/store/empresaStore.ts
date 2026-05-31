@@ -12,6 +12,7 @@ interface EmpresaState {
   
   fetchEmpresas: (page?: number, limit?: number, filtros?: any) => Promise<void>;
   fetchEmpresa: (id: string) => Promise<void>;
+  fetchEmpresaPorUnidade: (unidadeId: string) => Promise<void>;
   createEmpresa: (data: Partial<IEmpresa>) => Promise<void>;
   updateEmpresa: (id: string, data: Partial<IEmpresa>) => Promise<void>;
   deleteEmpresa: (id: string) => Promise<void>;
@@ -52,6 +53,19 @@ export const useEmpresaStore = create<EmpresaState>((set) => ({
     } catch (error: any) {
       set({ 
         error: error.response?.data?.message || 'Erro ao carregar empresa', 
+        loading: false 
+      });
+    }
+  },
+
+  fetchEmpresaPorUnidade: async (unidadeId) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await empresaService.obterPorUnidade(unidadeId);
+      set({ empresaAtual: data.data.empresa, loading: false });
+    } catch (error: any) {
+      set({ 
+        error: error.response?.data?.message || 'Erro ao carregar empresa da unidade', 
         loading: false 
       });
     }

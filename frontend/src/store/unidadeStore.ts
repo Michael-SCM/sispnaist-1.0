@@ -4,6 +4,7 @@ import { IUnidade } from '../types';
 
 interface UnidadeState {
   unidades: IUnidade[];
+  unidadesFiltradas: IUnidade[];
   unidadeAtual: IUnidade | null;
   loading: boolean;
   error: string | null;
@@ -13,6 +14,7 @@ interface UnidadeState {
   fetchUnidades: (page?: number, limit?: number, filtros?: any) => Promise<void>;
   fetchUnidade: (id: string) => Promise<void>;
   fetchUnidadesPorEmpresa: (empresaId: string) => Promise<void>;
+  fetchUnidadesFiltradas: (empresaId: string) => Promise<void>;
   createUnidade: (data: Partial<IUnidade>) => Promise<void>;
   updateUnidade: (id: string, data: Partial<IUnidade>) => Promise<void>;
   deleteUnidade: (id: string) => Promise<void>;
@@ -21,6 +23,7 @@ interface UnidadeState {
 
 export const useUnidadeStore = create<UnidadeState>((set) => ({
   unidades: [],
+  unidadesFiltradas: [],
   unidadeAtual: null,
   loading: false,
   error: null,
@@ -63,6 +66,19 @@ export const useUnidadeStore = create<UnidadeState>((set) => ({
     try {
       const data = await unidadeService.listarPorEmpresa(empresaId);
       set({ unidades: data.data.unidades, loading: false });
+    } catch (error: any) {
+      set({ 
+        error: error.response?.data?.message || 'Erro ao carregar unidades da empresa', 
+        loading: false 
+      });
+    }
+  },
+
+  fetchUnidadesFiltradas: async (empresaId) => {
+    set({ loading: true, error: null });
+    try {
+      const data = await unidadeService.listarPorEmpresa(empresaId);
+      set({ unidadesFiltradas: data.data.unidades, loading: false });
     } catch (error: any) {
       set({ 
         error: error.response?.data?.message || 'Erro ao carregar unidades da empresa', 

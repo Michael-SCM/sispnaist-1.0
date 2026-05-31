@@ -22,8 +22,11 @@ router.get('/ativas', async (req, res) => {
 
 // Todas as rotas de empresas requerem autenticação de Admin
 router.use(authMiddleware);
-router.use(adminMiddleware);
 
+// Rota pública para usuários autenticados (usada em dropdowns de cadastro)
+router.get('/unidade/:unidadeId', empresaController.getEmpresaPorUnidade);
+
+router.use(adminMiddleware);
 router.get('/', empresaController.getEmpresas);
 router.post('/', empresaController.createEmpresa);
 router.get('/:id', empresaController.getEmpresa);

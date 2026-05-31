@@ -93,3 +93,18 @@ export const deleteEmpresa = asyncHandler(async (req: Request, res: Response) =>
     data: null,
   });
 });
+
+/**
+ * @desc    Buscar empresa vinculada a uma unidade
+ * @route   GET /api/empresas/unidade/:unidadeId
+ * @access  Private
+ */
+export const getEmpresaPorUnidade = asyncHandler(async (req: Request, res: Response) => {
+  const { unidadeId } = req.params;
+  const empresa = await empresaService.listarPorUnidade(unidadeId);
+
+  res.status(200).json({
+    status: 'success',
+    data: { empresa },
+  });
+});

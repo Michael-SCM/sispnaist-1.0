@@ -16,6 +16,7 @@ const EditarUsuario: React.FC = () => {
   const { unidades, fetchUnidades } = useUnidadeStore();
 
   const [loading, setLoading] = useState(false);
+  const [unidadesFiltradas, setUnidadesFiltradas] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -39,15 +40,23 @@ const EditarUsuario: React.FC = () => {
       setLoading(true);
       const response = await api.get(`/usuarios/${id}`);
       const user = response.data.data.usuario;
+      const empresaId = typeof user.empresa === 'object' && user.empresa !== null ? user.empresa._id : user.empresa || '';
+      
       setFormData({
         nome: user.nome,
         email: user.email,
         password: '', // Não carregamos a senha
         perfil: user.perfil,
-        empresa: typeof user.empresa === 'object' && user.empresa !== null ? user.empresa._id : user.empresa || '',
+        empresa: empresaId,
         unidade: typeof user.unidade === 'object' && user.unidade !== null ? user.unidade._id : user.unidade || '',
         ativo: user.ativo,
       });
+      
+      // Inicializar unidades filtradas com base na empresa do usuário
+      if (empresaId && unidades.length > 0) {
+        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === empresaId);
+        setUnidadesFiltradas(unidadesDaEmpresa);
+      }
     } catch (error) {
       toast.error('Erro ao carregar usuário');
     } finally {
@@ -57,6 +66,31 @@ const EditarUsuario: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as any;
+    
+    // Filtro em cascata: quando empresa muda, atualiza unidades filtradas
+    if (name === 'empresa' && value) {
+      const empresaSelecionada = empresas.find(e => e._id === value);
+      if (empresaSelecionada) {
+        // Filtrar unidades da empresa selecionada
+        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === value);
+        setUnidadesFiltradas(unidadesDaEmpresa);
+        // Limpar seleção de unidade
+        setFormData(prev => ({ ...prev, unidade: '' }));
+      }
+    }
+
+    // Filtro em cascata: quando unidade muda, atualiza empresa selecionada
+    if (name === 'unidade' && value) {
+      const unidadeSelecionada = unidades.find(u => u._id === value);
+      if (unidadeSelecionada) {
+        // Atualizar empresa automaticamente
+        setFormData(prev => ({ ...prev, empresa: unidadeSelecionada.empresaId }));
+        // Atualizar unidades filtradas da empresa da unidade selecionada
+        const unidadesDaEmpresa = unidades.filter(u => u.empresaId === unidadeSelecionada.empresaId);
+        setUnidadesFiltradas(unidadesDaEmpresa);
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as any).checked : value
@@ -180,6 +214,9 @@ const EditarUsuario: React.FC = () => {
                         <option key={emp._id} value={emp._id}>{emp.razaoSocial}</option>
                       ))}
                     </select>
+                    {formData.empresa && unidadesFiltradas.length === 0 && (
+                      <p className="text-xs text-amber-600 mt-1">⚠️ Nenhuma unidade vinculada a esta empresa</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Unidade</label>
@@ -188,9 +225,10 @@ const EditarUsuario: React.FC = () => {
                       value={formData.unidade}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all"
+                      disabled={!formData.empresa}
                     >
-                      <option value="">Selecione...</option>
-                      {unidades.map(uni => (
+                      <option value="">{formData.empresa ? 'Selecione...' : 'Selecione uma empresa primeiro'}</option>
+                      {unidadesFiltradas.map(uni => (
                         <option key={uni._id} value={uni._id}>{uni.nome}</option>
                       ))}
                     </select>

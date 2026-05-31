@@ -32,6 +32,11 @@ const empresaService = {
     const response = await api.delete(`/empresas/${id}`);
     return response.data;
   },
+
+  obterPorUnidade: async (unidadeId: string) => {
+    const response = await api.get(`/empresas/unidade/${unidadeId}`);
+    return response.data;
+  },
 };
 
 export default empresaService;
