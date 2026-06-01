@@ -133,7 +133,6 @@ export interface IAcidente {
   descricao: string;
   descricaoTrauma?: string;
   local?: string;
-  estado?: string;
   lesoes?: string[];
   feriado?: boolean;
   comunicado?: boolean;
@@ -195,7 +194,6 @@ export interface IAcidentePopulated {
   descricao: string;
   descricaoTrauma?: string;
   local?: string;
-  estado?: string;
   lesoes?: string[];
   feriado?: boolean;
   comunicado?: boolean;

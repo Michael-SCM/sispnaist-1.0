@@ -59,8 +59,6 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
     },
     dataComunicacao: Date,
     dataNotificacao: Date,
-    estado: String,
-
     // Campos de atendimento médico
     atendimentoMedico: Boolean,
     dataAtendimento: Date,

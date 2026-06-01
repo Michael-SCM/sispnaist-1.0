@@ -43,7 +43,6 @@ interface FormData {
   comunicado: boolean;
   dataComunicacao: string;
   dataNotificacao: string;
-  estado: string;
   atendimentoMedico: boolean;
   dataAtendimento: string;
   horaAtendimento: string;
@@ -153,7 +152,6 @@ export const EditarAcidente: React.FC = () => {
           descricao: acidente.descricao,
           descricaoTrauma: acidente.descricaoTrauma || '',
           local: acidente.local || '',
-          estado: acidente.estado || '',
           lesoes: garantirArrayLesoes(acidente.lesoes),
           feriado: acidente.feriado || false,
           comunicado: acidente.comunicado || false,
@@ -495,17 +493,6 @@ export const EditarAcidente: React.FC = () => {
                       ))}
                     </select>
                     {errors.parteCorpo && <p className="mt-1 text-xs text-red-500 font-bold">{errors.parteCorpo}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Estado (UF)</label>
-                    <input
-                      name="estado"
-                      value={formData?.estado}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
-                      placeholder="Ex: SP"
-                      maxLength={2}
-                    />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-slate-600 mb-2 text-amber-600">Descrição do Acidente <span className="text-red-500">*</span></label>

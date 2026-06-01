@@ -217,12 +217,6 @@ export const DetalhesAcidente: React.FC = () => {
                     <p className="font-bold text-slate-700">{acidente.parteCorpo}</p>
                   </div>
                 )}
-                {acidente.estado && (
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estado (UF)</p>
-                    <p className="font-bold text-slate-700">{acidente.estado}</p>
-                  </div>
-                )}
               </div>
               {acidente.descricaoTrauma && (
                 <div className="px-8 pb-8">

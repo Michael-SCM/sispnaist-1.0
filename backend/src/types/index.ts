@@ -125,7 +125,6 @@ export interface IAcidente {
   comunicado?: boolean;
   dataComunicacao?: Date;
   dataNotificacao?: Date;
-  estado?: string;
 
   // Campos de atendimento médico
   atendimentoMedico?: boolean;

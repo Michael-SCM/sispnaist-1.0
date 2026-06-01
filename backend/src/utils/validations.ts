@@ -172,7 +172,6 @@ export const criarAcidenteSchema = Joi.object({
     .trim()
     .max(200)
     .optional(),
-  estado: Joi.string().trim().max(2).optional(),
   lesoes: Joi.array()
     .items(Joi.string().trim())
     .optional(),
@@ -236,7 +235,6 @@ export const atualizarAcidenteSchema = Joi.object({
     .messages({
       'any.required': 'Local do acidente é obrigatório',
     }),
-  estado: Joi.string().trim().max(2).optional(),
   lesoes: Joi.array()
     .items(Joi.string().trim())
     .min(1)

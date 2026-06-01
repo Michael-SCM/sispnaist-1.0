@@ -225,7 +225,6 @@ async function seedAcidentesDoencasVacinacoes() {
             comunicado: Math.random() > 0.2,
             dataComunicacao: getRandomDate(30),
             dataNotificacao: getRandomDate(20),
-            estado: 'Notificado',
 
             atendimentoMedico: Math.random() > 0.1,
             dataAtendimento: getRandomDate(7),
