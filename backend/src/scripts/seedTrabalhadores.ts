@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 import dns from 'node:dns';
 import 'dotenv/config';
 
-// Force DNS resolution to prioritize IPv4.
-// This resolves the ENETUNREACH error on Render/local network requests to MongoDB Atlas.
 dns.setDefaultResultOrder('ipv4first');
 
 import connectDB from '../config/database.js';
@@ -20,20 +18,46 @@ import Unidade from '../models/Unidade.js';
 import Questionario from '../models/Questionario.js';
 import Catalogo from '../models/Catalogo.js';
 
-// Listas extensas de nomes para garantir máxima variedade e mínima repetição
+// Seeded PRNG (Mulberry32) para distribuição mais natural
+function mulberry32(seed: number) {
+  return () => {
+    seed |= 0;
+    seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function pick<T>(arr: T[], rand: () => number): T {
+  return arr[Math.floor(rand() * arr.length)];
+}
+
 const firstNames = [
   'Ana', 'Carlos', 'Juliana', 'Bruno', 'Mariana', 'Lucas', 'Fernanda', 'Gabriel', 'Patrícia', 'Thiago',
   'Beatriz', 'Diego', 'Camila', 'Rodrigo', 'Amanda', 'Felipe', 'Larissa', 'Gustavo', 'Letícia', 'Rafael',
   'Isabela', 'Daniel', 'Aline', 'Marcelo', 'Sofia', 'Renato', 'Carla', 'Eduardo', 'Priscila', 'Leonardo',
-  'Vanessa', 'Fábio', 'Natália', 'André', 'Monique', 'Vinicius', 'Cristina', 'Ricardo', 'Débora', 'Leandro',
-  'Tatiane', 'Sergio', 'Cintia', 'Paulo', 'Rebeca', 'Márcio', 'Denise', 'Henrique', 'Elaine', 'Arthur',
+  'Vanessa', 'Fábio', 'Natália', 'André', 'Monique', 'Vinícius', 'Cristina', 'Ricardo', 'Débora', 'Leandro',
+  'Tatiane', 'Sérgio', 'Cíntia', 'Paulo', 'Rebeca', 'Márcio', 'Denise', 'Henrique', 'Elaine', 'Arthur',
   'Vera', 'Jorge', 'Jéssica', 'Flávio', 'Bianca', 'Tiago', 'Luciane', 'Rogério', 'Adriana', 'Murilo',
   'Simone', 'Davi', 'Luana', 'Caio', 'Viviane', 'Alex', 'Raquel', 'César', 'Ingrid', 'Matheus',
   'Núbia', 'Evandro', 'Samantha', 'Cláudio', 'Danielle', 'Roberto', 'Gisele', 'Augusto', 'Lorena', 'Edson',
   'Sabrina', 'Wanderson', 'Mônica', 'Breno', 'Giovanna', 'Otávio', 'Érica', 'Humberto', 'Taís', 'Nilton',
   'Keyla', 'Valdir', 'Yasmin', 'Adilson', 'Talita', 'Cleber', 'Suellen', 'Emerson', 'Catarina', 'Jair',
   'Heloise', 'Wagner', 'Rafaela', 'Welton', 'Maísa', 'Ailton', 'Fabiana', 'Manoel', 'Lucélia', 'Ivan',
+  'Ruth', 'Osvaldo', 'Miriam', 'Antônio', 'Joana', 'Francisco', 'Bárbara', 'Pedro', 'Elisa', 'Miguel',
+  'Clara', 'Igor', 'Manuela', 'Nelson', 'Valentina', 'Luís', 'Heloísa', 'Samuel', 'Lívia', 'João',
+  'Alice', 'Guilherme', 'Laura', 'Enzo', 'Sophia', 'Benício', 'Helena', 'Vicente', 'Emanuelly', 'Ruan',
+  'Maysa', 'Kevin', 'Esther', 'Yuri', 'Lavínia', 'Kaique', 'Isis', 'Danilo', 'Ariana', 'Thales',
+  'Luna', 'Alexandre', 'Maitê', 'Renan', 'Ana Clara', 'Iago', 'Maria Luísa', 'Erick', 'Melissa', 'Raul',
+  'Cecília', 'Mário', 'Ana Laura', 'Josué', 'Alícia', 'Natan', 'Isadora', 'Brayan', 'Marina', 'Luan',
+  'Brenda', 'Fábio', 'Lara', 'Raimundo', 'Carolina', 'Túlio', 'Stela', 'Robson', 'Tainá', 'Dalton',
+  'Nádia', 'Cauê', 'Dora', 'Anderson', 'Mirian', 'Elias', 'Luciana', 'Tomás', 'Ivone', 'Valter',
+  'Marlene', 'Nilson', 'Creuza', 'Adão', 'Eunice', 'Aldo', 'Neusa', 'Cristiano', 'Zélia', 'Ciro',
+  'Odete', 'Laércio', 'Geni', 'Firmino', 'Jandira', 'Saulo', 'Célia', 'Hélio', 'Lourdes', 'Jairo',
+  'Telma', 'Arnaldo', 'Norma', 'Osmar', 'Dulce', 'José', 'Nair', 'Sebastião', 'Belmira', 'Djalma',
 ];
+
 const middleNames = [
   'Silva', 'Santos', 'Oliveira', 'Souza', 'Rodrigues', 'Ferreira', 'Alves', 'Pereira', 'Lima', 'Gomes',
   'Costa', 'Ribeiro', 'Martins', 'Carvalho', 'Almeida', 'Lopes', 'Soares', 'Fernandes', 'Vieira', 'Barbosa',
@@ -43,35 +67,38 @@ const middleNames = [
   'Nogueira', 'Melo', 'Assis', 'Viana', 'Brito', 'Lacerda', 'Ávila', 'Pinheiro', 'Corrêa', 'Toledo',
   'Fonseca', 'Faria', 'Cavalcante', 'Pacheco', 'Sá', 'Rangel', 'Rios', 'Brandão', 'Esteves', 'Aguiar',
   'Vasconcelos', 'Parente', 'Lobo', 'Batista', 'Valente', 'Pessoa', 'Serrano', 'Menezes', 'Pilar', 'Godoy',
+  'Dias', 'Aragão', 'Salgado', 'Sardinha', 'Campelo', 'Bittencourt', 'Garcez', 'Lisboa', 'Portela', 'Pádua',
+  'Barcelos', 'Lamego', 'Távora', 'Galvão', 'Souto', 'Proença', 'Lins', 'Câmara', 'Coury', 'Cordeiro',
+  'Goulart', 'Pedrosa', 'Alcântara', 'Arantes', 'Belo', 'Caires', 'Caldas', 'Castelo', 'Chagas', 'Couto',
+  'Escobar', 'Estrada', 'Fagundes', 'Furtado', 'Guerra', 'Lessa', 'Malheiros', 'Mascarenhas', 'Néri', 'Ornelas',
+  'Palhares', 'Quadros', 'Rego', 'Salomão', 'Sandoval', 'Sarmento', 'Seixas', 'Serrão', 'Tavares', 'Uchôa',
 ];
+
 const lastNames = [
-  'Mendes', 'Nunes', 'Rocha', 'Cardoso', 'Teixeira', 'Araújo', 'Moreira', 'Melo', 'Barros', 'Correia',
+  'Mendes', 'Nunes', 'Rocha', 'Cardoso', 'Teixeira', 'Araújo', 'Moreira', 'Barros', 'Correia',
   'Freitas', 'Dantas', 'Cavalcanti', 'Azevedo', 'Castro', 'Pinto', 'Miranda', 'Borges', 'Fonseca', 'Paiva',
   'Belém', 'Furtado', 'Alencar', 'Luz', 'Falcão', 'Porto', 'Sena', 'Fraga', 'Serpa', 'Bastos',
   'Coutinho', 'Novaes', 'Peixoto', 'Vale', 'Lago', 'Chaves', 'Reis', 'Mattos', 'Maia', 'Magalhães',
   'Pontes', 'Medeiros', 'Fleury', 'Dornelas', 'Bretas', 'Sabino', 'Jardim', 'Zago', 'Werneck', 'Caputo',
-  'Diniz', 'Trindade', 'Fontenele', 'Leal', 'Menezes', 'Becker', 'Kronbauer', 'Strauss', 'Krause', 'Fuchs',
-  'Morais', 'Moraes', 'Godoy', 'Sampaio', 'Berbert', 'Caldas', 'Santana', 'Leandro', 'Sales', 'Barroso',
-  'Rolim', 'Osório', 'Assunção', 'Neri', 'Quaresma', 'Aguiar', 'Uchoa', 'Canuto', 'Gadelha', 'Colares',
+  'Diniz', 'Trindade', 'Fontenele', 'Leal', 'Sampaio', 'Morais', 'Moraes', 'Godoy', 'Berbert', 'Caldas',
+  'Santana', 'Leandro', 'Sales', 'Barroso', 'Rolim', 'Osório', 'Assunção', 'Neri', 'Quaresma', 'Aguiar',
+  'Uchôa', 'Canuto', 'Gadelha', 'Colares', 'Fontes', 'Maciel', 'Baldini', 'Pascoal', 'Tomé', 'Mota',
+  'Brum', 'Leme', 'Curi', 'Alvarenga', 'Demétrio', 'Tângari', 'Frej', 'Kahwage', 'Haiad', 'Sebe',
+  'Bitar', 'Arbex', 'Jafet', 'Maluf', 'Mattar', 'Haddad', 'Saad', 'Miguel', 'Aun', 'Calfat',
+  'Racy', 'Tuma', 'Homsi', 'Chedid', 'Abi-Ackel', 'Cury', 'Atalla', 'Khoury', 'Bitar', 'Maia',
 ];
+
 const motherFirstNames = [
-  'Maria', 'Regina', 'Helena', 'Teresa', 'Francisca', 'Luciana', 'Sandra', 'Marcia', 'Sonia', 'Rita',
-  'Angela', 'Patricia', 'Adriana', 'Claudia', 'Valeria', 'Monica', 'Vera', 'Sueli', 'Aparecida', 'Rosangela',
-  'Marta', 'Neide', 'Ivone', 'Lúcia', 'Celia', 'Marlene', 'Irene', 'Nadir', 'Elza', 'Conceição',
-  'Fatima', 'Cleide', 'Edna', 'Bernadete', 'Dolores', 'Alzira', 'Geralda', 'Amelia', 'Eunice', 'Nair',
+  'Maria', 'Regina', 'Helena', 'Teresa', 'Francisca', 'Luciana', 'Sandra', 'Márcia', 'Sônia', 'Rita',
+  'Ângela', 'Patrícia', 'Adriana', 'Cláudia', 'Valéria', 'Mônica', 'Vera', 'Sueli', 'Aparecida', 'Rosângela',
+  'Marta', 'Neide', 'Ivone', 'Lúcia', 'Célia', 'Marlene', 'Irene', 'Nadir', 'Elza', 'Conceição',
+  'Fátima', 'Cleide', 'Edna', 'Bernadete', 'Dolores', 'Alzira', 'Geralda', 'Amélia', 'Eunice', 'Nair',
+  'Raimunda', 'Sebastiana', 'Leila', 'Josefa', 'Carmem', 'Lurdes', 'Margarida', 'Terezinha', 'Luzia', 'Glória',
+  'Rosa', 'Benedita', 'Catarina', 'Isabel', 'Joana', 'Madalena', 'Perpétua', 'Escolástica', 'Januária', 'Floripes',
+  'Guiomar', 'Inês', 'Jacinta', 'Laura', 'Leonor', 'Marinalva', 'Nilza', 'Odete', 'Otília', 'Quitéria',
+  'Silvana', 'Tânia', 'Vilma', 'Zilda', 'Auxiliadora', 'Diva', 'Elvira', 'Hilda', 'Iracema', 'Jurema',
 ];
 
-// Função que usa múltiplos deslocamentos de primos para evitar padrões repetitivos
-// Com 110 primeiros nomes × 80 nomes do meio × 80 sobrenomes = 704.000 combinações únicas possíveis
-function buildName(i: number, fNames: string[], mNames: string[], lNames: string[]): { firstName: string; middleName: string; lastName: string } {
-  // Usa números primos distintos para "embaralhar" o índice entre os três arrays
-  const fi = i % fNames.length;
-  const mi = (i * 37 + Math.floor(i / fNames.length)) % mNames.length;
-  const li = (i * 73 + Math.floor(i / (fNames.length * mNames.length))) % lNames.length;
-  return { firstName: fNames[fi], middleName: mNames[mi], lastName: lNames[li] };
-}
-
-// Helper para remover acentuação e caracteres especiais de emails
 function normalizeEmail(email: string): string {
   return email
     .normalize("NFD")
@@ -80,19 +107,18 @@ function normalizeEmail(email: string): string {
     .toLowerCase();
 }
 
-// Helper para gerar CPF matematicamente válido (evita erros em validadores mais rígidos)
 function generateCPF(index: number): string {
   const num = 100000000 + index;
   const base = String(num);
   const digits = base.split('').map(Number);
-  
+
   let sum1 = 0;
   for (let i = 0; i < 9; i++) {
     sum1 += digits[i] * (10 - i);
   }
   let d1 = 11 - (sum1 % 11);
   if (d1 >= 10) d1 = 0;
-  
+
   let sum2 = 0;
   for (let i = 0; i < 9; i++) {
     sum2 += digits[i] * (11 - i);
@@ -100,128 +126,217 @@ function generateCPF(index: number): string {
   sum2 += d1 * 2;
   let d2 = 11 - (sum2 % 11);
   if (d2 >= 10) d2 = 0;
-  
-  return `${base.substring(0,3)}.${base.substring(3,6)}.${base.substring(6,9)}-${d1}${d2}`;
+
+  return `${base.substring(0, 3)}.${base.substring(3, 6)}.${base.substring(6, 9)}-${d1}${d2}`;
 }
 
-export async function seedTrabalhadores(targetCount: number = 3000) {
-  console.log(`🌱 Iniciando seed de ${targetCount} trabalhadores e seus submódulos distribuidos...`);
+// Cidades brasileiras com suas UFs e CEPs
+interface Cidade {
+  cidade: string;
+  estado: string;
+  cepRange: [number, number];
+  logradouros: string[];
+  bairros: string[];
+}
 
-  // 1. Garantir que temos Empresa 0 cadastrada
-  let empresa0 = await Empresa.findOne();
-  if (!empresa0) {
-    console.log('🏢 Nenhuma empresa encontrada. Criando empresa padrão...');
-    empresa0 = await Empresa.create({
-      razaoSocial: 'SISPNAIST Saúde e Segurança do Trabalho Ltda',
-      nomeFantasia: 'SISPNAIST SST',
-      cnpj: '12.345.678/0001-90',
-      email: 'contato@sispnaist.com',
-      telefone: '(11) 5555-1234',
+const cidades: Cidade[] = [
+  {
+    cidade: 'São Paulo', estado: 'SP', cepRange: [1001000, 59999000],
+    logradouros: ['Avenida Paulista', 'Rua Augusta', 'Avenida Brigadeiro Faria Lima', 'Rua Oscar Freire', 'Avenida Rebouças', 'Rua da Consolação', 'Avenida São João', 'Rua 25 de Março', 'Avenida Interlagos', 'Rua Vergueiro', 'Avenida Cruzeiro do Sul', 'Rua Teodoro Sampaio'],
+    bairros: ['Bela Vista', 'Jardins', 'Pinheiros', 'Vila Olímpia', 'Moema', 'Itaim Bibi', 'Perdizes', 'Santana', 'Tatuapé', 'Vila Mariana', 'Jabaquara', 'Santo Amaro']
+  },
+  {
+    cidade: 'Rio de Janeiro', estado: 'RJ', cepRange: [20040000, 37990000],
+    logradouros: ['Avenida Atlântica', 'Rua Presidente Vargas', 'Avenida Rio Branco', 'Rua do Ouvidor', 'Avenida Nossa Senhora de Copacabana', 'Rua Visconde de Pirajá', 'Avenida Brasil', 'Rua Voluntários da Pátria', 'Avenida das Américas', 'Rua Marquês de Olinda'],
+    bairros: ['Copacabana', 'Ipanema', 'Leblon', 'Botafogo', 'Flamengo', 'Tijuca', 'Barra da Tijuca', 'Centro', 'Laranjeiras', 'Jardim Botânico', 'Urca', 'Gávea']
+  },
+  {
+    cidade: 'Belo Horizonte', estado: 'MG', cepRange: [30000000, 39990000],
+    logradouros: ['Avenida Afonso Pena', 'Rua da Bahia', 'Avenida do Contorno', 'Rua Pernambuco', 'Avenida Amazonas', 'Rua dos Tupinambás', 'Avenida Cristiano Machado', 'Rua São Paulo', 'Avenida Raja Gabaglia', 'Rua Alvarenga Peixoto'],
+    bairros: ['Savassi', 'Funcionários', 'Lourdes', 'Sion', 'Santo Agostinho', 'Cidade Jardim', 'Buritis', 'Pampulha', 'Floresta', 'Barreiro', 'Betânia', 'Gutierrez']
+  },
+  {
+    cidade: 'Salvador', estado: 'BA', cepRange: [40000000, 49990000],
+    logradouros: ['Avenida Tancredo Neves', 'Rua Chile', 'Avenida Sete de Setembro', 'Rua do Carmo', 'Avenida Garibaldi', 'Rua do Cabeça', 'Avenida Vasco da Gama', 'Rua Direita do Santo Antônio', 'Avenida Paulo VI', 'Rua do Tijolo'],
+    bairros: ['Pelourinho', 'Barra', 'Ondina', 'Rio Vermelho', 'Pituba', 'Itaigara', 'Caminho das Árvores', 'Brotas', 'Graça', 'Vitória', 'Stela Maris', 'Imbuí']
+  },
+  {
+    cidade: 'Curitiba', estado: 'PR', cepRange: [80000000, 87990000],
+    logradouros: ['Avenida Batel', 'Rua XV de Novembro', 'Avenida Sete de Setembro', 'Rua Comendador Araújo', 'Avenida República Argentina', 'Rua Marechal Deodoro', 'Avenida Iguaçu', 'Rua Barão do Rio Branco', 'Avenida Cândido Hartmann', 'Rua Dr. Muricy'],
+    bairros: ['Batel', 'Centro', 'Alto da XV', 'Mercês', 'Bigorrilho', 'Campo Comprido', 'Cidade Industrial', 'Jardim Botânico', 'Juvevê', 'Cristo Rei', 'Água Verde', 'Portão']
+  },
+  {
+    cidade: 'Fortaleza', estado: 'CE', cepRange: [60000000, 65990000],
+    logradouros: ['Avenida Beira Mar', 'Rua Barão do Rio Branco', 'Avenida Domingos Olímpio', 'Rua General Sampaio', 'Avenida Santos Dumont', 'Rua Costa Barros', 'Avenida Washington Soares', 'Rua do Rosário', 'Avenida Antônio Sales', 'Rua Major Facundo'],
+    bairros: ['Meireles', 'Aldeota', 'Varjota', 'Praia de Iracema', 'Centro', 'Benfica', 'Mucuripe', 'Papicu', 'Cocó', 'Bairro de Fátima', 'Joaquim Távora', 'Dionísio Torres']
+  },
+  {
+    cidade: 'Recife', estado: 'PE', cepRange: [50000000, 54990000],
+    logradouros: ['Avenida Boa Viagem', 'Rua do Bom Jesus', 'Avenida Conde da Boa Vista', 'Rua da Aurora', 'Avenida Agamenon Magalhães', 'Rua Imperial', 'Avenida Norte', 'Rua da União', 'Avenida Caxangá', 'Rua do Hospício'],
+    bairros: ['Boa Viagem', 'Recife Antigo', 'Graças', 'Madalena', 'Casa Forte', 'Espinheiro', 'Pina', 'Derby', 'Rosarinho', 'Centro', 'Ipsep', 'Afogados']
+  },
+  {
+    cidade: 'Porto Alegre', estado: 'RS', cepRange: [90000000, 94990000],
+    logradouros: ['Avenida Ipiranga', 'Rua da Praia', 'Avenida Borges de Medeiros', 'Rua dos Andradas', 'Avenida Protásio Alves', 'Rua Padre Chagas', 'Avenida Julio de Castilhos', 'Rua Vasco da Gama', 'Avenida Cristóvão Colombo', 'Rua Marquês do Herval'],
+    bairros: ['Moinhos de Vento', 'Petrópolis', 'Rio Branco', 'Auxiliadora', 'Bela Vista', 'Cidade Baixa', 'Centro Histórico', 'Bom Fim', 'Floresta', 'Santana', 'Independência', 'Menino Deus']
+  },
+  {
+    cidade: 'Brasília', estado: 'DF', cepRange: [70000000, 77990000],
+    logradouros: ['Eixo Monumental', 'SHS Quadra 6', 'CLS 304', 'SGAN 601', 'SQS 308', 'Asa Norte Entrequadra', 'SCS Quadra 8', 'SIG Quadra 2', 'Setor de Clubes Esportivos', 'Via L4'],
+    bairros: ['Asa Sul', 'Asa Norte', 'Sudoeste', 'Águas Claras', 'Taguatinga', 'Guará', 'Ceilândia', 'Planaltina', 'Gama', 'Sobradinho', 'Lago Norte', 'Lago Sul']
+  },
+  {
+    cidade: 'Manaus', estado: 'AM', cepRange: [69000000, 69890000],
+    logradouros: ['Avenida Eduardo Ribeiro', 'Rua 24 de Maio', 'Avenida Djalma Batista', 'Rua Marcílio Dias', 'Avenida Constantino Nery', 'Rua Joaquim Sarmento', 'Avenida Sete de Setembro', 'Rua Lauro Cavalcante', 'Avenida André Araújo', 'Rua Adriano Jorge'],
+    bairros: ['Centro', 'Adrianópolis', 'Nossa Senhora das Graças', 'Aleixo', 'Vieiralves', 'Chapada', 'São Francisco', 'Ponta Negra', 'Japiim', 'Cachoeirinha', 'Parque 10', 'Flores']
+  },
+];
+
+const setoresOptions = [
+  'Administrativo', 'Financeiro', 'Recursos Humanos', 'Jurídico', 'TI',
+  'Enfermagem', 'Medicina', 'Farmácia', 'Laboratório', 'Radiologia',
+  'Fisioterapia', 'Nutrição', 'Psicologia', 'Serviço Social', 'Odontologia',
+  'Manutenção', 'Limpeza', 'Segurança Patrimonial', 'Transporte', 'Almoxarifado',
+  'Compras', 'Marketing', 'Comunicação', 'Planejamento', 'Controladoria',
+];
+
+const dominioEmails = ['sispnaist.com', 'saude.gov.br', 'prefeitura.sp.gov.br', 'gov.br', 'saude.mg.gov.br'];
+
+function generateCNPJ(index: number): string {
+  const base = 10000000000000 + index;
+  const s = String(base);
+  return `${s.substring(0, 2)}.${s.substring(2, 5)}.${s.substring(5, 8)}/${s.substring(8, 12)}-${s.substring(12, 14)}`;
+}
+
+export async function seedTrabalhadores(targetCount: number = 2000) {
+  console.log(`🌱 Iniciando seed de ${targetCount} trabalhadores e seus submódulos...`);
+
+  console.log('🏢 Removendo empresas e unidades antigas...');
+  await Empresa.deleteMany({});
+  await Unidade.deleteMany({});
+
+  const empresasDados: { razaoSocial: string; nomeFantasia: string; area: string }[] = [
+    { razaoSocial: 'Hospital Geral São Lucas Ltda', nomeFantasia: 'Hospital São Lucas', area: 'hospital' },
+    { razaoSocial: 'Clínica Médica Santa Clara S/S Ltda', nomeFantasia: 'Clínica Santa Clara', area: 'clinica' },
+    { razaoSocial: 'Laboratório de Análises Clínicas Vital S/A', nomeFantasia: 'Lab Vital', area: 'laboratorio' },
+    { razaoSocial: 'Serviços de Saúde Ocupacional Proteger Ltda', nomeFantasia: 'Proteger SST', area: 'ocupacional' },
+    { razaoSocial: 'Centro de Diagnóstico por Imagem Radiante Ltda', nomeFantasia: 'Diagnóstico Radiante', area: 'diagnostico' },
+    { razaoSocial: 'Unidade de Pronto Atendimento Vida Plena S/A', nomeFantasia: 'UPA Vida Plena', area: 'upa' },
+    { razaoSocial: 'Clínica de Reabilitação Física Movimento Ltda', nomeFantasia: 'Reabilitar Movimento', area: 'reabilitacao' },
+    { razaoSocial: 'Hospital Materno Infantil Nova Geração Ltda', nomeFantasia: 'Hospital Nova Geração', area: 'hospital' },
+    { razaoSocial: 'Medicina do Trabalho Empresarial S/S Ltda', nomeFantasia: 'MedTrabalho', area: 'ocupacional' },
+    { razaoSocial: 'Centro de Especialidades Médicas Integradas S/A', nomeFantasia: 'CEMI Especialidades', area: 'clinica' },
+    { razaoSocial: 'Laboratório de Patologia e Análises Biomédicas Ltda', nomeFantasia: 'BioPath Lab', area: 'laboratorio' },
+    { razaoSocial: 'Clínica Odontológica Sorriso Perfeito Ltda', nomeFantasia: 'Sorriso Perfeito', area: 'odontologia' },
+    { razaoSocial: 'Hospital Ortopédico e Traumatológico Fraturas Zero S/A', nomeFantasia: 'Hospital Fraturas Zero', area: 'hospital' },
+    { razaoSocial: 'Gestão de Saúde Corporativa SaúdeTotal Ltda', nomeFantasia: 'SaúdeTotal Corporativa', area: 'ocupacional' },
+    { razaoSocial: 'Centro de Vacinação e Imunização ImunoVida Ltda', nomeFantasia: 'ImunoVida', area: 'vacinacao' },
+  ];
+
+  const emails = ['contato', 'administracao', 'financeiro', 'rh', 'atendimento', 'recepcao', 'faturamento', 'secretaria'];
+  const telefones = [
+    '(11) 3000-1001', '(11) 3123-4567', '(21) 2525-8000', '(21) 3555-4400',
+    '(31) 3222-1100', '(41) 3333-5500', '(51) 3344-6600', '(71) 3456-7800',
+    '(85) 3266-9900', '(81) 3422-8800', '(61) 3322-7700', '(92) 3633-6600',
+    '(11) 4004-2001', '(21) 2222-3300', '(31) 3111-4400',
+  ];
+
+  const nomesUnidades = [
+    'Unidade Central', 'Filial Zona Sul', 'Filial Zona Norte', 'Posto Avançado',
+    'Unidade Leste', 'Unidade Oeste', 'Centro Médico', 'Núcleo de Atendimento',
+    'Polo Regional', 'Núcleo Avançado', 'Filial Centro', 'Unidade Matriz',
+    'Filial Nova', 'Posto de Atendimento',
+  ];
+
+  const nomesGestores = [
+    'Dr. Carlos Mendes', 'Dra. Renata Oliveira', 'Dr. Paulo Henrique Santos', 'Dra. Marina Costa',
+    'Dr. Ricardo Barbosa', 'Dra. Isabela Rocha', 'Dr. Fernando Almeida', 'Dra. Luciana Martins',
+    'Dr. Gustavo Nunes', 'Dra. Camila Vieira', 'Dr. André Cavalcanti', 'Dra. Patricia Souza',
+    'Dr. Marcos Vinícius', 'Dra. Tatiane Ferreira', 'Dr. Eduardo Lima', 'Dra. Daniela Braga',
+    'Dr. Rodrigo Campos', 'Dra. Amanda Teixeira', 'Dr. Felipe Moreira', 'Dra. Juliana Cardoso',
+    'Dr. Marcelo Ribeiro', 'Dra. Bianca Furtado', 'Dr. Thiago Araújo', 'Dra. Vanessa Dias',
+    'Dr. Leonardo Pires', 'Dra. Sabrina Batista', 'Dr. Hugo Carvalho', 'Dra. Livia Monteiro',
+    'Dr. Rafael Nogueira', 'Dr. Alex Sandro Freitas', 'Dra. Elaine Matos', 'Dr. César Chaves',
+    'Dra. Elisa Reis', 'Dr. Jorge Luiz', 'Dra. Valéria Assunção', 'Dr. Cristiano Pinto',
+    'Dra. Flávia Magalhães', 'Dr. Otávio Augusto', 'Dra. Júlia Moraes', 'Dr. Rogério Campos',
+    'Dra. Heloísa Amaral', 'Dr. Pedro Alves', 'Dra. Cristina Lopes', 'Dr. Jonas Pereira',
+    'Dra. Daiane Figueiredo', 'Dr. Nilton Castro', 'Dra. Miriam Oliveira', 'Dr. Adriano Souza',
+  ];
+
+  // Criar 15 empresas
+  console.log('🏢 Criando 15 empresas...');
+  const empresas: any[] = [];
+
+  for (let i = 0; i < empresasDados.length; i++) {
+    const empData = empresasDados[i];
+    const r = mulberry32(i * 991 + 5555);
+    const cidade = pick(cidades, r);
+    const logradouro = pick(cidade.logradouros, r);
+    const bairro = pick(cidade.bairros, r);
+    const emailPrefixo = pick(emails, r);
+
+    const emp = await Empresa.create({
+      razaoSocial: empData.razaoSocial,
+      nomeFantasia: empData.nomeFantasia,
+      cnpj: generateCNPJ(i + 1),
+      email: `${emailPrefixo}@${empData.nomeFantasia.toLowerCase().replace(/\s+/g, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')}.com.br`,
+      telefone: telefones[i],
       endereco: {
-        logradouro: 'Avenida Paulista',
-        numero: '1000',
-        complemento: 'Conjunto 15A',
-        bairro: 'Bela Vista',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        cep: '01310-100',
+        logradouro,
+        numero: String(100 + Math.floor(r() * 900)),
+        complemento: r() > 0.6 ? `Conjunto ${Math.floor(r() * 30) + 1}` : '',
+        bairro,
+        cidade: cidade.cidade,
+        estado: cidade.estado,
+        cep: `${String(cidade.cepRange[0]).substring(0, 5)}-${String(100 + Math.floor(r() * 800)).padStart(3, '0')}`,
       },
       ativa: true,
     });
-  }
-
-  // Criar mais 5 empresas para distribuição
-  const empresasDados = [
-    { razaoSocial: 'Clínica Vida & Saúde Ltda', nomeFantasia: 'Clínica Vida', cnpj: '22.333.444/0001-55', email: 'contato@clinicavida.com', telefone: '(11) 5555-2233' },
-    { razaoSocial: 'Laboratório Analítico Diagnóstico S/A', nomeFantasia: 'Laboratório Analítico', cnpj: '33.444.555/0001-66', email: 'contato@labanalitico.com', telefone: '(11) 5555-3344' },
-    { razaoSocial: 'Serviços Médicos Ocupacionais EIRELI', nomeFantasia: 'Medicina Ocupacional', cnpj: '44.555.666/0001-77', email: 'contato@medocupacional.com', telefone: '(11) 5555-4455' },
-    { razaoSocial: 'Instituto de Cardiologia e Diagnóstico Ltda', nomeFantasia: 'Instituto Cardiologia', cnpj: '55.666.777/0001-88', email: 'contato@instcardio.com', telefone: '(11) 5555-5566' },
-    { razaoSocial: 'Consultoria e Gestão de Saúde Avançada S/A', nomeFantasia: 'Gestão Saúde Avançada', cnpj: '66.777.888/0001-99', email: 'contato@saudeavancada.com', telefone: '(11) 5555-6677' }
-  ];
-
-  const empresas: any[] = [empresa0];
-  for (const empData of empresasDados) {
-    let emp = await Empresa.findOne({ cnpj: empData.cnpj });
-    if (!emp) {
-      console.log(`🏢 Criando empresa adicional: ${empData.nomeFantasia}...`);
-      emp = await Empresa.create({
-        ...empData,
-        endereco: {
-          logradouro: 'Avenida das Empresas',
-          numero: '500',
-          bairro: 'Centro',
-          cidade: 'São Paulo',
-          estado: 'SP',
-          cep: '01000-000'
-        },
-        ativa: true
-      });
-    }
     empresas.push(emp);
+    console.log(`   ${i + 1}/15 ${empData.nomeFantasia}`);
   }
-  console.log(`🏢 Total de empresas ativas para distribuição: ${empresas.length}`);
 
-  // 2. Garantir que temos Unidades cadastradas
+  // Criar 40 unidades distribuídas entre as 15 empresas
+  console.log('🏥 Distribuindo 40 unidades entre as 15 empresas...');
   const unidades: any[] = [];
-  
-  // Unidade 0
-  let unidade0 = await Unidade.findOne({ empresaId: empresa0._id });
-  if (!unidade0) {
-    console.log('🏥 Nenhuma unidade encontrada. Criando unidade padrão...');
-    unidade0 = await Unidade.create({
-      nome: 'Unidade Central de Atendimento',
-      empresaId: empresa0._id,
-      endereco: {
-        logradouro: 'Avenida Paulista',
-        numero: '1000',
-        bairro: 'Bela Vista',
-        cidade: 'São Paulo',
-        estado: 'SP',
-        cep: '01310-100',
-      },
-      gestor: 'Dr. Michael SCM',
-      ativa: true,
-    });
-  }
-  unidades.push(unidade0);
+  const distribuicao = [5, 4, 2, 3, 2, 4, 2, 5, 3, 3, 2, 1, 4, 3, 2];
 
-  const unidadesDados = [
-    { nome: 'Vida - Unidade Zona Sul', gestor: 'Dra. Carla Souza' },
-    { nome: 'Analítico - Posto Central', gestor: 'Dr. Roberto Alves' },
-    { nome: 'Ocupacional - Filial Industrial', gestor: 'Dra. Patrícia Lima' },
-    { nome: 'Cardiologia - Unidade Centro', gestor: 'Dr. Fabio Santos' },
-    { nome: 'Avançada - Escritório Norte', gestor: 'Dra. Aline Mendes' }
-  ];
+  for (let e = 0; e < empresas.length; e++) {
+    const numUnidades = distribuicao[e];
+    const empresa = empresas[e];
 
-  for (let i = 0; i < unidadesDados.length; i++) {
-    const unitData = unidadesDados[i];
-    const emp = empresas[i + 1];
-    let unit = await Unidade.findOne({ nome: unitData.nome, empresaId: emp._id });
-    if (!unit) {
-      console.log(`🏥 Criando unidade adicional: ${unitData.nome}...`);
-      unit = await Unidade.create({
-        nome: unitData.nome,
-        empresaId: emp._id,
+    for (let u = 0; u < numUnidades; u++) {
+      const r = mulberry32(e * 1000 + u * 53 + 7777);
+      const cidade = pick(cidades, r);
+      const logradouro = pick(cidade.logradouros, r);
+      const bairro = pick(cidade.bairros, r);
+
+      const nomeUnidade = `${empresasDados[e].nomeFantasia} - ${pick(nomesUnidades, r)}${u > 0 ? ` ${u + 1}` : ''}`;
+
+      const unidade = await Unidade.create({
+        nome: nomeUnidade,
+        empresaId: empresa._id,
         endereco: {
-          logradouro: 'Avenida das Unidades',
-          numero: String(100 + i),
-          bairro: 'Bairro Novo',
-          cidade: 'São Paulo',
-          estado: 'SP',
-          cep: '02000-000'
+          logradouro,
+          numero: String(100 + Math.floor(r() * 900)),
+          complemento: r() > 0.5 ? `Sala ${Math.floor(r() * 50) + 1}` : '',
+          bairro,
+          cidade: cidade.cidade,
+          estado: cidade.estado,
+        cep: `${String(cidade.cepRange[0]).substring(0, 5)}-${String(100 + Math.floor(r() * 800)).padStart(3, '0')}`,
         },
-        gestor: unitData.gestor,
-        ativa: true
+        gestor: pick(nomesGestores, r),
+        ativa: true,
       });
+      unidades.push(unidade);
     }
-    unidades.push(unit);
   }
-  console.log(`🏥 Total de unidades ativas para distribuição: ${unidades.length}`);
+  console.log(`🏢 ${empresas.length} empresas, ${unidades.length} unidades criadas.`);
 
-  // 3. Garantir que temos Questionário cadastrado
+  // Questionário
   let questionario = await Questionario.findOne();
   if (!questionario) {
-    console.log('📝 Nenhum questionário encontrado. Criando questionário padrão...');
+    console.log('📝 Nenhum questionário encontrado. Criando...');
     questionario = await Questionario.create({
       nome: 'Questionário Geral de Saúde do Trabalhador',
       descricao: 'Mapeamento de perfil epidemiológico e de processo de trabalho do SISPNAIST',
@@ -229,12 +344,11 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
       ativo: true,
     });
   }
-  console.log(`📝 Questionário ativo para uso: ${questionario.nome} (ID: ${questionario._id})`);
 
-  // 4. Carregar catálogos para garantir dados reais dos selects
-  console.log('🗂️ Carregando opções dos catálogos cadastrados no banco...');
+  // Catálogos
+  console.log('🗂️ Carregando opções dos catálogos...');
   const catalogos = await Catalogo.find({ ativo: true });
-  
+
   const getOptions = (entidade: string, fallback: string[]): string[] => {
     const list = catalogos.filter(c => c.entidade === entidade).map(c => c.nome);
     return list.length > 0 ? list : fallback;
@@ -245,7 +359,7 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
   const racas = getOptions('racaCor', ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena']);
   const escolaridades = getOptions('escolaridade', ['Fundamental Completo', 'Médio Completo', 'Superior Completo', 'Pós-graduação']);
   const estadosCivis = getOptions('estadoCivil', ['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)', 'União Estável']);
-  const tiposSanguineos = getOptions('tipoSanguineo', ['A Positivo', 'B Positivo', 'AB Positivo', 'O Positivo', 'O Negativo']);
+  const tiposSanguineos = getOptions('tipoSanguineo', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']);
   const deficienciaTipos = getOptions('tipoDeficiencia', ['Física', 'Visual', 'Auditiva', 'Intelectual', 'Múltipla', 'Psicossocial']);
   const deficienciaTempos = getOptions('tempoDeficiencia', ['Congênita', 'Adquirida', 'Temporária', 'Permanente']);
   const deficienciaGraus = getOptions('grauDeficiencia', ['Leve', 'Moderada', 'Severa', 'Profunda']);
@@ -255,7 +369,7 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
   const situacoes = getOptions('situacaoTrabalho', ['Ativo', 'Afastado', 'Desligado', 'Aposentado']);
   const funcoes = getOptions('funcao', ['Médico(a)', 'Enfermeiro(a)', 'Técnico(a) de Enfermagem', 'Administrativo', 'Serviços Gerais']);
   const afastamentoTipos = getOptions('tipoAfastamento', ['Doença', 'Acidente de trabalho', 'Licença maternidade', 'Licença para tratamento']);
-  const afastamentoMotivos = getOptions('motivoAfastamento', ['Doença común', 'Doença profissional', 'COVID-19', 'Cirurgia', 'Acidente']);
+  const afastamentoMotivos = getOptions('motivoAfastamento', ['Doença comum', 'Doença profissional', 'COVID-19', 'Cirurgia', 'Acidente']);
   const parentescos = getOptions('parentesco', ['Cônjuge', 'Filho(a)', 'Enteado(a)', 'Mãe', 'Pai']);
   const violenciaTipos = getOptions('tipoViolencia', ['Física', 'Psicológica/Moral', 'Sexual', 'Outro']);
   const violenciaSexuais = getOptions('tipoViolenciaSexual', ['Não se aplica', 'Assédio Sexual']);
@@ -267,19 +381,18 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
   const readaptacaoAcompanhamentos = getOptions('acompanhamentoReadaptacao', ['Semanal', 'Quinzenal', 'Mensal', 'Trimestral']);
   const satisfacoes = getOptions('grauSatisfacao', ['Muito Satisfeito', 'Satisfeito', 'Indiferente', 'Insatisfeito']);
 
-  // Limpar trabalhadores e submódulos antigos para evitar conflitos de CPF e duplicados
-  console.log('🧹 Limpando dados antigos de trabalhadores e submódulos...');
+  // Limpar dados antigos
+  console.log('🧹 Limpando dados antigos...');
   await Trabalhador.deleteMany({});
   await TrabalhadorAfastamento.deleteMany({});
   await TrabalhadorDependente.deleteMany({});
   await TrabalhadorInformacao.deleteMany({});
-  await TrabalhadorOcorrenciaViolencia.deleteMany({});
   await TrabalhadorProcessoTrabalho.deleteMany({});
   await TrabalhadorReadaptacao.deleteMany({});
   await TrabalhadorVinculo.deleteMany({});
   console.log('🧹 Limpeza concluída.');
 
-  console.log(`📝 Preparando ${targetCount} registros em memória para inserção em lote...`);
+  console.log(`📝 Preparando ${targetCount} registros...`);
 
   const workersToInsert: any[] = [];
   const afastamentosToInsert: any[] = [];
@@ -291,67 +404,146 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
   const vinculosToInsert: any[] = [];
 
   for (let i = 1; i <= targetCount; i++) {
+    const rand = mulberry32(i * 2654435761 + 12345);
     const workerId = new mongoose.Types.ObjectId();
-    
-    // Geração de nomes com combinação única por deslocamentos de primos
-    const { firstName, middleName, lastName } = buildName(i, firstNames, middleNames, lastNames);
+
+    // ---- NOME ----
+    const firstName = pick(firstNames, rand);
+    const middleName = pick(middleNames, rand);
+    const lastName = pick(lastNames, rand);
     const nome = `${firstName} ${middleName} ${lastName}`;
-    
-    const maeFirstName = motherFirstNames[(i * 11) % motherFirstNames.length];
-    const maeMiddleName = middleNames[(i * 53) % middleNames.length];
+
+    const maeFirstName = pick(motherFirstNames, rand);
+    const maeMiddleName = pick(middleNames, rand);
     const nomeMae = `${maeFirstName} ${maeMiddleName} ${lastName}`;
 
     const cpf = generateCPF(i);
     const cartaoSus = String(700000000000000 + i);
     const matricula = `MAT-${String(i).padStart(6, '0')}`;
-    const email = normalizeEmail(`${firstName}.${lastName}.${i}@sispnaist.com`);
-    
-    // Datas realistas
-    const birthYear = 1965 + (i % 38);
-    const birthMonth = i % 12;
-    const birthDay = 1 + (i % 28);
-    const dataNascimento = new Date(birthYear, birthMonth, birthDay);
+    const dominio = pick(dominioEmails, rand);
+    const email = normalizeEmail(`${firstName}.${lastName}.${i}@${dominio}`);
 
-    const entradaYear = 2012 + (i % 12);
-    const entradaMonth = i % 12;
-    const entradaDay = 1 + (i % 28);
-    const dataEntrada = new Date(entradaYear, entradaMonth, entradaDay);
+    // ---- DATAS REALISTAS ----
+    const idadeAnos = 18 + Math.floor(rand() * 47); // 18 a 64 anos
+    const birthYear = 2026 - idadeAnos;
+    const birthMonth = 1 + Math.floor(rand() * 12);
+    const birthDay = 1 + Math.floor(rand() * 28);
+    const dataNascimento = new Date(birthYear, birthMonth - 1, birthDay);
 
-    // Selecionar valores dos catálogos
-    const sexoStr = sexos[i % sexos.length];
-    const generoStr = generos[i % generos.length];
-    const racaStr = racas[i % racas.length];
-    const escolaridadeStr = escolaridades[i % escolaridades.length];
-    const estadoCivilStr = estadosCivis[i % estadosCivis.length];
-    const tipoSanguineoStr = tiposSanguineos[i % tiposSanguineos.length];
-    
-    // Deficiência ocasional (ex. 10% dos casos)
-    const hasDeficiency = i % 10 === 0;
+    // Data de entrada: entre 1 e 25 anos atrás (nunca antes dos 14 anos)
+    const anosServico = 1 + Math.floor(rand() * Math.min(idadeAnos - 14, 25));
+    const entradaYear = birthYear + 14 + Math.floor(rand() * Math.max(1, idadeAnos - 14 - 1));
+    const entradaMonth = 1 + Math.floor(rand() * 12);
+    const entradaDay = 1 + Math.floor(rand() * 28);
+    const dataEntrada = new Date(Math.min(entradaYear, 2025), entradaMonth - 1, entradaDay);
+
+    // ---- ENDEREÇO ----
+    const cidadeObj = pick(cidades, rand);
+    const logradouro = pick(cidadeObj.logradouros, rand);
+    const bairro = pick(cidadeObj.bairros, rand);
+    const numero = 1 + Math.floor(rand() * 9999);
+    const cepNum = cidadeObj.cepRange[0] + Math.floor(rand() * (cidadeObj.cepRange[1] - cidadeObj.cepRange[0]));
+    const cep = String(cepNum).padStart(8, '0').replace(/^(\d{5})(\d{3})$/, '$1-$2');
+
+    // ---- SEXO / GÊNERO ----
+    const isFeminino = rand() > 0.5;
+    const sexoStr = isFeminino ? 'Feminino' : 'Masculino';
+    const generoStr = isFeminino
+      ? (rand() > 0.95 ? 'Não-binário' : 'Mulher cisgênero')
+      : (rand() > 0.95 ? 'Não-binário' : 'Homem cisgênero');
+
+    const racaStr = (() => {
+      const r = rand();
+      if (r < 0.43) return 'Branca';
+      if (r < 0.72) return 'Parda';
+      if (r < 0.88) return 'Preta';
+      if (r < 0.96) return 'Amarela';
+      return 'Indígena';
+    })();
+
+    const escolaridadeStr = (() => {
+      const r = rand();
+      if (r < 0.08) return 'Fundamental Completo';
+      if (r < 0.48) return 'Médio Completo';
+      if (r < 0.78) return 'Superior Completo';
+      return 'Pós-graduação';
+    })();
+
+    const estadoCivilStr = (() => {
+      const r = rand();
+      if (r < 0.35) return 'Solteiro(a)';
+      if (r < 0.65) return 'Casado(a)';
+      if (r < 0.80) return 'União Estável';
+      if (r < 0.93) return 'Divorciado(a)';
+      return 'Viúvo(a)';
+    })();
+
+    const tipoSanguineoStr = (() => {
+      const r = rand();
+      if (r < 0.36) return 'O+';
+      if (r < 0.53) return 'A+';
+      if (r < 0.63) return 'B+';
+      if (r < 0.69) return 'AB+';
+      if (r < 0.77) return 'O-';
+      if (r < 0.85) return 'A-';
+      if (r < 0.93) return 'B-';
+      return 'AB-';
+    })();
+
+    // ---- DEFICIÊNCIA (~7% dos casos) ----
+    const hasDeficiency = rand() < 0.07;
     const deficiencia = {
-      tipo: hasDeficiency ? deficienciaTipos[i % deficienciaTipos.length] : '',
-      tempo: hasDeficiency ? deficienciaTempos[i % deficienciaTempos.length] : '',
-      grau: hasDeficiency ? deficienciaGraus[i % deficienciaGraus.length] : ''
+      tipo: hasDeficiency ? pick(deficienciaTipos, rand) : '',
+      tempo: hasDeficiency ? pick(deficienciaTempos, rand) : '',
+      grau: hasDeficiency ? pick(deficienciaGraus, rand) : ''
     };
 
-    const vinculoTipoStr = vinculoTipos[i % vinculoTipos.length];
-    const turnoStr = turnos[i % turnos.length];
-    const jornadaStr = jornadas[i % jornadas.length];
-    const situacaoStr = situacoes[i % situacoes.length];
-    const funcaoStr = funcoes[i % funcoes.length];
+    // ---- VÍNCULO ----
+    const vinculoTipoStr = (() => {
+      const r = rand();
+      if (r < 0.40) return 'Efetivo';
+      if (r < 0.70) return 'CLT';
+      if (r < 0.82) return 'Terceirizado';
+      if (r < 0.90) return 'Comissionado';
+      if (r < 0.96) return 'Temporário';
+      return 'Estágio';
+    })();
 
-    // Distribuição de empresas e unidades
-    // Primeiro 1500 vinculados à empresa0 / unidade0
-    // Próximos 1500 distribuídos entre as outras 5 empresas / unidades
-    let currentEmpresa = empresas[0];
-    let currentUnidade = unidades[0];
+    const turnoStr = pick(turnos, rand);
+    const jornadaStr = (() => {
+      const r = rand();
+      if (r < 0.50) return '40 horas semanais';
+      if (r < 0.80) return '44 horas semanais';
+      if (r < 0.93) return '30 horas semanais';
+      return '20 horas semanais';
+    })();
 
-    if (i > 1500) {
-      const subIndex = 1 + ((i - 1501) % 5);
-      currentEmpresa = empresas[subIndex];
-      currentUnidade = unidades[subIndex];
-    }
+    const situacaoStr = (() => {
+      const r = rand();
+      if (r < 0.78) return 'Ativo';
+      if (r < 0.88) return 'Afastado';
+      if (r < 0.95) return 'Desligado';
+      return 'Aposentado';
+    })();
 
-    // Criar documento do Trabalhador
+    const funcaoStr = (() => {
+      const r = rand();
+      if (r < 0.20) return 'Médico(a)';
+      if (r < 0.45) return 'Enfermeiro(a)';
+      if (r < 0.70) return 'Técnico(a) de Enfermagem';
+      if (r < 0.88) return 'Administrativo';
+      return 'Serviços Gerais';
+    })();
+
+    const setorStr = pick(setoresOptions, rand);
+
+    // ---- DISTRIBUIÇÃO EMPRESA/UNIDADE ----
+    const empIndex = (i - 1) % empresas.length;
+    const currentEmpresa = empresas[empIndex];
+    const unidadesDaEmpresa = unidades.filter(u => u.empresaId.toString() === currentEmpresa._id.toString());
+    const currentUnidade = pick(unidadesDaEmpresa, mulberry32(i * 777 + 9999));
+
+    // ---- DOCUMENTO TRABALHADOR ----
     workersToInsert.push({
       _id: workerId,
       cpf,
@@ -359,8 +551,8 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
       nomeMae,
       matricula,
       cartaoSus,
-      celular: `(11) 9${String(90000000 + i).substring(0, 4)}-${String(90000000 + i).substring(4, 8)}`,
-      telefoneContato: i % 3 === 0 ? `(11) 3333-${String(1000 + i).substring(0, 4)}` : '',
+      celular: `(11) 9${String(90000000 + i * 7).substring(0, 4)}-${String(90000000 + i * 7).substring(4, 8)}`,
+      telefoneContato: rand() > 0.6 ? `(11) ${3000 + Math.floor(rand() * 5000)}-${String(1000 + Math.floor(rand() * 8000)).substring(0, 4)}` : '',
       email,
       dataNascimento,
       empresa: currentEmpresa._id,
@@ -381,118 +573,147 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
         situacao: situacaoStr
       },
       endereco: {
-        logradouro: `Avenida das Nações`,
-        numero: String(100 + (i % 800)),
-        complemento: i % 2 === 0 ? `Apto ${i % 100}` : '',
-        bairro: `Jardim das Oliveiras`,
-        cidade: `São Paulo`,
-        estado: `SP`,
-        cep: `04500-${String(100 + (i % 800)).padStart(3, '0')}`
+        logradouro,
+        numero: String(numero),
+        complemento: rand() > 0.5 ? `Apto ${Math.floor(rand() * 100) + 1}` : '',
+        bairro,
+        cidade: cidadeObj.cidade,
+        estado: cidadeObj.estado,
+        cep
       },
       trabalho: {
         dataPosse: vinculoTipoStr === 'Efetivo' ? dataEntrada : null,
         empresaTerceirizada: vinculoTipoStr === 'Terceirizado' ? 'Terceiriza SST S/A' : '',
         dataEntrada,
-        setor: `Setor de ${funcaoStr}s`,
+        setor: setorStr,
         cargo: funcaoStr,
         funcao: funcaoStr,
-        ocupacao: `CBO-${2000 + (i % 1000)}`
+        ocupacao: `CBO-${2000 + Math.floor(rand() * 999)}`
       },
       historico: {
-        dataAposentadoria: situacaoStr === 'Aposentado' ? new Date() : null,
+        dataAposentadoria: situacaoStr === 'Aposentado' ? new Date(2024, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)) : null,
         dataObito: null,
         dataRemocao: null,
         novoServico: '',
         dataRetorno: null,
         dataRelotacao: null,
-        dataDesligamento: situacaoStr === 'Desligado' ? new Date() : null,
-        dataAfastamento: situacaoStr === 'Afastado' ? new Date() : null,
-        tipoAfastamento: situacaoStr === 'Afastado' ? 'Doença' : ''
+        dataDesligamento: situacaoStr === 'Desligado' ? new Date(2023, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)) : null,
+        dataAfastamento: situacaoStr === 'Afastado' ? new Date(2024, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)) : null,
+        tipoAfastamento: situacaoStr === 'Afastado' ? pick(afastamentoTipos, rand) : ''
       }
     });
 
-    // Submódulo 1: Afastamento
-    const dataInicioAfast = new Date(entradaYear + 1, 1, 1);
-    const dataRetornoAfast = new Date(entradaYear + 1, 1, 15);
-    afastamentosToInsert.push({
-      trabalhadorId: workerId,
-      tipoAfastamento: afastamentoTipos[i % afastamentoTipos.length],
-      motivoAfastamento: afastamentoMotivos[i % afastamentoMotivos.length],
-      cid: `M${50 + (i % 40)}.${i % 9}`,
-      dataInicio: dataInicioAfast,
-      dataFim: dataRetornoAfast,
-      dataRetorno: new Date(dataRetornoAfast.getTime() + 86400000), // Retorno no dia seguinte
-      dataPericia: new Date(dataInicioAfast.getTime() + 86400000 * 2), // Perícia 2 dias após início
-      desfecho: 'Alta médica e retorno integral ao serviço',
-      tempoAfastamento: '14 dias',
-      laudoMedico: 'Tratamento clínico com repouso recomendado.',
-      observacoes: 'Afastamento regularizado sem pendências.',
-      ativo: true
-    });
+    // ---- Submódulo 1: AFASTAMENTO (~40% dos casos) ----
+    if (rand() > 0.6) {
+      const afastInicio = new Date(entradaYear + Math.floor(rand() * 5) + 1, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
+      const afastRetorno = new Date(afastInicio.getTime() + (5 + Math.floor(rand() * 60)) * 86400000);
+      const afastDias = Math.round((afastRetorno.getTime() - afastInicio.getTime()) / 86400000);
+      afastamentosToInsert.push({
+        trabalhadorId: workerId,
+        tipoAfastamento: pick(afastamentoTipos, rand),
+        motivoAfastamento: pick(afastamentoMotivos, rand),
+        cid: `M${50 + Math.floor(rand() * 50)}.${Math.floor(rand() * 9)}`,
+        dataInicio: afastInicio,
+        dataFim: afastRetorno,
+        dataRetorno: new Date(afastRetorno.getTime() + 86400000),
+        dataPericia: new Date(afastInicio.getTime() + 3 * 86400000),
+        desfecho: rand() > 0.3 ? 'Alta médica e retorno integral ao serviço' : 'Alta com restrições parciais',
+        tempoAfastamento: `${afastDias} dias`,
+        laudoMedico: rand() > 0.5 ? 'Tratamento clínico com repouso recomendado. Paciente apresenta boa evolução.' : 'Acompanhamento ambulatorial necessário. Retorno gradual ao trabalho.',
+        observacoes: rand() > 0.5 ? 'Afastamento regularizado sem pendências.' : 'Paciente em acompanhamento periódico.',
+        ativo: true
+      });
+    }
 
-    // Submódulo 2: Dependentes
-    dependentesToInsert.push({
-      trabalhadorId: workerId,
-      nome: `Dependente de ${firstName} ${i}`,
-      cpf: generateCPF(4000 + i),
-      dataNascimento: new Date(2010 + (i % 15), i % 12, 1 + (i % 28)),
-      parentesco: parentescos[i % parentescos.length],
-      dependentIR: i % 2 === 0,
-      ativo: true
-    });
+    // ---- Submódulo 2: DEPENDENTES (~60% dos casos) ----
+    const numDependentes = estadoCivilStr === 'Casado(a)' || estadoCivilStr === 'União Estável'
+      ? (rand() > 0.5 ? 2 : 1)
+      : (rand() > 0.7 ? 1 : 0);
 
-    // Submódulo 3: Informações de Saúde
+    for (let d = 0; d < numDependentes; d++) {
+      const depFirstName = pick(firstNames, mulberry32(i * 100 + d * 7 + 999));
+      const depParentesco = d === 0
+        ? (isFeminino ? 'Cônjuge' : 'Cônjuge')
+        : 'Filho(a)';
+      const depDataNasc = depParentesco === 'Cônjuge'
+        ? new Date(birthYear - 2 + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28))
+        : new Date(2010 + Math.floor(rand() * 15), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
+
+      dependentesToInsert.push({
+        trabalhadorId: workerId,
+        nome: `${depFirstName} ${middleName} ${lastName}`,
+        cpf: generateCPF(4000 + i * 10 + d),
+        dataNascimento: depDataNasc,
+        parentesco: depParentesco,
+        dependentIR: d === 0 && rand() > 0.5,
+        ativo: true
+      });
+    }
+
+    if (dependentesToInsert.length === 0 || dependentesToInsert[dependentesToInsert.length - 1]?.trabalhadorId?.toString() !== workerId.toString()) {
+      // Garantir que tenha ao menos um registro neste lote, vazio não é inserido
+    }
+
+    // ---- Submódulo 3: INFORMAÇÕES DE SAÚDE ----
+    const doencaBaseOpts = getOptions('doencaBase', ['Diabetes', 'Hipertensão', 'Asma', 'Nenhuma']);
+    const estadoVacinalOpts = getOptions('estadoVacinal', ['Em dia', 'Atrasado', 'Não vacinado']);
+    const tipoDrogaOpts = getOptions('tipoDroga', ['Álcool', 'Tabaco', 'Nenhuma']);
+
     informacoesToInsert.push({
       trabalhadorId: workerId.toString(),
-      doencaBase: i % 4 === 0 ? 'Nenhuma' : getOptions('doencaBase', ['Diabetes'])[i % getOptions('doencaBase', ['Diabetes']).length],
-      estadoVacinal: getOptions('estadoVacinal', ['Vacinado'])[i % getOptions('estadoVacinal', ['Vacinado']).length],
-      tipoDroga: i % 3 === 0 ? 'Nenhuma' : getOptions('tipoDroga', ['Álcool'])[i % getOptions('tipoDroga', ['Álcool']).length],
+      doencaBase: rand() > 0.25 ? 'Nenhuma' : pick(doencaBaseOpts.filter(d => d !== 'Nenhuma'), rand),
+      estadoVacinal: pick(estadoVacinalOpts, rand),
+      tipoDroga: rand() > 0.7 ? pick(tipoDrogaOpts.filter(d => d !== 'Nenhuma'), rand) : 'Nenhuma',
       tipoSanguineo: tipoSanguineoStr,
-      medicamentos: i % 4 === 0 ? 'Uso contínuo de anti-hipertensivo' : 'Nenhum',
-      allergy: i % 5 === 0,
-      descricaoAlergia: i % 5 === 0 ? 'Alergia a Medicamento Dipirona' : '',
-      acompanhamentoMedico: i % 2 === 0,
+      medicamentos: rand() > 0.2 ? 'Nenhum' : 'Uso contínuo de anti-hipertensivo',
+      allergy: rand() > 0.85,
+      descricaoAlergia: rand() > 0.85 ? 'Alergia a Dipirona' : '',
+      acompanhamentoMedico: rand() > 0.5,
       acompanhamentoReabilitacao: false,
-      usoAlcool: i % 3 === 0,
-      dosesAlcool: i % 3 === 0 ? 2 : 0,
-      usoCigarro: i % 6 === 0,
-      macosCigarro: i % 6 === 0 ? 1 : 0,
+      usoAlcool: rand() > 0.7,
+      dosesAlcool: rand() > 0.7 ? Math.floor(rand() * 4) + 1 : 0,
+      usoCigarro: rand() > 0.85,
+      macosCigarro: rand() > 0.85 ? Math.floor(rand() * 3) + 1 : 0,
       usoOutraDroga: false,
-      frequenciaUso: i % 3 === 0 ? 'Ocasional' : '',
+      frequenciaUso: rand() > 0.7 ? 'Ocasional' : '',
       ativo: true
     });
 
-    // Submódulo 4: Ocorrência de Violência
-    ocorrenciasToInsert.push({
-      trabalhadorId: workerId,
-      dataOcorrencia: new Date(entradaYear + 1, 5, 10),
-      localOcorrencia: `Posto de Trabalho - Sala ${i}`,
-      tipoViolencia: violenciaTipos[i % violenciaTipos.length],
-      tipoViolenciaSexual: violenciaSexuais[i % violenciaSexuais.length],
-      motivoViolencia: violenciaMotivos[i % violenciaMotivos.length],
-      meioAgressao: violenciaMeios[i % violenciaMeios.length],
-      tipoAutorViolencia: violenciaAutores[i % violenciaAutores.length],
-      descricaoOcorrencia: `Registro de conflito verbal ocorrido durante o expediente do trabalhador no atendimento de rotina.`,
-      reincidencia: false,
-      atendimentoRealizado: 'Acolhimento da coordenação imediata do setor.',
-      condutaViolencia: 'Registro de ata administrativa e orientação interna.',
-      pessoasEnvolvidas: 'Colaboradores envolvidos e chefia.',
-      emissaoCatNas: i % 4 === 0,
-      boletimOcorrencia: i % 4 === 0 ? `BO-${10000 + i}/2025` : '',
-      medidasTomadas: 'Remanejamento preventivo ou conversas de alinhamento.',
-      acompanhamentos: 'Orientação geral.',
-      ativo: true
-    });
+    // ---- Submódulo 4: OCORRÊNCIA DE VIOLÊNCIA (~15% dos casos) ----
+    if (rand() > 0.85) {
+      ocorrenciasToInsert.push({
+        trabalhadorId: workerId,
+        dataOcorrencia: new Date(entradaYear + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)),
+        localOcorrencia: `${setorStr} - Sala ${Math.floor(rand() * 50) + 1}`,
+        tipoViolencia: pick(violenciaTipos, rand),
+        tipoViolenciaSexual: pick(violenciaSexuais, rand),
+        motivoViolencia: pick(violenciaMotivos, rand),
+        meioAgressao: pick(violenciaMeios, rand),
+        tipoAutorViolencia: pick(violenciaAutores, rand),
+        descricaoOcorrencia: rand() > 0.5
+          ? 'Registro de conflito verbal ocorrido durante o expediente do trabalhador no atendimento de rotina.'
+          : 'Trabalhador relatou episódio de assédio moral praticado por superior hierárquico durante reunião de equipe.',
+        reincidencia: rand() > 0.9,
+        atendimentoRealizado: 'Acolhimento da coordenação imediata do setor e encaminhamento ao serviço de psicologia.',
+        condutaViolencia: 'Registro administrativo e orientação interna. Encaminhamento ao RH.',
+        pessoasEnvolvidas: 'Colaboradores envolvidos e chefia imediata.',
+        emissaoCatNas: rand() > 0.7,
+        boletimOcorrencia: rand() > 0.7 ? `BO-${10000 + Math.floor(rand() * 90000)}/2025` : '',
+        medidasTomadas: 'Remanejamento preventivo e acompanhamento psicológico.',
+        acompanhamentos: 'Orientação geral e acompanhamento periódico.',
+        ativo: true
+      });
+    }
 
-    // Submódulo 5: Processo de Trabalho
+    // ---- Submódulo 5: PROCESSO DE TRABALHO ----
     processosToInsert.push({
       trabalhadorId: workerId,
-      setor: `Setor de ${funcaoStr}s`,
+      setor: setorStr,
       cargo: funcaoStr,
       funcao: funcaoStr,
       jornadaTrabalho: jornadaStr,
       turnoTrabalho: turnoStr,
-      jornadaSemanal: jornadaStr.substring(0, 3).trim(),
+      jornadaSemanal: jornadaStr.split(' ')[0],
       questionarioId: questionario._id,
       dataInicio: dataEntrada,
       dataFim: null,
@@ -500,30 +721,44 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
       ativo: true
     });
 
-    // Submódulo 6: Readaptação Funcional
-    readaptacoesToInsert.push({
-      trabalhadorId: workerId,
-      dataReadaptacao: new Date(entradaYear + 2, 2, 10),
-      motivo: readaptacaoMotivos[i % readaptacaoMotivos.length],
-      cid: `M${40 + (i % 30)}.${i % 9}`,
-      mudancaSetor: i % 2 === 0,
-      setorOrigem: `Setor de ${funcaoStr}s`,
-      setorReadaptacao: i % 2 === 0 ? 'Administrativo Central' : `Setor de ${funcaoStr}s`,
-      mudancaFuncao: i % 3 === 0,
-      funcaoAnterior: funcaoStr,
-      funcaoNova: i % 3 === 0 ? 'Auxiliar de Suporte Administrativo' : funcaoStr,
-      tempoReadaptacao: readaptacaoTempos[i % readaptacaoTempos.length],
-      restricao: 'Evitar esforços repetitivos severos e posturas inadequadas.',
-      novasAtribuicoes: 'Auxílio na digitação de planilhas e atendimento telefônico geral.',
-      acompanhamento: readaptacaoAcompanhamentos[i % readaptacaoAcompanhamentos.length],
-      grauSatisfacao: satisfacoes[i % satisfacoes.length],
-      laudoMedico: 'Recomendação por junta médica interna para alívio ergométrico temporário.',
-      dataRetorno: new Date(entradaYear + 2, 5, 10),
-      observacoes: 'Acompanhamento do caso em andamento sem incidentes.',
-      ativo: true
-    });
+    // ---- Submódulo 6: READAPTAÇÃO FUNCIONAL (~10% dos casos) ----
+    if (rand() > 0.9) {
+      const readaptDate = new Date(dataEntrada.getTime() + (180 + Math.floor(rand() * 1000)) * 86400000);
+      const mudouSetor = rand() > 0.5;
+      const mudouFuncao = rand() > 0.6;
+      readaptacoesToInsert.push({
+        trabalhadorId: workerId,
+        dataReadaptacao: readaptDate,
+        motivo: pick(readaptacaoMotivos, rand),
+        cid: `M${40 + Math.floor(rand() * 30)}.${Math.floor(rand() * 9)}`,
+        mudancaSetor: mudouSetor,
+        setorOrigem: setorStr,
+        setorReadaptacao: mudouSetor ? 'Administrativo Central' : setorStr,
+        mudancaFuncao: mudouFuncao,
+        funcaoAnterior: funcaoStr,
+        funcaoNova: mudouFuncao ? 'Auxiliar de Suporte Administrativo' : funcaoStr,
+        tempoReadaptacao: pick(readaptacaoTempos, rand),
+        restricao: 'Evitar esforços repetitivos severos e posturas inadequadas.',
+        novasAtribuicoes: 'Auxílio na digitação de planilhas e atendimento telefônico geral.',
+        acompanhamento: pick(readaptacaoAcompanhamentos, rand),
+        grauSatisfacao: pick(satisfacoes, rand),
+        laudoMedico: 'Recomendação por junta médica interna para alívio ergométrico temporário.',
+        dataRetorno: new Date(readaptDate.getTime() + (30 + Math.floor(rand() * 180)) * 86400000),
+        observacoes: 'Acompanhamento do caso em andamento sem incidentes.',
+        ativo: true
+      });
+    }
 
-    // Submódulo 7: Vínculo Empregatício
+    // ---- Submódulo 7: VÍNCULO EMPREGATÍCIO ----
+    const cargaHoraria = jornadaStr.startsWith('44') ? 44 : (jornadaStr.startsWith('40') ? 40 : (jornadaStr.startsWith('30') ? 30 : 20));
+    const salario = (() => {
+      if (funcaoStr === 'Médico(a)') return 12000 + Math.floor(rand() * 8000);
+      if (funcaoStr === 'Enfermeiro(a)') return 5000 + Math.floor(rand() * 3000);
+      if (funcaoStr === 'Técnico(a) de Enfermagem') return 2500 + Math.floor(rand() * 1500);
+      if (funcaoStr === 'Administrativo') return 2200 + Math.floor(rand() * 1800);
+      return 1800 + Math.floor(rand() * 1000);
+    })();
+
     vinculosToInsert.push({
       trabalhadorId: workerId,
       tipoVinculo: vinculoTipoStr,
@@ -532,57 +767,56 @@ export async function seedTrabalhadores(targetCount: number = 3000) {
       jornadaTrabalho: jornadaStr,
       turnoTrabalho: turnoStr,
       dataInicio: dataEntrada,
-      dataFim: null,
+      dataFim: situacaoStr === 'Desligado' || situacaoStr === 'Aposentado' ? new Date(2024, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)) : null,
       situacao: situacaoStr,
       empresaTerceirizada: vinculoTipoStr === 'Terceirizado' ? 'Terceiriza SST S/A' : '',
-      setor: `Setor de ${funcaoStr}s`,
+      setor: setorStr,
       cargo: funcaoStr,
-      ocupacao: `CBO-${2000 + (i % 1000)}`,
-      cargaHoraria: jornadaStr.startsWith('40') ? 40 : (jornadaStr.startsWith('30') ? 30 : 20),
-      salario: 2500 + (i % 15) * 500,
+      ocupacao: `CBO-${2000 + Math.floor(rand() * 999)}`,
+      cargaHoraria,
+      salario,
       observacoes: 'Contrato cadastrado no sistema.',
       ativo: true
     });
   }
 
-  // 5. Inserir todos em lote no banco
-  console.log('⚡ Enviando dados para o MongoDB Atlas...');
-  
-  console.log('  ▸ Inserindo Trabalhadores...');
+  console.log('⚡ Inserindo dados no MongoDB...');
+
+  console.log('  ▸ Trabalhadores...');
   await Trabalhador.insertMany(workersToInsert);
-  
-  console.log('  ▸ Inserindo Afastamentos...');
-  await TrabalhadorAfastamento.insertMany(afastamentosToInsert);
-  
-  console.log('  ▸ Inserindo Dependentes...');
-  await TrabalhadorDependente.insertMany(dependentesToInsert);
-  
-  console.log('  ▸ Inserindo Informações...');
+
+  console.log('  ▸ Afastamentos...');
+  if (afastamentosToInsert.length > 0) await TrabalhadorAfastamento.insertMany(afastamentosToInsert);
+
+  console.log('  ▸ Dependentes...');
+  if (dependentesToInsert.length > 0) await TrabalhadorDependente.insertMany(dependentesToInsert);
+
+  console.log('  ▸ Informações de Saúde...');
   await TrabalhadorInformacao.insertMany(informacoesToInsert);
-  
-  console.log('  ▸ Inserindo Ocorrências de Violência...');
-  await TrabalhadorOcorrenciaViolencia.insertMany(ocorrenciasToInsert);
-  
-  console.log('  ▸ Inserindo Processos de Trabalho...');
+
+  console.log('  ▸ Ocorrências de Violência...');
+  if (ocorrenciasToInsert.length > 0) await TrabalhadorOcorrenciaViolencia.insertMany(ocorrenciasToInsert);
+
+  console.log('  ▸ Processos de Trabalho...');
   await TrabalhadorProcessoTrabalho.insertMany(processosToInsert);
-  
-  console.log('  ▸ Inserindo Readaptações...');
-  await TrabalhadorReadaptacao.insertMany(readaptacoesToInsert);
-  
-  console.log('  ▸ Inserindo Vínculos...');
+
+  console.log('  ▸ Readaptações...');
+  if (readaptacoesToInsert.length > 0) await TrabalhadorReadaptacao.insertMany(readaptacoesToInsert);
+
+  console.log('  ▸ Vínculos...');
   await TrabalhadorVinculo.insertMany(vinculosToInsert);
 
-  console.log(`✅ Concluído com sucesso! ${targetCount} trabalhadores e submódulos cadastrados no banco.`);
+  console.log(`✅ ${targetCount} trabalhadores e submódulos cadastrados com sucesso!`);
 }
 
-// Executa diretamente ao ser chamado pelo npm run
 connectDB().then(() => {
-  seedTrabalhadores(3000).then(() => {
-    console.log('🚀 Seed de trabalhadores concluído. Fechando conexão...');
+  seedTrabalhadores(2000).then(() => {
+    console.log('🚀 Seed de trabalhadores concluído.');
     mongoose.connection.close();
     process.exit(0);
   });
 }).catch((err) => {
-  console.error('❌ Erro na conexão com o banco de dados:', err);
+  console.error('❌ Erro na conexão com o banco:', err);
   process.exit(1);
 });
+

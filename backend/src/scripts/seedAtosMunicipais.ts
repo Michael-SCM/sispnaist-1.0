@@ -108,7 +108,6 @@ export async function seedAtosMunicipais(targetCount = 120) {
   console.log(`✅ Concluído! Inseridos ${docs.length} atos municipais.`);
 }
 
-// Executa diretamente ao ser chamado pelo npm run
 connectDB()
   .then(() => {
     seedAtosMunicipais(120).then(() => {
@@ -121,3 +120,5 @@ connectDB()
     console.error('❌ Erro na seed de Atos Municipais:', err);
     process.exit(1);
   });
+
+

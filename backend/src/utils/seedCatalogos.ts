@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import connectDB from '../config/database.js';
 import Catalogo from '../models/Catalogo';
 
 /**
@@ -472,16 +473,10 @@ export async function seedCatalogos() {
   }
 }
 
-// Se executado diretamente (não importado como módulo)
-if (import.meta.url === `file://${process.argv[1]}`) {
-  import('../config/database').then(({ default: connectDB }) => {
-    connectDB().then(() => {
-      seedCatalogos().then(() => {
-        console.log('🚀 Seed finalizado. Fechando conexão...');
-        mongoose.connection.close();
-        process.exit(0);
-      });
-    });
+connectDB().then(() => {
+  seedCatalogos().then(() => {
+    console.log('🚀 Seed de catálogos finalizado. Fechando conexão...');
+    mongoose.connection.close();
+    process.exit(0);
   });
-}
-
+});
