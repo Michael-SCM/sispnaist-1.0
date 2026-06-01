@@ -9,6 +9,7 @@ export class UserService {
     filtros?: {
       nome?: string;
       email?: string;
+      cpf?: string;
       perfil?: string;
     }
   ): Promise<{ usuarios: IUser[]; total: number; pages: number }> {
@@ -21,6 +22,10 @@ export class UserService {
 
     if (filtros?.email) {
       query.email = { $regex: filtros.email, $options: 'i' };
+    }
+
+    if (filtros?.cpf) {
+      query.cpf = filtros.cpf;
     }
 
     if (filtros?.perfil) {

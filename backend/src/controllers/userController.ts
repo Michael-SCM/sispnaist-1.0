@@ -15,6 +15,7 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const filtros = {
     nome: req.query.nome as string,
     email: req.query.email as string,
+    cpf: req.query.cpf as string,
     perfil: req.query.perfil as string,
   };
 

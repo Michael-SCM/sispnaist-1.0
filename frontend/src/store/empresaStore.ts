@@ -27,7 +27,7 @@ export const useEmpresaStore = create<EmpresaState>((set) => ({
   total: 0,
   pages: 0,
 
-  fetchEmpresas: async (page = 1, limit = 10, filtros = {}) => {
+  fetchEmpresas: async (page = 1, limit = 100, filtros = {}) => {
     set({ loading: true, error: null });
     try {
       const data = await empresaService.listar(page, limit, filtros);

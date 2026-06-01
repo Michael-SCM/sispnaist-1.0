@@ -30,7 +30,7 @@ export const useUnidadeStore = create<UnidadeState>((set) => ({
   total: 0,
   pages: 0,
 
-  fetchUnidades: async (page = 1, limit = 10, filtros = {}) => {
+  fetchUnidades: async (page = 1, limit = 100, filtros = {}) => {
     set({ loading: true, error: null });
     try {
       const data = await unidadeService.listar(page, limit, filtros);
