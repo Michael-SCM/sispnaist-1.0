@@ -15,7 +15,7 @@ class PreferenciaController {
                     usuarioId: req.user.id
                 });
             }
-            return res.status(200).json(preferencia);
+            return res.status(200).json({ data: preferencia });
         }
         catch (error) {
             next(error);
@@ -36,7 +36,7 @@ class PreferenciaController {
             else {
                 await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
             }
-            return res.status(200).json(preferencia);
+            return res.status(200).json({ data: preferencia });
         }
         catch (error) {
             next(error);
@@ -50,7 +50,7 @@ class PreferenciaController {
             if (!preferencia) {
                 throw new AppError('Preferências não encontradas', 404);
             }
-            return res.status(200).json(preferencia);
+            return res.status(200).json({ data: preferencia });
         }
         catch (error) {
             next(error);
@@ -69,7 +69,7 @@ class PreferenciaController {
             else {
                 await logAction(req, 'CREATE', 'Preferencia', preferencia._id.toString(), preferencia);
             }
-            return res.status(200).json(preferencia);
+            return res.status(200).json({ data: preferencia });
         }
         catch (error) {
             next(error);

@@ -8,7 +8,8 @@ const PreferenciaUsuarioSchema = new Schema({
     dashboardPadrao: { type: String },
     itensPorPagina: { type: Number, default: 10 },
     ordenacaoPadrao: { type: String },
-    dataUltimoAcesso: { type: Date }
+    dataUltimoAcesso: { type: Date },
+    ocultarAlertaOrientacao: { type: Boolean, default: false }
 }, {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
     collection: 'preferencias_usuario'
