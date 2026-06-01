@@ -15,6 +15,7 @@ export interface IPreferenciaUsuario extends Document {
   itensPorPagina?: number;
   ordenacaoPadrao?: string;
   dataUltimoAcesso?: Date;
+  ocultarAlertaOrientacao?: boolean;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
@@ -29,7 +30,8 @@ const PreferenciaUsuarioSchema = new Schema<IPreferenciaUsuario>(
     dashboardPadrao: { type: String },
     itensPorPagina: { type: Number, default: 10 },
     ordenacaoPadrao: { type: String },
-    dataUltimoAcesso: { type: Date }
+    dataUltimoAcesso: { type: Date },
+    ocultarAlertaOrientacao: { type: Boolean, default: false }
   },
   {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },

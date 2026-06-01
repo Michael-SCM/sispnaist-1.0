@@ -477,6 +477,7 @@ export interface IPreferenciaUsuario {
   notificacoesPush?: boolean;
   dashboardPadrao?: string;
   itensPorPagina?: number;
+  ocultarAlertaOrientacao?: boolean;
 }
 
 // Servidor/Funcionario

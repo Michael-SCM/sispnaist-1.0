@@ -5,6 +5,7 @@ import { useAnalyticsStore } from '../store/analyticsStore.js';
 import { MainLayout } from '../layouts/MainLayout.js';
 import { KPICard } from '../components/KPICard.js';
 import { AcidentesPorMes, PieChartComponent, BarChartComponent } from '../components/charts/index.js';
+import { AlertaOrientacaoMobile } from '../components/AlertaOrientacaoMobile.js';
 import { format } from 'date-fns';
 
 export const Dashboard: React.FC = () => {
@@ -92,6 +93,7 @@ const {
   if (isLoading && !kpis && !dashboardAdmin && !dashboardTrabalhador) {
     return (
       <MainLayout>
+        <AlertaOrientacaoMobile />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -108,6 +110,7 @@ const {
 
     return (
       <MainLayout>
+        <AlertaOrientacaoMobile />
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
@@ -340,6 +343,7 @@ const {
 
     return (
       <MainLayout>
+        <AlertaOrientacaoMobile />
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Meu Painel</h1>
@@ -468,6 +472,7 @@ const {
   // Fallback - Dashboard básico (antes de carregar)
   return (
     <MainLayout>
+      <AlertaOrientacaoMobile />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="card bg-blue-50 border-blue-100">
           <h3 className="text-lg font-semibold text-blue-600 flex items-center gap-2">

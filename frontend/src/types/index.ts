@@ -356,6 +356,18 @@ export interface ITrabalhador {
   dataAtualizacao?: string;
 }
 
+export interface IPreferenciaUsuario {
+  _id?: string;
+  usuarioId: string;
+  tema?: string;
+  idioma?: string;
+  notificacoesEmail?: boolean;
+  notificacoesPush?: boolean;
+  dashboardPadrao?: string;
+  itensPorPagina?: number;
+  ocultarAlertaOrientacao?: boolean;
+}
+
 export interface IVideoAula {
   _id?: string;
   titulo: string;
