@@ -329,7 +329,6 @@ export class AnalyticsService {
           },
         },
         { $sort: { total: -1 } },
-        { $limit: 10 },
       ])
     ]);
 
