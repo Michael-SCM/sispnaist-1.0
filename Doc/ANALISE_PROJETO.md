@@ -54,20 +54,6 @@ tipoTrauma: Joi.string().trim().max(100).required().messages({
 
 ---
 
-### 4. Erro de Runtime no `obterPorTrabalhador` do AcidenteService
-
-**Arquivo:** `backend/src/services/AcidenteService.ts` (linha 271)
-**Problema:**
-```typescript
-acidentes.map(a => ({ ...a.toObject(), _id: a._id?.toString() })) as IAcidente[],
-```
-
-O método `find()` é chamado sem `.lean()`, mas `a` pode ser um plain object (dependendo da versão do Mongoose). Se `.lean()` não foi usado, `toObject()` existe, mas se foi, vai lançar `TypeError: a.toObject is not a function`.
-
-**Correção:** Simplificar para:
-```typescript
-acidentes.map(a => ({ ...a, _id: a._id?.toString() })) as IAcidente[],
-```
 
 ---
 
@@ -95,39 +81,6 @@ acidentes.map(a => ({ ...a, _id: a._id?.toString() })) as IAcidente[],
 
 ---
 
-### 6. Interceptadores Duplicados no Axios (api.ts)
-
-**Arquivo:** `frontend/src/services/api.ts`
-**Problema:** Existem **três** `interceptors.response.use()` registrados:
-1. Retry logic (linha 14-41) — tenta novamente em 5xx/network errors
-2. Auth token injection (linha 44-50) — request interceptor ✅
-3. Auth error handler (linha 53-77) — redireciona para `/login` em 401
-
-O problema principal: o interceptor #1 (retry) é registrado primeiro, depois o #3 (auth). A ordem de execução é FIFO, então o retry pode tentar reprocessar uma requisição que deveria limpar o token. Além disso, quando o retry entra em ação, ele chama `axiosInstance(config)` novamente, que passa por todos os interceptors de novo — incluindo o de auth error, que pode redirecionar antes do retry completar.
-
-**Correção:** Consolidar em um único interceptor de resposta:
-```typescript
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      return Promise.reject(error);
-    }
-
-    const config = error.config as any;
-    if (config && config.retryCount < 3 && (!error.response || error.response.status >= 500)) {
-      config.retryCount = (config.retryCount || 0) + 1;
-      await new Promise(r => setTimeout(r, config.retryCount * 1000));
-      return axiosInstance(config);
-    }
-
-    return Promise.reject(error);
-  }
-);
-```
 
 ---
 
