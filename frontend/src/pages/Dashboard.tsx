@@ -31,6 +31,15 @@ const {
     }
   }, [userPerfil]);
 
+  const colorVariants: Record<string, { primary: string; secondary: string }> = {
+    blue: { primary: 'bg-blue-600 hover:bg-blue-700', secondary: 'border-blue-600 text-blue-600 hover:bg-blue-50' },
+    purple: { primary: 'bg-purple-600 hover:bg-purple-700', secondary: 'border-purple-600 text-purple-600 hover:bg-purple-50' },
+    red: { primary: 'bg-red-600 hover:bg-red-700', secondary: 'border-red-600 text-red-600 hover:bg-red-50' },
+    green: { primary: 'bg-green-600 hover:bg-green-700', secondary: 'border-green-600 text-green-600 hover:bg-green-50' },
+    indigo: { primary: 'bg-indigo-600 hover:bg-indigo-700', secondary: 'border-indigo-600 text-indigo-600 hover:bg-indigo-50' },
+    amber: { primary: 'bg-amber-600 hover:bg-amber-700', secondary: 'border-amber-600 text-amber-600 hover:bg-amber-50' },
+  };
+
   const actions = [
     {
       title: 'Acidentes',
@@ -315,14 +324,14 @@ const {
                 <div className="flex flex-col gap-2">
                   <Link
                     to={action.link}
-                    className={`text-center py-2 px-4 bg-${action.color}-600 text-white rounded hover:bg-${action.color}-700 transition`}
+                    className={`text-center py-2 px-4 ${colorVariants[action.color].primary} text-white rounded transition`}
                   >
                     {action.buttonLabel || 'Ver Todos'}
                   </Link>
                   {action.newLink && (
                     <Link
                       to={action.newLink}
-                      className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
+                      className={`text-center py-2 px-4 border ${colorVariants[action.color].secondary} rounded transition font-medium`}
                     >
                       + Novo Registro
                     </Link>
@@ -457,7 +466,7 @@ const {
                 <p className="text-gray-600 mb-6 text-sm">{action.description}</p>
                 <Link
                   to={action.link}
-                  className={`block text-center py-2 px-4 bg-${action.color}-600 text-white rounded hover:bg-${action.color}-700 transition`}
+                  className={`block text-center py-2 px-4 ${colorVariants[action.color].primary} text-white rounded transition`}
                 >
                   {action.buttonLabel || 'Ver Todos'}
                 </Link>
@@ -514,14 +523,14 @@ const {
             <div className="flex flex-col gap-2">
               <Link
                 to={action.link}
-                className={`text-center py-2 px-4 bg-${action.color}-600 text-white rounded hover:bg-${action.color}-700 transition`}
+                className={`text-center py-2 px-4 ${colorVariants[action.color].primary} text-white rounded transition`}
               >
                 {action.buttonLabel || 'Ver Todos'}
               </Link>
               {action.newLink && (
                 <Link
                   to={action.newLink}
-                  className={`text-center py-2 px-4 border border-${action.color}-600 text-${action.color}-600 rounded hover:bg-${action.color}-50 transition font-medium`}
+                  className={`text-center py-2 px-4 border ${colorVariants[action.color].secondary} rounded transition font-medium`}
                 >
                   + Novo Registro
                 </Link>
