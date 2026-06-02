@@ -9,9 +9,6 @@ export const authService = {
 
   login: async (email: string, senha: string): Promise<IAuthResponse> => {
     const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha });
-    const { token, user } = response.data.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
     return response.data.data;
   },
 

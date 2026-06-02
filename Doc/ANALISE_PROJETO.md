@@ -91,49 +91,6 @@ tipoTrauma: Joi.string().trim().max(100).required().messages({
 
 **Correção:** Revogar imediatamente essa senha nas configurações de segurança do Google (https://myaccount.google.com/apppasswords) e gerar uma nova. Depois configurar apenas via variável de ambiente no Render.
 
----
-
----
-
-
-### 10. Login Não Redireciona se Já Autenticado
-
-**Arquivo:** `frontend/src/pages/Login.tsx`
-**Problema:** Se o usuário já está logado e navega para `/login`, ele continua vendo o formulário de login. O ideal seria redirecionar automaticamente para `/dashboard`.
-
-**Correção:** Adicionar um `useEffect` ou `useNavigate` condicional:
-```tsx
-const { isAuthenticated } = useAuthStore();
-useEffect(() => {
-  if (isAuthenticated) navigate('/dashboard', { replace: true });
-}, [isAuthenticated, navigate]);
-```
-
----
-
-### 11. Variável `FRONTEND_URL` Aponta para Localhost no .env
-
-**Arquivo:** `backend/.env` (linha 17)
-**Problema:**
-```
-FRONTEND_URL=http://localhost:5173
-```
-
-Isso significa que todos os e-mails de recuperação de senha e verificação conterão links para `http://localhost:5173/reset-password?token=...` — que não funciona em produção.
-
-**Correção:** No Render Dashboard, configurar:
-```
-FRONTEND_URL=https://sispnaist-1-0.vercel.app
-```
-
----
-
-### 12. Sem Logout Endpoint no Backend
-
-**Arquivo:** `backend/src/routes/auth.ts`
-**Problema:** Não existe rota `POST /api/auth/logout`. O frontend apenas limpa o localStorage, mas não invalida o token no servidor. Isso significa que tokens JWT continuam válidos até expirarem (7 dias), mesmo após o usuário "sair".
-
-**Correção (opcional para JWT stateless):** Para JWT, isso geralmente não é um problema crítico (tokens expiram). Mas se quiser invalidar, pode-se implementar uma blacklist de tokens no Redis ou no MongoDB. Alternativa mais simples: reduzir `JWT_EXPIRE` para 24h.
 
 ---
 
@@ -151,49 +108,8 @@ const verificationToken = jwt.sign(
 );
 ```
 
----
 
-## 🟢 BAIXOS
-
-### 14. Arquivos Duplicados/Obsoletos
-
-**Arquivos:**
-- `frontend/src/hooks/useAsync-fixed.ts` vs `useAsync.ts`
-- `frontend/src/components/FormFields-fixed.tsx` vs `FormFields.tsx`
-
-**Problema:** Arquivos com sufixo `-fixed` foram deixados no código, sugerindo que houve bugs que foram corrigidos em versões paralelas. Isso causa confusão sobre qual arquivo está sendo usado.
-
-**Correção:** Remover os arquivos `-fixed` após confirmar que o conteúdo foi incorporado nos arquivos originais.
-
----
-
-### 15. `authService.login` Armazena Token Duas Vezes
-
-**Arquivo:** `frontend/src/services/authService.ts` (linhas 11-14)
-**Problema:**
-```typescript
-login: async (email: string, senha: string): Promise<IAuthResponse> => {
-  const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha });
-  const { token, user } = response.data.data;
-  localStorage.setItem('token', token);       // ← armazena aqui
-  localStorage.setItem('user', JSON.stringify(user)); // ← armazena aqui
-  return response.data.data;
-},
-```
-
-E no Login.tsx (linhas 31-32):
-```typescript
-const { user, token } = await authService.login(values.email, values.senha);
-setAuth(user, token); // ← armazena NOVAMENTE no localStorage via authStore
-```
-
-**Impacto:** Nenhum erro funcional, mas é código duplicado/messy.
-
-**Correção:** Remover os `localStorage.setItem` do `authService.login` e deixar apenas o `setAuth` no componente ou store.
-
----
-
-### 16. Nenhum Rate Limiting nos Endpoints de Autenticação
+## 16. Nenhum Rate Limiting nos Endpoints de Autenticação
 
 **Problema:** As rotas `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot-password` não possuem rate limiting, permitindo ataques de brute-force.
 
