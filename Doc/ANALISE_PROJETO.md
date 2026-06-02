@@ -93,57 +93,8 @@ tipoTrauma: Joi.string().trim().max(100).required().messages({
 
 ---
 
-## 🟡 MÉDIOS
-
-### 8. Tailwind CSS com Classes Dinâmicas
-
-**Arquivo:** `frontend/src/pages/Dashboard.tsx` (múltiplas linhas)
-**Problema:** Uso de classes Tailwind via template literals:
-```tsx
-className={`text-center py-2 px-4 bg-${action.color}-600 text-white rounded hover:bg-${action.color}-700 transition`}
-```
-
-O Tailwind usa **static extraction** (escaneia o código em busca de strings completas como `bg-blue-600`). Strings dinâmicas como `` bg-${action.color}-600 `` **não são reconhecidas** e os estilos não serão aplicados em produção (build purga classes não encontradas).
-
-**Correção:** Mapear cores manualmente:
-```tsx
-const colorMap: Record<string, string> = {
-  blue: 'bg-blue-600 hover:bg-blue-700',
-  red: 'bg-red-600 hover:bg-red-700',
-  green: 'bg-green-600 hover:bg-green-700',
-  // ...
-};
-className={`... ${colorMap[action.color]}`}
-```
-
 ---
 
-### 9. Frontend Vite Proxy Aponta para Produção
-
-**Arquivo:** `frontend/vite.config.ts`
-**Problema:**
-```typescript
-proxy: {
-  '/api': {
-    target: 'https://sispnaist-1-0.onrender.com',
-    changeOrigin: true,
-  },
-}
-```
-
-Durante desenvolvimento local, o proxy do Vite encaminha `/api` para o backend **de produção no Render**. Se você estiver rodando o backend localmente (porta 3001), as requisições vão para produção e não para seu backend local.
-
-**Correção:** Usar variável de ambiente no proxy:
-```typescript
-proxy: {
-  '/api': {
-    target: process.env.VITE_PROXY_TARGET || 'http://localhost:3001',
-    changeOrigin: true,
-  },
-}
-```
-
----
 
 ### 10. Login Não Redireciona se Já Autenticado
 

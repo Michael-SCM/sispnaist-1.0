@@ -16,12 +16,17 @@ interface LoginFormData {
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const setAuth = useAuthStore((state) => state.setAuth);
   const { values, handleChange, handleBlur, reset } = useForm<LoginFormData>({
     email: '',
     senha: '',
   });
   const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated) navigate('/dashboard', { replace: true });
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
