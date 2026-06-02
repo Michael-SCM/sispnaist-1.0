@@ -213,15 +213,9 @@ export const atualizarAcidenteSchema = Joi.object({
   tipoAcidente: Joi.string()
     .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
     .optional(),
-  tipoTrauma: Joi.string().trim().max(100).required().messages({
-    'any.required': 'Tipo de trauma é obrigatório',
-  }),
-  agenteCausador: Joi.string().trim().max(100).required().messages({
-    'any.required': 'Agente causador é obrigatório',
-  }),
-  parteCorpo: Joi.string().trim().max(100).required().messages({
-    'any.required': 'Parte do corpo é obrigatória',
-  }),
+  tipoTrauma: Joi.string().trim().max(100).optional(),
+  agenteCausador: Joi.string().trim().max(100).optional(),
+  parteCorpo: Joi.string().trim().max(100).optional(),
   descricao: Joi.string()
     .trim()
     .min(10)
@@ -231,18 +225,10 @@ export const atualizarAcidenteSchema = Joi.object({
   local: Joi.string()
     .trim()
     .max(200)
-    .required()
-    .messages({
-      'any.required': 'Local do acidente é obrigatório',
-    }),
+    .optional(),
   lesoes: Joi.array()
     .items(Joi.string().trim())
-    .min(1)
-    .required()
-    .messages({
-      'array.min': 'Adicione pelo menos uma lesão',
-      'any.required': 'Lesões são obrigatórias',
-    }),
+    .optional(),
   feriado: Joi.boolean().optional(),
   comunicado: Joi.boolean().optional(),
   dataComunicacao: Joi.date().optional().allow('', null),

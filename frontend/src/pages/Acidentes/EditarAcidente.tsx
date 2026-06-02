@@ -218,11 +218,7 @@ export const EditarAcidente: React.FC = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.tipoAcidente) newErrors.tipoAcidente = 'Tipo é obrigatório';
-    if (!formData.tipoTrauma) newErrors.tipoTrauma = 'Tipo de trauma é obrigatório';
-    if (!formData.agenteCausador) newErrors.agenteCausador = 'Agente causador é obrigatório';
-    if (!formData.parteCorpo) newErrors.parteCorpo = 'Parte do corpo é obrigatória';
-    if (!formData.local) newErrors.local = 'Local é obrigatório';
-    if (!formData.lesoes || formData.lesoes.length === 0) newErrors.lesoes = 'Adicione pelo menos uma lesão';
+
     if (!formData.descricao || formData.descricao.length < 10) {
       newErrors.descricao = 'Descrição deve ter pelo menos 10 caracteres';
     }
@@ -447,9 +443,8 @@ export const EditarAcidente: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Trauma <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Trauma</label>
                     <select
-                      required
                       name="tipoTrauma"
                       value={formData?.tipoTrauma}
                       onChange={handleChange}
@@ -463,9 +458,8 @@ export const EditarAcidente: React.FC = () => {
                     {errors.tipoTrauma && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoTrauma}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Agente Causador <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Agente Causador</label>
                     <select
-                      required
                       name="agenteCausador"
                       value={formData?.agenteCausador}
                       onChange={handleChange}
@@ -479,9 +473,8 @@ export const EditarAcidente: React.FC = () => {
                     {errors.agenteCausador && <p className="mt-1 text-xs text-red-500 font-bold">{errors.agenteCausador}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Parte do Corpo <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Parte do Corpo</label>
                     <select
-                      required
                       name="parteCorpo"
                       value={formData?.parteCorpo}
                       onChange={handleChange}
@@ -529,9 +522,8 @@ export const EditarAcidente: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-6">
                   <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Local do Acidente <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Local do Acidente</label>
                       <input
-                        required
                         name="local"
                       value={formData?.local}
                       onChange={handleChange}
@@ -540,7 +532,7 @@ export const EditarAcidente: React.FC = () => {
                     {errors.local && <p className="mt-1 text-xs text-red-500 font-bold">{errors.local}</p>}
                   </div>
                   <div>
-                      <label className="block text-sm font-bold text-slate-600 mb-2">Lesões Identificadas <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Lesões Identificadas</label>
                     <div className="flex flex-wrap gap-2 mb-3">
                       {formData?.lesoes.map(lesao => (
                         <span key={lesao} className="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-xl text-xs font-bold flex items-center gap-2 border border-amber-100">
