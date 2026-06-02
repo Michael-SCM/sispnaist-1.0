@@ -12,7 +12,7 @@ interface RegisterFormData {
   email: string;
   cpf: string;
   senha: string;
-  confirmaSenha: string;
+  confirmarSenha: string;
   [key: string]: string | number | boolean;
 }
 
@@ -27,14 +27,14 @@ export const Register: React.FC = () => {
     cpf: '',
     dataNascimento: '',
     senha: '',
-    confirmaSenha: '',
+    confirmarSenha: '',
   });
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (values.senha !== values.confirmaSenha) {
+    if (values.senha !== values.confirmarSenha) {
       toast.error('As senhas não coincidem');
       return;
     }
@@ -145,8 +145,8 @@ export const Register: React.FC = () => {
             <label className="label">Confirme a Senha</label>
             <input
               type="password"
-              name="confirmaSenha"
-              value={values.confirmaSenha}
+              name="confirmarSenha"
+              value={values.confirmarSenha}
               onChange={handleChange}
               onBlur={handleBlur}
               className="input"

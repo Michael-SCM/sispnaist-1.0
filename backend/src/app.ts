@@ -53,7 +53,10 @@ app.use(cors({
 }));
 
 // Middleware de segurança
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
 // Parser de requisições
 app.use(express.json({ limit: '10mb', strict: false }));

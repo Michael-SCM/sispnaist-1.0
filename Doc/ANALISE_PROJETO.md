@@ -106,37 +106,7 @@ const verificationToken = jwt.sign(
   process.env.EMAIL_JWT_SECRET || config.jwtSecret, // ideal: EMAIL_JWT_SECRET separado
   { expiresIn: '24h' }
 );
-```
 
-
-## 16. Nenhum Rate Limiting nos Endpoints de Autenticação
-
-**Problema:** As rotas `/api/auth/login`, `/api/auth/register`, `/api/auth/forgot-password` não possuem rate limiting, permitindo ataques de brute-force.
-
-**Correção:** Adicionar `express-rate-limit`:
-```typescript
-import rateLimit from 'express-rate-limit';
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 tentativas
-  message: { status: 'error', message: 'Muitas tentativas. Tente novamente em 15 minutos.' }
-});
-app.use('/api/auth/login', loginLimiter);
-```
-
----
-
-### 17. Frontend Register: Campo `confirmaSenha` com Possível Typo
-
-**Arquivo:** `frontend/src/pages/Register.tsx`
-**Problema:** O campo `confirmaSenha` está sem a letra 'r' (o correto seria `confirmaSenha` ou `confirmacaoSenha`). A validação é:
-```tsx
-if (values.senha !== values.confirmaSenha) {
-```
-
-Funciona, mas o nome do campo está inconsistente. O backend usa `confirmarSenha` no schema de reset de senha.
-
----
 
 ### 18. JSON2CSV é Dependência em Versionamento Alpha
 
@@ -168,26 +138,6 @@ Isso permite diversos tipos de bugs que o TypeScript pegaria: `any` implícitos,
 
 ---
 
-### 20. Helmet Configuração Padrão Pode Bloquear Recursos do Frontend
-
-**Arquivo:** `backend/src/app.ts` (linha 56)
-**Problema:**
-```typescript
-app.use(helmet());
-```
-
-A configuração padrão do Helmet pode bloquear:
-- Conexões WebSocket se forem usadas
-- Carregamento de imagens/fontes de URLs externas (CDN)
-- Iframes (Content-Security-Policy)
-
-**Correção:** Configurar Helmet explicitamente:
-```typescript
-app.use(helmet({
-  contentSecurityPolicy: false, // se não precisa de CSP estrita
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-}));
-```
 
 ---
 
