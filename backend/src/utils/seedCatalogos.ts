@@ -473,11 +473,9 @@ export async function seedCatalogos() {
   }
 }
 
-import { fileURLToPath } from 'url';
 import { resolve } from 'path';
 import { argv } from 'process';
 
-const __filename = fileURLToPath(import.meta.url);
 const isMainModule = argv[1] && resolve(argv[1]) === resolve(__filename);
 
 if (isMainModule) {
