@@ -37,23 +37,6 @@ git rm --cached backend/.env
 
 ---
 
-### 2. Campo `diasAfastamento` Inexistente no Modelo Acidente
-
-**Arquivo:** `backend/src/services/AnalyticsService.ts` (linhas 87-88)
-**Problema:** O método `obterKPIs()` executa uma aggregation que consulta o campo `diasAfastamento` no modelo Acidente, mas **este campo não existe no schema** (`backend/src/models/Acidente.ts`).
-
-```typescript
-// Linhas 87-88
-{ $match: { diasAfastamento: { $exists: true, $gt: 0 } } },
-{ $group: { _id: null, total: { $sum: '$diasAfastamento' } } }
-```
-
-**Impacto:** O KPI `totalAbsenteismo` sempre retornará 0, independente dos dados reais. Um comentário no código (linha 428) reconhece o problema: *"O campo diasAfastamento não existe no modelo 'Acidente'"*.
-
-**Correção (2 opções):**
-- **Opção A:** Adicionar o campo `diasAfastamento` ao schema `Acidente.ts` e popular esse campo nos formulários de cadastro/edição
-- **Opção B:** Remover a aggregation por `diasAfastamento` e calcular absenteísmo a partir de `TrabalhadorAfastamento` (como já é feito em `obterMonitoramentoClinico()`)
-
 ---
 
 ### 3. Schema de Atualização de Acidente com Campos Obrigatórios

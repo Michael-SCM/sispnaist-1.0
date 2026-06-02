@@ -268,7 +268,7 @@ export class AcidenteService {
     const pages = Math.ceil(total / limit);
 
     return {
-      acidentes: acidentes.map(a => ({ ...a.toObject(), _id: a._id?.toString() })) as IAcidente[],
+      acidentes: acidentes.map(a => ({ ...a, _id: a._id?.toString() })) as IAcidente[],
       total,
       pages,
     };
