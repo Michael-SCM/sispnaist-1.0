@@ -60,6 +60,8 @@ export class AnalyticsService {
     const trintaDias = new Date();
     trintaDias.setDate(trintaDias.getDate() + 30);
 
+    const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
+
     const [
       totalAcidentes,
       acidentesAbertos,
@@ -71,7 +73,7 @@ export class AnalyticsService {
       totalVacinacoes,
       proximasVacinacoes,
       trabalhadoresComVacina,
-      acidentesComAfastamento
+      absenteismoAgg
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -83,9 +85,31 @@ export class AnalyticsService {
       Vacinacao.countDocuments(),
       Vacinacao.countDocuments({ proximoDose: { $lte: trintaDias } }),
       Vacinacao.distinct('trabalhadorId'),
-      Acidente.aggregate([
-        { $match: { diasAfastamento: { $exists: true, $gt: 0 } } },
-        { $group: { _id: null, total: { $sum: '$diasAfastamento' } } }
+      TrabalhadorAfastamento.aggregate([
+        {
+          $match: {
+            dataInicio: { $exists: true, $ne: null },
+            dataRetorno: { $exists: true, $ne: null }
+          }
+        },
+        {
+          $project: {
+            diasAfastamento: {
+              $ceil: {
+                $divide: [
+                  { $subtract: ['$dataRetorno', '$dataInicio'] },
+                  1000 * 60 * 60 * 24
+                ]
+              }
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$diasAfastamento' }
+          }
+        }
       ])
     ]);
     
@@ -99,8 +123,8 @@ export class AnalyticsService {
       ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100) 
       : 0;
 
-    // Total absenteísmo (dias de afastamento)
-    const totalAbsenteismo = acidentesComAfastamento[0]?.total || 0;
+    // Total absenteísmo (dias de afastamento) calculado a partir dos afastamentos reais
+    const totalAbsenteismo = absenteismoAgg[0]?.total || 0;
 
     return {
       totalAcidentes,
