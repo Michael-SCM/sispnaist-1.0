@@ -12,7 +12,7 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
 
     if (error) {
       console.log(`[Validation] Error:`, error.details);
-      const messages = error.details.map(d => `${d.path.join('.')}: ${d.message}`).join('; ');
+      const messages = error.details.map(d => d.message).join('; ');
       throw new AppError(messages, 400);
     }
 
@@ -30,7 +30,7 @@ export const validateQuery = (schema: Joi.ObjectSchema) => {
     });
 
     if (error) {
-      const messages = error.details.map(d => `${d.path.join('.')}: ${d.message}`).join('; ');
+      const messages = error.details.map(d => d.message).join('; ');
       throw new AppError(messages, 400);
     }
 

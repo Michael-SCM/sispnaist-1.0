@@ -58,8 +58,8 @@ export const Register: React.FC = () => {
       reset();
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Erro ao fazer cadastro';
-      if (message.includes('senha:') || message.includes('Senha deve') || message.includes('senha deve')) {
-        setSenhaError(message.replace(/^senha:\s*/i, ''));
+      if (message.includes('Senha deve') || message.includes('A senha deve')) {
+        setSenhaError(message);
       } else {
         toast.error(message);
       }

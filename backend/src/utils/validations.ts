@@ -23,17 +23,11 @@ export const registerSchema = Joi.object({
     }),
   senha: Joi.string()
     .min(8)
-    .pattern(/[a-z]/, { name: 'lowercase' })
-    .pattern(/[A-Z]/, { name: 'uppercase' })
-    .pattern(/\d/, { name: 'number' })
-    .pattern(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { name: 'special' })
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
       'string.min': 'Senha deve ter pelo menos 8 caracteres',
-      'string.pattern.lowercase': 'Senha deve conter pelo menos uma letra minúscula',
-      'string.pattern.uppercase': 'Senha deve conter pelo menos uma letra maiúscula',
-      'string.pattern.number': 'Senha deve conter pelo menos um número',
-      'string.pattern.special': 'Senha deve conter pelo menos um caractere especial',
+      'string.pattern.base': 'A senha deve conter letra maiúscula, minúscula, número e caractere especial',
     }),
   telefone: Joi.string().optional(),
   dataNascimento: Joi.date().required().messages({
@@ -87,17 +81,11 @@ export const resetPasswordSchema = Joi.object({
   }),
   novaSenha: Joi.string()
     .min(8)
-    .pattern(/[a-z]/, { name: 'lowercase' })
-    .pattern(/[A-Z]/, { name: 'uppercase' })
-    .pattern(/\d/, { name: 'number' })
-    .pattern(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, { name: 'special' })
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
       'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
-      'string.pattern.lowercase': 'A nova senha deve conter pelo menos uma letra minúscula',
-      'string.pattern.uppercase': 'A nova senha deve conter pelo menos uma letra maiúscula',
-      'string.pattern.number': 'A nova senha deve conter pelo menos um número',
-      'string.pattern.special': 'A nova senha deve conter pelo menos um caractere especial',
+      'string.pattern.base': 'A nova senha deve conter letra maiúscula, minúscula, número e caractere especial',
       'any.required': 'A nova senha é obrigatória',
     }),
   confirmarSenha: Joi.string().valid(Joi.ref('novaSenha')).required().messages({

@@ -37,8 +37,8 @@ export const ResetPassword: React.FC = () => {
       navigate('/login');
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Erro ao redefinir senha';
-      if (message.includes('novaSenha:') || message.includes('Senha deve') || message.includes('senha deve')) {
-        setSenhaError(message.replace(/^novaSenha:\s*/i, ''));
+      if (message.includes('A nova senha deve') || message.includes('A senha deve')) {
+        setSenhaError(message);
       } else {
         toast.error(message);
       }
