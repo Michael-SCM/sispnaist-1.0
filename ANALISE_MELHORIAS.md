@@ -22,46 +22,9 @@
 
 ---
 
-## 3. Problemas no Backend
 
-### 3.1 Seed de catálogos executado em todo startup do servidor
 
-**Arquivo:** `backend/src/app.ts:69-74`
 
-```typescript
-connectDB().then(() => {
-  if (process.env.NODE_ENV !== 'test') {
-    seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
-  }
-});
-```
-
-**Problema:** A função `seedCatalogos()` é executada **toda vez que o servidor inicia**. Isso significa:
-- A cada deploy no Render (que reinicia o servidor), o seed é executado novamente.
-- Se não houver verificação de duplicidade no seed, itens de catálogo serão duplicados a cada restart.
-- Em serviços como o Render que podem reiniciar o servidor por diversos motivos (deploy, queda, escalonamento), isso acumula dados espúrios.
-
-**Solução:** Modificar `seedCatalogos()` para verificar se os dados já existem antes de inserir (upsert), ou criar um script separado que execute manualmente.
-
-### 3.2 Graceful shutdown não desconecta do MongoDB
-
-**Arquivo:** `backend/src/server.ts:35-49`
-
-```typescript
-process.on('SIGTERM', () => {
-  server.close(() => {
-    console.log('✓ Server closed');
-    process.exit(0);
-  });
-});
-```
-
-**Problema:** Quando o servidor recebe SIGTERM (comum no Render durante deploys), o servidor HTTP é fechado mas a conexão com o MongoDB **não é fechada** (`mongoose.disconnect()` não é chamado). Isso pode causar:
-- Conexões órfãs no MongoDB Atlas
-- Possível corrupção de dados se operações estiverem em andamento
-- Warning no log do servidor sobre conexões não encerradas
-
-**Solução:** Adicionar `mongoose.disconnect()` dentro dos handlers `SIGTERM` e `SIGINT` antes do `process.exit()`.
 
 ### 3.3 Auditoria: middleware usa `_id` mas controllers usam `id`
 
