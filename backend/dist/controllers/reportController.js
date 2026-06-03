@@ -1,12 +1,18 @@
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import Acidente from '../models/Acidente.js';
-import Doenca from '../models/Doenca.js';
-import Vacinacao from '../models/Vacinacao.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.gerarRelatorioDoencas = exports.gerarRelatorioVacinacoes = exports.gerarRelatorioAcidentes = void 0;
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const Acidente_js_1 = __importDefault(require("../models/Acidente.js"));
+const Doenca_js_1 = __importDefault(require("../models/Doenca.js"));
+const Vacinacao_js_1 = __importDefault(require("../models/Vacinacao.js"));
 /**
  * Gera relatório em formato JSON (base para PDF/XLS)
  * GET /api/reports/acidentes?format=json
  */
-export const gerarRelatorioAcidentes = asyncHandler(async (req, res) => {
+exports.gerarRelatorioAcidentes = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { dataInicio, dataFim, tipoAcidente, status } = req.query;
     const query = {};
     if (dataInicio || dataFim) {
@@ -22,7 +28,7 @@ export const gerarRelatorioAcidentes = asyncHandler(async (req, res) => {
     if (status) {
         query.status = status;
     }
-    const acidentes = await Acidente.find(query)
+    const acidentes = await Acidente_js_1.default.find(query)
         .populate('trabalhadorId', 'nome cpf email')
         .sort({ dataAcidente: -1 })
         .lean();
@@ -54,8 +60,8 @@ export const gerarRelatorioAcidentes = asyncHandler(async (req, res) => {
  * Gera relatório de vacinações
  * GET /api/reports/vacinacoes?format=json
  */
-export const gerarRelatorioVacinacoes = asyncHandler(async (req, res) => {
-    const vacinacoes = await Vacinacao.find()
+exports.gerarRelatorioVacinacoes = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const vacinacoes = await Vacinacao_js_1.default.find()
         .populate('trabalhadorId', 'nome cpf email')
         .sort({ dataVacinacao: -1 })
         .lean();
@@ -80,8 +86,8 @@ export const gerarRelatorioVacinacoes = asyncHandler(async (req, res) => {
  * Gera relatório de doenças
  * GET /api/reports/doencas?format=json
  */
-export const gerarRelatorioDoencas = asyncHandler(async (req, res) => {
-    const doencas = await Doenca.find()
+exports.gerarRelatorioDoencas = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const doencas = await Doenca_js_1.default.find()
         .populate('trabalhadorId', 'nome cpf email')
         .sort({ dataInicio: -1 })
         .lean();

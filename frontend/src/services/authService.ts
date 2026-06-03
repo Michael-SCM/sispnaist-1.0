@@ -12,8 +12,14 @@ export const authService = {
     return response.data.data;
   },
 
-  logout: (): void => {
+  logout: async (): Promise<void> => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // falha no logout remoto não impede o logout local
+    }
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
   },
 

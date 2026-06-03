@@ -1,6 +1,12 @@
-import User from '../models/User.js';
-import { AppError } from '../middleware/errorHandler.js';
-export class UserService {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserService = void 0;
+const User_js_1 = __importDefault(require("../models/User.js"));
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
+class UserService {
     async listar(page = 1, limit = 10, filtros) {
         const skip = (page - 1) * limit;
         const query = {};
@@ -10,11 +16,14 @@ export class UserService {
         if (filtros?.email) {
             query.email = { $regex: filtros.email, $options: 'i' };
         }
+        if (filtros?.cpf) {
+            query.cpf = filtros.cpf;
+        }
         if (filtros?.perfil) {
             query.perfil = filtros.perfil;
         }
-        const total = await User.countDocuments(query);
-        const usuarios = await User.find(query)
+        const total = await User_js_1.default.countDocuments(query);
+        const usuarios = await User_js_1.default.find(query)
             .select('-senha') // Nunca retornar a senha
             .populate('empresa', 'razaoSocial')
             .populate('unidade', 'nome')
@@ -30,9 +39,9 @@ export class UserService {
         };
     }
     async obter(id) {
-        const usuario = await User.findById(id).select('-senha').lean();
+        const usuario = await User_js_1.default.findById(id).select('-senha').lean();
         if (!usuario) {
-            throw new AppError('Usuário não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Usuário não encontrado', 404);
         }
         return usuario;
     }
@@ -53,19 +62,20 @@ export class UserService {
             updateFields.empresa = userData.empresa;
         if (userData.unidade)
             updateFields.unidade = userData.unidade;
-        const usuario = await User.findByIdAndUpdate(id, { $set: updateFields }, { new: true, runValidators: true }).select('-senha').lean();
+        const usuario = await User_js_1.default.findByIdAndUpdate(id, { $set: updateFields }, { new: true, runValidators: true }).select('-senha').lean();
         if (!usuario) {
-            throw new AppError('Usuário não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Usuário não encontrado', 404);
         }
         return usuario;
     }
     async deletar(id) {
-        const usuario = await User.findById(id);
+        const usuario = await User_js_1.default.findById(id);
         if (!usuario) {
-            throw new AppError('Usuário não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Usuário não encontrado', 404);
         }
         // Não permitir deletar o próprio usuário ou o último admin (opcional, mas seguro)
-        await User.findByIdAndDelete(id);
+        await User_js_1.default.findByIdAndDelete(id);
     }
 }
-export default new UserService();
+exports.UserService = UserService;
+exports.default = new UserService();

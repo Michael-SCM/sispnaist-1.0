@@ -1,12 +1,18 @@
-import Joi from 'joi';
-export const registerSchema = Joi.object({
-    cpf: Joi.string()
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.atualizarTrabalhadorSchema = exports.criarTrabalhadorSchema = exports.atualizarVacinacaoSchema = exports.criarVacinacaoSchema = exports.atualizarDoencaSchema = exports.criarDoencaSchema = exports.atualizarAcidenteSchema = exports.criarAcidenteSchema = exports.updateProfileSchema = exports.verifyEmailSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.loginSchema = exports.catalogoUpdateSchema = exports.catalogoSchema = exports.registerSchema = void 0;
+const joi_1 = __importDefault(require("joi"));
+exports.registerSchema = joi_1.default.object({
+    cpf: joi_1.default.string()
         .pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)
         .required()
         .messages({
         'string.pattern.base': 'CPF deve estar no formato: XXX.XXX.XXX-XX',
     }),
-    nome: Joi.string()
+    nome: joi_1.default.string()
         .trim()
         .min(3)
         .max(100)
@@ -14,140 +20,147 @@ export const registerSchema = Joi.object({
         .messages({
         'string.min': 'Nome deve ter pelo menos 3 caracteres',
     }),
-    email: Joi.string()
+    email: joi_1.default.string()
         .email()
         .required()
         .messages({
         'string.email': 'Email inválido',
     }),
-    senha: Joi.string()
-        .min(6)
+    senha: joi_1.default.string()
+        .min(8)
+        .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
         .required()
         .messages({
-        'string.min': 'Senha deve ter pelo menos 6 caracteres',
+        'string.min': 'Senha deve ter pelo menos 8 caracteres',
+        'string.pattern.base': 'A senha deve conter letra maiúscula, minúscula, número e caractere especial',
     }),
-    telefone: Joi.string().optional(),
-    dataNascimento: Joi.date().required().messages({
+    telefone: joi_1.default.string().optional(),
+    dataNascimento: joi_1.default.date().required().messages({
         'date.base': 'Data de nascimento inválida',
         'any.required': 'Data de nascimento é obrigatória',
     }),
 });
 // Validação genérica para catálogos/tabelas auxiliares
-export const catalogoSchema = Joi.object({
-    nome: Joi.string().trim().min(1).max(200).required().messages({
+exports.catalogoSchema = joi_1.default.object({
+    nome: joi_1.default.string().trim().min(1).max(200).required().messages({
         'string.min': 'Nome deve ter pelo menos 1 caractere',
         'any.required': 'Nome é obrigatório'
     }),
-    sigla: Joi.string().trim().max(10).optional(),
-    descricao: Joi.string().trim().max(500).optional(),
-    ativo: Joi.boolean().optional(),
-    ordem: Joi.number().integer().min(0).optional()
+    sigla: joi_1.default.string().trim().max(10).optional(),
+    descricao: joi_1.default.string().trim().max(500).optional(),
+    ativo: joi_1.default.boolean().optional(),
+    ordem: joi_1.default.number().integer().min(0).optional()
 });
-export const catalogoUpdateSchema = Joi.object({
-    nome: Joi.string().trim().min(1).max(200).optional(),
-    sigla: Joi.string().trim().max(10).optional(),
-    descricao: Joi.string().trim().max(500).optional(),
-    ativo: Joi.boolean().optional(),
-    ordem: Joi.number().integer().min(0).optional()
+exports.catalogoUpdateSchema = joi_1.default.object({
+    nome: joi_1.default.string().trim().min(1).max(200).optional(),
+    sigla: joi_1.default.string().trim().max(10).optional(),
+    descricao: joi_1.default.string().trim().max(500).optional(),
+    ativo: joi_1.default.boolean().optional(),
+    ordem: joi_1.default.number().integer().min(0).optional()
 });
-export const loginSchema = Joi.object({
-    email: Joi.string()
+exports.loginSchema = joi_1.default.object({
+    email: joi_1.default.string()
         .email()
         .required(),
-    senha: Joi.string()
+    senha: joi_1.default.string()
         .required(),
 });
-export const forgotPasswordSchema = Joi.object({
-    email: Joi.string().email().required().messages({
+exports.forgotPasswordSchema = joi_1.default.object({
+    email: joi_1.default.string().email().required().messages({
         'string.email': 'Email inválido',
         'any.required': 'Email é obrigatório',
     }),
-    dataNascimento: Joi.date().required().messages({
+    dataNascimento: joi_1.default.date().required().messages({
         'date.base': 'Data de nascimento inválida',
         'any.required': 'Data de nascimento é obrigatória',
     }),
 });
-export const resetPasswordSchema = Joi.object({
-    token: Joi.string().required().messages({
+exports.resetPasswordSchema = joi_1.default.object({
+    token: joi_1.default.string().required().messages({
         'any.required': 'Token é obrigatório',
     }),
-    novaSenha: Joi.string().min(6).required().messages({
-        'string.min': 'A nova senha deve ter pelo menos 6 caracteres',
+    novaSenha: joi_1.default.string()
+        .min(8)
+        .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+        .required()
+        .messages({
+        'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
+        'string.pattern.base': 'A nova senha deve conter letra maiúscula, minúscula, número e caractere especial',
         'any.required': 'A nova senha é obrigatória',
     }),
-    confirmarSenha: Joi.string().valid(Joi.ref('novaSenha')).required().messages({
+    confirmarSenha: joi_1.default.string().valid(joi_1.default.ref('novaSenha')).required().messages({
         'any.only': 'As senhas não conferem',
         'any.required': 'Confirmação de senha é obrigatória',
     }),
 });
-export const verifyEmailSchema = Joi.object({
-    token: Joi.string().required().messages({
+exports.verifyEmailSchema = joi_1.default.object({
+    token: joi_1.default.string().required().messages({
         'any.required': 'O token de verificação é obrigatório.',
     }),
 });
-export const updateProfileSchema = Joi.object({
-    nome: Joi.string()
+exports.updateProfileSchema = joi_1.default.object({
+    nome: joi_1.default.string()
         .trim()
         .min(3)
         .max(100)
         .optional(),
-    email: Joi.string()
+    email: joi_1.default.string()
         .email()
         .optional(),
-    telefone: Joi.string().optional(),
-    dataNascimento: Joi.date().optional(),
-    endereco: Joi.object({
-        logradouro: Joi.string().optional(),
-        numero: Joi.string().optional(),
-        complemento: Joi.string().optional(),
-        bairro: Joi.string().optional(),
-        cidade: Joi.string().optional(),
-        estado: Joi.string().optional(),
-        cep: Joi.string().optional(),
+    telefone: joi_1.default.string().optional(),
+    dataNascimento: joi_1.default.date().optional(),
+    endereco: joi_1.default.object({
+        logradouro: joi_1.default.string().optional(),
+        numero: joi_1.default.string().optional(),
+        complemento: joi_1.default.string().optional(),
+        bairro: joi_1.default.string().optional(),
+        cidade: joi_1.default.string().optional(),
+        estado: joi_1.default.string().optional(),
+        cep: joi_1.default.string().optional(),
     }).optional(),
 }).min(1);
 // =========== SCHEMAS PARA ACIDENTES ===========
-export const criarAcidenteSchema = Joi.object({
-    dataAcidente: Joi.date()
+exports.criarAcidenteSchema = joi_1.default.object({
+    dataAcidente: joi_1.default.date()
         .required()
         .messages({
         'date.base': 'Data do acidente deve ser uma data válida',
         'any.required': 'Data do acidente é obrigatória',
     }),
-    horario: Joi.string()
+    horario: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional()
         .messages({
         'string.pattern.base': 'Horário deve estar no formato HH:MM',
     }),
-    horarioAposInicioJornada: Joi.string()
+    horarioAposInicioJornada: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional()
         .messages({
         'string.pattern.base': 'Horário deve estar no formato HH:MM',
     }),
-    trabalhadorId: Joi.string()
+    trabalhadorId: joi_1.default.string()
         .required()
         .messages({
         'any.required': 'Trabalhador é obrigatório',
     }),
-    tipoAcidente: Joi.string()
+    tipoAcidente: joi_1.default.string()
         .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
         .required()
         .messages({
         'any.required': 'Tipo de acidente é obrigatório',
         'any.only': 'Tipo de acidente inválido',
     }),
-    tipoTrauma: Joi.string().trim().max(100).required().messages({
+    tipoTrauma: joi_1.default.string().trim().max(100).required().messages({
         'any.required': 'Tipo de trauma é obrigatório',
     }),
-    agenteCausador: Joi.string().trim().max(100).required().messages({
+    agenteCausador: joi_1.default.string().trim().max(100).required().messages({
         'any.required': 'Agente causador é obrigatório',
     }),
-    parteCorpo: Joi.string().trim().max(100).required().messages({
+    parteCorpo: joi_1.default.string().trim().max(100).required().messages({
         'any.required': 'Parte do corpo é obrigatória',
     }),
-    descricao: Joi.string()
+    descricao: joi_1.default.string()
         .trim()
         .min(10)
         .max(1000)
@@ -157,129 +170,113 @@ export const criarAcidenteSchema = Joi.object({
         'string.max': 'Descrição não pode ter mais de 1000 caracteres',
         'any.required': 'Descrição é obrigatória',
     }),
-    descricaoTrauma: Joi.string().trim().max(500).optional(),
-    local: Joi.string()
+    descricaoTrauma: joi_1.default.string().trim().max(500).optional(),
+    local: joi_1.default.string()
         .trim()
         .max(200)
         .optional(),
-    estado: Joi.string().trim().max(2).optional(),
-    lesoes: Joi.array()
-        .items(Joi.string().trim())
+    lesoes: joi_1.default.array()
+        .items(joi_1.default.string().trim())
         .optional(),
-    feriado: Joi.boolean().optional(),
-    comunicado: Joi.boolean().optional(),
-    dataComunicacao: Joi.date().optional().allow('', null),
-    dataNotificacao: Joi.date().optional().allow('', null),
-    atendimentoMedico: Joi.boolean().optional(),
-    dataAtendimento: Joi.date().optional().allow('', null),
-    horaAtendimento: Joi.string()
+    feriado: joi_1.default.boolean().optional(),
+    comunicado: joi_1.default.boolean().optional(),
+    dataComunicacao: joi_1.default.date().optional().allow('', null),
+    dataNotificacao: joi_1.default.date().optional().allow('', null),
+    atendimentoMedico: joi_1.default.boolean().optional(),
+    dataAtendimento: joi_1.default.date().optional().allow('', null),
+    horaAtendimento: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional()
         .messages({
         'string.pattern.base': 'Hora deve estar no formato HH:MM',
     }),
-    unidadeAtendimento: Joi.string().trim().max(200).optional(),
-    internamento: Joi.boolean().optional(),
-    duracaoInternamento: Joi.number().integer().min(0).optional(),
-    catNas: Joi.boolean().optional(),
-    registroPolicial: Joi.boolean().optional(),
-    encaminhamentoJuntaMedica: Joi.boolean().optional(),
-    afastamento: Joi.boolean().optional(),
-    outrosTrabalhadoresAtingidos: Joi.boolean().optional(),
-    quantidadeTrabalhadoresAtingidos: Joi.number().integer().min(0).optional(),
-    status: Joi.string()
+    unidadeAtendimento: joi_1.default.string().trim().max(200).optional(),
+    internamento: joi_1.default.boolean().optional(),
+    duracaoInternamento: joi_1.default.number().integer().min(0).optional(),
+    catNas: joi_1.default.boolean().optional(),
+    registroPolicial: joi_1.default.boolean().optional(),
+    encaminhamentoJuntaMedica: joi_1.default.boolean().optional(),
+    afastamento: joi_1.default.boolean().optional(),
+    outrosTrabalhadoresAtingidos: joi_1.default.boolean().optional(),
+    quantidadeTrabalhadoresAtingidos: joi_1.default.number().integer().min(0).optional(),
+    status: joi_1.default.string()
         .valid('Aberto', 'Em Análise', 'Fechado')
         .optional(),
 });
-export const atualizarAcidenteSchema = Joi.object({
-    dataAcidente: Joi.date().optional(),
-    horario: Joi.string()
+exports.atualizarAcidenteSchema = joi_1.default.object({
+    dataAcidente: joi_1.default.date().optional(),
+    horario: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional(),
-    horarioAposInicioJornada: Joi.string()
+    horarioAposInicioJornada: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional(),
-    trabalhadorId: Joi.string().optional(),
-    tipoAcidente: Joi.string()
+    trabalhadorId: joi_1.default.string().optional(),
+    tipoAcidente: joi_1.default.string()
         .valid('Típico', 'Trajeto', 'Doença Ocupacional', 'Acidente com Material Biológico', 'Violência')
         .optional(),
-    tipoTrauma: Joi.string().trim().max(100).required().messages({
-        'any.required': 'Tipo de trauma é obrigatório',
-    }),
-    agenteCausador: Joi.string().trim().max(100).required().messages({
-        'any.required': 'Agente causador é obrigatório',
-    }),
-    parteCorpo: Joi.string().trim().max(100).required().messages({
-        'any.required': 'Parte do corpo é obrigatória',
-    }),
-    descricao: Joi.string()
+    tipoTrauma: joi_1.default.string().trim().max(100).optional(),
+    agenteCausador: joi_1.default.string().trim().max(100).optional(),
+    parteCorpo: joi_1.default.string().trim().max(100).optional(),
+    descricao: joi_1.default.string()
         .trim()
         .min(10)
         .max(1000)
         .optional(),
-    descricaoTrauma: Joi.string().trim().max(500).optional(),
-    local: Joi.string()
+    descricaoTrauma: joi_1.default.string().trim().max(500).optional(),
+    local: joi_1.default.string()
         .trim()
         .max(200)
-        .required()
-        .messages({
-        'any.required': 'Local do acidente é obrigatório',
-    }),
-    estado: Joi.string().trim().max(2).optional(),
-    lesoes: Joi.array()
-        .items(Joi.string().trim())
-        .min(1)
-        .required()
-        .messages({
-        'array.min': 'Adicione pelo menos uma lesão',
-        'any.required': 'Lesões são obrigatórias',
-    }),
-    feriado: Joi.boolean().optional(),
-    comunicado: Joi.boolean().optional(),
-    dataComunicacao: Joi.date().optional().allow('', null),
-    dataNotificacao: Joi.date().optional().allow('', null),
-    atendimentoMedico: Joi.boolean().optional(),
-    dataAtendimento: Joi.date().optional().allow('', null),
-    horaAtendimento: Joi.string()
+        .optional(),
+    lesoes: joi_1.default.array()
+        .items(joi_1.default.string().trim())
+        .optional(),
+    feriado: joi_1.default.boolean().optional(),
+    comunicado: joi_1.default.boolean().optional(),
+    dataComunicacao: joi_1.default.date().optional().allow('', null),
+    dataNotificacao: joi_1.default.date().optional().allow('', null),
+    atendimentoMedico: joi_1.default.boolean().optional(),
+    dataAtendimento: joi_1.default.date().optional().allow('', null),
+    horaAtendimento: joi_1.default.string()
         .pattern(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/)
         .optional(),
-    unidadeAtendimento: Joi.string().trim().max(200).optional(),
-    internamento: Joi.boolean().optional(),
-    duracaoInternamento: Joi.number().integer().min(0).optional(),
-    catNas: Joi.boolean().optional(),
-    registroPolicial: Joi.boolean().optional(),
-    encaminhamentoJuntaMedica: Joi.boolean().optional(),
-    afastamento: Joi.boolean().optional(),
-    outrosTrabalhadoresAtingidos: Joi.boolean().optional(),
-    quantidadeTrabalhadoresAtingidos: Joi.number().integer().min(0).optional(),
-    status: Joi.string()
+    unidadeAtendimento: joi_1.default.string().trim().max(200).optional(),
+    internamento: joi_1.default.boolean().optional(),
+    duracaoInternamento: joi_1.default.number().integer().min(0).optional(),
+    catNas: joi_1.default.boolean().optional(),
+    registroPolicial: joi_1.default.boolean().optional(),
+    encaminhamentoJuntaMedica: joi_1.default.boolean().optional(),
+    afastamento: joi_1.default.boolean().optional(),
+    outrosTrabalhadoresAtingidos: joi_1.default.boolean().optional(),
+    quantidadeTrabalhadoresAtingidos: joi_1.default.number().integer().min(0).optional(),
+    status: joi_1.default.string()
         .valid('Aberto', 'Em Análise', 'Fechado')
         .optional(),
 }).min(1);
 // =========== SCHEMAS PARA DOENÇAS ===========
-export const criarDoencaSchema = Joi.object({
-    dataInicio: Joi.date()
+exports.criarDoencaSchema = joi_1.default.object({
+    dataInicio: joi_1.default.date()
         .required()
         .messages({
         'date.base': 'Data de início deve ser uma data válida',
         'any.required': 'Data de início é obrigatória',
     }),
-    dataFim: Joi.date()
+    dataFim: joi_1.default.date()
         .optional()
         .allow(null),
-    trabalhadorId: Joi.string()
+    trabalhadorId: joi_1.default.string()
         .required()
         .messages({
         'any.required': 'Trabalhador é obrigatório',
     }),
-    codigoDoenca: Joi.string()
+    codigoDoenca: joi_1.default.string()
         .trim()
         .max(50)
         .required()
         .messages({
         'any.required': 'Código da doença é obrigatório',
     }),
-    nomeDoenca: Joi.string()
+    nomeDoenca: joi_1.default.string()
         .trim()
         .min(3)
         .max(200)
@@ -288,51 +285,51 @@ export const criarDoencaSchema = Joi.object({
         'string.min': 'Nome da doença deve ter pelo menos 3 caracteres',
         'any.required': 'Nome da doença é obrigatório',
     }),
-    relatoClinico: Joi.string()
+    relatoClinico: joi_1.default.string()
         .trim()
         .max(2000)
         .optional(),
-    profissionalSaude: Joi.string()
+    profissionalSaude: joi_1.default.string()
         .trim()
         .max(100)
         .optional(),
-    ativo: Joi.boolean()
+    ativo: joi_1.default.boolean()
         .optional(),
 });
-export const atualizarDoencaSchema = Joi.object({
-    dataInicio: Joi.date()
+exports.atualizarDoencaSchema = joi_1.default.object({
+    dataInicio: joi_1.default.date()
         .optional(),
-    dataFim: Joi.date()
+    dataFim: joi_1.default.date()
         .optional()
         .allow(null),
-    codigoDoenca: Joi.string()
+    codigoDoenca: joi_1.default.string()
         .trim()
         .max(50)
         .optional(),
-    nomeDoenca: Joi.string()
+    nomeDoenca: joi_1.default.string()
         .trim()
         .min(3)
         .max(200)
         .optional(),
-    relatoClinico: Joi.string()
+    relatoClinico: joi_1.default.string()
         .trim()
         .max(2000)
         .optional(),
-    profissionalSaude: Joi.string()
+    profissionalSaude: joi_1.default.string()
         .trim()
         .max(100)
         .optional(),
-    ativo: Joi.boolean()
+    ativo: joi_1.default.boolean()
         .optional(),
 }).min(1);
 // =========== SCHEMAS PARA VACINAÇÕES ===========
-export const criarVacinacaoSchema = Joi.object({
-    trabalhadorId: Joi.string()
+exports.criarVacinacaoSchema = joi_1.default.object({
+    trabalhadorId: joi_1.default.string()
         .required()
         .messages({
         'any.required': 'Trabalhador é obrigatório',
     }),
-    vacina: Joi.string()
+    vacina: joi_1.default.string()
         .trim()
         .min(3)
         .max(200)
@@ -341,202 +338,202 @@ export const criarVacinacaoSchema = Joi.object({
         'string.min': 'Nome da vacina deve ter pelo menos 3 caracteres',
         'any.required': 'Vacina é obrigatória',
     }),
-    dataVacinacao: Joi.date()
+    dataVacinacao: joi_1.default.date()
         .required()
         .messages({
         'date.base': 'Data da vacinação deve ser uma data válida',
         'any.required': 'Data da vacinação é obrigatória',
     }),
-    proximoDose: Joi.date()
+    proximoDose: joi_1.default.date()
         .optional()
         .allow(null),
-    unidadeSaude: Joi.string()
+    unidadeSaude: joi_1.default.string()
         .trim()
         .max(200)
         .optional(),
-    profissional: Joi.string()
+    profissional: joi_1.default.string()
         .trim()
         .max(100)
         .optional(),
-    certificado: Joi.string()
+    certificado: joi_1.default.string()
         .trim()
         .max(500)
         .optional(),
 });
-export const atualizarVacinacaoSchema = Joi.object({
-    trabalhadorId: Joi.string()
+exports.atualizarVacinacaoSchema = joi_1.default.object({
+    trabalhadorId: joi_1.default.string()
         .optional(),
-    vacina: Joi.string()
+    vacina: joi_1.default.string()
         .trim()
         .min(3)
         .max(200)
         .optional(),
-    dataVacinacao: Joi.date()
+    dataVacinacao: joi_1.default.date()
         .optional(),
-    proximoDose: Joi.date()
+    proximoDose: joi_1.default.date()
         .optional()
         .allow(null),
-    unidadeSaude: Joi.string()
+    unidadeSaude: joi_1.default.string()
         .trim()
         .max(200)
         .optional(),
-    profissional: Joi.string()
+    profissional: joi_1.default.string()
         .trim()
         .max(100)
         .optional(),
-    certificado: Joi.string()
+    certificado: joi_1.default.string()
         .trim()
         .max(500)
         .optional(),
 }).min(1);
 // =========== SCHEMAS PARA TRABALHADORES ===========
-export const criarTrabalhadorSchema = Joi.object({
-    cpf: Joi.string()
+exports.criarTrabalhadorSchema = joi_1.default.object({
+    cpf: joi_1.default.string()
         .pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)
         .required()
         .messages({
         'string.pattern.base': 'CPF deve estar no formato: XXX.XXX.XXX-XX',
         'any.required': 'CPF é obrigatório',
     }),
-    nome: Joi.string()
+    nome: joi_1.default.string()
         .trim()
         .min(3)
         .max(100)
         .required(),
-    nomeMae: Joi.string().trim().allow('', null),
-    matricula: Joi.string().trim().allow('', null),
-    cartaoSus: Joi.string().trim().allow('', null),
-    celular: Joi.string().trim().allow('', null),
-    telefoneContato: Joi.string().trim().allow('', null),
-    email: Joi.string().email().allow('', null),
-    dataNascimento: Joi.date().required().messages({
+    nomeMae: joi_1.default.string().trim().allow('', null),
+    matricula: joi_1.default.string().trim().allow('', null),
+    cartaoSus: joi_1.default.string().trim().allow('', null),
+    celular: joi_1.default.string().trim().allow('', null),
+    telefoneContato: joi_1.default.string().trim().allow('', null),
+    email: joi_1.default.string().email().allow('', null),
+    dataNascimento: joi_1.default.date().required().messages({
         'any.required': 'Data de nascimento é obrigatória',
     }),
-    sexo: Joi.string().trim().allow('', null),
-    genero: Joi.string().trim().allow('', null),
-    raca: Joi.string().trim().allow('', null),
-    escolaridade: Joi.string().trim().allow('', null),
-    estadoCivil: Joi.string().trim().allow('', null),
-    tipoSanguineo: Joi.string().trim().allow('', null),
-    deficiencia: Joi.object({
-        tipo: Joi.string().trim().allow('', null),
-        tempo: Joi.string().trim().allow('', null),
-        grau: Joi.string().trim().allow('', null),
+    sexo: joi_1.default.string().trim().allow('', null),
+    genero: joi_1.default.string().trim().allow('', null),
+    raca: joi_1.default.string().trim().allow('', null),
+    escolaridade: joi_1.default.string().trim().allow('', null),
+    estadoCivil: joi_1.default.string().trim().allow('', null),
+    tipoSanguineo: joi_1.default.string().trim().allow('', null),
+    deficiencia: joi_1.default.object({
+        tipo: joi_1.default.string().trim().allow('', null),
+        tempo: joi_1.default.string().trim().allow('', null),
+        grau: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    empresa: Joi.string().trim().required().messages({
+    empresa: joi_1.default.string().trim().required().messages({
         'any.required': 'Empresa é obrigatória',
     }),
-    unidade: Joi.string().trim().required().messages({
+    unidade: joi_1.default.string().trim().required().messages({
         'any.required': 'Unidade é obrigatória',
     }),
-    vinculo: Joi.object({
-        tipo: Joi.string().trim().allow('', null),
-        outro: Joi.string().trim().allow('', null),
-        turno: Joi.string().trim().allow('', null),
-        jornada: Joi.string().trim().allow('', null),
-        jornadaOutro: Joi.string().trim().allow('', null),
-        situacao: Joi.string().trim().allow('', null),
+    vinculo: joi_1.default.object({
+        tipo: joi_1.default.string().trim().allow('', null),
+        outro: joi_1.default.string().trim().allow('', null),
+        turno: joi_1.default.string().trim().allow('', null),
+        jornada: joi_1.default.string().trim().allow('', null),
+        jornadaOutro: joi_1.default.string().trim().allow('', null),
+        situacao: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    endereco: Joi.object({
-        logradouro: Joi.string().trim().allow('', null),
-        numero: Joi.string().trim().allow('', null),
-        complemento: Joi.string().trim().allow('', null),
-        bairro: Joi.string().trim().allow('', null),
-        cidade: Joi.string().trim().allow('', null),
-        estado: Joi.string().trim().allow('', null),
-        cep: Joi.string().trim().allow('', null),
+    endereco: joi_1.default.object({
+        logradouro: joi_1.default.string().trim().allow('', null),
+        numero: joi_1.default.string().trim().allow('', null),
+        complemento: joi_1.default.string().trim().allow('', null),
+        bairro: joi_1.default.string().trim().allow('', null),
+        cidade: joi_1.default.string().trim().allow('', null),
+        estado: joi_1.default.string().trim().allow('', null),
+        cep: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    trabalho: Joi.object({
-        dataPosse: Joi.date().allow(null),
-        empresaTerceirizada: Joi.string().trim().allow('', null),
-        dataEntrada: Joi.date().allow(null),
-        setor: Joi.string().trim().allow('', null),
-        cargo: Joi.string().trim().allow('', null),
-        funcao: Joi.string().trim().allow('', null),
-        ocupacao: Joi.string().trim().allow('', null),
+    trabalho: joi_1.default.object({
+        dataPosse: joi_1.default.date().allow(null),
+        empresaTerceirizada: joi_1.default.string().trim().allow('', null),
+        dataEntrada: joi_1.default.date().allow(null),
+        setor: joi_1.default.string().trim().allow('', null),
+        cargo: joi_1.default.string().trim().allow('', null),
+        funcao: joi_1.default.string().trim().allow('', null),
+        ocupacao: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    historico: Joi.object({
-        dataAposentadoria: Joi.date().allow(null),
-        dataObito: Joi.date().allow(null),
-        dataRemocao: Joi.date().allow(null),
-        novoServico: Joi.string().trim().allow('', null),
-        dataRetorno: Joi.date().allow(null),
-        dataRelotacao: Joi.date().allow(null),
-        dataDesligamento: Joi.date().allow(null),
-        dataAfastamento: Joi.date().allow(null),
-        tipoAfastamento: Joi.string().trim().allow('', null),
+    historico: joi_1.default.object({
+        dataAposentadoria: joi_1.default.date().allow(null),
+        dataObito: joi_1.default.date().allow(null),
+        dataRemocao: joi_1.default.date().allow(null),
+        novoServico: joi_1.default.string().trim().allow('', null),
+        dataRetorno: joi_1.default.date().allow(null),
+        dataRelotacao: joi_1.default.date().allow(null),
+        dataDesligamento: joi_1.default.date().allow(null),
+        dataAfastamento: joi_1.default.date().allow(null),
+        tipoAfastamento: joi_1.default.string().trim().allow('', null),
     }).optional(),
 });
-export const atualizarTrabalhadorSchema = Joi.object({
-    cpf: Joi.string()
+exports.atualizarTrabalhadorSchema = joi_1.default.object({
+    cpf: joi_1.default.string()
         .pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)
         .optional(),
-    nome: Joi.string()
+    nome: joi_1.default.string()
         .trim()
         .min(3)
         .max(100)
         .optional(),
-    nomeMae: Joi.string().trim().allow('', null),
-    matricula: Joi.string().trim().allow('', null),
-    cartaoSus: Joi.string().trim().allow('', null),
-    celular: Joi.string().trim().allow('', null),
-    telefoneContato: Joi.string().trim().allow('', null),
-    email: Joi.string().email().allow('', null),
-    dataNascimento: Joi.date().required().messages({
+    nomeMae: joi_1.default.string().trim().allow('', null),
+    matricula: joi_1.default.string().trim().allow('', null),
+    cartaoSus: joi_1.default.string().trim().allow('', null),
+    celular: joi_1.default.string().trim().allow('', null),
+    telefoneContato: joi_1.default.string().trim().allow('', null),
+    email: joi_1.default.string().email().allow('', null),
+    dataNascimento: joi_1.default.date().required().messages({
         'any.required': 'Data de nascimento é obrigatória',
     }),
-    sexo: Joi.string().trim().allow('', null),
-    genero: Joi.string().trim().allow('', null),
-    raca: Joi.string().trim().allow('', null),
-    escolaridade: Joi.string().trim().allow('', null),
-    estadoCivil: Joi.string().trim().allow('', null),
-    tipoSanguineo: Joi.string().trim().allow('', null),
-    deficiencia: Joi.object({
-        tipo: Joi.string().trim().allow('', null),
-        tempo: Joi.string().trim().allow('', null),
-        grau: Joi.string().trim().allow('', null),
+    sexo: joi_1.default.string().trim().allow('', null),
+    genero: joi_1.default.string().trim().allow('', null),
+    raca: joi_1.default.string().trim().allow('', null),
+    escolaridade: joi_1.default.string().trim().allow('', null),
+    estadoCivil: joi_1.default.string().trim().allow('', null),
+    tipoSanguineo: joi_1.default.string().trim().allow('', null),
+    deficiencia: joi_1.default.object({
+        tipo: joi_1.default.string().trim().allow('', null),
+        tempo: joi_1.default.string().trim().allow('', null),
+        grau: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    empresa: Joi.string().trim().required().messages({
+    empresa: joi_1.default.string().trim().required().messages({
         'any.required': 'Empresa é obrigatória',
     }),
-    unidade: Joi.string().trim().required().messages({
+    unidade: joi_1.default.string().trim().required().messages({
         'any.required': 'Unidade é obrigatória',
     }),
-    vinculo: Joi.object({
-        tipo: Joi.string().trim().allow('', null),
-        outro: Joi.string().trim().allow('', null),
-        turno: Joi.string().trim().allow('', null),
-        jornada: Joi.string().trim().allow('', null),
-        jornadaOutro: Joi.string().trim().allow('', null),
-        situacao: Joi.string().trim().allow('', null),
+    vinculo: joi_1.default.object({
+        tipo: joi_1.default.string().trim().allow('', null),
+        outro: joi_1.default.string().trim().allow('', null),
+        turno: joi_1.default.string().trim().allow('', null),
+        jornada: joi_1.default.string().trim().allow('', null),
+        jornadaOutro: joi_1.default.string().trim().allow('', null),
+        situacao: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    endereco: Joi.object({
-        logradouro: Joi.string().trim().allow('', null),
-        numero: Joi.string().trim().allow('', null),
-        complemento: Joi.string().trim().allow('', null),
-        bairro: Joi.string().trim().allow('', null),
-        cidade: Joi.string().trim().allow('', null),
-        estado: Joi.string().trim().allow('', null),
-        cep: Joi.string().trim().allow('', null),
+    endereco: joi_1.default.object({
+        logradouro: joi_1.default.string().trim().allow('', null),
+        numero: joi_1.default.string().trim().allow('', null),
+        complemento: joi_1.default.string().trim().allow('', null),
+        bairro: joi_1.default.string().trim().allow('', null),
+        cidade: joi_1.default.string().trim().allow('', null),
+        estado: joi_1.default.string().trim().allow('', null),
+        cep: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    trabalho: Joi.object({
-        dataPosse: Joi.date().allow(null),
-        empresaTerceirizada: Joi.string().trim().allow('', null),
-        dataEntrada: Joi.date().allow(null),
-        setor: Joi.string().trim().allow('', null),
-        cargo: Joi.string().trim().allow('', null),
-        funcao: Joi.string().trim().allow('', null),
-        ocupacao: Joi.string().trim().allow('', null),
+    trabalho: joi_1.default.object({
+        dataPosse: joi_1.default.date().allow(null),
+        empresaTerceirizada: joi_1.default.string().trim().allow('', null),
+        dataEntrada: joi_1.default.date().allow(null),
+        setor: joi_1.default.string().trim().allow('', null),
+        cargo: joi_1.default.string().trim().allow('', null),
+        funcao: joi_1.default.string().trim().allow('', null),
+        ocupacao: joi_1.default.string().trim().allow('', null),
     }).optional(),
-    historico: Joi.object({
-        dataAposentadoria: Joi.date().allow(null),
-        dataObito: Joi.date().allow(null),
-        dataRemocao: Joi.date().allow(null),
-        novoServico: Joi.string().trim().allow('', null),
-        dataRetorno: Joi.date().allow(null),
-        dataRelotacao: Joi.date().allow(null),
-        dataDesligamento: Joi.date().allow(null),
-        dataAfastamento: Joi.date().allow(null),
-        tipoAfastamento: Joi.string().trim().allow('', null),
+    historico: joi_1.default.object({
+        dataAposentadoria: joi_1.default.date().allow(null),
+        dataObito: joi_1.default.date().allow(null),
+        dataRemocao: joi_1.default.date().allow(null),
+        novoServico: joi_1.default.string().trim().allow('', null),
+        dataRetorno: joi_1.default.date().allow(null),
+        dataRelotacao: joi_1.default.date().allow(null),
+        dataDesligamento: joi_1.default.date().allow(null),
+        dataAfastamento: joi_1.default.date().allow(null),
+        tipoAfastamento: joi_1.default.string().trim().allow('', null),
     }).optional(),
 }).min(1);

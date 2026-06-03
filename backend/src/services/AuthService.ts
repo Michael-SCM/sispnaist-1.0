@@ -1,5 +1,5 @@
 import User, { IUserDocument } from '../models/User.js';
-import { generateToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
 import { sendResetPasswordEmail, sendVerificationEmail, validateEmailDomain } from '../utils/emailService.js';
@@ -67,38 +67,51 @@ export class AuthService {
     return { user: userObj };
   }
 
-  async login(email: string, password: string): Promise<{ user: IUser; token: string }> {
-    // Find user with password field
+  private async generateTokens(user: IUserDocument): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload = {
+      id: user._id.toString(),
+      cpf: user.cpf,
+      email: user.email,
+      perfil: user.perfil || 'trabalhador',
+    };
+
+    const accessToken = generateToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    const refreshExpires = new Date();
+    refreshExpires.setDate(refreshExpires.getDate() + 7);
+
+    await User.findByIdAndUpdate(user._id, {
+      refreshToken,
+      refreshTokenExpires: refreshExpires,
+    });
+
+    return { accessToken, refreshToken };
+  }
+
+  async login(email: string, password: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
     const user = await User.findOne({ email }).select('+senha');
 
     if (!user) {
       throw new AppError('Email ou senha inválidos', 401);
     }
 
-    // Verificar se o e-mail está verificado
     if (user.isVerified === false) {
       throw new AppError('O e-mail desta conta ainda não foi verificado! Por favor, verifique sua caixa de entrada (ou spam) para ativar sua conta.', 401);
     }
 
-    // Compare password
     const isPasswordValid = await (user as IUserDocument).comparePassword(password);
 
     if (!isPasswordValid) {
       throw new AppError('Email ou senha inválidos', 401);
     }
 
-    // Generate token
-    const token = generateToken({
-      id: user._id.toString(),
-      cpf: user.cpf,
-      email: user.email,
-      perfil: user.perfil || 'trabalhador',
-    });
+    const tokens = await this.generateTokens(user);
 
     const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
-    return { user: userObj, token };
+    return { user: userObj, ...tokens };
   }
 
   async me(userId: string): Promise<IUser> {
@@ -191,6 +204,30 @@ export class AuthService {
       if (error instanceof AppError) throw error;
       throw new AppError('Token de recuperação inválido ou expirado', 400);
     }
+  }
+
+  async refreshToken(token: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload = verifyRefreshToken(token);
+    if (!payload) {
+      throw new AppError('Refresh token inválido ou expirado', 401);
+    }
+
+    const user = await User.findById(payload.id).select('+refreshToken +refreshTokenExpires');
+    if (!user || user.refreshToken !== token) {
+      throw new AppError('Refresh token inválido ou revogado', 401);
+    }
+
+    if (user.refreshTokenExpires && user.refreshTokenExpires < new Date()) {
+      throw new AppError('Refresh token expirado', 401);
+    }
+
+    return this.generateTokens(user);
+  }
+
+  async logout(userId: string): Promise<void> {
+    await User.findByIdAndUpdate(userId, {
+      $unset: { refreshToken: '', refreshTokenExpires: '' },
+    });
   }
 
   async verifyEmail(token: string): Promise<void> {

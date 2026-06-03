@@ -13,7 +13,7 @@ describe('config', () => {
   it('deve usar valores padrão para variáveis não definidas', async () => {
     const config = (await import('../../config/config')).default;
     expect(config.port).toBe(3001);
-    expect(config.jwtExpire).toBe('12h');
+    expect(config.jwtExpire).toBe('15m');
   });
 
   it('deve usar valores das variáveis de ambiente', async () => {

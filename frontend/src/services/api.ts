@@ -1,18 +1,35 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 segundos
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+function processQueue(error: any, token: string | null = null) {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+}
+
 // Interceptor para adicionar token à requisição
-axiosInstance.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -20,14 +37,33 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor único de resposta: trata 401, retry em 5xx/erro de rede, e extrai mensagens de erro
+// Interceptor de resposta: refresh automático em 401
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const config = error.config as any;
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // 401 = token inválido/expirado → limpar e redirecionar
-    if (error.response?.status === 401) {
+    // Se não for 401 ou já tentou refresh, rejeita normalmente
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      const responseData = error.response?.data as any;
+      const errorMessage = responseData?.message || error.message || 'Erro na requisição';
+      const customError = new Error(errorMessage) as any;
+      if (responseData?.errors) customError.details = responseData.errors;
+      return Promise.reject(customError);
+    }
+
+    // Evita refresh na própria chamada de refresh-token
+    if (originalRequest.url?.includes('/auth/refresh-token')) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      toast.error('Sessão expirada. Faça login novamente.');
+      setTimeout(() => { window.location.href = '/login'; }, 2500);
+      return Promise.reject(error);
+    }
+
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       toast.error('Sessão expirada. Faça login novamente.');
@@ -35,30 +71,41 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Tentar novamente em erros de rede ou 5xx (até 3 tentativas)
-    if (config && config.retryCount < 3) {
-      const shouldRetry = !error.response || (error.response.status >= 500 && error.response.status <= 599);
-      if (shouldRetry) {
-        config.retryCount = (config.retryCount || 0) + 1;
-        console.warn(`Tentativa de reconexão ${config.retryCount}/3...`);
-        await new Promise(resolve => setTimeout(resolve, config.retryCount * 1000));
-        return axiosInstance(config);
-      }
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return axiosInstance(originalRequest);
+      });
     }
 
-    // Extrair mensagem de erro detalhada do servidor
-    const responseData = error.response?.data as any;
-    const errorMessage = responseData?.message || error.message || 'Erro na requisição';
+    originalRequest._retry = true;
+    isRefreshing = true;
 
-    const customError = new Error(errorMessage) as any;
-    if (responseData?.errors) {
-      customError.details = responseData.errors;
-    }
-    if (responseData?.receivedBody) {
-      customError.receivedBody = responseData.receivedBody;
-    }
+    try {
+      const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
+      const newToken = data.data.accessToken;
+      const newRefreshToken = data.data.refreshToken;
 
-    return Promise.reject(customError);
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+
+      processQueue(null, newToken);
+
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError, null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      toast.error('Sessão expirada. Faça login novamente.');
+      setTimeout(() => { window.location.href = '/login'; }, 2500);
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 

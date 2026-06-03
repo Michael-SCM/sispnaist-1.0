@@ -1,15 +1,20 @@
-import axios from 'axios';
-import { AppError } from '../middleware/errorHandler.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const axios_1 = __importDefault(require("axios"));
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
 class EnderecoController {
     // Busca bairros pelo nome (Proxy para o webservice original)
     async buscarBairros(req, res, next) {
         try {
             const { pesquisa } = req.query;
             if (!pesquisa)
-                throw new AppError('Termo de pesquisa é obrigatório', 400);
+                throw new errorHandler_js_1.AppError('Termo de pesquisa é obrigatório', 400);
             // Usando a URL do sistema original
             const url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaBairro.php?valorPesquisa=${pesquisa}`;
-            const response = await axios.get(url);
+            const response = await axios_1.default.get(url);
             return res.status(200).json(response.data);
         }
         catch (error) {
@@ -31,9 +36,9 @@ class EnderecoController {
                 url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?valorPesquisa=${pesquisa}`;
             }
             else {
-                throw new AppError('Parâmetros de busca insuficientes', 400);
+                throw new errorHandler_js_1.AppError('Parâmetros de busca insuficientes', 400);
             }
-            const response = await axios.get(url);
+            const response = await axios_1.default.get(url);
             return res.status(200).json(response.data);
         }
         catch (error) {
@@ -44,7 +49,7 @@ class EnderecoController {
     async buscarCEP(req, res, next) {
         try {
             const { cep } = req.params;
-            const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+            const response = await axios_1.default.get(`https://viacep.com.br/ws/${cep}/json/`);
             return res.status(200).json(response.data);
         }
         catch (error) {
@@ -52,4 +57,4 @@ class EnderecoController {
         }
     }
 }
-export default new EnderecoController();
+exports.default = new EnderecoController();

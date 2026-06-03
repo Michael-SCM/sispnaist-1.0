@@ -1,5 +1,10 @@
-import PadraoEmail from '../models/PadraoEmail';
-import { AppError } from '../middleware/errorHandler';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const PadraoEmail_1 = __importDefault(require("../models/PadraoEmail"));
+const errorHandler_1 = require("../middleware/errorHandler");
 class EmailController {
     // GET /api/emails/padroes - Listar templates de email
     async listarPadroes(req, res, next) {
@@ -13,8 +18,8 @@ class EmailController {
             if (categoria)
                 filtro.categoria = categoria;
             const [padroes, total] = await Promise.all([
-                PadraoEmail.find(filtro).sort({ nome: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
-                PadraoEmail.countDocuments(filtro)
+                PadraoEmail_1.default.find(filtro).sort({ nome: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+                PadraoEmail_1.default.countDocuments(filtro)
             ]);
             return res.status(200).json({
                 data: padroes,
@@ -32,9 +37,9 @@ class EmailController {
     async obterPadrao(req, res, next) {
         try {
             const { id } = req.params;
-            const padrao = await PadraoEmail.findById(id);
+            const padrao = await PadraoEmail_1.default.findById(id);
             if (!padrao) {
-                throw new AppError('Template não encontrado', 404);
+                throw new errorHandler_1.AppError('Template não encontrado', 404);
             }
             return res.status(200).json(padrao);
         }
@@ -45,7 +50,7 @@ class EmailController {
     // POST /api/emails/padroes - Criar template
     async criarPadrao(req, res, next) {
         try {
-            const padrao = await PadraoEmail.create(req.body);
+            const padrao = await PadraoEmail_1.default.create(req.body);
             return res.status(201).json(padrao);
         }
         catch (error) {
@@ -56,9 +61,9 @@ class EmailController {
     async atualizarPadrao(req, res, next) {
         try {
             const { id } = req.params;
-            const padrao = await PadraoEmail.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+            const padrao = await PadraoEmail_1.default.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!padrao) {
-                throw new AppError('Template não encontrado', 404);
+                throw new errorHandler_1.AppError('Template não encontrado', 404);
             }
             return res.status(200).json(padrao);
         }
@@ -70,9 +75,9 @@ class EmailController {
     async deletarPadrao(req, res, next) {
         try {
             const { id } = req.params;
-            const resultado = await PadraoEmail.updateOne({ _id: id }, { ativo: false });
+            const resultado = await PadraoEmail_1.default.updateOne({ _id: id }, { ativo: false });
             if (resultado.matchedCount === 0) {
-                throw new AppError('Template não encontrado', 404);
+                throw new errorHandler_1.AppError('Template não encontrado', 404);
             }
             return res.status(204).send();
         }
@@ -88,4 +93,4 @@ class EmailController {
         });
     }
 }
-export default new EmailController();
+exports.default = new EmailController();

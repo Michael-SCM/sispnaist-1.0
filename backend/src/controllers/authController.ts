@@ -17,13 +17,14 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, senha } = req.body;
-  const { user, token } = await authService.login(email, senha);
+  const { user, accessToken, refreshToken } = await authService.login(email, senha);
 
   res.status(200).json({
     status: 'success',
     data: {
       user,
-      token,
+      token: accessToken,
+      refreshToken,
     },
   });
 });
@@ -80,6 +81,32 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   res.status(200).json({
     status: 'success',
     message: 'Senha atualizada com sucesso!',
+  });
+});
+
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  const { refreshToken: token } = req.body;
+  if (!token) {
+    res.status(400).json({ status: 'error', message: 'Refresh token é obrigatório' });
+    return;
+  }
+
+  const tokens = await authService.refreshToken(token);
+
+  res.status(200).json({
+    status: 'success',
+    data: tokens,
+  });
+});
+
+export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (req.user) {
+    await authService.logout(req.user.id);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Logout realizado com sucesso',
   });
 });
 

@@ -1,19 +1,25 @@
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import unidadeService from '../services/UnidadeService.js';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getUnidadesPorEmpresa = exports.deleteUnidade = exports.updateUnidade = exports.createUnidade = exports.getUnidade = exports.getUnidades = void 0;
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const UnidadeService_js_1 = __importDefault(require("../services/UnidadeService.js"));
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 /**
  * @desc    Listar unidades com paginação e filtros
  * @route   GET /api/unidades
  * @access  Private/Admin
  */
-export const getUnidades = asyncHandler(async (req, res) => {
+exports.getUnidades = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const filtros = {
         nome: req.query.nome,
         empresaId: req.query.empresaId,
     };
-    const result = await unidadeService.listar(page, limit, filtros);
+    const result = await UnidadeService_js_1.default.listar(page, limit, filtros);
     res.status(200).json({
         status: 'success',
         ...result,
@@ -24,9 +30,9 @@ export const getUnidades = asyncHandler(async (req, res) => {
  * @route   GET /api/unidades/:id
  * @access  Private/Admin
  */
-export const getUnidade = asyncHandler(async (req, res) => {
+exports.getUnidade = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const unidade = await unidadeService.obter(id);
+    const unidade = await UnidadeService_js_1.default.obter(id);
     res.status(200).json({
         status: 'success',
         data: { unidade },
@@ -37,9 +43,9 @@ export const getUnidade = asyncHandler(async (req, res) => {
  * @route   POST /api/unidades
  * @access  Private/Admin
  */
-export const createUnidade = asyncHandler(async (req, res) => {
-    const unidade = await unidadeService.criar(req.body);
-    await logAction(req, 'CREATE', 'Unidade', unidade._id.toString(), unidade);
+exports.createUnidade = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const unidade = await UnidadeService_js_1.default.criar(req.body);
+    await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'Unidade', unidade._id.toString(), unidade);
     res.status(201).json({
         status: 'success',
         data: { unidade },
@@ -50,12 +56,12 @@ export const createUnidade = asyncHandler(async (req, res) => {
  * @route   PUT /api/unidades/:id
  * @access  Private/Admin
  */
-export const updateUnidade = asyncHandler(async (req, res) => {
+exports.updateUnidade = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const unidadeAntiga = await unidadeService.obter(id);
-    const unidadeNova = await unidadeService.atualizar(id, req.body);
-    const mudancas = compararDados(unidadeAntiga, unidadeNova);
-    await logAction(req, 'UPDATE', 'Unidade', id, mudancas);
+    const unidadeAntiga = await UnidadeService_js_1.default.obter(id);
+    const unidadeNova = await UnidadeService_js_1.default.atualizar(id, req.body);
+    const mudancas = (0, auditLogger_js_1.compararDados)(unidadeAntiga, unidadeNova);
+    await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'Unidade', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { unidade: unidadeNova },
@@ -66,11 +72,11 @@ export const updateUnidade = asyncHandler(async (req, res) => {
  * @route   DELETE /api/unidades/:id
  * @access  Private/Admin
  */
-export const deleteUnidade = asyncHandler(async (req, res) => {
+exports.deleteUnidade = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const unidade = await unidadeService.obter(id);
-    await logAction(req, 'DELETE', 'Unidade', id, unidade);
-    await unidadeService.deletar(id);
+    const unidade = await UnidadeService_js_1.default.obter(id);
+    await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'Unidade', id, unidade);
+    await UnidadeService_js_1.default.deletar(id);
     res.status(204).json({
         status: 'success',
         data: null,
@@ -81,9 +87,9 @@ export const deleteUnidade = asyncHandler(async (req, res) => {
  * @route   GET /api/unidades/empresa/:empresaId
  * @access  Private
  */
-export const getUnidadesPorEmpresa = asyncHandler(async (req, res) => {
+exports.getUnidadesPorEmpresa = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { empresaId } = req.params;
-    const unidades = await unidadeService.listarPorEmpresa(empresaId);
+    const unidades = await UnidadeService_js_1.default.listarPorEmpresa(empresaId);
     res.status(200).json({
         status: 'success',
         data: { unidades },

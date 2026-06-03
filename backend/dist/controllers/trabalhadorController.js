@@ -1,13 +1,19 @@
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import trabalhadorService from '../services/TrabalhadorService.js';
-import { AppError } from '../middleware/errorHandler.js';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteTrabalhador = exports.updateTrabalhador = exports.createTrabalhador = exports.getTrabalhadorCompleto = exports.getTrabalhador = exports.getTrabalhadores = void 0;
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const TrabalhadorService_js_1 = __importDefault(require("../services/TrabalhadorService.js"));
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 /**
  * @desc    Listar trabalhadores com paginação e filtros
  * @route   GET /api/trabalhadores
  * @access  Private
  */
-export const getTrabalhadores = asyncHandler(async (req, res) => {
+exports.getTrabalhadores = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const filtros = {
@@ -20,7 +26,7 @@ export const getTrabalhadores = asyncHandler(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
         filtros.cpf = req.user.cpf;
     }
-    const result = await trabalhadorService.listar(page, limit, filtros);
+    const result = await TrabalhadorService_js_1.default.listar(page, limit, filtros);
     res.status(200).json({
         status: 'success',
         ...result,
@@ -31,15 +37,15 @@ export const getTrabalhadores = asyncHandler(async (req, res) => {
  * @route   GET /api/trabalhadores/:id
  * @access  Private
  */
-export const getTrabalhador = asyncHandler(async (req, res) => {
+exports.getTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const trabalhador = await trabalhadorService.obter(id);
+    const trabalhador = await TrabalhadorService_js_1.default.obter(id);
     if (!trabalhador) {
-        throw new AppError('Trabalhador não encontrado', 404);
+        throw new errorHandler_js_1.AppError('Trabalhador não encontrado', 404);
     }
     // Se o usuário logado for trabalhador, ele só pode acessar seu próprio perfil (CPF correspondente)
     if (req.user?.perfil === 'trabalhador' && trabalhador.cpf !== req.user.cpf) {
-        throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para acessar os dados deste trabalhador', 403);
     }
     res.status(200).json({
         status: 'success',
@@ -51,15 +57,15 @@ export const getTrabalhador = asyncHandler(async (req, res) => {
  * @route   GET /api/trabalhadores/:id/completo
  * @access  Private
  */
-export const getTrabalhadorCompleto = asyncHandler(async (req, res) => {
+exports.getTrabalhadorCompleto = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const trabalhador = await trabalhadorService.obterComSubmodulos(id);
+    const trabalhador = await TrabalhadorService_js_1.default.obterComSubmodulos(id);
     if (!trabalhador) {
-        throw new AppError('Trabalhador não encontrado', 404);
+        throw new errorHandler_js_1.AppError('Trabalhador não encontrado', 404);
     }
     // Se o usuário logado for trabalhador, ele só pode acessar seu próprio perfil (CPF correspondente)
     if (req.user?.perfil === 'trabalhador' && trabalhador.cpf !== req.user.cpf) {
-        throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para acessar os dados deste trabalhador', 403);
     }
     res.status(200).json({
         status: 'success',
@@ -71,14 +77,14 @@ export const getTrabalhadorCompleto = asyncHandler(async (req, res) => {
  * @route   POST /api/trabalhadores
  * @access  Private/Admin/Saude
  */
-export const createTrabalhador = asyncHandler(async (req, res) => {
+exports.createTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     // Trabalhadores não podem cadastrar nenhum perfil
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para cadastrar trabalhadores', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para cadastrar trabalhadores', 403);
     }
     try {
-        const trabalhador = await trabalhadorService.criar(req.body);
-        await logAction(req, 'CREATE', 'Trabalhador', trabalhador._id.toString(), trabalhador);
+        const trabalhador = await TrabalhadorService_js_1.default.criar(req.body);
+        await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'Trabalhador', trabalhador._id.toString(), trabalhador);
         res.status(201).json({
             status: 'success',
             data: { trabalhador },
@@ -96,16 +102,16 @@ export const createTrabalhador = asyncHandler(async (req, res) => {
  * @route   PUT /api/trabalhadores/:id
  * @access  Private/Admin/Saude
  */
-export const updateTrabalhador = asyncHandler(async (req, res) => {
+exports.updateTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     // Trabalhadores não podem atualizar nenhum perfil (apenas leitura de seus próprios dados)
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para atualizar dados de trabalhadores', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para atualizar dados de trabalhadores', 403);
     }
     const { id } = req.params;
-    const trabalhadorAntigo = await trabalhadorService.obter(id);
-    const trabalhadorNovo = await trabalhadorService.atualizar(id, req.body);
-    const mudancas = compararDados(trabalhadorAntigo, trabalhadorNovo);
-    await logAction(req, 'UPDATE', 'Trabalhador', id, mudancas);
+    const trabalhadorAntigo = await TrabalhadorService_js_1.default.obter(id);
+    const trabalhadorNovo = await TrabalhadorService_js_1.default.atualizar(id, req.body);
+    const mudancas = (0, auditLogger_js_1.compararDados)(trabalhadorAntigo, trabalhadorNovo);
+    await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'Trabalhador', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { trabalhador: trabalhadorNovo },
@@ -116,14 +122,14 @@ export const updateTrabalhador = asyncHandler(async (req, res) => {
  * @route   DELETE /api/trabalhadores/:id
  * @access  Private/Admin
  */
-export const deleteTrabalhador = asyncHandler(async (req, res) => {
+exports.deleteTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para deletar trabalhadores', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para deletar trabalhadores', 403);
     }
     const { id } = req.params;
-    const trabalhador = await trabalhadorService.obter(id);
-    await logAction(req, 'DELETE', 'Trabalhador', id, trabalhador);
-    await trabalhadorService.deletar(id);
+    const trabalhador = await TrabalhadorService_js_1.default.obter(id);
+    await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'Trabalhador', id, trabalhador);
+    await TrabalhadorService_js_1.default.deletar(id);
     res.status(204).json({
         status: 'success',
         data: null,

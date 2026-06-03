@@ -1,13 +1,18 @@
-import Acidente from '../models/Acidente.js';
-import Trabalhador from '../models/Trabalhador.js';
-import MaterialBiologico from '../models/MaterialBiologico.js';
-import { Parser } from 'json2csv';
-import pdfService from '../services/PdfService.js';
-import analyticsService from '../services/AnalyticsService.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Acidente_js_1 = __importDefault(require("../models/Acidente.js"));
+const Trabalhador_js_1 = __importDefault(require("../models/Trabalhador.js"));
+const MaterialBiologico_js_1 = __importDefault(require("../models/MaterialBiologico.js"));
+const json2csv_1 = require("json2csv");
+const PdfService_js_1 = __importDefault(require("../services/PdfService.js"));
+const AnalyticsService_js_1 = __importDefault(require("../services/AnalyticsService.js"));
 class ExportController {
     async exportarAcidentesCSV(req, res, next) {
         try {
-            const acidentes = await Acidente.find()
+            const acidentes = await Acidente_js_1.default.find()
                 .populate('trabalhadorId', 'nome cpf')
                 .lean();
             const fields = [
@@ -18,7 +23,7 @@ class ExportController {
                 { label: 'Tipo', value: 'tipoAcidente' },
                 { label: 'Status', value: 'status' }
             ];
-            const json2csv = new Parser({ fields });
+            const json2csv = new json2csv_1.Parser({ fields });
             const csv = json2csv.parse(acidentes);
             res.header('Content-Type', 'text/csv');
             res.attachment('acidentes_sispnaist.csv');
@@ -30,9 +35,9 @@ class ExportController {
     }
     async exportarTrabalhadoresCSV(req, res, next) {
         try {
-            const trabalhadores = await Trabalhador.find().lean();
+            const trabalhadores = await Trabalhador_js_1.default.find().lean();
             const fields = ['nome', 'cpf', 'email', 'dataNascimento', 'sexo', 'empresa', 'unidade'];
-            const json2csv = new Parser({ fields });
+            const json2csv = new json2csv_1.Parser({ fields });
             const csv = json2csv.parse(trabalhadores);
             res.header('Content-Type', 'text/csv');
             res.attachment('trabalhadores_sispnaist.csv');
@@ -44,7 +49,7 @@ class ExportController {
     }
     async exportarMaterialBiologicoCSV(req, res, next) {
         try {
-            const fichas = await MaterialBiologico.find()
+            const fichas = await MaterialBiologico_js_1.default.find()
                 .populate({
                 path: 'acidenteId',
                 populate: { path: 'trabalhadorId', select: 'nome cpf' }
@@ -61,7 +66,7 @@ class ExportController {
                 { label: 'Sorologia Acidentado', value: 'sorologiaAcidentado' },
                 { label: 'Data Reavaliação', value: 'dataReavaliacao' }
             ];
-            const json2csv = new Parser({ fields });
+            const json2csv = new json2csv_1.Parser({ fields });
             const csv = json2csv.parse(fichas);
             res.header('Content-Type', 'text/csv');
             res.attachment('material_biologico_sispnaist.csv');
@@ -87,7 +92,7 @@ class ExportController {
                 filtros.matricula = req.query.matricula;
             if (req.query.setor)
                 filtros['trabalho.setor'] = { $regex: req.query.setor, $options: 'i' };
-            await pdfService.gerarPdfTrabalhadores(res, filtros);
+            await PdfService_js_1.default.gerarPdfTrabalhadores(res, filtros);
         }
         catch (error) {
             next(error);
@@ -103,7 +108,7 @@ class ExportController {
                 filtros.status = req.query.status;
             if (req.query.tipo)
                 filtros.tipoAcidente = { $regex: req.query.tipo, $options: 'i' };
-            await pdfService.gerarPdfAcidentes(res, filtros);
+            await PdfService_js_1.default.gerarPdfAcidentes(res, filtros);
         }
         catch (error) {
             next(error);
@@ -117,7 +122,7 @@ class ExportController {
             const filtros = {};
             if (req.query.ativo !== undefined)
                 filtros.ativo = req.query.ativo === 'true';
-            await pdfService.gerarPdfDoencas(res, filtros);
+            await PdfService_js_1.default.gerarPdfDoencas(res, filtros);
         }
         catch (error) {
             next(error);
@@ -128,7 +133,7 @@ class ExportController {
      */
     async exportarVacinacoesPDF(req, res, next) {
         try {
-            await pdfService.gerarPdfVacinacoes(res, {});
+            await PdfService_js_1.default.gerarPdfVacinacoes(res, {});
         }
         catch (error) {
             next(error);
@@ -139,12 +144,12 @@ class ExportController {
      */
     async exportarMonitoramentoPDF(req, res, next) {
         try {
-            const monitoramento = await analyticsService.obterMonitoramentoClinico();
-            await pdfService.gerarPdfMonitoramento(res, monitoramento);
+            const monitoramento = await AnalyticsService_js_1.default.obterMonitoramentoClinico();
+            await PdfService_js_1.default.gerarPdfMonitoramento(res, monitoramento);
         }
         catch (error) {
             next(error);
         }
     }
 }
-export default new ExportController();
+exports.default = new ExportController();

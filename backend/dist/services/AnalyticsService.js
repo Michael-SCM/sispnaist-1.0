@@ -1,30 +1,92 @@
-import Acidente from '../models/Acidente.js';
-import Doenca from '../models/Doenca.js';
-import Vacinacao from '../models/Vacinacao.js';
-import Trabalhador from '../models/Trabalhador.js';
-import User from '../models/User.js';
-import mongoose from 'mongoose';
-export class AnalyticsService {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnalyticsService = void 0;
+const Acidente_js_1 = __importDefault(require("../models/Acidente.js"));
+const Doenca_js_1 = __importDefault(require("../models/Doenca.js"));
+const Vacinacao_js_1 = __importDefault(require("../models/Vacinacao.js"));
+const Trabalhador_js_1 = __importDefault(require("../models/Trabalhador.js"));
+const User_js_1 = __importDefault(require("../models/User.js"));
+const mongoose_1 = __importDefault(require("mongoose"));
+class AnalyticsService {
     /**
      * Obtém KPIs gerais do sistema
      */
     async obterKPIs() {
         const trintaDias = new Date();
         trintaDias.setDate(trintaDias.getDate() + 30);
-        const [totalAcidentes, acidentesAbertos, acidentesEmAnalise, acidentesFechados, totalTrabalhadores, totalDoencas, doencasAtivas, totalVacinacoes, proximasVacinacoes, trabalhadoresComVacina, acidentesComAfastamento] = await Promise.all([
-            Acidente.countDocuments(),
-            Acidente.countDocuments({ status: 'Aberto' }),
-            Acidente.countDocuments({ status: 'Em Análise' }),
-            Acidente.countDocuments({ status: 'Fechado' }),
-            Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' }),
-            Doenca.countDocuments(),
-            Doenca.countDocuments({ ativo: true }),
-            Vacinacao.countDocuments(),
-            Vacinacao.countDocuments({ proximoDose: { $lte: trintaDias } }),
-            Vacinacao.distinct('trabalhadorId'),
-            Acidente.aggregate([
-                { $match: { diasAfastamento: { $exists: true, $gt: 0 } } },
-                { $group: { _id: null, total: { $sum: '$diasAfastamento' } } }
+        const TrabalhadorAfastamento = (await Promise.resolve().then(() => __importStar(require('../models/TrabalhadorAfastamento.js')))).default;
+        const [totalAcidentes, acidentesAbertos, acidentesEmAnalise, acidentesFechados, totalTrabalhadores, totalDoencas, doencasAtivas, totalVacinacoes, proximasVacinacoes, trabalhadoresComVacina, absenteismoAgg] = await Promise.all([
+            Acidente_js_1.default.countDocuments(),
+            Acidente_js_1.default.countDocuments({ status: 'Aberto' }),
+            Acidente_js_1.default.countDocuments({ status: 'Em Análise' }),
+            Acidente_js_1.default.countDocuments({ status: 'Fechado' }),
+            Trabalhador_js_1.default.countDocuments({ 'vinculo.situacao': 'Ativo' }),
+            Doenca_js_1.default.countDocuments(),
+            Doenca_js_1.default.countDocuments({ ativo: true }),
+            Vacinacao_js_1.default.countDocuments(),
+            Vacinacao_js_1.default.countDocuments({ proximoDose: { $lte: trintaDias } }),
+            Vacinacao_js_1.default.distinct('trabalhadorId'),
+            TrabalhadorAfastamento.aggregate([
+                {
+                    $match: {
+                        dataInicio: { $exists: true, $ne: null },
+                        dataRetorno: { $exists: true, $ne: null }
+                    }
+                },
+                {
+                    $project: {
+                        diasAfastamento: {
+                            $ceil: {
+                                $divide: [
+                                    { $subtract: ['$dataRetorno', '$dataInicio'] },
+                                    1000 * 60 * 60 * 24
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        total: { $sum: '$diasAfastamento' }
+                    }
+                }
             ])
         ]);
         // Taxa de resolução (acidentes fechados / total * 100)
@@ -35,8 +97,8 @@ export class AnalyticsService {
         const coberturaVacinal = totalTrabalhadores > 0
             ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
             : 0;
-        // Total absenteísmo (dias de afastamento)
-        const totalAbsenteismo = acidentesComAfastamento[0]?.total || 0;
+        // Total absenteísmo (dias de afastamento) calculado a partir dos afastamentos reais
+        const totalAbsenteismo = absenteismoAgg[0]?.total || 0;
         return {
             totalAcidentes,
             acidentesAbertos,
@@ -60,7 +122,7 @@ export class AnalyticsService {
         seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
         // Executa as agregações em paralelo
         const [porTipoAgg, porStatusAgg, ultimosMesesAgg] = await Promise.all([
-            Acidente.aggregate([
+            Acidente_js_1.default.aggregate([
                 {
                     $group: {
                         _id: '$tipoAcidente',
@@ -69,7 +131,7 @@ export class AnalyticsService {
                 },
                 { $sort: { valor: -1 } },
             ]),
-            Acidente.aggregate([
+            Acidente_js_1.default.aggregate([
                 {
                     $group: {
                         _id: '$status',
@@ -78,7 +140,7 @@ export class AnalyticsService {
                 },
                 { $sort: { valor: -1 } },
             ]),
-            Acidente.aggregate([
+            Acidente_js_1.default.aggregate([
                 {
                     $match: {
                         dataAcidente: { $gte: seisMesesAtras },
@@ -134,7 +196,7 @@ export class AnalyticsService {
         const hoje = new Date();
         const limite = new Date();
         limite.setDate(limite.getDate() + dias);
-        const vacinacoesBrutas = await Vacinacao.find({
+        const vacinacoesBrutas = await Vacinacao_js_1.default.find({
             proximoDose: { $lte: limite },
         })
             .populate('trabalhadorId', 'nome cpf email empresa unidade')
@@ -143,21 +205,21 @@ export class AnalyticsService {
             .lean();
         const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao) => {
             if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
-                const doc = await Vacinacao.findById(vacinacao._id).select('trabalhadorId').lean();
+                const doc = await Vacinacao_js_1.default.findById(vacinacao._id).select('trabalhadorId').lean();
                 if (doc && doc.trabalhadorId) {
                     const identifier = doc.trabalhadorId.toString();
                     let t = null;
-                    if (mongoose.Types.ObjectId.isValid(identifier)) {
+                    if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
                         const [trabalhadorObj, userObj] = await Promise.all([
-                            Trabalhador.findById(identifier).select('nome cpf').lean(),
-                            User.findById(identifier).select('nome cpf').lean()
+                            Trabalhador_js_1.default.findById(identifier).select('nome cpf').lean(),
+                            User_js_1.default.findById(identifier).select('nome cpf').lean()
                         ]);
                         t = trabalhadorObj || userObj;
                     }
                     else {
                         const [trabalhadorObj, userObj] = await Promise.all([
-                            Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean(),
-                            User.findOne({ cpf: identifier }).select('nome cpf').lean()
+                            Trabalhador_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean(),
+                            User_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean()
                         ]);
                         t = trabalhadorObj || userObj;
                     }
@@ -188,28 +250,28 @@ export class AnalyticsService {
      * Obtém últimos acidentes registrados
      */
     async obterUltimosAcidentes(limit = 5) {
-        const acidentesBrutos = await Acidente.find()
+        const acidentesBrutos = await Acidente_js_1.default.find()
             .populate('trabalhadorId', 'nome cpf empresa unidade')
             .sort({ dataAcidente: -1 })
             .limit(limit)
             .lean();
         const acidentes = await Promise.all(acidentesBrutos.map(async (acidente) => {
             if (!acidente.trabalhadorId || typeof acidente.trabalhadorId === 'string' || !acidente.trabalhadorId.nome) {
-                const doc = await Acidente.findById(acidente._id).select('trabalhadorId').lean();
+                const doc = await Acidente_js_1.default.findById(acidente._id).select('trabalhadorId').lean();
                 if (doc && doc.trabalhadorId) {
                     const identifier = doc.trabalhadorId.toString();
                     let t = null;
-                    if (mongoose.Types.ObjectId.isValid(identifier)) {
+                    if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
                         const [trabalhadorObj, userObj] = await Promise.all([
-                            Trabalhador.findById(identifier).select('nome cpf').lean(),
-                            User.findById(identifier).select('nome cpf').lean()
+                            Trabalhador_js_1.default.findById(identifier).select('nome cpf').lean(),
+                            User_js_1.default.findById(identifier).select('nome cpf').lean()
                         ]);
                         t = trabalhadorObj || userObj;
                     }
                     else {
                         const [trabalhadorObj, userObj] = await Promise.all([
-                            Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean(),
-                            User.findOne({ cpf: identifier }).select('nome cpf').lean()
+                            Trabalhador_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean(),
+                            User_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean()
                         ]);
                         t = trabalhadorObj || userObj;
                     }
@@ -230,7 +292,7 @@ export class AnalyticsService {
             this.obterDadosAcidentes(),
             this.obterProximasVacinacoes(30),
             this.obterUltimosAcidentes(5),
-            Trabalhador.aggregate([
+            Trabalhador_js_1.default.aggregate([
                 { $match: { empresa: { $exists: true, $ne: null } } },
                 {
                     $lookup: {
@@ -272,9 +334,9 @@ export class AnalyticsService {
      * Obtém dados resumidos para dashboard do trabalhador
      */
     async obterDadosDashboardTrabalhador(trabalhadorId) {
-        const acidentes = await Acidente.countDocuments({ trabalhadorId });
-        const doencas = await Doenca.countDocuments({ trabalhadorId, ativo: true });
-        const vacinacoes = await Vacinacao.find({ trabalhadorId })
+        const acidentes = await Acidente_js_1.default.countDocuments({ trabalhadorId });
+        const doencas = await Doenca_js_1.default.countDocuments({ trabalhadorId, ativo: true });
+        const vacinacoes = await Vacinacao_js_1.default.find({ trabalhadorId })
             .sort({ proximoDose: 1 })
             .lean();
         const proximaVacinacao = vacinacoes.find((vac) => {
@@ -297,7 +359,7 @@ export class AnalyticsService {
             },
             proximaVacinacao: proximaVacinacao || null,
             vacinacaoVencida: vacinacaoVencida || null,
-            ultimosAcidentes: await Acidente.find({ trabalhadorId })
+            ultimosAcidentes: await Acidente_js_1.default.find({ trabalhadorId })
                 .sort({ dataAcidente: -1 })
                 .limit(3)
                 .lean(),
@@ -307,12 +369,12 @@ export class AnalyticsService {
      * Obtém dados detalhados de monitoramento clínico
      */
     async obterMonitoramentoClinico() {
-        const totalTrabalhadores = await Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' });
-        const trabalhadoresComVacina = await Vacinacao.distinct('trabalhadorId');
+        const totalTrabalhadores = await Trabalhador_js_1.default.countDocuments({ 'vinculo.situacao': 'Ativo' });
+        const trabalhadoresComVacina = await Vacinacao_js_1.default.distinct('trabalhadorId');
         // Alertas Críticos
         // Regra atual: trabalhadores com >= 2 acidentes
         // Ajuste: buscar nome na coleção 'trabalhadores' (não em 'users')
-        const trabalhadoresEmRisco = await Acidente.aggregate([
+        const trabalhadoresEmRisco = await Acidente_js_1.default.aggregate([
             {
                 $group: { _id: '$trabalhadorId', count: { $sum: 1 } },
             },
@@ -336,7 +398,7 @@ export class AnalyticsService {
         // Absenteísmo por mês
         // Ajuste: o campo diasAfastamento não existe no modelo 'Acidente'.
         // Então calculamos por afastamentos do trabalhador (TrabalhadorAfastamento), somando dias entre dataInicio e dataFim (ou dataRetorno).
-        const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
+        const TrabalhadorAfastamento = (await Promise.resolve().then(() => __importStar(require('../models/TrabalhadorAfastamento.js')))).default;
         const afastamentos = await TrabalhadorAfastamento.find({}).lean();
         const porMesMap = {};
         let totalDias = 0;
@@ -378,7 +440,7 @@ export class AnalyticsService {
         // Cobertura vacinal por empresa
         // Definição: percentual de trabalhadores ativos (vinculo.situacao === 'Ativo') que possuem pelo menos 1 registro em Vacinacao,
         // agrupado por empresa do Trabalhador.
-        const totalAtivosPorEmpresa = await Trabalhador.aggregate([
+        const totalAtivosPorEmpresa = await Trabalhador_js_1.default.aggregate([
             {
                 $match: {
                     'vinculo.situacao': 'Ativo',
@@ -408,7 +470,7 @@ export class AnalyticsService {
                 },
             },
         ]);
-        const ativosComVacinaPorEmpresa = await Vacinacao.aggregate([
+        const ativosComVacinaPorEmpresa = await Vacinacao_js_1.default.aggregate([
             {
                 $lookup: {
                     from: 'trabalhadores',
@@ -505,4 +567,5 @@ export class AnalyticsService {
         };
     }
 }
-export default new AnalyticsService();
+exports.AnalyticsService = AnalyticsService;
+exports.default = new AnalyticsService();

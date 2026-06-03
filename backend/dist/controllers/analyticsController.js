@@ -1,11 +1,17 @@
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import analyticsService from '../services/AnalyticsService.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.obterMonitoramento = exports.obterDashboardTrabalhador = exports.obterDashboardAdmin = exports.obterUltimosAcidentes = exports.obterProximasVacinacoes = exports.obterDadosAcidentes = exports.obterKPIs = void 0;
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const AnalyticsService_js_1 = __importDefault(require("../services/AnalyticsService.js"));
 /**
  * GET /api/analytics/kpis
  * Obtém KPIs gerais do sistema
  */
-export const obterKPIs = asyncHandler(async (req, res) => {
-    const kpis = await analyticsService.obterKPIs();
+exports.obterKPIs = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const kpis = await AnalyticsService_js_1.default.obterKPIs();
     res.status(200).json({
         status: 'success',
         data: { kpis },
@@ -15,8 +21,8 @@ export const obterKPIs = asyncHandler(async (req, res) => {
  * GET /api/analytics/acidentes
  * Obtém dados para gráficos de acidentes
  */
-export const obterDadosAcidentes = asyncHandler(async (req, res) => {
-    const dados = await analyticsService.obterDadosAcidentes();
+exports.obterDadosAcidentes = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const dados = await AnalyticsService_js_1.default.obterDadosAcidentes();
     res.status(200).json({
         status: 'success',
         data: { dados },
@@ -26,9 +32,9 @@ export const obterDadosAcidentes = asyncHandler(async (req, res) => {
  * GET /api/analytics/vacinacoes/proximas
  * Obtém próximas vacinações (vencidas ou próximas de vencer)
  */
-export const obterProximasVacinacoes = asyncHandler(async (req, res) => {
+exports.obterProximasVacinacoes = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const dias = parseInt(req.query.dias) || 30;
-    const vacinacoes = await analyticsService.obterProximasVacinacoes(dias);
+    const vacinacoes = await AnalyticsService_js_1.default.obterProximasVacinacoes(dias);
     res.status(200).json({
         status: 'success',
         data: { vacinacoes },
@@ -38,9 +44,9 @@ export const obterProximasVacinacoes = asyncHandler(async (req, res) => {
  * GET /api/analytics/acidentes/ultimos
  * Obtém últimos acidentes registrados
  */
-export const obterUltimosAcidentes = asyncHandler(async (req, res) => {
+exports.obterUltimosAcidentes = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
-    const acidentes = await analyticsService.obterUltimosAcidentes(limit);
+    const acidentes = await AnalyticsService_js_1.default.obterUltimosAcidentes(limit);
     res.status(200).json({
         status: 'success',
         data: { acidentes },
@@ -50,8 +56,8 @@ export const obterUltimosAcidentes = asyncHandler(async (req, res) => {
  * GET /api/analytics/dashboard
  * Obtém dados completos para dashboard admin
  */
-export const obterDashboardAdmin = asyncHandler(async (req, res) => {
-    const dados = await analyticsService.obterDadosDashboardAdmin();
+exports.obterDashboardAdmin = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const dados = await AnalyticsService_js_1.default.obterDadosDashboardAdmin();
     res.status(200).json({
         status: 'success',
         data: { dados },
@@ -61,7 +67,7 @@ export const obterDashboardAdmin = asyncHandler(async (req, res) => {
  * GET /api/analytics/dashboard/trabalhador
  * Obtém dados resumidos para dashboard do trabalhador
  */
-export const obterDashboardTrabalhador = asyncHandler(async (req, res) => {
+exports.obterDashboardTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const authReq = req;
     const trabalhadorId = authReq.user?.id;
     if (!trabalhadorId) {
@@ -70,7 +76,7 @@ export const obterDashboardTrabalhador = asyncHandler(async (req, res) => {
             message: 'Usuário não autenticado',
         });
     }
-    const dados = await analyticsService.obterDadosDashboardTrabalhador(trabalhadorId);
+    const dados = await AnalyticsService_js_1.default.obterDadosDashboardTrabalhador(trabalhadorId);
     res.status(200).json({
         status: 'success',
         data: { dados },
@@ -80,8 +86,8 @@ export const obterDashboardTrabalhador = asyncHandler(async (req, res) => {
  * GET /api/analytics/monitoramento
  * Obtém dados de inteligência em saúde e monitoramento clínico
  */
-export const obterMonitoramento = asyncHandler(async (req, res) => {
-    const monitoramento = await analyticsService.obterMonitoramentoClinico();
+exports.obterMonitoramento = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const monitoramento = await AnalyticsService_js_1.default.obterMonitoramentoClinico();
     res.status(200).json({
         status: 'success',
         data: { monitoramento },

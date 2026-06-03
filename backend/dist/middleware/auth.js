@@ -1,6 +1,12 @@
-import jwt from 'jsonwebtoken';
-import config from '../config/config.js';
-export const authMiddleware = (req, res, next) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminOuGestorMiddleware = exports.adminMiddleware = exports.authorize = exports.authMiddleware = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_js_1 = __importDefault(require("../config/config.js"));
+const authMiddleware = (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
@@ -8,7 +14,7 @@ export const authMiddleware = (req, res, next) => {
             res.status(401).json({ message: 'Token não fornecido' });
             return;
         }
-        const decoded = jwt.verify(token, config.jwtSecret);
+        const decoded = jsonwebtoken_1.default.verify(token, config_js_1.default.jwtSecret);
         if (typeof decoded === 'object' && decoded !== null) {
             req.user = {
                 id: decoded.id || '',
@@ -27,7 +33,8 @@ export const authMiddleware = (req, res, next) => {
         res.status(401).json({ message: 'Token inválido ou expirado' });
     }
 };
-export const authorize = (...roles) => {
+exports.authMiddleware = authMiddleware;
+const authorize = (...roles) => {
     return (req, res, next) => {
         if (!req.user) {
             res.status(401).json({ message: 'Não autenticado' });
@@ -40,14 +47,16 @@ export const authorize = (...roles) => {
         next();
     };
 };
-export const adminMiddleware = (req, res, next) => {
+exports.authorize = authorize;
+const adminMiddleware = (req, res, next) => {
     if (!req.user || req.user.perfil !== 'admin') {
         res.status(403).json({ message: 'Sem permissão de administrador' });
         return;
     }
     next();
 };
-export const adminOuGestorMiddleware = (req, res, next) => {
+exports.adminMiddleware = adminMiddleware;
+const adminOuGestorMiddleware = (req, res, next) => {
     console.log('[Auth] adminOuGestorMiddleware perfil recebido:', req.user?.perfil, 'user:', req.user?.id);
     if (!req.user || !['admin', 'gestor'].includes(req.user.perfil)) {
         res.status(403).json({ message: 'Sem permissão de administrador/gestor' });
@@ -55,3 +64,4 @@ export const adminOuGestorMiddleware = (req, res, next) => {
     }
     next();
 };
+exports.adminOuGestorMiddleware = adminOuGestorMiddleware;

@@ -1,11 +1,17 @@
-import AuditLog from '../models/AuditLog.js';
-export class AuditService {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuditService = void 0;
+const AuditLog_js_1 = __importDefault(require("../models/AuditLog.js"));
+class AuditService {
     /**
      * Registra uma ação no audit log
      */
     async registrar(data) {
         try {
-            await AuditLog.create(data);
+            await AuditLog_js_1.default.create(data);
         }
         catch (error) {
             console.error('Erro ao registrar audit log:', error);
@@ -36,8 +42,8 @@ export class AuditService {
                 query.createdAt.$lte = new Date(filtros.dataFim);
             }
         }
-        const total = await AuditLog.countDocuments(query);
-        const logs = await AuditLog.find(query)
+        const total = await AuditLog_js_1.default.countDocuments(query);
+        const logs = await AuditLog_js_1.default.find(query)
             .populate('usuarioId', 'nome email perfil')
             .sort({ createdAt: -1 })
             .skip(skip)
@@ -54,8 +60,8 @@ export class AuditService {
      * Obtém estatísticas de auditoria
      */
     async obterEstatisticas() {
-        const totalLogs = await AuditLog.countDocuments();
-        const porAcaoAgg = await AuditLog.aggregate([
+        const totalLogs = await AuditLog_js_1.default.countDocuments();
+        const porAcaoAgg = await AuditLog_js_1.default.aggregate([
             {
                 $group: {
                     _id: '$acao',
@@ -64,7 +70,7 @@ export class AuditService {
             },
             { $sort: { total: -1 } },
         ]);
-        const porEntidadeAgg = await AuditLog.aggregate([
+        const porEntidadeAgg = await AuditLog_js_1.default.aggregate([
             {
                 $group: {
                     _id: '$entidade',
@@ -73,7 +79,7 @@ export class AuditService {
             },
             { $sort: { total: -1 } },
         ]);
-        const ultimasAtividades = await AuditLog.find()
+        const ultimasAtividades = await AuditLog_js_1.default.find()
             .sort({ createdAt: -1 })
             .limit(10)
             .lean();
@@ -93,4 +99,5 @@ export class AuditService {
         };
     }
 }
-export default new AuditService();
+exports.AuditService = AuditService;
+exports.default = new AuditService();

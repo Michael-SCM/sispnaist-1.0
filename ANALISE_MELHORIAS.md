@@ -103,19 +103,7 @@ localStorage.setItem('user', JSON.stringify(user));
 
 
 
-### 6.4 `express-async-errors` importado mas errorHandler pode não capturar todos
 
-**Arquivo:** `backend/src/app.ts:2`
-
-```typescript
-import 'express-async-errors';
-```
-
-**Problema:** Esta biblioteca captura erros de rotas assíncronas, mas há também um `asyncHandler.ts` no middleware. Pode haver duplicação de funcionalidade ou inconsistência no tratamento de erros.
-
-**Solução:** Escolher uma abordagem: ou usar `express-async-errors` globalmente, ou usar `asyncHandler` por rota, mas não ambos.
-
----
 
 ## 7. Funcionalidades Faltantes / Melhorias
 

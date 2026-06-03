@@ -1,5 +1,12 @@
-import mongoose from 'mongoose';
-import Catalogo from '../models/Catalogo';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.seedCatalogos = seedCatalogos;
+const mongoose_1 = __importDefault(require("mongoose"));
+const database_js_1 = __importDefault(require("../config/database.js"));
+const Catalogo_1 = __importDefault(require("../models/Catalogo"));
 /**
  * Seeder para catálogos essenciais do sistema.
  * Dados baseados nas tabelas auxiliares do sistema PHP original.
@@ -424,13 +431,12 @@ const CATALOGO_DADOS = [
             { nome: 'Não se aplica', ordem: 100 },
         ] },
 ];
-export async function seedCatalogos() {
-    console.log('🌱 Iniciando seed de catálogos...');
+async function seedCatalogos() {
+    console.log('🌱 Verificando catálogos...');
     let criados = 0;
     let pulados = 0;
     try {
-        // Busca todos os catálogos existentes de uma vez
-        const existentes = await Catalogo.find({}, 'entidade nome').lean();
+        const existentes = await Catalogo_1.default.find({}, 'entidade nome').lean();
         const existenteSet = new Set(existentes.map(item => `${item.entidade}:${item.nome}`));
         const itensParaInserir = [];
         for (const catalogo of CATALOGO_DADOS) {
@@ -451,23 +457,28 @@ export async function seedCatalogos() {
             }
         }
         if (itensParaInserir.length > 0) {
-            await Catalogo.insertMany(itensParaInserir);
+            await Catalogo_1.default.insertMany(itensParaInserir);
         }
-        console.log(`✅ Seed concluído! ${criados} itens criados, ${pulados} pulados (já existiam).`);
+        if (criados > 0) {
+            console.log(`✅ Seed: ${criados} novos itens criados, ${pulados} já existentes.`);
+        }
+        else {
+            console.log(`⏭️  Seed: ${pulados} itens já existentes, nenhum novo para criar.`);
+        }
     }
     catch (error) {
         console.error('❌ Erro no seed de catálogos:', error);
     }
 }
-// Se executado diretamente (não importado como módulo)
-if (import.meta.url === `file://${process.argv[1]}`) {
-    import('../config/database').then(({ default: connectDB }) => {
-        connectDB().then(() => {
-            seedCatalogos().then(() => {
-                console.log('🚀 Seed finalizado. Fechando conexão...');
-                mongoose.connection.close();
-                process.exit(0);
-            });
+const path_1 = require("path");
+const process_1 = require("process");
+const isMainModule = process_1.argv[1] && (0, path_1.resolve)(process_1.argv[1]) === (0, path_1.resolve)(__filename);
+if (isMainModule) {
+    (0, database_js_1.default)().then(() => {
+        seedCatalogos().then(() => {
+            console.log('🚀 Seed de catálogos finalizado. Fechando conexão...');
+            mongoose_1.default.connection.close();
+            process.exit(0);
         });
     });
 }

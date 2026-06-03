@@ -1,66 +1,80 @@
-import express from 'express';
-import 'express-async-errors';
-import cors from 'cors';
-import helmet from 'helmet';
-import connectDB from './config/database.js';
-import authRoutes from './routes/auth.js';
-import acidentesRoutes from './routes/acidentes.js';
-import doencasRoutes from './routes/doencas.js';
-import vacinacoesRoutes from './routes/vacinacoes.js';
-import trabalhadoresRoutes from './routes/trabalhadores.js';
-import empresasRoutes from './routes/empresas.js';
-import unidadesRoutes from './routes/unidades.js';
-import usuariosRoutes from './routes/usuarios.js';
-import analyticsRoutes from './routes/analytics.js';
-import reportsRoutes from './routes/reports.js';
-import auditRoutes from './routes/audit.js';
-import catalogosRoutes from './routes/catalogos.js';
-import submodulosTrabalhadorRoutes from './routes/submodulosTrabalhador.js';
-import questionariosRoutes from './routes/questionarios.js';
-import uploadsRoutes from './routes/uploads.js';
-import emailsRoutes from './routes/emails.js';
-import parametrosRoutes from './routes/parametros.js';
-import preferenciasRoutes from './routes/preferencias.js';
-import servidoresRoutes from './routes/servidores.js';
-import videoAulasRoutes from './routes/videoAulas.js';
-import atosMunicipaisRoutes from './routes/atosMunicipais.js';
-import enderecosRoutes from './routes/enderecos.js';
-import exportRoutes from './routes/export.js';
-import materialBiologicoRoutes from './routes/materialBiologico.js';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import auditMiddleware from './middleware/auditMiddleware.js';
-import { seedCatalogos } from './utils/seedCatalogos.js';
-const app = express();
-// Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
-app.use(cors({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const helmet_1 = __importDefault(require("helmet"));
+const database_js_1 = __importDefault(require("./config/database.js"));
+const config_js_1 = __importDefault(require("./config/config.js"));
+const auth_js_1 = __importDefault(require("./routes/auth.js"));
+const acidentes_js_1 = __importDefault(require("./routes/acidentes.js"));
+const doencas_js_1 = __importDefault(require("./routes/doencas.js"));
+const vacinacoes_js_1 = __importDefault(require("./routes/vacinacoes.js"));
+const trabalhadores_js_1 = __importDefault(require("./routes/trabalhadores.js"));
+const empresas_js_1 = __importDefault(require("./routes/empresas.js"));
+const unidades_js_1 = __importDefault(require("./routes/unidades.js"));
+const usuarios_js_1 = __importDefault(require("./routes/usuarios.js"));
+const analytics_js_1 = __importDefault(require("./routes/analytics.js"));
+const reports_js_1 = __importDefault(require("./routes/reports.js"));
+const audit_js_1 = __importDefault(require("./routes/audit.js"));
+const catalogos_js_1 = __importDefault(require("./routes/catalogos.js"));
+const submodulosTrabalhador_js_1 = __importDefault(require("./routes/submodulosTrabalhador.js"));
+const questionarios_js_1 = __importDefault(require("./routes/questionarios.js"));
+const uploads_js_1 = __importDefault(require("./routes/uploads.js"));
+const emails_js_1 = __importDefault(require("./routes/emails.js"));
+const parametros_js_1 = __importDefault(require("./routes/parametros.js"));
+const preferencias_js_1 = __importDefault(require("./routes/preferencias.js"));
+const servidores_js_1 = __importDefault(require("./routes/servidores.js"));
+const videoAulas_js_1 = __importDefault(require("./routes/videoAulas.js"));
+const atosMunicipais_js_1 = __importDefault(require("./routes/atosMunicipais.js"));
+const enderecos_js_1 = __importDefault(require("./routes/enderecos.js"));
+const export_js_1 = __importDefault(require("./routes/export.js"));
+const materialBiologico_js_1 = __importDefault(require("./routes/materialBiologico.js"));
+const errorHandler_js_1 = require("./middleware/errorHandler.js");
+const seedCatalogos_js_1 = require("./utils/seedCatalogos.js");
+const app = (0, express_1.default)();
+// Middleware de CORS (usa lista configurável via CORS_ORIGIN no .env)
+app.use((0, cors_1.default)({
     origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:3000',
-            'http://localhost:5173',
-            'https://sispnaist-1-0.vercel.app'
-        ];
-        // Permitir se for um dos origens permitidas ou se for um subdomínio da vercel
-        if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+        if (!origin || config_js_1.default.corsOrigin.indexOf(origin) !== -1) {
             callback(null, true);
         }
         else {
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false);
         }
     },
     credentials: true,
 }));
 // Middleware de segurança
-app.use(helmet());
+app.use((0, helmet_1.default)({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:"],
+            fontSrc: ["'self'"],
+            frameSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
+            connectSrc: ["'self'"],
+            mediaSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'self'", "https://sispnaist-1-0.vercel.app", "http://localhost:5173"],
+        },
+    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 // Parser de requisições
-app.use(express.json({ limit: '10mb', strict: false }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-// Middleware de auditoria automática (registra todas as operações CREATE, UPDATE, DELETE)
-app.use('/api', auditMiddleware);
+app.use(express_1.default.json({ limit: '10mb', strict: false }));
+app.use(express_1.default.urlencoded({ limit: '10mb', extended: true }));
 // Conectar ao MongoDB e rodar seeds
-connectDB().then(() => {
-    // Executa o seed apenas se não estiver em ambiente de teste
+(0, database_js_1.default)().then(() => {
+    // Executa o seed apenas se o banco estiver vazio
     if (process.env.NODE_ENV !== 'test') {
-        seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
+        (0, seedCatalogos_js_1.seedCatalogos)();
     }
 });
 // Root route
@@ -193,32 +207,32 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/acidentes', acidentesRoutes);
-app.use('/api/doencas', doencasRoutes);
-app.use('/api/vacinacoes', vacinacoesRoutes);
-app.use('/api/trabalhadores', trabalhadoresRoutes);
-app.use('/api/empresas', empresasRoutes);
-app.use('/api/unidades', unidadesRoutes);
-app.use('/api/usuarios', usuariosRoutes);
-app.use('/api/analytics', analyticsRoutes);
-app.use('/api/reports', reportsRoutes);
-app.use('/api/audit', auditRoutes);
-app.use('/api/catalogos', catalogosRoutes);
-app.use('/api/trabalhadores', submodulosTrabalhadorRoutes);
-app.use('/api/questionarios', questionariosRoutes);
-app.use('/api/uploads', uploadsRoutes);
-app.use('/api/emails', emailsRoutes);
-app.use('/api/parametros', parametrosRoutes);
-app.use('/api/preferencias', preferenciasRoutes);
-app.use('/api/servidores', servidoresRoutes);
-app.use('/api/video-aulas', videoAulasRoutes);
-app.use('/api/atos-municipais', atosMunicipaisRoutes);
-app.use('/api/enderecos', enderecosRoutes);
-app.use('/api/export', exportRoutes);
-app.use('/api/material-biologico', materialBiologicoRoutes);
+app.use('/api/auth', auth_js_1.default);
+app.use('/api/acidentes', acidentes_js_1.default);
+app.use('/api/doencas', doencas_js_1.default);
+app.use('/api/vacinacoes', vacinacoes_js_1.default);
+app.use('/api/trabalhadores', trabalhadores_js_1.default);
+app.use('/api/empresas', empresas_js_1.default);
+app.use('/api/unidades', unidades_js_1.default);
+app.use('/api/usuarios', usuarios_js_1.default);
+app.use('/api/analytics', analytics_js_1.default);
+app.use('/api/reports', reports_js_1.default);
+app.use('/api/audit', audit_js_1.default);
+app.use('/api/catalogos', catalogos_js_1.default);
+app.use('/api/trabalhadores', submodulosTrabalhador_js_1.default);
+app.use('/api/questionarios', questionarios_js_1.default);
+app.use('/api/uploads', uploads_js_1.default);
+app.use('/api/emails', emails_js_1.default);
+app.use('/api/parametros', parametros_js_1.default);
+app.use('/api/preferencias', preferencias_js_1.default);
+app.use('/api/servidores', servidores_js_1.default);
+app.use('/api/video-aulas', videoAulas_js_1.default);
+app.use('/api/atos-municipais', atosMunicipais_js_1.default);
+app.use('/api/enderecos', enderecos_js_1.default);
+app.use('/api/export', export_js_1.default);
+app.use('/api/material-biologico', materialBiologico_js_1.default);
 // 404 handler
-app.use(notFoundHandler);
+app.use(errorHandler_js_1.notFoundHandler);
 // Error handler
-app.use(errorHandler);
-export default app;
+app.use(errorHandler_js_1.errorHandler);
+exports.default = app;

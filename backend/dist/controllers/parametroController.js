@@ -1,6 +1,11 @@
-import Parametro from '../models/Parametro';
-import { AppError } from '../middleware/errorHandler';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Parametro_1 = __importDefault(require("../models/Parametro"));
+const errorHandler_1 = require("../middleware/errorHandler");
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 class ParametroController {
     // GET /api/parametros - Listar todos os parâmetros
     async listar(req, res, next) {
@@ -14,8 +19,8 @@ class ParametroController {
             else if (ativo === 'false')
                 filtro.ativo = false;
             const [parametros, total] = await Promise.all([
-                Parametro.find(filtro).sort({ categoria: 1, chave: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
-                Parametro.countDocuments(filtro)
+                Parametro_1.default.find(filtro).sort({ categoria: 1, chave: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+                Parametro_1.default.countDocuments(filtro)
             ]);
             return res.status(200).json({
                 data: parametros,
@@ -33,9 +38,9 @@ class ParametroController {
     async obterPorChave(req, res, next) {
         try {
             const { chave } = req.params;
-            const parametro = await Parametro.findOne({ chave });
+            const parametro = await Parametro_1.default.findOne({ chave });
             if (!parametro) {
-                throw new AppError('Parâmetro não encontrado', 404);
+                throw new errorHandler_1.AppError('Parâmetro não encontrado', 404);
             }
             return res.status(200).json(parametro);
         }
@@ -47,9 +52,9 @@ class ParametroController {
     async obter(req, res, next) {
         try {
             const { id } = req.params;
-            const parametro = await Parametro.findById(id);
+            const parametro = await Parametro_1.default.findById(id);
             if (!parametro) {
-                throw new AppError('Parâmetro não encontrado', 404);
+                throw new errorHandler_1.AppError('Parâmetro não encontrado', 404);
             }
             return res.status(200).json(parametro);
         }
@@ -60,8 +65,8 @@ class ParametroController {
     // POST /api/parametros - Criar parâmetro
     async criar(req, res, next) {
         try {
-            const parametro = await Parametro.create(req.body);
-            await logAction(req, 'CREATE', 'Parametro', parametro._id.toString(), parametro);
+            const parametro = await Parametro_1.default.create(req.body);
+            await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'Parametro', parametro._id.toString(), parametro);
             return res.status(201).json(parametro);
         }
         catch (error) {
@@ -72,16 +77,16 @@ class ParametroController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
-            const parametroAntigo = await Parametro.findById(id);
+            const parametroAntigo = await Parametro_1.default.findById(id);
             if (!parametroAntigo) {
-                throw new AppError('Parâmetro não encontrado', 404);
+                throw new errorHandler_1.AppError('Parâmetro não encontrado', 404);
             }
-            const parametro = await Parametro.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+            const parametro = await Parametro_1.default.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!parametro) {
-                throw new AppError('Parâmetro não encontrado', 404);
+                throw new errorHandler_1.AppError('Parâmetro não encontrado', 404);
             }
-            const mudancas = compararDados(parametroAntigo, parametro);
-            await logAction(req, 'UPDATE', 'Parametro', id, mudancas);
+            const mudancas = (0, auditLogger_js_1.compararDados)(parametroAntigo, parametro);
+            await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'Parametro', id, mudancas);
             return res.status(200).json(parametro);
         }
         catch (error) {
@@ -92,12 +97,12 @@ class ParametroController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
-            const parametroAntigo = await Parametro.findById(id);
+            const parametroAntigo = await Parametro_1.default.findById(id);
             if (!parametroAntigo) {
-                throw new AppError('Parâmetro não encontrado', 404);
+                throw new errorHandler_1.AppError('Parâmetro não encontrado', 404);
             }
-            await Parametro.updateOne({ _id: id }, { ativo: false });
-            await logAction(req, 'DELETE', 'Parametro', id, parametroAntigo);
+            await Parametro_1.default.updateOne({ _id: id }, { ativo: false });
+            await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'Parametro', id, parametroAntigo);
             return res.status(204).send();
         }
         catch (error) {
@@ -105,4 +110,4 @@ class ParametroController {
         }
     }
 }
-export default new ParametroController();
+exports.default = new ParametroController();
