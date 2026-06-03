@@ -13,6 +13,7 @@ import { Home } from './pages/Home.js';
 import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
 import { ListaMaterialBiologico } from './pages/Acidentes/MaterialBiologico/ListaMaterialBiologico.js';
 import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoMaterialBiologico.js';
+import { VisualizarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/VisualizarMaterialBiologico.js';
 import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
 import { ListaDoencas, NovaDoenca, EditarDoenca, DetalhesDoenca } from './pages/Doencas/index.js';
 import { ListaVacinacoes, NovaVacinacao, EditarVacinacao, DetalhesVacinacao } from './pages/Vacinacoes/index.js';
@@ -106,6 +107,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <NovoMaterialBiologico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/acidentes/material-biologico/:id"
+          element={
+            <ProtectedRoute>
+              <VisualizarMaterialBiologico />
             </ProtectedRoute>
           }
         />

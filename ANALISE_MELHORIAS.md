@@ -111,11 +111,7 @@ localStorage.setItem('user', JSON.stringify(user));
 
 **Sugestão:** Implementar testes unitários para utilitários (validação CPF, JWT, email) e testes de integração para as principais rotas da API, usando um banco de dados de teste separado (MongoDB Memory Server).
 
-### 7.5 Sem paginação em listas de dados
 
-**Problema:** As rotas que listam trabalhadores, acidentes, etc. provavelmente retornam todos os registros de uma vez. Conforme a base de dados cresce, isso se torna insustentável — páginas lentas, consumo excessivo de memória, e eventualmente timeouts.
-
-**Sugestão:** Implementar paginação padronizada (`page`, `limit`, `total`, `totalPages`) em todas as rotas de listagem.
 
 ### 7.6 Sem logs estruturados (Winston/Pino)
 

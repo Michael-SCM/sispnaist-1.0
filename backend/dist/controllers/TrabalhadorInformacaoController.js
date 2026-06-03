@@ -11,8 +11,6 @@ class TrabalhadorInformacaoController {
     async listar(req, res, next) {
         try {
             const { id } = req.params;
-            const page = Math.max(1, parseInt(req.query.page) || 1);
-            const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
             // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
             if (req.user?.perfil === 'trabalhador') {
                 const trabalhador = await Trabalhador_1.default.findOne({ cpf: req.user.cpf });
@@ -20,14 +18,13 @@ class TrabalhadorInformacaoController {
                     throw new errorHandler_1.AppError('Sem permissão para acessar as informações deste trabalhador', 403);
                 }
             }
+            const page = Math.max(1, parseInt(req.query.page) || 1);
+            const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 100));
             const result = await TrabalhadorInformacaoService_1.default.listarPorTrabalhador(id, page, limit);
-            return res.status(200).json({
-                data: result.informacoes,
-                total: result.total,
-                page,
-                limit,
-                pages: result.pages,
-            });
+            res.setHeader('X-Total-Count', result.total.toString());
+            res.setHeader('X-Page', page.toString());
+            res.setHeader('X-Limit', limit.toString());
+            return res.status(200).json(result.informacoes);
         }
         catch (error) {
             next(error);
