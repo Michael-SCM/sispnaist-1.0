@@ -30,6 +30,9 @@ class SubmoduloTrabalhadorController {
     try {
       const { id, submodulo } = req.params;
       const { ativo } = req.query;
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10));
+      const skip = (page - 1) * limit;
 
       // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
       if ((req as any).user?.perfil === 'trabalhador') {
@@ -48,9 +51,18 @@ class SubmoduloTrabalhadorController {
       if (ativo === 'true') filtro.ativo = true;
       else if (ativo === 'false') filtro.ativo = false;
 
-      const itens = await Model.find(filtro).sort({ createdAt: -1 }).lean();
+      const [itens, total] = await Promise.all([
+        Model.find(filtro).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+        Model.countDocuments(filtro),
+      ]);
 
-      return res.status(200).json(itens);
+      return res.status(200).json({
+        data: itens,
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit),
+      });
     } catch (error) {
       next(error);
     }

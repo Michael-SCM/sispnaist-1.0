@@ -165,12 +165,18 @@ class VacinacaoService {
             throw new errorHandler_js_1.AppError('Vacinação não encontrada', 404);
         }
     }
-    async obterPorTrabalhador(trabalhadorId) {
+    async obterPorTrabalhador(trabalhadorId, page = 1, limit = 10) {
         const resolvedId = await this.resolverTrabalhadorId(trabalhadorId);
-        const vacinacoesBrutas = await Vacinacao_js_1.default.find({ trabalhadorId: resolvedId })
-            .populate('trabalhadorId', 'cpf nome email')
-            .sort({ dataVacinacao: -1 })
-            .lean();
+        const skip = (page - 1) * limit;
+        const [vacinacoesBrutas, total] = await Promise.all([
+            Vacinacao_js_1.default.find({ trabalhadorId: resolvedId })
+                .populate('trabalhadorId', 'cpf nome email')
+                .sort({ dataVacinacao: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Vacinacao_js_1.default.countDocuments({ trabalhadorId: resolvedId }),
+        ]);
         const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao) => {
             if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
                 const doc = await Vacinacao_js_1.default.findById(vacinacao._id).select('trabalhadorId').lean();
@@ -193,7 +199,8 @@ class VacinacaoService {
             }
             return vacinacao;
         }));
-        return vacinacoes;
+        const pages = Math.ceil(total / limit);
+        return { vacinacoes: vacinacoes, total, pages };
     }
     async obterEstatisticas() {
         const total = await Vacinacao_js_1.default.countDocuments();

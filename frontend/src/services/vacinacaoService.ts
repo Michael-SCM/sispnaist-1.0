@@ -51,11 +51,16 @@ export const vacinacaoService = {
     await api.delete(`/vacinacoes/${id}`);
   },
 
-  obterPorTrabalhador: async (trabalhadorId: string): Promise<{ vacinacoes: IVacinacao[] }> => {
-    const response = await api.get<{ data: { vacinacoes: IVacinacao[] } }>(
-      `/vacinacoes/trabalhador/${trabalhadorId}`
+  obterPorTrabalhador: async (
+    trabalhadorId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ListarVacinacoesResponse> => {
+    const response = await api.get<{ data: { vacinacoes: IVacinacao[]; paginacao: { page: number; limit: number; total: number; pages: number } } }>(
+      `/vacinacoes/trabalhador/${trabalhadorId}?page=${page}&limit=${limit}`
     );
-    return response.data.data;
+    const { vacinacoes, paginacao } = response.data.data;
+    return { vacinacoes, total: paginacao.total, pages: paginacao.pages };
   },
 
   obterEstatisticas: async (): Promise<EstatisticasResponse> => {

@@ -101,15 +101,7 @@ localStorage.setItem('user', JSON.stringify(user));
 
 
 
-
-
-### 7.3 Sem índice TTL para logs de auditoria
-
-**Problema:** Os logs de auditoria ficam acumulados no MongoDB sem nenhuma política de expiração. Com o tempo, a coleção `audit_logs` pode crescer indefinidamente, consumindo armazenamento e degradando performance de consultas.
-
-**Sugestão:** Adicionar um índice TTL (Time-To-Live) no campo `createdAt` da coleção `audit_logs` para expirar logs mais antigos que X dias (ex: 90 ou 180 dias).
-
-### 7.4 Sem testes (nem unitários, nem de integração)
+## 7.4 Sem testes (nem unitários, nem de integração)
 
 **Problema:** Zero testes em todo o projeto. Não há como garantir que:
 - Uma alteração não quebrou funcionalidades existentes

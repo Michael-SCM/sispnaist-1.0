@@ -95,6 +95,8 @@ exports.deletarVacinacao = (0, asyncHandler_js_1.asyncHandler)(async (req, res) 
 });
 exports.obterVacinacoesPorTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { trabalhadorId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
     if (req.user?.perfil === 'trabalhador') {
         const trabalhador = await Trabalhador_js_1.default.findOne({ cpf: req.user.cpf });
@@ -102,10 +104,18 @@ exports.obterVacinacoesPorTrabalhador = (0, asyncHandler_js_1.asyncHandler)(asyn
             throw new errorHandler_js_1.AppError('Sem permissão para acessar estes dados', 403);
         }
     }
-    const vacinacoes = await VacinacaoService_js_1.default.obterPorTrabalhador(trabalhadorId);
+    const result = await VacinacaoService_js_1.default.obterPorTrabalhador(trabalhadorId, page, limit);
     res.status(200).json({
         status: 'success',
-        data: { vacinacoes },
+        data: {
+            vacinacoes: result.vacinacoes,
+            paginacao: {
+                page,
+                limit,
+                total: result.total,
+                pages: result.pages,
+            },
+        },
     });
 });
 exports.obterEstatisticas = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
