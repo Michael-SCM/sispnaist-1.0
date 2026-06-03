@@ -432,17 +432,22 @@ const CATALOGO_DADOS: Array<{
 ];
 
 export async function seedCatalogos() {
-  console.log('🌱 Iniciando seed de catálogos...');
+  console.log('🌱 Verificando catálogos...');
 
   let criados = 0;
   let pulados = 0;
 
   try {
-    // Busca todos os catálogos existentes de uma vez
     const existentes = await Catalogo.find({}, 'entidade nome').lean();
     const existenteSet = new Set(existentes.map(item => `${item.entidade}:${item.nome}`));
 
-    const itensParaInserir = [];
+    const itensParaInserir: Array<{
+      entidade: string;
+      nome: string;
+      sigla?: string;
+      ordem: number;
+      ativo: boolean;
+    }> = [];
 
     for (const catalogo of CATALOGO_DADOS) {
       for (const item of catalogo.itens) {
@@ -467,7 +472,11 @@ export async function seedCatalogos() {
       await Catalogo.insertMany(itensParaInserir);
     }
 
-    console.log(`✅ Seed concluído! ${criados} itens criados, ${pulados} pulados (já existiam).`);
+    if (criados > 0) {
+      console.log(`✅ Seed: ${criados} novos itens criados, ${pulados} já existentes.`);
+    } else {
+      console.log(`⏭️  Seed: ${pulados} itens já existentes, nenhum novo para criar.`);
+    }
   } catch (error) {
     console.error('❌ Erro no seed de catálogos:', error);
   }

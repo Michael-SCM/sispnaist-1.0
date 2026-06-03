@@ -82,9 +82,9 @@ app.use('/api', auditMiddleware);
 
 // Conectar ao MongoDB e rodar seeds
 connectDB().then(() => {
-  // Executa o seed apenas se não estiver em ambiente de teste
+  // Executa o seed apenas se o banco estiver vazio
   if (process.env.NODE_ENV !== 'test') {
-    seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
+    seedCatalogos();
   }
 });
 
