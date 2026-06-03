@@ -93,7 +93,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/acidentes/material-biologico')}
+              onClick={() => {
+                const ac = getAcidente();
+                if (ac?._id) navigate(`/acidentes/${ac._id}`);
+                else navigate('/acidentes/material-biologico');
+              }}
               className="p-3 hover:bg-emerald-50 rounded-2xl transition-all text-emerald-600 active:scale-90"
             >
               <ArrowLeft size={24} />
