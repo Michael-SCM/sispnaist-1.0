@@ -110,17 +110,7 @@ export const EditarMaterialBiologico: React.FC = () => {
       await materialBiologicoService.atualizar(id, formData);
       toast.success('Ficha técnica atualizada com sucesso!');
 
-      // Navegar para detalhes do trabalhador vinculado ao acidente
-      const acidente = await acidenteService.obter(acidenteId);
-      const trabalhadorId = typeof acidente.trabalhadorId === 'object'
-        ? (acidente.trabalhadorId as any)._id
-        : acidente.trabalhadorId;
-
-      if (trabalhadorId) {
-        navigate(`/trabalhadores/${trabalhadorId}`);
-      } else {
-        navigate(`/acidentes/material-biologico/${id}`);
-      }
+      navigate(`/acidentes/${acidenteId}`);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Erro ao atualizar ficha técnica');
     } finally {
