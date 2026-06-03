@@ -33,16 +33,10 @@ import { seedCatalogos } from './utils/seedCatalogos.js';
 
 const app = express();
 
-// Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
+// Middleware de CORS (usa lista configurável via CORS_ORIGIN no .env)
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'https://sispnaist-1-0.vercel.app'
-    ];
-    // Permitir se for um dos origens permitidas ou se for um subdomínio da vercel
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+    if (!origin || config.corsOrigin.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

@@ -78,21 +78,7 @@ localStorage.setItem('user', JSON.stringify(user));
 
 **Solução:** Implementar validação de formulários no frontend (com React Hook Form + Zod/Yup, ou ao menos validação nativa HTML5) antes de enviar ao servidor.
 
-### 4.4 Tratamento de erro 401 redireciona sem aviso
 
-**Arquivo:** `frontend/src/services/api.ts:23-25`
-
-```typescript
-if (error.response?.status === 401) {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = '/login';
-}
-```
-
-**Problema:** Quando o token expira ou é inválido, o usuário é abruptamente redirecionado para `/login` sem nenhum aviso ou explicação. Todas as ações em andamento são perdidas. Além disso, `window.location.href` causa um hard reload, perdendo o estado da aplicação.
-
-**Solução:** Usar o roteador do React (`useNavigate()` ou `<Navigate>`) para redirecionamento suave, e exibir um toast/notificação explicando que a sessão expirou.
 
 ### 4.5 Retry cego em erros 5xx pode causar loops
 
@@ -102,39 +88,7 @@ if (error.response?.status === 401) {
 
 **Solução:** Implementar retry apenas para métodos idempotentes (GET, PUT, DELETE), ou usar um identificador de idempotência no header da requisição.
 
-### 4.6 Vite define `VITE_API_URL` em build time de forma duplicada
 
-**Arquivo:** `frontend/vite.config.ts:19-21`
-
-```typescript
-define: {
-  'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api'),
-},
-```
-
-**Problema:** O Vite já substitui `import.meta.env.VITE_API_URL` pelo valor do arquivo `.env` (que também tem o fallback para produção). Ao usar `define`, o valor é substituído **em tempo de compilação** e não pode ser sobrescrito por variáveis de ambiente no servidor (Vercel) durante o runtime. Além disso, se o valor no `.env` for diferente, haverá conflito.
-
-**Solução:** Remover a seção `define` do `vite.config.ts` e deixar que o Vite use o `.env` padrão. Configurar as env vars da Vercel no dashboard.
-
----
-
-## 5. Problemas de Integração/Deploy
-
-### 5.1 CORS hardcoded e incompleto para produção
-
-**Arquivo:** `backend/src/app.ts:38-53`
-
-```typescript
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'https://sispnaist-1-0.vercel.app'
-];
-```
-
-**Problema:** O CORS está hardcoded e não usa `config.corsOrigin`. Se o frontend for deployed em outro domínio (ex: preview da Vercel, ou domínio customizado), as requisições serão bloqueadas. Além disso, a verificação `origin.endsWith('.vercel.app')` é muito permissiva.
-
-**Solução:** Usar `config.corsOrigin` (definido via variável de ambiente) e validar cada origem explicitamente, ou usar uma lista configurável.
 
 ### 5.2 CI/CD sem testes reais e com verificação de secrets frágil
 

@@ -14,29 +14,27 @@ jobs:
         working-directory: backend
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Type check
         run: npm run build
 
-      - name: Run tests (if available)
-        run: npm test || echo "No tests configured"
+      - name: Run tests
+        run: npm test
+        continue-on-error: false
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend-dist
-          path: backend/dist/
+      - name: Vet dependencies
+        run: npm audit --production
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -45,17 +43,17 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Type check
         run: npm run type-check
@@ -63,32 +61,48 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-dist
-          path: frontend/dist/
+      - name: Vet dependencies
+        run: npm audit --production
 
   security-check:
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Scan for hardcoded secrets
+        uses: trufflesecurity/trufflehog@v3
         with:
-          node-version: '18'
+          extra_args: --only-verified
 
-      - name: Audit backend dependencies
-        run: cd backend && npm audit --production || true
-
-      - name: Audit frontend dependencies
-        run: cd frontend && npm audit --production || true
-
-      - name: Check for secrets
+      - name: Check for secrets in source code
         run: |
-          grep -r "password\|secret\|key" backend/.env* || true
-          grep -r "password\|secret\|key" frontend/.env* || true
-          echo "⚠️ Verify no secrets are hardcoded!"
+          echo "Scanning source code for potential secrets..."
+          ! grep -rnE '(password|secret|api[_-]?key|auth_token|JWT_SECRET)\s*[:=]\s*['"'"'"][^'"'"'"]+' backend/src frontend/src --include='*.ts' --include='*.tsx'
+        continue-on-error: true
+
+  deploy-backend:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-check]
+
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        shell: bash
+
+  deploy-frontend:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security-check]
+
+    steps:
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
