@@ -9,6 +9,18 @@ dns.setDefaultResultOrder('ipv4first');
 import { promisify } from 'util';
 const resolveMx = promisify(dns.resolveMx);
 
+// Transporter reutilizável (criado uma vez, usado em todas as chamadas)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: config.email.user || '',
+    pass: config.email.pass || '',
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
 /**
  * Valida em tempo real via DNS se o domínio do e-mail possui registros MX configurados
  * e está apto a receber mensagens.
@@ -128,16 +140,6 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
   }
 
   console.log('Tentando enviar e-mail via Gmail SMTP (Nodemailer)...');
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: config.email.user,
-      pass: config.email.pass,
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
 
   try {
     await transporter.sendMail({
@@ -250,16 +252,6 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   }
 
   console.log('Tentando enviar e-mail de verificação via Gmail SMTP (Nodemailer)...');
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: config.email.user,
-      pass: config.email.pass,
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
 
   try {
     await transporter.sendMail({

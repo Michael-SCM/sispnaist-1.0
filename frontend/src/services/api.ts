@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
 
@@ -29,7 +30,9 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      toast.error('Sessão expirada. Faça login novamente.');
+      setTimeout(() => { window.location.href = '/login'; }, 2500);
+      return Promise.reject(error);
     }
 
     // Tentar novamente em erros de rede ou 5xx (até 3 tentativas)

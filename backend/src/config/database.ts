@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
+import config from './config.js';
 
 const connectDB = async (): Promise<void> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sispatnaist';
+    const mongoUri = config.mongodbUri;
 
     // Mongoose v8: não aceita mais 'retryWrites' e 'w' como opções diretas.
     // Para Atlas, essas opções já estão incluídas na connection string por padrão.

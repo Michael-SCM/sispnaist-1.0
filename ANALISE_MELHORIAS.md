@@ -26,34 +26,6 @@
 
 
 
-### 3.3 Auditoria: middleware usa `_id` mas controllers usam `id`
-
-**Arquivo:** `backend/src/middleware/auditMiddleware.ts:109`
-```typescript
-const usuarioId = req.user?._id || 'system';
-```
-
-**Arquivo:** `backend/src/utils/auditLogger.ts:42`
-```typescript
-const usuarioId = req.user?.id || req.user?._id || 'system';
-```
-
-**Problema:** O middleware de auditoria (fallback) acessa `req.user._id`, enquanto o utilitário de auditoria tenta `req.user.id` primeiro, depois `_id`. O tipo `IAuthRequest` em `backend/src/types/index.ts` usa `req.user.id` (não `_id`), porque o `id` é adicionado pelo middleware de autenticação JWT. Isso significa que:
-- O middleware de auditoria **nunca encontra** `req.user._id` e sempre registra o usuário como `'system'`
-- Os logs de auditoria criados pelo middleware sempre terão `usuarioId: 'system'`, mesmo para usuários autenticados
-
-**Solução:** Padronizar o acesso ao ID do usuário. O middleware JWT adiciona `req.user.id` (baseado no `_id` do MongoDB). Usar `req.user?.id || req.user?._id || 'system'` em todos os lugares.
-
-### 3.4 Risco de duplicação de auditoria (middleware + controller)
-
-**Arquivo:** `backend/src/middleware/auditMiddleware.ts` + `backend/src/utils/auditLogger.ts`
-
-**Problema:** O middleware de auditoria é um fallback automático que intercepta todas as requisições e registra CREATE/UPDATE/DELETE. Os controllers também chamam `logAction()` para registrar auditoria com dados mais completos. A flag `auditLogged` (`req.auditLogged = true`) tenta evitar duplicação, mas:
-- Se o controller não definir `req.auditLogged = true` em todos os casos (erros, por exemplo), a duplicação acontece
-- Se o middleware registrar primeiro (em respostas bem-sucedidas) mas o controller também registrar, haverá dois logs
-- A lógica de "quem registra primeiro" é frágil e difícil de manter
-
-**Solução:** Simplificar para usar **apenas** os controllers chamando `logAction()`, ou **apenas** o middleware de auditoria. A abordagem híbrida atual é propensa a bugs.
 
 ### 3.5 Múltiplos `console.log` expondo dados sensíveis em produção
 
@@ -66,25 +38,7 @@ const usuarioId = req.user?.id || req.user?._id || 'system';
 
 **Solução:** Usar uma biblioteca de logging (Winston, Pino) com níveis configuráveis, ou ao menos guardar logs sensíveis com `if (process.env.NODE_ENV !== 'production')`.
 
-### 3.6 Nodemailer cria novo transporter a cada chamada
 
-**Arquivo:** `backend/src/utils/emailService.ts:131-140` e `253-262`
-
-**Problema:** `sendResetPasswordEmail()` e `sendVerificationEmail()` criam um novo `transporter` do Nodemailer **cada vez que são chamados**. Isso é ineficiente, pois cada instância precisa estabelecer uma nova conexão SMTP (handshake, autenticação). Em cenários com múltiplos envios, isso sobrecarrega desnecessariamente.
-
-**Solução:** Criar o transporter uma única vez, fora das funções, e reutilizá-lo em todas as chamadas.
-
-### 3.7 Conexão MongoDB não usa o URI da config
-
-**Arquivo:** `backend/src/config/database.ts:7`
-
-```typescript
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/sispatnaist';
-```
-
-**Problema:** O arquivo `config.ts` já carrega e processa `MONGODB_URI`, mas `database.ts` lê diretamente de `process.env.MONGODB_URI` em vez de importar `config.mongodbUri`. Isso é redundante e pode levar a inconsistências se a lógica de carregamento mudar no `config.ts`.
-
-**Solução:** Importar `config` de `../config/config.js` e usar `config.mongodbUri`.
 
 ### 3.8 Sem limite de tamanho para JSON bodies
 
@@ -100,18 +54,7 @@ app.use(express.json({ limit: '10mb', strict: false }));
 
 ---
 
-## 4. Problemas no Frontend
 
-### 4.1 CSS duplicado no globals.css
-
-**Arquivo:** `frontend/src/styles/globals.css:21-45 e 47-71`
-
-**Problema:** O bloco `@layer components` com as classes `.btn`, `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.label` aparece **duas vezes** no arquivo, exatamente idêntico. Isso não causa erro de compilação, mas:
-- Aumenta o tamanho do CSS final desnecessariamente
-- Pode causar conflitos de especificidade ou comportamento inesperado
-- Indica uma falha de edição (CTRL+C / CTRL+V sem limpeza)
-
-**Solução:** Remover o bloco duplicado (linhas 47-71).
 
 ### 4.2 Token armazenado em localStorage sem proteção contra XSS
 
