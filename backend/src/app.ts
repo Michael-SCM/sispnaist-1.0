@@ -39,7 +39,7 @@ app.use(cors({
     if (!origin || config.corsOrigin.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true,

@@ -89,26 +89,6 @@ localStorage.setItem('user', JSON.stringify(user));
 **Solução:** Implementar retry apenas para métodos idempotentes (GET, PUT, DELETE), ou usar um identificador de idempotência no header da requisição.
 
 
-
-### 5.3 Backend não tem test suite
-
-**Arquivo:** `backend/package.json:10`
-```json
-"test": "jest"
-```
-
-**Problema:** Jest está listado, mas não há configuração do Jest (jest.config.js), nem testes escritos. O comando `npm test` vai falhar ou executar zero testes. O pipeline de CI considera isso como sucesso (`|| echo "No tests configured"`).
-
-**Solução:** Adicionar configuração Jest e testes para modelos, rotas (integração) e utilitários.
-
-### 5.4 `netlify.toml` desnecessário
-
-**Arquivo:** `frontend/netlify.toml`
-
-**Problema:** Este arquivo indica configuração para deploy na Netlify, mas o frontend está na Vercel. Pode ser uma sobra de configuração anterior que causa confusão.
-
-**Solução:** Remover se não for mais utilizado, ou documentar seu propósito.
-
 ---
 
 ## 6. Problemas de Código e Boas Práticas
@@ -119,26 +99,9 @@ localStorage.setItem('user', JSON.stringify(user));
 
 **Solução:** Padronizar todos os imports para usar `.js` (padrão para ESM/TypeScript com `"type": "module"`) ou remover a extensão se CommonJS.
 
-### 6.2 Variável de ambiente `MONGODB_URI` com nome do banco errado
 
-**Arquivo:** `backend/src/config/config.ts:8`
-```typescript
-mongodbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/sispatnaist'
-```
 
-O nome do banco no fallback é **sispatnaist** (sem o segundo 'S'), enquanto o projeto chama-se **sispnaist**. Apenas um detalhe cosmético no fallback local, mas que pode causar confusão.
 
-### 6.3 CORS error handler em app.ts pode retornar 500 genérico
-
-**Arquivo:** `backend/src/app.ts:48-49`
-
-```typescript
-callback(new Error('Not allowed by CORS'));
-```
-
-**Problema:** Quando o CORS rejeita uma origem, o Express retorna um erro 500 (Internal Server Error) genérico, quando o correto seria 403 (Forbidden). Além disso, o erro não é tratado pelo errorHandler da aplicação de forma elegante.
-
-**Solução:** Usar `callback(null, false)` para rejeitar com 403, ou tratar o erro no errorHandler para retornar uma mensagem amigável.
 
 ### 6.4 `express-async-errors` importado mas errorHandler pode não capturar todos
 
