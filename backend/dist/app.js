@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const database_js_1 = __importDefault(require("./config/database.js"));
 const config_js_1 = __importDefault(require("./config/config.js"));
 const auth_js_1 = __importDefault(require("./routes/auth.js"));
@@ -70,6 +71,28 @@ app.use((0, helmet_1.default)({
 // Parser de requisições
 app.use(express_1.default.json({ limit: '10mb', strict: false }));
 app.use(express_1.default.urlencoded({ limit: '10mb', extended: true }));
+// Rate limiting global
+const apiLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000,
+    max: 200,
+    message: { status: 'error', message: 'Muitas requisições. Tente novamente em 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+const writeLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+    message: { status: 'error', message: 'Muitas requisições de escrita. Tente novamente em 15 minutos.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api', apiLimiter);
+app.use('/api', (req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+        return writeLimiter(req, res, next);
+    }
+    next();
+});
 // Conectar ao MongoDB e rodar seeds
 (0, database_js_1.default)().then(() => {
     // Executa o seed apenas se o banco estiver vazio

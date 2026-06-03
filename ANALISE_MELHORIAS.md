@@ -103,24 +103,6 @@ localStorage.setItem('user', JSON.stringify(user));
 
 
 
-
-
-## 7. Funcionalidades Faltantes / Melhorias
-
-### 7.1 Sem refresh token
-
-**Problema:** O JWT tem duração de 12h (`JWT_EXPIRE`). Quando expira, o usuário é forçado a fazer login novamente. Não há mecanismo de refresh token para renovar a sessão silenciosamente. Isso impacta negativamente a experiência do usuário.
-
-**Sugestão:** Implementar refresh token (token de longa duração armazenado em cookie httpOnly) para renovar o access token automaticamente.
-
-### 7.2 Sem rate limiting na maioria das rotas
-
-**Arquivo:** `backend/src/routes/auth.ts` (provavelmente)
-
-**Problema:** Apenas as rotas de autenticação (register, login, forgot-password, verify-email) parecem ter rate limiting. O resto da API não tem proteção contra abuso. Um atacante pode fazer milhares de requisições para rotas como GET /api/trabalhadores ou POST /api/acidentes sem restrição.
-
-**Sugestão:** Aplicar rate limiting global com limites mais generosos (ex: 100 req/min), e limites mais restritivos para operações de escrita (CRUD).
-
 ### 7.3 Sem índice TTL para logs de auditoria
 
 **Problema:** Os logs de auditoria ficam acumulados no MongoDB sem nenhuma política de expiração. Com o tempo, a coleção `audit_logs` pode crescer indefinidamente, consumindo armazenamento e degradando performance de consultas.
