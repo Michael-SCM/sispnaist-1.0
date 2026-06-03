@@ -30,9 +30,11 @@ export const Register: React.FC = () => {
     confirmarSenha: '',
   });
   const [isLoading, setIsLoading] = React.useState(false);
+  const [senhaError, setSenhaError] = React.useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSenhaError('');
 
     if (values.senha !== values.confirmarSenha) {
       toast.error('As senhas não coincidem');
@@ -54,9 +56,13 @@ export const Register: React.FC = () => {
       toast.success(response.message || 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar sua conta.');
       navigate('/login');
       reset();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao fazer cadastro';
-      toast.error(message);
+    } catch (error: any) {
+      const message = error.response?.data?.message || error.message || 'Erro ao fazer cadastro';
+      if (message.includes('senha:') || message.includes('Senha deve') || message.includes('senha deve')) {
+        setSenhaError(message.replace(/^senha:\s*/i, ''));
+      } else {
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -134,11 +140,15 @@ export const Register: React.FC = () => {
               type="password"
               name="senha"
               value={values.senha}
-              onChange={handleChange}
+              onChange={(e) => { setSenhaError(''); handleChange(e); }}
               onBlur={handleBlur}
-              className="input"
+              className={`input${senhaError ? ' border-red-500' : ''}`}
               required
             />
+            {senhaError && <p className="text-red-500 text-xs mt-1">{senhaError}</p>}
+            <p className="text-gray-400 text-xs mt-1">
+              Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial
+            </p>
           </div>
 
           <div>
