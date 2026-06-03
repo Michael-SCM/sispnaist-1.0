@@ -20,36 +20,9 @@
 
 ---
 
-## 1. Problemas de Segurança (Críticos)
 
-### 1.1 JWT_SECRET — servidor aceita iniciar sem ela configurada (falta fail-fast)
 
-**Arquivo:** `backend/src/config/config.ts:9`
 
-```typescript
-jwtSecret: process.env.JWT_SECRET || 'your-secret-key-here'
-```
-
-> ✅ **Nota:** A variável `JWT_SECRET` já está configurada no Render com uma senha real. Em produção este não é um problema ativo.
-
-**Problema:** O fallback `'your-secret-key-here'` é uma string pública e conhecida. Se amanhã a env var for removida ou renomeada acidentalmente no Render, ou se um novo desenvolvedor clonar o projeto e rodar local sem `.env`, o servidor vai aceitar a chave pública **sem dar nenhum aviso** — qualquer pessoa pode forjar JWTs válidos.
-
-**Solução:** Remover o fallback inseguro e fazer o servidor **falhar ao iniciar** (`process.exit(1)`) se `JWT_SECRET` não estiver definida. Criar uma função `validateConfig()` que verifica todas as variáveis obrigatórias no startup.
-
-### 1.2 Content Security Policy (CSP) desabilitado
-
-**Arquivo:** `backend/src/app.ts:57`
-
-```typescript
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-}));
-```
-
-**Problema:** O CSP foi completamente desabilitado, o que reduz a proteção contra ataques de XSS (Cross-Site Scripting). Embora possa ser necessário para carregar recursos de múltiplas origens, a abordagem correta seria configurar uma política CSP adequada, não desabilitá-la totalmente.
-
-**Solução:** Configurar uma política CSP que reflita as necessidades reais do projeto (por exemplo, permitindo carregar recursos do próprio domínio, da Vercel, e de serviços específicos como YouTube para vídeos).
 
 ### 1.3 Senha sem requisitos de complexidade
 

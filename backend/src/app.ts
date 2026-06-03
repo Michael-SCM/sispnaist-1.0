@@ -54,7 +54,22 @@ app.use(cors({
 
 // Middleware de segurança
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      fontSrc: ["'self'"],
+      frameSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
+      connectSrc: ["'self'"],
+      mediaSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'", "https://sispnaist-1-0.vercel.app", "http://localhost:5173"],
+    },
+  },
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
