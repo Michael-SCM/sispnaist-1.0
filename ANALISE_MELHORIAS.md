@@ -90,17 +90,6 @@ localStorage.setItem('user', JSON.stringify(user));
 
 
 
-### 5.2 CI/CD sem testes reais e com verificação de secrets frágil
-
-**Arquivo:** `.github/workflows/ci-cd.yml`
-
-**Problema:**
-1. O comando `npm test` tem `|| echo "No tests configured"`, ou seja, testes podem falhar que o pipeline continua (falso positivo)
-2. A verificação de secrets usa `grep -r "password\|secret\|key" backend/.env* || true` — além de ser frágil, o `|| true` ignora qualquer match encontrado
-3. Não há deploy automático para Vercel nem Render no pipeline
-
-**Solução:** Implementar testes reais de backend, remover o `|| true` dos testes, implementar deploy automático via GitHub Actions para Vercel e Render, e melhorar a verificação de secrets.
-
 ### 5.3 Backend não tem test suite
 
 **Arquivo:** `backend/package.json:10`
