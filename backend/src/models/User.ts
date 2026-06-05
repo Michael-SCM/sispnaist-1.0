@@ -87,7 +87,6 @@ const UserSchema = new Schema<IUserDocument>(
     verificationTokenExpires: {
       type: Date,
       select: false,
-      index: { expires: 0 }, // Índice TTL: o MongoDB exclui a conta automaticamente se passar de 24h sem verificação
     },
     refreshToken: {
       type: String,
@@ -106,6 +105,13 @@ const UserSchema = new Schema<IUserDocument>(
 
 UserSchema.index({ nome: 1 });
 UserSchema.index({ perfil: 1 });
+UserSchema.index(
+  { dataCriacao: 1 },
+  {
+    expireAfterSeconds: 30 * 24 * 60 * 60,
+    partialFilterExpression: { isVerified: false },
+  }
+);
 
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
