@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from '../hooks/useForm.js';
 import { authService } from '../services/authService.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -87,21 +87,21 @@ export const Login: React.FC = () => {
           </button>
 
           <div className="text-center">
-            <a 
-              href="/forgot-password" 
+            <Link 
+              to="/forgot-password" 
               className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
             >
               Esqueci a senha
-            </a>
+            </Link>
           </div>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Não tem conta?{' '}
-            <a href="/register" className="text-blue-600 hover:underline">
+            <Link to="/register" className="text-blue-600 hover:underline">
               Cadastre-se aqui
-            </a>
+            </Link>
           </p>
         </div>
       </div>

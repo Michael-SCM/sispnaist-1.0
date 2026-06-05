@@ -58,8 +58,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     status: 'success',
     data: {
       user,
-      token: accessToken,
-      refreshToken,
     },
   });
 });
@@ -130,7 +128,7 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
 
   res.status(200).json({
     status: 'success',
-    data: tokens,
+    message: 'Token renovado com sucesso',
   });
 });
 

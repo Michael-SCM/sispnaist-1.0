@@ -3,6 +3,8 @@ import api from '../services/api.js';
 import { useAuthStore } from '../store/authStore.js';
 
 export const HealthCheck: React.FC = () => {
+  if (!import.meta.env.DEV) return null;
+
   const { isAuthenticated } = useAuthStore();
   const [status, setStatus] = useState<{
     frontend: boolean;
