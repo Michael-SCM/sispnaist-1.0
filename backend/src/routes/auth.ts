@@ -15,6 +15,14 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const refreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { status: 'error', message: 'Muitas requisições de renovação de token. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 router.post(
   '/register',
   authLimiter,
@@ -47,6 +55,7 @@ router.post(
 
 router.post(
   '/reset-password',
+  authLimiter,
   validateRequest(resetPasswordSchema),
   authController.resetPassword
 );
@@ -58,7 +67,7 @@ router.post(
   authController.verifyEmail
 );
 
-router.post('/refresh-token', authController.refreshToken);
+router.post('/refresh-token', refreshLimiter, authController.refreshToken);
 router.post('/logout', authMiddleware, authController.logout);
 
 export default router;
