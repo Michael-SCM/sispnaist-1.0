@@ -26,8 +26,14 @@ const setAuthCookies = (res: Response, token: string, refreshToken?: string) => 
 };
 
 const clearAuthCookies = (res: Response) => {
-  res.clearCookie('token', { path: '/' });
-  res.clearCookie('refreshToken', { path: '/' });
+  const cookieOptions = {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: config.nodeEnv === 'production' ? 'none' as const : 'lax' as const,
+    path: '/',
+  };
+  res.clearCookie('token', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
 };
 
 export const register = asyncHandler(async (req: Request, res: Response) => {

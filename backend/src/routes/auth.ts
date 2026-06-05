@@ -68,6 +68,6 @@ router.post(
 );
 
 router.post('/refresh-token', refreshLimiter, authController.refreshToken);
-router.post('/logout', authMiddleware, authController.logout);
+router.post('/logout', authController.logout);
 
 export default router;
