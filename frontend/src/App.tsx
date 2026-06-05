@@ -81,11 +81,20 @@ const ItensCatalogo = React.lazy(() => import('./pages/Admin/Catalogos/ItensCata
 const Auditoria = React.lazy(() => import('./pages/Admin/Auditoria.js'));
 
 const App: React.FC = () => {
+  const [appReady, setAppReady] = React.useState(false);
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
   React.useEffect(() => {
-    initializeAuth();
+    const init = async () => {
+      await initializeAuth();
+      setAppReady(true);
+    };
+    init();
   }, [initializeAuth]);
+
+  if (!appReady) {
+    return <LoadingFallback />;
+  }
 
   return (
     <Router>

@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 
@@ -6,22 +5,13 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
   adminOnly?: boolean;
+  authorize?: string[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, adminOnly }) => {
-  const { isAuthenticated, user, loading, initializeAuth } = useAuthStore();
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, adminOnly, authorize }) => {
+  const { isAuthenticated, user, loading } = useAuthStore();
 
-  const [bootstrapped, setBootstrapped] = React.useState(false);
-
-  useEffect(() => {
-    const init = async () => {
-      await initializeAuth();
-      setBootstrapped(true);
-    };
-    init();
-  }, [initializeAuth]);
-
-  if (!bootstrapped || loading) {
+  if (loading) {
     return null;
   }
 
@@ -34,6 +24,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
   }
 
   if (requiredRole && user?.perfil !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (authorize && user?.perfil && !authorize.includes(user.perfil)) {
     return <Navigate to="/dashboard" replace />;
   }
 
