@@ -2,6 +2,33 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import authService from '../services/AuthService.js';
 import { IAuthRequest } from '../middleware/auth.js';
+import config from '../config/config.js';
+
+const setAuthCookies = (res: Response, token: string, refreshToken?: string) => {
+  const cookieOptions = {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: config.nodeEnv === 'production' ? 'none' as const : 'lax' as const,
+    path: '/',
+  };
+
+  res.cookie('token', token, {
+    ...cookieOptions,
+    maxAge: 15 * 60 * 1000, // 15 min
+  });
+
+  if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+    });
+  }
+};
+
+const clearAuthCookies = (res: Response) => {
+  res.clearCookie('token', { path: '/' });
+  res.clearCookie('refreshToken', { path: '/' });
+};
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user } = await authService.register(req.body);
@@ -18,6 +45,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, senha } = req.body;
   const { user, accessToken, refreshToken } = await authService.login(email, senha);
+
+  setAuthCookies(res, accessToken, refreshToken);
 
   res.status(200).json({
     status: 'success',
@@ -61,7 +90,6 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
   const { email, dataNascimento } = req.body;
   const resetToken = await authService.forgotPassword(email, dataNascimento);
 
-  // Em desenvolvimento, logar o link para facilitar testes locais
   if (process.env.NODE_ENV !== 'production') {
     console.log(`\n=== LINK DE RECUPERAÇÃO DE SENHA (DESENVOLVIMENTO) ===`);
     console.log(`http://localhost:5173/reset-password?token=${resetToken}`);
@@ -85,13 +113,14 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
-  const { refreshToken: token } = req.body;
+  const token = req.body.refreshToken || req.cookies?.refreshToken;
   if (!token) {
     res.status(400).json({ status: 'error', message: 'Refresh token é obrigatório' });
     return;
   }
 
   const tokens = await authService.refreshToken(token);
+  setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
   res.status(200).json({
     status: 'success',
@@ -103,6 +132,8 @@ export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user) {
     await authService.logout(req.user.id);
   }
+
+  clearAuthCookies(res);
 
   res.status(200).json({
     status: 'success',

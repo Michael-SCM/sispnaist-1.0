@@ -9,21 +9,25 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole, adminOnly }) => {
-  const { isAuthenticated, user, initializeAuth } = useAuthStore();
+  const { isAuthenticated, user, loading, initializeAuth } = useAuthStore();
 
   const [bootstrapped, setBootstrapped] = React.useState(false);
 
   useEffect(() => {
-    // Ao recarregar, initializeAuth() precisa rodar antes de decidir pelo redirect.
-    initializeAuth();
-    setBootstrapped(true);
+    const init = async () => {
+      await initializeAuth();
+      setBootstrapped(true);
+    };
+    init();
   }, [initializeAuth]);
 
-  if (!bootstrapped || !isAuthenticated) {
-    // Evita redirect imediato no primeiro render após refresh.
+  if (!bootstrapped || loading) {
     return null;
   }
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (adminOnly && user?.perfil !== 'admin') {
     return <Navigate to="/dashboard" replace />;
@@ -35,4 +39,3 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
 
   return <>{children}</>;
 };
-

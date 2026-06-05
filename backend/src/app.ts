@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import connectDB from './config/database.js';
 import config from './config/config.js';
 import authRoutes from './routes/auth.js';
@@ -69,6 +70,7 @@ app.use(helmet({
 // Parser de requisições
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(cookieParser());
 
 // Rate limiting global
 const apiLimiter = rateLimit({

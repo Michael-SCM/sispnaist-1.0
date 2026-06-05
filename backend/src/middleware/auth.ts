@@ -13,10 +13,9 @@ export interface IAuthRequest extends Request {
 
 export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunction): void => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
 
     if (!token) {
-      console.log('[Auth] token não fornecido - header authorization vazio');
       res.status(401).json({ message: 'Token não fornecido' });
       return;
     }

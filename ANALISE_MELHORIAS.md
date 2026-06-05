@@ -27,16 +27,7 @@
 
 
 
-### 3.5 Múltiplos `console.log` expondo dados sensíveis em produção
 
-**Arquivos diversos do backend**
-
-**Problema:** Diversos `console.log` no backend registram dados de requisições, corpos de requisições, e detalhes de erros em produção. Isso pode expor informações sensíveis nos logs do Render. Exemplos:
-- Logging de corpo de requisição em validações
-- Dados de erro de API de email (Brevo/Resend) com detalhes da resposta
-- `[AUDIT]` e `[AUDIT-FALLBACK]` com dados de operações
-
-**Solução:** Usar uma biblioteca de logging (Winston, Pino) com níveis configuráveis, ou ao menos guardar logs sensíveis com `if (process.env.NODE_ENV !== 'production')`.
 
 
 
@@ -56,18 +47,7 @@ app.use(express.json({ limit: '10mb', strict: false }));
 
 
 
-### 4.2 Token armazenado em localStorage sem proteção contra XSS
 
-**Arquivo:** `frontend/src/store/authStore.ts`
-
-```typescript
-localStorage.setItem('token', token);
-localStorage.setItem('user', JSON.stringify(user));
-```
-
-**Problema:** O token JWT e os dados do usuário são armazenados em `localStorage`, que é acessível por qualquer JavaScript executado na mesma origem. Se houver qualquer vulnerabilidade XSS no frontend (mesmo que pequena), o token pode ser roubado. A alternativa `httpOnly cookie` é mais segura porque não é acessível via JavaScript.
-
-**Solução:** Migrar para armazenamento de token em cookie `httpOnly` (o que exige mudanças no backend para definir o cookie no login), ou ao menos implementar medidas mitigatórias como renovação periódica de token.
 
 ### 4.3 Sem validação de formulários no frontend (apenas Joi no backend)
 

@@ -1,68 +1,56 @@
 import { create } from 'zustand';
 import { IUser } from '../types';
+import api from '../services/api';
 
 interface AuthStore {
   user: IUser | null;
   token: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  loading: boolean;
   setUser: (user: IUser | null) => void;
   setToken: (token: string | null) => void;
   setRefreshToken: (refreshToken: string | null) => void;
   setAuth: (user: IUser, token: string, refreshToken?: string) => void;
   clearAuth: () => void;
-  initializeAuth: () => void;
+  initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   token: null,
   refreshToken: null,
   isAuthenticated: false,
+  loading: true,
 
   setUser: (user) => {
     set({ user, isAuthenticated: !!user });
-    if (user) localStorage.setItem('user', JSON.stringify(user));
-    else localStorage.removeItem('user');
   },
 
   setToken: (token) => {
     set({ token, isAuthenticated: !!token });
-    if (token) localStorage.setItem('token', token);
-    else localStorage.removeItem('token');
   },
 
   setRefreshToken: (refreshToken) => {
     set({ refreshToken });
-    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-    else localStorage.removeItem('refreshToken');
   },
 
   setAuth: (user, token, refreshToken) => {
     set({ user, token, refreshToken: refreshToken || null, isAuthenticated: true });
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
   },
 
   clearAuth: () => {
     set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
   },
 
-  initializeAuth: () => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    const storedRefreshToken = localStorage.getItem('refreshToken');
-    if (storedUser && storedToken) {
-      set({
-        user: JSON.parse(storedUser),
-        token: storedToken,
-        refreshToken: storedRefreshToken,
-        isAuthenticated: true,
-      });
+  initializeAuth: async () => {
+    try {
+      set({ loading: true });
+      const response = await api.get('/auth/me');
+      const user = response.data.data.user;
+      set({ user, isAuthenticated: true, token: null, refreshToken: null, loading: false });
+    } catch {
+      set({ user: null, token: null, refreshToken: null, isAuthenticated: false, loading: false });
     }
   },
 }));
