@@ -1,16 +1,33 @@
-import nodemailer from 'nodemailer';
-import dns from 'node:dns';
-import axios from 'axios';
-import config from '../config/config.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sendVerificationEmail = exports.sendResetPasswordEmail = exports.validateEmailDomain = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const node_dns_1 = __importDefault(require("node:dns"));
+const axios_1 = __importDefault(require("axios"));
+const config_js_1 = __importDefault(require("../config/config.js"));
 // Garantir prioridade de IPv4 para evitar ENETUNREACH no Render
-dns.setDefaultResultOrder('ipv4first');
-import { promisify } from 'util';
-const resolveMx = promisify(dns.resolveMx);
+node_dns_1.default.setDefaultResultOrder('ipv4first');
+const util_1 = require("util");
+const resolveMx = (0, util_1.promisify)(node_dns_1.default.resolveMx);
+// Transporter reutilizável (criado uma vez, usado em todas as chamadas)
+const transporter = nodemailer_1.default.createTransport({
+    service: 'gmail',
+    auth: {
+        user: config_js_1.default.email.user || '',
+        pass: config_js_1.default.email.pass || '',
+    },
+    tls: {
+        rejectUnauthorized: false,
+    },
+});
 /**
  * Valida em tempo real via DNS se o domínio do e-mail possui registros MX configurados
  * e está apto a receber mensagens.
  */
-export const validateEmailDomain = async (email) => {
+const validateEmailDomain = async (email) => {
     const domain = email.split('@')[1];
     if (!domain)
         return false;
@@ -27,6 +44,7 @@ export const validateEmailDomain = async (email) => {
         return true;
     }
 };
+exports.validateEmailDomain = validateEmailDomain;
 /**
  * Servico de Email (Híbrido de Alta Compatibilidade)
  * Envia o link de redefinição de senha para o usuário.
@@ -35,8 +53,8 @@ export const validateEmailDomain = async (email) => {
  * 2. Resend HTTP API (Excelente para Render se possuir domínio próprio)
  * 3. Gmail SMTP (Nodemailer, ideal para Localhost)
  */
-export const sendResetPasswordEmail = async (email, token) => {
-    const resetLink = `${config.frontendUrl}/reset-password?token=${token}`;
+const sendResetPasswordEmail = async (email, token) => {
+    const resetLink = `${config_js_1.default.frontendUrl}/reset-password?token=${token}`;
     const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
       <h2 style="color: #2563eb; text-align: center;">Recuperação de Senha</h2>
@@ -59,10 +77,10 @@ export const sendResetPasswordEmail = async (email, token) => {
     if (process.env.BREVO_API_KEY) {
         console.log('Tentando enviar e-mail via API da Brevo (Porta 443 HTTPS)...');
         try {
-            await axios.post('https://api.brevo.com/v3/smtp/email', {
+            await axios_1.default.post('https://api.brevo.com/v3/smtp/email', {
                 sender: {
                     name: 'SISPNAIST',
-                    email: config.email.user || 'sispnaist@gmail.com'
+                    email: config_js_1.default.email.user || 'sispnaist@gmail.com'
                 },
                 to: [
                     {
@@ -89,11 +107,11 @@ export const sendResetPasswordEmail = async (email, token) => {
     // 2. Usar Resend HTTP API se a chave estiver configurada
     if (process.env.RESEND_API_KEY) {
         console.log('Tentando enviar e-mail via API do Resend (Porta 443 HTTPS)...');
-        const fromEmail = config.email.from && config.email.from.includes('gmail')
+        const fromEmail = config_js_1.default.email.from && config_js_1.default.email.from.includes('gmail')
             ? 'SISPNAIST <onboarding@resend.dev>'
-            : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
+            : config_js_1.default.email.from || 'SISPNAIST <onboarding@resend.dev>';
         try {
-            await axios.post('https://api.resend.com/emails', {
+            await axios_1.default.post('https://api.resend.com/emails', {
                 from: fromEmail,
                 to: email,
                 subject: "Recuperação de Senha - SISPNAIST",
@@ -114,24 +132,14 @@ export const sendResetPasswordEmail = async (email, token) => {
         }
     }
     // 3. Fallback para Gmail SMTP se nenhuma API Key estiver configurada (Ideal para Local)
-    if (!config.email.user || !config.email.pass) {
+    if (!config_js_1.default.email.user || !config_js_1.default.email.pass) {
         console.log('AVISO: Nenhuma chave de API (Brevo/Resend) configurada e credenciais SMTP locais incompletas.');
         return;
     }
     console.log('Tentando enviar e-mail via Gmail SMTP (Nodemailer)...');
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: config.email.user,
-            pass: config.email.pass,
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
     try {
         await transporter.sendMail({
-            from: config.email.from,
+            from: config_js_1.default.email.from,
             to: email,
             subject: "Recuperação de Senha - SISPNAIST",
             html: htmlContent
@@ -143,12 +151,13 @@ export const sendResetPasswordEmail = async (email, token) => {
         throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Configure BREVO_API_KEY para enviar sem restrições no Render.');
     }
 };
+exports.sendResetPasswordEmail = sendResetPasswordEmail;
 /**
  * Envia o link de verificação de e-mail ao criar conta.
  * Suporta as mesmas APIs: Brevo, Resend e Gmail SMTP.
  */
-export const sendVerificationEmail = async (email, token) => {
-    const verificationLink = `${config.frontendUrl}/verify-email?token=${token}`;
+const sendVerificationEmail = async (email, token) => {
+    const verificationLink = `${config_js_1.default.frontendUrl}/verify-email?token=${token}`;
     const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
       <h2 style="color: #2563eb; text-align: center;">Confirmação de E-mail</h2>
@@ -172,10 +181,10 @@ export const sendVerificationEmail = async (email, token) => {
     if (process.env.BREVO_API_KEY) {
         console.log('Tentando enviar e-mail de verificação via API da Brevo (Porta 443 HTTPS)...');
         try {
-            await axios.post('https://api.brevo.com/v3/smtp/email', {
+            await axios_1.default.post('https://api.brevo.com/v3/smtp/email', {
                 sender: {
                     name: 'SISPNAIST',
-                    email: config.email.user || 'sispnaist@gmail.com'
+                    email: config_js_1.default.email.user || 'sispnaist@gmail.com'
                 },
                 to: [
                     {
@@ -202,11 +211,11 @@ export const sendVerificationEmail = async (email, token) => {
     // 2. Usar Resend HTTP API se a chave estiver configurada
     if (process.env.RESEND_API_KEY) {
         console.log('Tentando enviar e-mail de verificação via API do Resend (Porta 443 HTTPS)...');
-        const fromEmail = config.email.from && config.email.from.includes('gmail')
+        const fromEmail = config_js_1.default.email.from && config_js_1.default.email.from.includes('gmail')
             ? 'SISPNAIST <onboarding@resend.dev>'
-            : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
+            : config_js_1.default.email.from || 'SISPNAIST <onboarding@resend.dev>';
         try {
-            await axios.post('https://api.resend.com/emails', {
+            await axios_1.default.post('https://api.resend.com/emails', {
                 from: fromEmail,
                 to: email,
                 subject: "Confirmação de E-mail - SISPNAIST",
@@ -227,7 +236,7 @@ export const sendVerificationEmail = async (email, token) => {
         }
     }
     // 3. Fallback para Gmail SMTP se nenhuma API Key estiver configurada (Ideal para Local)
-    if (!config.email.user || !config.email.pass) {
+    if (!config_js_1.default.email.user || !config_js_1.default.email.pass) {
         console.log('AVISO: Nenhuma chave de API (Brevo/Resend) configurada e credenciais SMTP locais incompletas.');
         if (process.env.NODE_ENV === 'production') {
             throw new Error('Nenhum serviço de envio de e-mail (Brevo/Resend/SMTP) foi configurado nas variáveis de ambiente do servidor.');
@@ -235,19 +244,9 @@ export const sendVerificationEmail = async (email, token) => {
         return;
     }
     console.log('Tentando enviar e-mail de verificação via Gmail SMTP (Nodemailer)...');
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: config.email.user,
-            pass: config.email.pass,
-        },
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
     try {
         await transporter.sendMail({
-            from: config.email.from,
+            from: config_js_1.default.email.from,
             to: email,
             subject: "Confirmação de E-mail - SISPNAIST",
             html: htmlContent
@@ -259,3 +258,4 @@ export const sendVerificationEmail = async (email, token) => {
         throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Configure BREVO_API_KEY para enviar sem restrições no Render.');
     }
 };
+exports.sendVerificationEmail = sendVerificationEmail;

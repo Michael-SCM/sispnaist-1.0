@@ -33,8 +33,8 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authService.login(values.email, values.senha);
-      setAuth(user, token);
+      const { user, token, refreshToken } = await authService.login(values.email, values.senha);
+      setAuth(user, token, refreshToken);
       toast.success('Login realizado com sucesso!');
       navigate('/dashboard');
       reset();

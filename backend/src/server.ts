@@ -5,6 +5,7 @@ import dns from 'node:dns';
 // Isso resolve o erro ENETUNREACH no Render, pois a plataforma não possui suporte a IPv6 de saída.
 dns.setDefaultResultOrder('ipv4first');
 
+import mongoose from 'mongoose';
 import app from './app.js';
 import config from './config/config.js';
 
@@ -31,22 +32,18 @@ API Documentation:
   `);
 });
 
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('\n🛑 SIGTERM received, shutting down gracefully...');
+async function gracefulShutdown(signal: string) {
+  console.log(`\n🛑 ${signal} received, shutting down gracefully...`);
   server.close(() => {
-    console.log('✓ Server closed');
-    process.exit(0);
+    console.log('✓ HTTP server closed');
   });
-});
+  await mongoose.disconnect();
+  console.log('✓ MongoDB disconnected');
+  process.exit(0);
+}
 
-process.on('SIGINT', () => {
-  console.log('\n🛑 SIGINT received, shutting down gracefully...');
-  server.close(() => {
-    console.log('✓ Server closed');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {

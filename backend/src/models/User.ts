@@ -5,6 +5,8 @@ export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade'
   empresa?: mongoose.Types.ObjectId;
   unidade?: mongoose.Types.ObjectId;
   senha?: string;
+  refreshToken?: string;
+  refreshTokenExpires?: Date;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -86,6 +88,14 @@ const UserSchema = new Schema<IUserDocument>(
       type: Date,
       select: false,
       index: { expires: 0 }, // Índice TTL: o MongoDB exclui a conta automaticamente se passar de 24h sem verificação
+    },
+    refreshToken: {
+      type: String,
+      select: false,
+    },
+    refreshTokenExpires: {
+      type: Date,
+      select: false,
     },
   },
   { 

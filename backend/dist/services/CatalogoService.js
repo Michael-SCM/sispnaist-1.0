@@ -1,5 +1,10 @@
-import Catalogo from '../models/Catalogo';
-import { AppError } from '../middleware/errorHandler';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Catalogo_1 = __importDefault(require("../models/Catalogo"));
+const errorHandler_1 = require("../middleware/errorHandler");
 class CatalogoService {
     /**
      * Service genérico para gerenciar TODAS as tabelas auxiliares/catalogos.
@@ -13,12 +18,12 @@ class CatalogoService {
         if (ativo !== undefined)
             filtro.ativo = ativo;
         const [data, total] = await Promise.all([
-            Catalogo.find(filtro)
+            Catalogo_1.default.find(filtro)
                 .sort({ ordem: 1, nome: 1 })
                 .skip((page - 1) * limit)
                 .limit(limit)
                 .lean(),
-            Catalogo.countDocuments(filtro)
+            Catalogo_1.default.countDocuments(filtro)
         ]);
         return {
             data: data,
@@ -31,7 +36,7 @@ class CatalogoService {
     // Lista apenas itens ativos (equivalente ao getdados.php original)
     async listarAtivos(entidade) {
         this.validarEntidade(entidade);
-        const resultado = await Catalogo.find({ entidade, ativo: true })
+        const resultado = await Catalogo_1.default.find({ entidade, ativo: true })
             .sort({ ordem: 1, nome: 1 })
             .select('_id nome sigla descricao ordem')
             .lean();
@@ -45,9 +50,9 @@ class CatalogoService {
     // Obtém um item específico
     async obter(entidade, id) {
         this.validarEntidade(entidade);
-        const item = await Catalogo.findOne({ _id: id, entidade });
+        const item = await Catalogo_1.default.findOne({ _id: id, entidade });
         if (!item) {
-            throw new AppError(`Item não encontrado na entidade ${entidade}`, 404);
+            throw new errorHandler_1.AppError(`Item não encontrado na entidade ${entidade}`, 404);
         }
         return item;
     }
@@ -55,14 +60,14 @@ class CatalogoService {
     async criar(entidade, dados) {
         this.validarEntidade(entidade);
         // Verifica se já existe item com mesmo nome
-        const existente = await Catalogo.findOne({
+        const existente = await Catalogo_1.default.findOne({
             entidade,
             nome: { $regex: new RegExp(`^${dados.nome}$`, 'i') }
         });
         if (existente) {
-            throw new AppError(`Já existe um registro com o nome "${dados.nome}" nesta entidade`, 400);
+            throw new errorHandler_1.AppError(`Já existe um registro com o nome "${dados.nome}" nesta entidade`, 400);
         }
-        const item = await Catalogo.create({
+        const item = await Catalogo_1.default.create({
             entidade,
             nome: dados.nome,
             sigla: dados.sigla,
@@ -75,19 +80,19 @@ class CatalogoService {
     // Atualiza um item existente
     async atualizar(entidade, id, dados) {
         this.validarEntidade(entidade);
-        const item = await Catalogo.findOne({ _id: id, entidade });
+        const item = await Catalogo_1.default.findOne({ _id: id, entidade });
         if (!item) {
-            throw new AppError(`Item não encontrado na entidade ${entidade}`, 404);
+            throw new errorHandler_1.AppError(`Item não encontrado na entidade ${entidade}`, 404);
         }
         // Verifica duplicidade se o nome foi alterado
         if (dados.nome && dados.nome !== item.nome) {
-            const existente = await Catalogo.findOne({
+            const existente = await Catalogo_1.default.findOne({
                 entidade,
                 nome: { $regex: new RegExp(`^${dados.nome}$`, 'i') },
                 _id: { $ne: id }
             });
             if (existente) {
-                throw new AppError(`Já existe um registro com o nome "${dados.nome}" nesta entidade`, 400);
+                throw new errorHandler_1.AppError(`Já existe um registro com o nome "${dados.nome}" nesta entidade`, 400);
             }
         }
         Object.assign(item, dados);
@@ -97,19 +102,19 @@ class CatalogoService {
     // Deleta um item (soft delete - marca como inativo)
     async deletar(entidade, id) {
         this.validarEntidade(entidade);
-        const resultado = await Catalogo.updateOne({ _id: id, entidade }, { ativo: false });
+        const resultado = await Catalogo_1.default.updateOne({ _id: id, entidade }, { ativo: false });
         if (resultado.matchedCount === 0) {
-            throw new AppError(`Item não encontrado na entidade ${entidade}`, 404);
+            throw new errorHandler_1.AppError(`Item não encontrado na entidade ${entidade}`, 404);
         }
     }
     // Lista todas as entidades disponíveis com contagem
     async listarEntidades() {
-        const entidades = Catalogo.schema.path('entidade');
+        const entidades = Catalogo_1.default.schema.path('entidade');
         const listaEntidades = entidades.enumValues;
         const resultados = await Promise.all(listaEntidades.map(async (entidade) => {
             const [total, ativos] = await Promise.all([
-                Catalogo.countDocuments({ entidade }),
-                Catalogo.countDocuments({ entidade, ativo: true })
+                Catalogo_1.default.countDocuments({ entidade }),
+                Catalogo_1.default.countDocuments({ entidade, ativo: true })
             ]);
             return { entidade, total, ativos };
         }));
@@ -135,8 +140,8 @@ class CatalogoService {
             'padraoEmail', 'parametro', 'parentesco', 'sorologia'
         ];
         if (!entidadesValidas.includes(entidade)) {
-            throw new AppError(`Entidade "${entidade}" não é válida`, 400);
+            throw new errorHandler_1.AppError(`Entidade "${entidade}" não é válida`, 400);
         }
     }
 }
-export default new CatalogoService();
+exports.default = new CatalogoService();

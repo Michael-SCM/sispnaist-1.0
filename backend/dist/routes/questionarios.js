@@ -1,38 +1,43 @@
-import { Router } from 'express';
-import questionarioController from '../controllers/questionarioController';
-import { authMiddleware } from '../middleware/auth';
-import { validateRequest } from '../middleware/validation';
-import Joi from 'joi';
-const router = Router();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const questionarioController_1 = __importDefault(require("../controllers/questionarioController"));
+const auth_1 = require("../middleware/auth");
+const validation_1 = require("../middleware/validation");
+const joi_1 = __importDefault(require("joi"));
+const router = (0, express_1.Router)();
 // Validação básica para questionário
-const questionarioSchema = Joi.object({
-    nome: Joi.string().trim().min(1).max(200).required(),
-    descricao: Joi.string().trim().max(500).optional(),
-    tipo: Joi.string().required(),
-    ativo: Joi.boolean().optional(),
-    dataInicio: Joi.date().optional(),
-    dataFim: Joi.date().optional()
+const questionarioSchema = joi_1.default.object({
+    nome: joi_1.default.string().trim().min(1).max(200).required(),
+    descricao: joi_1.default.string().trim().max(500).optional(),
+    tipo: joi_1.default.string().required(),
+    ativo: joi_1.default.boolean().optional(),
+    dataInicio: joi_1.default.date().optional(),
+    dataFim: joi_1.default.date().optional()
 });
-const questionarioItemSchema = Joi.object({
-    pergunta: Joi.string().trim().min(1).max(500).required(),
-    tipoResposta: Joi.string().valid('texto', 'unica', 'multipla', 'escala', 'data').required(),
-    obrigatorio: Joi.boolean().optional(),
-    ordem: Joi.number().integer().min(0).optional(),
-    alternativas: Joi.array().items(Joi.object({
-        valor: Joi.string().required(),
-        texto: Joi.string().required(),
-        pontuacao: Joi.number().optional()
+const questionarioItemSchema = joi_1.default.object({
+    pergunta: joi_1.default.string().trim().min(1).max(500).required(),
+    tipoResposta: joi_1.default.string().valid('texto', 'unica', 'multipla', 'escala', 'data').required(),
+    obrigatorio: joi_1.default.boolean().optional(),
+    ordem: joi_1.default.number().integer().min(0).optional(),
+    alternativas: joi_1.default.array().items(joi_1.default.object({
+        valor: joi_1.default.string().required(),
+        texto: joi_1.default.string().required(),
+        pontuacao: joi_1.default.number().optional()
     })).optional()
 });
 // Todas as rotas requerem autenticação
-router.use(authMiddleware);
-router.get('/', questionarioController.listar);
-router.get('/:id', questionarioController.obter);
-router.post('/', validateRequest(questionarioSchema), questionarioController.criar);
-router.put('/:id', questionarioController.atualizar);
-router.delete('/:id', questionarioController.deletar);
+router.use(auth_1.authMiddleware);
+router.get('/', questionarioController_1.default.listar);
+router.get('/:id', questionarioController_1.default.obter);
+router.post('/', (0, validation_1.validateRequest)(questionarioSchema), questionarioController_1.default.criar);
+router.put('/:id', questionarioController_1.default.atualizar);
+router.delete('/:id', questionarioController_1.default.deletar);
 // Rotas de itens do questionário
-router.post('/:id/itens', validateRequest(questionarioItemSchema), questionarioController.criarItem);
-router.put('/:id/itens/:itemId', questionarioController.atualizarItem);
-router.delete('/:id/itens/:itemId', questionarioController.deletarItem);
-export default router;
+router.post('/:id/itens', (0, validation_1.validateRequest)(questionarioItemSchema), questionarioController_1.default.criarItem);
+router.put('/:id/itens/:itemId', questionarioController_1.default.atualizarItem);
+router.delete('/:id/itens/:itemId', questionarioController_1.default.deletarItem);
+exports.default = router;

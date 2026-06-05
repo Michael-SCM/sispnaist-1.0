@@ -1,19 +1,25 @@
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import empresaService from '../services/EmpresaService.js';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getEmpresaPorUnidade = exports.deleteEmpresa = exports.updateEmpresa = exports.createEmpresa = exports.getEmpresa = exports.getEmpresas = void 0;
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const EmpresaService_js_1 = __importDefault(require("../services/EmpresaService.js"));
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 /**
  * @desc    Listar empresas com paginação e filtros
  * @route   GET /api/empresas
  * @access  Private/Admin
  */
-export const getEmpresas = asyncHandler(async (req, res) => {
+exports.getEmpresas = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const filtros = {
         razaoSocial: req.query.razaoSocial,
         cnpj: req.query.cnpj,
     };
-    const result = await empresaService.listar(page, limit, filtros);
+    const result = await EmpresaService_js_1.default.listar(page, limit, filtros);
     res.status(200).json({
         status: 'success',
         ...result,
@@ -24,9 +30,9 @@ export const getEmpresas = asyncHandler(async (req, res) => {
  * @route   GET /api/empresas/:id
  * @access  Private/Admin
  */
-export const getEmpresa = asyncHandler(async (req, res) => {
+exports.getEmpresa = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const empresa = await empresaService.obter(id);
+    const empresa = await EmpresaService_js_1.default.obter(id);
     res.status(200).json({
         status: 'success',
         data: { empresa },
@@ -37,9 +43,9 @@ export const getEmpresa = asyncHandler(async (req, res) => {
  * @route   POST /api/empresas
  * @access  Private/Admin
  */
-export const createEmpresa = asyncHandler(async (req, res) => {
-    const empresa = await empresaService.criar(req.body);
-    await logAction(req, 'CREATE', 'Empresa', empresa._id.toString(), empresa);
+exports.createEmpresa = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
+    const empresa = await EmpresaService_js_1.default.criar(req.body);
+    await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'Empresa', empresa._id.toString(), empresa);
     res.status(201).json({
         status: 'success',
         data: { empresa },
@@ -50,12 +56,12 @@ export const createEmpresa = asyncHandler(async (req, res) => {
  * @route   PUT /api/empresas/:id
  * @access  Private/Admin
  */
-export const updateEmpresa = asyncHandler(async (req, res) => {
+exports.updateEmpresa = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const empresaAntiga = await empresaService.obter(id);
-    const empresa = await empresaService.atualizar(id, req.body);
-    const mudancas = compararDados(empresaAntiga, empresa);
-    await logAction(req, 'UPDATE', 'Empresa', id, mudancas);
+    const empresaAntiga = await EmpresaService_js_1.default.obter(id);
+    const empresa = await EmpresaService_js_1.default.atualizar(id, req.body);
+    const mudancas = (0, auditLogger_js_1.compararDados)(empresaAntiga, empresa);
+    await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'Empresa', id, mudancas);
     res.status(200).json({
         status: 'success',
         data: { empresa },
@@ -66,11 +72,11 @@ export const updateEmpresa = asyncHandler(async (req, res) => {
  * @route   DELETE /api/empresas/:id
  * @access  Private/Admin
  */
-export const deleteEmpresa = asyncHandler(async (req, res) => {
+exports.deleteEmpresa = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const empresaAntiga = await empresaService.obter(id);
-    await empresaService.deletar(id);
-    await logAction(req, 'DELETE', 'Empresa', id, empresaAntiga);
+    const empresaAntiga = await EmpresaService_js_1.default.obter(id);
+    await EmpresaService_js_1.default.deletar(id);
+    await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'Empresa', id, empresaAntiga);
     res.status(204).json({
         status: 'success',
         data: null,
@@ -81,9 +87,9 @@ export const deleteEmpresa = asyncHandler(async (req, res) => {
  * @route   GET /api/empresas/unidade/:unidadeId
  * @access  Private
  */
-export const getEmpresaPorUnidade = asyncHandler(async (req, res) => {
+exports.getEmpresaPorUnidade = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { unidadeId } = req.params;
-    const empresa = await empresaService.listarPorUnidade(unidadeId);
+    const empresa = await EmpresaService_js_1.default.listarPorUnidade(unidadeId);
     res.status(200).json({
         status: 'success',
         data: { empresa },

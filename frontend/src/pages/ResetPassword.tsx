@@ -11,6 +11,7 @@ export const ResetPassword: React.FC = () => {
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [senhaError, setSenhaError] = useState('');
 
   useEffect(() => {
     if (!token) {
@@ -21,14 +22,10 @@ export const ResetPassword: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSenhaError('');
 
     if (novaSenha !== confirmarSenha) {
       toast.error('As senhas não coincidem!');
-      return;
-    }
-
-    if (novaSenha.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
@@ -40,7 +37,11 @@ export const ResetPassword: React.FC = () => {
       navigate('/login');
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Erro ao redefinir senha';
-      toast.error(message);
+      if (message.includes('A nova senha deve') || message.includes('A senha deve')) {
+        setSenhaError(message);
+      } else {
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -60,11 +61,15 @@ export const ResetPassword: React.FC = () => {
             <input
               type="password"
               value={novaSenha}
-              onChange={(e) => setNovaSenha(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              onChange={(e) => { setSenhaError(''); setNovaSenha(e.target.value); }}
+              className={`w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all${senhaError ? ' border-red-500 ring-red-500' : ''}`}
               placeholder="••••••••"
               required
             />
+            {senhaError && <p className="text-red-500 text-xs mt-1">{senhaError}</p>}
+            <p className="text-gray-400 text-xs mt-1">
+              Mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial
+            </p>
           </div>
 
           <div>

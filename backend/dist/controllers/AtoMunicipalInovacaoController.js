@@ -1,6 +1,11 @@
-import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
-import { AppError } from '../middleware/errorHandler.js';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const AtoMunicipalInovacao_js_1 = __importDefault(require("../models/AtoMunicipalInovacao.js"));
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 class AtoMunicipalInovacaoController {
     async listar(req, res, next) {
         try {
@@ -10,11 +15,11 @@ class AtoMunicipalInovacaoController {
                 filter.nm_cidade = new RegExp(String(cidade), 'i');
             if (ano)
                 filter.ano_ato = Number(ano);
-            const items = await AtoMunicipalInovacao.find(filter)
+            const items = await AtoMunicipalInovacao_js_1.default.find(filter)
                 .sort({ ano_ato: -1, nr_ato: -1 })
                 .limit(Number(limit))
                 .skip((Number(page) - 1) * Number(limit));
-            const total = await AtoMunicipalInovacao.countDocuments(filter);
+            const total = await AtoMunicipalInovacao_js_1.default.countDocuments(filter);
             return res.status(200).json({
                 items,
                 total,
@@ -28,10 +33,10 @@ class AtoMunicipalInovacaoController {
     }
     async obter(req, res, next) {
         try {
-            const item = await AtoMunicipalInovacao.findById(req.params.id)
+            const item = await AtoMunicipalInovacao_js_1.default.findById(req.params.id)
                 .populate('papeisModoGovernanca');
             if (!item) {
-                throw new AppError('Ato Municipal não encontrado', 404);
+                throw new errorHandler_js_1.AppError('Ato Municipal não encontrado', 404);
             }
             return res.status(200).json(item);
         }
@@ -41,26 +46,26 @@ class AtoMunicipalInovacaoController {
     }
     async criar(req, res, next) {
         try {
-            const novoItem = await AtoMunicipalInovacao.create(req.body);
-            await logAction(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), novoItem);
+            const novoItem = await AtoMunicipalInovacao_js_1.default.create(req.body);
+            await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'AtoMunicipalInovacao', novoItem._id.toString(), novoItem);
             return res.status(201).json(novoItem);
         }
         catch (error) {
             if (error.code === 11000) {
-                return next(new AppError('Já existe um ato cadastrado com este número e ano.', 400));
+                return next(new errorHandler_js_1.AppError('Já existe um ato cadastrado com este número e ano.', 400));
             }
             next(error);
         }
     }
     async atualizar(req, res, next) {
         try {
-            const oldItem = await AtoMunicipalInovacao.findById(req.params.id);
+            const oldItem = await AtoMunicipalInovacao_js_1.default.findById(req.params.id);
             if (!oldItem) {
-                throw new AppError('Ato Municipal não encontrado', 404);
+                throw new errorHandler_js_1.AppError('Ato Municipal não encontrado', 404);
             }
-            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-            const mudancas = compararDados(oldItem, item);
-            await logAction(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), mudancas);
+            const item = await AtoMunicipalInovacao_js_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+            const mudancas = (0, auditLogger_js_1.compararDados)(oldItem, item);
+            await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'AtoMunicipalInovacao', item._id.toString(), mudancas);
             return res.status(200).json(item);
         }
         catch (error) {
@@ -69,12 +74,12 @@ class AtoMunicipalInovacaoController {
     }
     async deletar(req, res, next) {
         try {
-            const oldItem = await AtoMunicipalInovacao.findById(req.params.id);
+            const oldItem = await AtoMunicipalInovacao_js_1.default.findById(req.params.id);
             if (!oldItem) {
-                throw new AppError('Ato Municipal não encontrado', 404);
+                throw new errorHandler_js_1.AppError('Ato Municipal não encontrado', 404);
             }
-            const item = await AtoMunicipalInovacao.findByIdAndUpdate(req.params.id, { ativo: false }, { new: true });
-            await logAction(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), oldItem);
+            const item = await AtoMunicipalInovacao_js_1.default.findByIdAndUpdate(req.params.id, { ativo: false }, { new: true });
+            await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'AtoMunicipalInovacao', item._id.toString(), oldItem);
             return res.status(204).send();
         }
         catch (error) {
@@ -82,4 +87,4 @@ class AtoMunicipalInovacaoController {
         }
     }
 }
-export default new AtoMunicipalInovacaoController();
+exports.default = new AtoMunicipalInovacaoController();

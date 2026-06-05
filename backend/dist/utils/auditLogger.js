@@ -1,4 +1,10 @@
-import AuditLog from '../models/AuditLog.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.compararDados = exports.logAction = void 0;
+const AuditLog_js_1 = __importDefault(require("../models/AuditLog.js"));
 /**
  * Registra uma ação no audit log com dados estruturados
  * ✅ USE ESTA FUNÇÃO nos controllers para máximo detalhe!
@@ -20,14 +26,12 @@ import AuditLog from '../models/AuditLog.js';
  *     cnpj: dados.cnpj
  *   });
  */
-export const logAction = async (req, acao, entidade, entidadeId, detalhes) => {
+const logAction = async (req, acao, entidade, entidadeId, detalhes) => {
     try {
-        // Marca que a auditoria foi logada (para middleware não registrar novamente)
-        req.auditLogged = true;
         const usuarioId = req.user?.id || req.user?._id || req.body?.usuarioId || 'system';
         const ip = (req.ip || req.connection?.remoteAddress || '0.0.0.0').replace('::ffff:', '');
         const userAgent = req.get('User-Agent') || 'Unknown';
-        await AuditLog.create({
+        await AuditLog_js_1.default.create({
             usuarioId,
             acao,
             entidade,
@@ -42,6 +46,7 @@ export const logAction = async (req, acao, entidade, entidadeId, detalhes) => {
         console.error('Erro ao salvar log de auditoria:', error);
     }
 };
+exports.logAction = logAction;
 /**
  * 🔥 Para UPDATE: Cria objeto com antes/depois automático
  *
@@ -56,7 +61,7 @@ export const logAction = async (req, acao, entidade, entidadeId, detalhes) => {
  *   }
  * }
  */
-export const compararDados = (datosAntigosRaw, datosNovosRaw) => {
+const compararDados = (datosAntigosRaw, datosNovosRaw) => {
     // Converte documentos Mongoose para objetos puros se necessário
     const datosAntigos = typeof datosAntigosRaw?.toObject === 'function' ? datosAntigosRaw.toObject() : JSON.parse(JSON.stringify(datosAntigosRaw || {}));
     const datosNovos = typeof datosNovosRaw?.toObject === 'function' ? datosNovosRaw.toObject() : JSON.parse(JSON.stringify(datosNovosRaw || {}));
@@ -95,6 +100,7 @@ export const compararDados = (datosAntigosRaw, datosNovosRaw) => {
         mudancas
     };
 };
+exports.compararDados = compararDados;
 /**
  * Remove dados sensíveis e campos internos do Mongoose antes de registrar
  */

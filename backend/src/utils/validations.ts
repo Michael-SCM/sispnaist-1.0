@@ -22,10 +22,12 @@ export const registerSchema = Joi.object({
       'string.email': 'Email inválido',
     }),
   senha: Joi.string()
-    .min(6)
+    .min(8)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
-      'string.min': 'Senha deve ter pelo menos 6 caracteres',
+      'string.min': 'Senha deve ter pelo menos 8 caracteres',
+      'string.pattern.base': 'A senha deve conter letra maiúscula, minúscula, número e caractere especial',
     }),
   telefone: Joi.string().optional(),
   dataNascimento: Joi.date().required().messages({
@@ -77,10 +79,15 @@ export const resetPasswordSchema = Joi.object({
   token: Joi.string().required().messages({
     'any.required': 'Token é obrigatório',
   }),
-  novaSenha: Joi.string().min(6).required().messages({
-    'string.min': 'A nova senha deve ter pelo menos 6 caracteres',
-    'any.required': 'A nova senha é obrigatória',
-  }),
+  novaSenha: Joi.string()
+    .min(8)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+    .required()
+    .messages({
+      'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
+      'string.pattern.base': 'A nova senha deve conter letra maiúscula, minúscula, número e caractere especial',
+      'any.required': 'A nova senha é obrigatória',
+    }),
   confirmarSenha: Joi.string().valid(Joi.ref('novaSenha')).required().messages({
     'any.only': 'As senhas não conferem',
     'any.required': 'Confirmação de senha é obrigatória',

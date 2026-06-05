@@ -1,4 +1,7 @@
-export class AppError extends Error {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.notFoundHandler = exports.errorHandler = exports.AppError = void 0;
+class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
         this.message = message;
@@ -6,7 +9,8 @@ export class AppError extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
-export const errorHandler = (err, req, res, next) => {
+exports.AppError = AppError;
+const errorHandler = (err, req, res, next) => {
     if (err instanceof AppError) {
         res.status(err.statusCode).json({
             status: 'error',
@@ -49,14 +53,11 @@ export const errorHandler = (err, req, res, next) => {
         ...(process.env.NODE_ENV === 'development' && { stack: err instanceof Error ? err.stack : undefined }),
     });
 };
-export const notFoundHandler = (req, res) => {
+exports.errorHandler = errorHandler;
+const notFoundHandler = (req, res) => {
     res.status(404).json({
         status: 'error',
         message: `Rota ${req.originalUrl} não encontrada`,
     });
 };
-export const asyncHandler = (fn) => {
-    return (req, res, next) => {
-        Promise.resolve(fn(req, res, next)).catch(next);
-    };
-};
+exports.notFoundHandler = notFoundHandler;

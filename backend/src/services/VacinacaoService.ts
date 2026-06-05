@@ -154,13 +154,20 @@ export class VacinacaoService {
     }
   }
 
-  async obterPorTrabalhador(trabalhadorId: string): Promise<IVacinacao[]> {
+  async obterPorTrabalhador(trabalhadorId: string, page = 1, limit = 10): Promise<{ vacinacoes: IVacinacao[]; total: number; pages: number }> {
     const resolvedId = await this.resolverTrabalhadorId(trabalhadorId);
 
-    const vacinacoesBrutas = await Vacinacao.find({ trabalhadorId: resolvedId })
-      .populate('trabalhadorId', 'cpf nome email')
-      .sort({ dataVacinacao: -1 })
-      .lean();
+    const skip = (page - 1) * limit;
+
+    const [vacinacoesBrutas, total] = await Promise.all([
+      Vacinacao.find({ trabalhadorId: resolvedId })
+        .populate('trabalhadorId', 'cpf nome email')
+        .sort({ dataVacinacao: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Vacinacao.countDocuments({ trabalhadorId: resolvedId }),
+    ]);
 
     const vacinacoes = await Promise.all(vacinacoesBrutas.map(async (vacinacao: any) => {
       if (!vacinacao.trabalhadorId || typeof vacinacao.trabalhadorId === 'string' || !vacinacao.trabalhadorId.nome) {
@@ -181,7 +188,8 @@ export class VacinacaoService {
       return vacinacao;
     }));
 
-    return vacinacoes as unknown as IVacinacao[];
+    const pages = Math.ceil(total / limit);
+    return { vacinacoes: vacinacoes as unknown as IVacinacao[], total, pages };
   }
 
   async obterEstatisticas(): Promise<{

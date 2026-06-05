@@ -1,9 +1,15 @@
-import mongoose from 'mongoose';
-import dns from 'node:dns';
-import 'dotenv/config';
-dns.setDefaultResultOrder('ipv4first');
-import connectDB from '../config/database.js';
-import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.seedAtosMunicipais = seedAtosMunicipais;
+const mongoose_1 = __importDefault(require("mongoose"));
+const node_dns_1 = __importDefault(require("node:dns"));
+require("dotenv/config");
+node_dns_1.default.setDefaultResultOrder('ipv4first');
+const database_js_1 = __importDefault(require("../config/database.js"));
+const AtoMunicipalInovacao_js_1 = __importDefault(require("../models/AtoMunicipalInovacao.js"));
 function pick(arr, i) {
     return arr[i % arr.length];
 }
@@ -17,10 +23,10 @@ function buildTexto(i, municipio, tipo) {
             `Observação: conteúdo sintético para uso em ambiente de desenvolvimento/seed.`,
     };
 }
-export async function seedAtosMunicipais(targetCount = 120) {
+async function seedAtosMunicipais(targetCount = 120) {
     console.log(`🌱 Iniciando seed de Atos Municipais (${targetCount})...`);
     console.log('🧹 Limpando coleção de atos municipais...');
-    await AtoMunicipalInovacao.deleteMany({});
+    await AtoMunicipalInovacao_js_1.default.deleteMany({});
     console.log('🧹 Limpeza concluída.');
     const cidades = [
         'São Paulo',
@@ -85,15 +91,14 @@ export async function seedAtosMunicipais(targetCount = 120) {
         });
     }
     console.log('⚡ Inserindo registros em lote...');
-    await AtoMunicipalInovacao.insertMany(docs);
+    await AtoMunicipalInovacao_js_1.default.insertMany(docs);
     console.log(`✅ Concluído! Inseridos ${docs.length} atos municipais.`);
 }
-// Executa diretamente ao ser chamado pelo npm run
-connectDB()
+(0, database_js_1.default)()
     .then(() => {
     seedAtosMunicipais(120).then(() => {
         console.log('🚀 Seed de Atos Municipais concluído. Fechando conexão...');
-        mongoose.connection.close();
+        mongoose_1.default.connection.close();
         process.exit(0);
     });
 })

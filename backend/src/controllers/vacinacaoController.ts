@@ -115,6 +115,8 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
 export const obterVacinacoesPorTrabalhador = asyncHandler(
   async (req: IAuthRequest, res: Response) => {
     const { trabalhadorId } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
 
     // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
     if (req.user?.perfil === 'trabalhador') {
@@ -124,11 +126,19 @@ export const obterVacinacoesPorTrabalhador = asyncHandler(
       }
     }
 
-    const vacinacoes = await vacinacaoService.obterPorTrabalhador(trabalhadorId);
+    const result = await vacinacaoService.obterPorTrabalhador(trabalhadorId, page, limit);
 
     res.status(200).json({
       status: 'success',
-      data: { vacinacoes },
+      data: {
+        vacinacoes: result.vacinacoes,
+        paginacao: {
+          page,
+          limit,
+          total: result.total,
+          pages: result.pages,
+        },
+      },
     });
   }
 );

@@ -1,6 +1,11 @@
-import ArquivoUpload from '../models/ArquivoUpload';
-import { AppError } from '../middleware/errorHandler';
-import fs from 'fs';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const ArquivoUpload_1 = __importDefault(require("../models/ArquivoUpload"));
+const errorHandler_1 = require("../middleware/errorHandler");
+const fs_1 = __importDefault(require("fs"));
 class UploadController {
     // GET /api/uploads - Listar uploads
     async listar(req, res, next) {
@@ -12,8 +17,8 @@ class UploadController {
             if (entidadeId)
                 filtro.entidadeId = entidadeId;
             const [uploads, total] = await Promise.all([
-                ArquivoUpload.find(filtro).sort({ dataCriacao: -1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
-                ArquivoUpload.countDocuments(filtro)
+                ArquivoUpload_1.default.find(filtro).sort({ dataCriacao: -1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+                ArquivoUpload_1.default.countDocuments(filtro)
             ]);
             return res.status(200).json({
                 data: uploads,
@@ -31,9 +36,9 @@ class UploadController {
     async obter(req, res, next) {
         try {
             const { id } = req.params;
-            const upload = await ArquivoUpload.findById(id);
+            const upload = await ArquivoUpload_1.default.findById(id);
             if (!upload) {
-                throw new AppError('Upload não encontrado', 404);
+                throw new errorHandler_1.AppError('Upload não encontrado', 404);
             }
             return res.status(200).json(upload);
         }
@@ -47,12 +52,12 @@ class UploadController {
             const { entidade, entidadeId, descricao } = req.body;
             const file = req.file;
             if (!file) {
-                throw new AppError('Nenhum arquivo enviado', 400);
+                throw new errorHandler_1.AppError('Nenhum arquivo enviado', 400);
             }
             if (!req.user) {
-                throw new AppError('Usuário não autenticado', 401);
+                throw new errorHandler_1.AppError('Usuário não autenticado', 401);
             }
-            const upload = await ArquivoUpload.create({
+            const upload = await ArquivoUpload_1.default.create({
                 entidade,
                 entidadeId,
                 nomeOriginal: file.originalname,
@@ -73,13 +78,13 @@ class UploadController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
-            const upload = await ArquivoUpload.findById(id);
+            const upload = await ArquivoUpload_1.default.findById(id);
             if (!upload) {
-                throw new AppError('Upload não encontrado', 404);
+                throw new errorHandler_1.AppError('Upload não encontrado', 404);
             }
             // Remove arquivo físico
-            if (fs.existsSync(upload.caminho)) {
-                fs.unlinkSync(upload.caminho);
+            if (fs_1.default.existsSync(upload.caminho)) {
+                fs_1.default.unlinkSync(upload.caminho);
             }
             // Remove registro do banco
             await upload.deleteOne();
@@ -93,12 +98,12 @@ class UploadController {
     async download(req, res, next) {
         try {
             const { id } = req.params;
-            const upload = await ArquivoUpload.findById(id);
+            const upload = await ArquivoUpload_1.default.findById(id);
             if (!upload) {
-                throw new AppError('Upload não encontrado', 404);
+                throw new errorHandler_1.AppError('Upload não encontrado', 404);
             }
-            if (!fs.existsSync(upload.caminho)) {
-                throw new AppError('Arquivo não encontrado no servidor', 404);
+            if (!fs_1.default.existsSync(upload.caminho)) {
+                throw new errorHandler_1.AppError('Arquivo não encontrado no servidor', 404);
             }
             res.download(upload.caminho, upload.nomeOriginal);
         }
@@ -107,4 +112,4 @@ class UploadController {
         }
     }
 }
-export default new UploadController();
+exports.default = new UploadController();

@@ -17,9 +17,15 @@ class TrabalhadorInformacaoController {
         }
       }
 
-      const informacoes = await TrabalhadorInformacaoService.listarPorTrabalhador(id);
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
+      const result = await TrabalhadorInformacaoService.listarPorTrabalhador(id, page, limit);
 
-      return res.status(200).json(informacoes);
+      res.setHeader('X-Total-Count', result.total.toString());
+      res.setHeader('X-Page', page.toString());
+      res.setHeader('X-Limit', limit.toString());
+
+      return res.status(200).json(result.informacoes);
     } catch (error) {
       next(error);
     }

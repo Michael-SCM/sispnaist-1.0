@@ -3,13 +3,20 @@ import { ITrabalhadorInformacao } from '../models/TrabalhadorInformacao';
 
 class TrabalhadorInformacaoService {
   // Listar informações de um trabalhador
-  async listarPorTrabalhador(trabalhadorId: string): Promise<ITrabalhadorInformacao[]> {
-    const resultados = await TrabalhadorInformacao.find({
-      trabalhadorId,
-      ativo: true,
-    }).sort({ createdAt: -1 }).lean();
+  async listarPorTrabalhador(trabalhadorId: string, page = 1, limit = 10): Promise<{ informacoes: ITrabalhadorInformacao[]; total: number; pages: number }> {
+    const skip = (page - 1) * limit;
 
-    return resultados as unknown as ITrabalhadorInformacao[];
+    const [resultados, total] = await Promise.all([
+      TrabalhadorInformacao.find({
+        trabalhadorId,
+        ativo: true,
+      }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      TrabalhadorInformacao.countDocuments({ trabalhadorId, ativo: true }),
+    ]);
+
+    const pages = Math.ceil(total / limit);
+
+    return { informacoes: resultados as unknown as ITrabalhadorInformacao[], total, pages };
   }
 
   async obterPorId(id: string): Promise<ITrabalhadorInformacao | null> {

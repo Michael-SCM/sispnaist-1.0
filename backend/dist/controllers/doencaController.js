@@ -1,39 +1,45 @@
-import doencaService from '../services/DoencaService.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
-import { AppError } from '../middleware/errorHandler.js';
-import Trabalhador from '../models/Trabalhador.js';
-import { logAction, compararDados } from '../utils/auditLogger.js';
-export const criar = asyncHandler(async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.obterEstatisticas = exports.obterPorTrabalhador = exports.deletar = exports.atualizar = exports.listar = exports.obter = exports.criar = void 0;
+const DoencaService_js_1 = __importDefault(require("../services/DoencaService.js"));
+const asyncHandler_js_1 = require("../middleware/asyncHandler.js");
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
+const Trabalhador_js_1 = __importDefault(require("../models/Trabalhador.js"));
+const auditLogger_js_1 = require("../utils/auditLogger.js");
+exports.criar = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para criar registros de doenças', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para criar registros de doenças', 403);
     }
     const doencaData = {
         ...req.body,
         trabalhadorId: req.body.trabalhadorId,
     };
-    const doenca = await doencaService.criar(doencaData);
-    await logAction(req, 'CREATE', 'Doenca', doenca._id.toString(), doenca);
+    const doenca = await DoencaService_js_1.default.criar(doencaData);
+    await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'Doenca', doenca._id.toString(), doenca);
     res.status(201).json({ sucesso: true, dados: doenca });
 });
-export const obter = asyncHandler(async (req, res) => {
+exports.obter = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { id } = req.params;
-    const doenca = await doencaService.obter(id);
+    const doenca = await DoencaService_js_1.default.obter(id);
     if (!doenca) {
-        throw new AppError('Doença não encontrada', 404);
+        throw new errorHandler_js_1.AppError('Doença não encontrada', 404);
     }
     // Se o usuário logado for trabalhador, só pode visualizar se for dele
     if (req.user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
+        const trabalhador = await Trabalhador_js_1.default.findOne({ cpf: req.user.cpf });
         const recordTrabalhadorId = (doenca.trabalhadorId && doenca.trabalhadorId._id)
             ? doenca.trabalhadorId._id.toString()
             : doenca.trabalhadorId.toString();
         if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
-            throw new AppError('Sem permissão para acessar os dados desta doença', 403);
+            throw new errorHandler_js_1.AppError('Sem permissão para acessar os dados desta doença', 403);
         }
     }
     res.status(200).json({ sucesso: true, dados: doenca });
 });
-export const listar = asyncHandler(async (req, res) => {
+exports.listar = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const filtros = {
@@ -51,7 +57,7 @@ export const listar = asyncHandler(async (req, res) => {
     }
     // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
     if (req.user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
+        const trabalhador = await Trabalhador_js_1.default.findOne({ cpf: req.user.cpf });
         filtros.trabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
     }
     // Remover filtros undefined
@@ -60,62 +66,62 @@ export const listar = asyncHandler(async (req, res) => {
             delete filtros[key];
         }
     });
-    const { doencas, total, pages } = await doencaService.listar(page, limit, filtros);
+    const { doencas, total, pages } = await DoencaService_js_1.default.listar(page, limit, filtros);
     res.status(200).json({
         sucesso: true,
         dados: doencas,
         paginacao: { page, limit, total, pages },
     });
 });
-export const atualizar = asyncHandler(async (req, res) => {
+exports.atualizar = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para atualizar registros de doenças', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para atualizar registros de doenças', 403);
     }
     const { id } = req.params;
-    const doencaAntiga = await doencaService.obter(id);
+    const doencaAntiga = await DoencaService_js_1.default.obter(id);
     if (!doencaAntiga) {
-        throw new AppError('Doença não encontrada', 404);
+        throw new errorHandler_js_1.AppError('Doença não encontrada', 404);
     }
-    const doenca = await doencaService.atualizar(id, req.body);
-    const mudancas = compararDados(doencaAntiga, doenca);
-    await logAction(req, 'UPDATE', 'Doenca', id, mudancas);
+    const doenca = await DoencaService_js_1.default.atualizar(id, req.body);
+    const mudancas = (0, auditLogger_js_1.compararDados)(doencaAntiga, doenca);
+    await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'Doenca', id, mudancas);
     res.status(200).json({ sucesso: true, dados: doenca });
 });
-export const deletar = asyncHandler(async (req, res) => {
+exports.deletar = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para deletar registros de doenças', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para deletar registros de doenças', 403);
     }
     const { id } = req.params;
-    const doencaAntiga = await doencaService.obter(id);
+    const doencaAntiga = await DoencaService_js_1.default.obter(id);
     if (!doencaAntiga) {
-        throw new AppError('Doença não encontrada', 404);
+        throw new errorHandler_js_1.AppError('Doença não encontrada', 404);
     }
-    await doencaService.deletar(id);
-    await logAction(req, 'DELETE', 'Doenca', id, doencaAntiga);
+    await DoencaService_js_1.default.deletar(id);
+    await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'Doenca', id, doencaAntiga);
     res.status(200).json({ sucesso: true, mensagem: 'Doença deletada com sucesso' });
 });
-export const obterPorTrabalhador = asyncHandler(async (req, res) => {
+exports.obterPorTrabalhador = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     const { trabalhadorId } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
     if (req.user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
+        const trabalhador = await Trabalhador_js_1.default.findOne({ cpf: req.user.cpf });
         if (!trabalhador || trabalhador._id.toString() !== trabalhadorId) {
-            throw new AppError('Sem permissão para acessar estes dados', 403);
+            throw new errorHandler_js_1.AppError('Sem permissão para acessar estes dados', 403);
         }
     }
-    const { doencas, total, pages } = await doencaService.obterPorTrabalhador(trabalhadorId, page, limit);
+    const { doencas, total, pages } = await DoencaService_js_1.default.obterPorTrabalhador(trabalhadorId, page, limit);
     res.status(200).json({
         sucesso: true,
         dados: doencas,
         paginacao: { page, limit, total, pages },
     });
 });
-export const obterEstatisticas = asyncHandler(async (req, res) => {
+exports.obterEstatisticas = (0, asyncHandler_js_1.asyncHandler)(async (req, res) => {
     if (req.user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para acessar estatísticas gerais', 403);
+        throw new errorHandler_js_1.AppError('Sem permissão para acessar estatísticas gerais', 403);
     }
-    const stats = await doencaService.obterEstatisticas();
+    const stats = await DoencaService_js_1.default.obterEstatisticas();
     res.status(200).json({ sucesso: true, dados: stats });
 });

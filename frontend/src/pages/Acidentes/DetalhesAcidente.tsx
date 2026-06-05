@@ -327,12 +327,20 @@ export const DetalhesAcidente: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     {fichaBiologica ? (
-                      <button
-                        onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
-                        className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
-                      >
-                        Editar Ficha
-                      </button>
+                      <>
+                        <button
+                          onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}`)}
+                          className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
+                        >
+                          Ver Detalhes
+                        </button>
+                        <button
+                          onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
+                          className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
+                        >
+                          Editar
+                        </button>
+                      </>
                     ) : (
                       <button
                         onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}

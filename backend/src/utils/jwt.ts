@@ -9,14 +9,32 @@ interface TokenPayload {
 }
 
 export const generateToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, config.jwtSecret, {
+  return jwt.sign({ ...payload, type: 'access' }, config.jwtSecret, {
     expiresIn: config.jwtExpire as any,
   });
 };
 
 export const verifyToken = (token: string): TokenPayload | null => {
   try {
-    return jwt.verify(token, config.jwtSecret) as TokenPayload;
+    const decoded = jwt.verify(token, config.jwtSecret) as TokenPayload & { type?: string };
+    if (decoded.type && decoded.type !== 'access') return null;
+    return decoded;
+  } catch {
+    return null;
+  }
+};
+
+export const generateRefreshToken = (payload: TokenPayload): string => {
+  return jwt.sign({ ...payload, type: 'refresh' }, config.jwtSecret, {
+    expiresIn: config.jwtRefreshExpire as any,
+  });
+};
+
+export const verifyRefreshToken = (token: string): TokenPayload | null => {
+  try {
+    const decoded = jwt.verify(token, config.jwtSecret) as TokenPayload & { type?: string };
+    if (decoded.type !== 'refresh') return null;
+    return decoded;
   } catch {
     return null;
   }

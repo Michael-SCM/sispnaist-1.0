@@ -1,14 +1,20 @@
-import PDFDocument from 'pdfkit';
-import Trabalhador from '../models/Trabalhador.js';
-import Empresa from '../models/Empresa.js';
-import Acidente from '../models/Acidente.js';
-import Doenca from '../models/Doenca.js';
-import Vacinacao from '../models/Vacinacao.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PdfService = void 0;
+const pdfkit_1 = __importDefault(require("pdfkit"));
+const Trabalhador_js_1 = __importDefault(require("../models/Trabalhador.js"));
+const Empresa_js_1 = __importDefault(require("../models/Empresa.js"));
+const Acidente_js_1 = __importDefault(require("../models/Acidente.js"));
+const Doenca_js_1 = __importDefault(require("../models/Doenca.js"));
+const Vacinacao_js_1 = __importDefault(require("../models/Vacinacao.js"));
 /**
  * Serviço de geração de relatórios PDF corporativos
  * Usa streaming direto para não estourar memória do servidor
  */
-export class PdfService {
+class PdfService {
     constructor() {
         // Margens do documento (em pontos, 1 ponto = 1/72 polegada)
         this.MARGEM_ESQUERDA = 50;
@@ -56,12 +62,12 @@ export class PdfService {
      */
     async gerarPdfTrabalhadores(res, filtros = {}) {
         // Buscar trabalhadores do MongoDB (ordenado por nome alfabético)
-        const trabalhadores = await Trabalhador.find(filtros).sort({ nome: 1 }).lean();
+        const trabalhadores = await Trabalhador_js_1.default.find(filtros).sort({ nome: 1 }).lean();
         // Buscar empresas para resolver referências
         const empresaIds = [...new Set(trabalhadores
                 .filter(t => t.empresa)
                 .map(t => t.empresa?.toString()))];
-        const empresas = await Empresa.find({ _id: { $in: empresaIds } }).lean();
+        const empresas = await Empresa_js_1.default.find({ _id: { $in: empresaIds } }).lean();
         const empresaMap = new Map(empresas.map(e => [e._id.toString(), { ...e.toObject ? e.toObject() : e }]));
         // Configurar resposta como PDF
         const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
@@ -69,7 +75,7 @@ export class PdfService {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         // Criar PDF com streaming
-        const doc = new PDFDocument({
+        const doc = new pdfkit_1.default({
             size: 'A4',
             margin: 0,
             bufferPages: true,
@@ -425,7 +431,7 @@ export class PdfService {
      */
     async gerarPdfAcidentes(res, filtros = {}) {
         // Buscar acidentes do MongoDB (ordenado por data decrescente)
-        const acidentes = await Acidente.find(filtros)
+        const acidentes = await Acidente_js_1.default.find(filtros)
             .sort({ dataAcidente: -1 })
             .populate('trabalhadorId', 'nome cpf empresa')
             .lean();
@@ -435,7 +441,7 @@ export class PdfService {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         // Criar PDF com streaming
-        const doc = new PDFDocument({
+        const doc = new pdfkit_1.default({
             size: 'A4',
             margin: 0,
             bufferPages: true,
@@ -678,7 +684,7 @@ export class PdfService {
      */
     async gerarPdfDoencas(res, filtros = {}) {
         // Buscar doenças do MongoDB (ordenado por data de início decrescente)
-        const doencas = await Doenca.find(filtros)
+        const doencas = await Doenca_js_1.default.find(filtros)
             .sort({ dataInicio: -1 })
             .populate('trabalhadorId', 'nome cpf empresa')
             .lean();
@@ -688,7 +694,7 @@ export class PdfService {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         // Criar PDF com streaming
-        const doc = new PDFDocument({
+        const doc = new pdfkit_1.default({
             size: 'A4',
             margin: 0,
             bufferPages: true,
@@ -923,7 +929,7 @@ export class PdfService {
      */
     async gerarPdfVacinacoes(res, filtros = {}) {
         // Buscar vacinações do MongoDB (ordenado por data decrescente)
-        const vacinacoes = await Vacinacao.find(filtros)
+        const vacinacoes = await Vacinacao_js_1.default.find(filtros)
             .sort({ dataVacinacao: -1 })
             .populate('trabalhadorId', 'nome cpf')
             .lean();
@@ -933,7 +939,7 @@ export class PdfService {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         // Criar PDF com streaming
-        const doc = new PDFDocument({
+        const doc = new pdfkit_1.default({
             size: 'A4',
             margin: 0,
             bufferPages: true,
@@ -1168,7 +1174,7 @@ export class PdfService {
         const filename = `relatorio_monitoramento_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        const doc = new PDFDocument({
+        const doc = new pdfkit_1.default({
             size: 'A4',
             margin: 0,
             bufferPages: true,
@@ -1368,4 +1374,5 @@ export class PdfService {
         return y;
     }
 }
-export default new PdfService();
+exports.PdfService = PdfService;
+exports.default = new PdfService();

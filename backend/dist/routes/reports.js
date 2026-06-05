@@ -1,11 +1,13 @@
-import { Router } from 'express';
-import { gerarRelatorioAcidentes, gerarRelatorioVacinacoes, gerarRelatorioDoencas, } from '../controllers/reportController.js';
-import { authMiddleware } from '../middleware/auth.js';
-const router = Router();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const reportController_js_1 = require("../controllers/reportController.js");
+const auth_js_1 = require("../middleware/auth.js");
+const router = (0, express_1.Router)();
 // Todas as rotas exigem autenticação
-router.use(authMiddleware);
+router.use(auth_js_1.authMiddleware);
 // Relatórios em JSON (base para PDF/XLS no frontend)
-router.get('/acidentes', gerarRelatorioAcidentes);
-router.get('/vacinacoes', gerarRelatorioVacinacoes);
-router.get('/doencas', gerarRelatorioDoencas);
-export default router;
+router.get('/acidentes', reportController_js_1.gerarRelatorioAcidentes);
+router.get('/vacinacoes', reportController_js_1.gerarRelatorioVacinacoes);
+router.get('/doencas', reportController_js_1.gerarRelatorioDoencas);
+exports.default = router;

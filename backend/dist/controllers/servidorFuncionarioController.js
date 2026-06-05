@@ -1,6 +1,11 @@
-import ServidorFuncionario from '../models/ServidorFuncionario';
-import { AppError } from '../middleware/errorHandler';
-import { logAction, compararDados } from '../utils/auditLogger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const ServidorFuncionario_1 = __importDefault(require("../models/ServidorFuncionario"));
+const errorHandler_1 = require("../middleware/errorHandler");
+const auditLogger_js_1 = require("../utils/auditLogger.js");
 class ServidorFuncionarioController {
     // GET /api/servidores - Listar servidores
     async listar(req, res, next) {
@@ -16,13 +21,13 @@ class ServidorFuncionarioController {
             if (lotacao)
                 filtro.lotacao = { $regex: new RegExp(String(lotacao), 'i') };
             const [servidores, total] = await Promise.all([
-                ServidorFuncionario.find(filtro)
+                ServidorFuncionario_1.default.find(filtro)
                     .populate('trabalhadorId', 'nome cpf matricula')
                     .sort({ matriculaFuncional: 1 })
                     .skip((Number(page) - 1) * Number(limit))
                     .limit(Number(limit))
                     .lean(),
-                ServidorFuncionario.countDocuments(filtro)
+                ServidorFuncionario_1.default.countDocuments(filtro)
             ]);
             return res.status(200).json({
                 data: servidores,
@@ -40,9 +45,9 @@ class ServidorFuncionarioController {
     async obter(req, res, next) {
         try {
             const { id } = req.params;
-            const servidor = await ServidorFuncionario.findById(id).populate('trabalhadorId');
+            const servidor = await ServidorFuncionario_1.default.findById(id).populate('trabalhadorId');
             if (!servidor) {
-                throw new AppError('Servidor não encontrado', 404);
+                throw new errorHandler_1.AppError('Servidor não encontrado', 404);
             }
             return res.status(200).json(servidor);
         }
@@ -53,8 +58,8 @@ class ServidorFuncionarioController {
     // POST /api/servidores - Criar servidor
     async criar(req, res, next) {
         try {
-            const servidor = await ServidorFuncionario.create(req.body);
-            await logAction(req, 'CREATE', 'ServidorFuncionario', servidor._id.toString(), servidor);
+            const servidor = await ServidorFuncionario_1.default.create(req.body);
+            await (0, auditLogger_js_1.logAction)(req, 'CREATE', 'ServidorFuncionario', servidor._id.toString(), servidor);
             return res.status(201).json(servidor);
         }
         catch (error) {
@@ -65,16 +70,16 @@ class ServidorFuncionarioController {
     async atualizar(req, res, next) {
         try {
             const { id } = req.params;
-            const servidorAntigo = await ServidorFuncionario.findById(id);
+            const servidorAntigo = await ServidorFuncionario_1.default.findById(id);
             if (!servidorAntigo) {
-                throw new AppError('Servidor não encontrado', 404);
+                throw new errorHandler_1.AppError('Servidor não encontrado', 404);
             }
-            const servidor = await ServidorFuncionario.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+            const servidor = await ServidorFuncionario_1.default.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
             if (!servidor) {
-                throw new AppError('Servidor não encontrado', 404);
+                throw new errorHandler_1.AppError('Servidor não encontrado', 404);
             }
-            const mudancas = compararDados(servidorAntigo, servidor);
-            await logAction(req, 'UPDATE', 'ServidorFuncionario', id, mudancas);
+            const mudancas = (0, auditLogger_js_1.compararDados)(servidorAntigo, servidor);
+            await (0, auditLogger_js_1.logAction)(req, 'UPDATE', 'ServidorFuncionario', id, mudancas);
             return res.status(200).json(servidor);
         }
         catch (error) {
@@ -85,14 +90,14 @@ class ServidorFuncionarioController {
     async deletar(req, res, next) {
         try {
             const { id } = req.params;
-            const servidor = await ServidorFuncionario.findById(id);
+            const servidor = await ServidorFuncionario_1.default.findById(id);
             if (!servidor) {
-                throw new AppError('Servidor não encontrado', 404);
+                throw new errorHandler_1.AppError('Servidor não encontrado', 404);
             }
-            await logAction(req, 'DELETE', 'ServidorFuncionario', id, servidor);
-            const resultado = await ServidorFuncionario.updateOne({ _id: id }, { ativo: false });
+            await (0, auditLogger_js_1.logAction)(req, 'DELETE', 'ServidorFuncionario', id, servidor);
+            const resultado = await ServidorFuncionario_1.default.updateOne({ _id: id }, { ativo: false });
             if (resultado.matchedCount === 0) {
-                throw new AppError('Servidor não encontrado', 404);
+                throw new errorHandler_1.AppError('Servidor não encontrado', 404);
             }
             return res.status(204).send();
         }
@@ -101,4 +106,4 @@ class ServidorFuncionarioController {
         }
     }
 }
-export default new ServidorFuncionarioController();
+exports.default = new ServidorFuncionarioController();

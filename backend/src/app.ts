@@ -1,7 +1,7 @@
 import express from 'express';
-import 'express-async-errors';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import connectDB from './config/database.js';
 import config from './config/config.js';
 import authRoutes from './routes/auth.js';
@@ -29,24 +29,17 @@ import enderecosRoutes from './routes/enderecos.js';
 import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import auditMiddleware from './middleware/auditMiddleware.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
 
 const app = express();
 
-// Middleware de CORS (Configurado para ser flexível entre Local e Vercel)
+// Middleware de CORS (usa lista configurável via CORS_ORIGIN no .env)
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'https://sispnaist-1-0.vercel.app'
-    ];
-    // Permitir se for um dos origens permitidas ou se for um subdomínio da vercel
-    if (!origin || allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+    if (!origin || config.corsOrigin.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true,
@@ -54,7 +47,22 @@ app.use(cors({
 
 // Middleware de segurança
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      fontSrc: ["'self'"],
+      frameSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
+      connectSrc: ["'self'"],
+      mediaSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'", "https://sispnaist-1-0.vercel.app", "http://localhost:5173"],
+    },
+  },
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 
@@ -62,14 +70,36 @@ app.use(helmet({
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Middleware de auditoria automática (registra todas as operações CREATE, UPDATE, DELETE)
-app.use('/api', auditMiddleware);
+// Rate limiting global
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  message: { status: 'error', message: 'Muitas requisições. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { status: 'error', message: 'Muitas requisições de escrita. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api', apiLimiter);
+app.use('/api', (req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    return writeLimiter(req, res, next);
+  }
+  next();
+});
 
 // Conectar ao MongoDB e rodar seeds
 connectDB().then(() => {
-  // Executa o seed apenas se não estiver em ambiente de teste
+  // Executa o seed apenas se o banco estiver vazio
   if (process.env.NODE_ENV !== 'test') {
-    seedCatalogos().catch(err => console.error('Erro ao rodar seed de catálogos:', err));
+    seedCatalogos();
   }
 });
 

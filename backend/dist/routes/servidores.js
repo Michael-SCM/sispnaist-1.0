@@ -1,29 +1,34 @@
-import { Router } from 'express';
-import servidorFuncionarioController from '../controllers/servidorFuncionarioController';
-import { authMiddleware } from '../middleware/auth';
-import { validateRequest } from '../middleware/validation';
-import Joi from 'joi';
-const router = Router();
-const servidorSchema = Joi.object({
-    trabalhadorId: Joi.string().required(),
-    matriculaFuncional: Joi.string().trim().min(1).max(50).required(),
-    dataPosse: Joi.date().required(),
-    dataExercicio: Joi.date().required(),
-    regimeJuridico: Joi.string().trim().optional(),
-    cargoEfetivo: Joi.string().trim().optional(),
-    cargoComissionado: Joi.string().trim().optional(),
-    lotacao: Joi.string().trim().optional(),
-    situacaoFuncional: Joi.string().trim().optional(),
-    atoNomeacao: Joi.string().trim().optional(),
-    dataNomeacao: Joi.date().optional(),
-    dataAposentadoria: Joi.date().optional(),
-    observacoes: Joi.string().trim().optional()
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const servidorFuncionarioController_1 = __importDefault(require("../controllers/servidorFuncionarioController"));
+const auth_1 = require("../middleware/auth");
+const validation_1 = require("../middleware/validation");
+const joi_1 = __importDefault(require("joi"));
+const router = (0, express_1.Router)();
+const servidorSchema = joi_1.default.object({
+    trabalhadorId: joi_1.default.string().required(),
+    matriculaFuncional: joi_1.default.string().trim().min(1).max(50).required(),
+    dataPosse: joi_1.default.date().required(),
+    dataExercicio: joi_1.default.date().required(),
+    regimeJuridico: joi_1.default.string().trim().optional(),
+    cargoEfetivo: joi_1.default.string().trim().optional(),
+    cargoComissionado: joi_1.default.string().trim().optional(),
+    lotacao: joi_1.default.string().trim().optional(),
+    situacaoFuncional: joi_1.default.string().trim().optional(),
+    atoNomeacao: joi_1.default.string().trim().optional(),
+    dataNomeacao: joi_1.default.date().optional(),
+    dataAposentadoria: joi_1.default.date().optional(),
+    observacoes: joi_1.default.string().trim().optional()
 });
 // Todas as rotas requerem autenticação
-router.use(authMiddleware);
-router.get('/', servidorFuncionarioController.listar);
-router.get('/:id', servidorFuncionarioController.obter);
-router.post('/', validateRequest(servidorSchema), servidorFuncionarioController.criar);
-router.put('/:id', servidorFuncionarioController.atualizar);
-router.delete('/:id', servidorFuncionarioController.deletar);
-export default router;
+router.use(auth_1.authMiddleware);
+router.get('/', servidorFuncionarioController_1.default.listar);
+router.get('/:id', servidorFuncionarioController_1.default.obter);
+router.post('/', (0, validation_1.validateRequest)(servidorSchema), servidorFuncionarioController_1.default.criar);
+router.put('/:id', servidorFuncionarioController_1.default.atualizar);
+router.delete('/:id', servidorFuncionarioController_1.default.deletar);
+exports.default = router;

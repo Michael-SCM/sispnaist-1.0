@@ -1,10 +1,49 @@
-import Acidente from '../models/Acidente.js';
-import User from '../models/User.js';
-import Trabalhador from '../models/Trabalhador.js';
-import { AppError } from '../middleware/errorHandler.js';
-import mongoose from 'mongoose';
-import MaterialBiologico from '../models/MaterialBiologico.js';
-export class AcidenteService {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AcidenteService = void 0;
+const Acidente_js_1 = __importDefault(require("../models/Acidente.js"));
+const User_js_1 = __importDefault(require("../models/User.js"));
+const Trabalhador_js_1 = __importDefault(require("../models/Trabalhador.js"));
+const errorHandler_js_1 = require("../middleware/errorHandler.js");
+const mongoose_1 = __importDefault(require("mongoose"));
+const MaterialBiologico_js_1 = __importDefault(require("../models/MaterialBiologico.js"));
+class AcidenteService {
     /**
      * Resolve trabalhadorId de CPF para ObjectId
      * Se o valor já for um ObjectId válido, retorna como está
@@ -12,26 +51,26 @@ export class AcidenteService {
      */
     async resolverTrabalhadorId(identifier) {
         // Se já for um ObjectId válido, retorna como está
-        if (mongoose.Types.ObjectId.isValid(identifier)) {
+        if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
             return identifier;
         }
         // Tentar buscar na coleção de usuários e trabalhadores em paralelo
         const [usuario, trabalhador] = await Promise.all([
-            User.findOne({ cpf: identifier }).select('_id').lean(),
-            Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
+            User_js_1.default.findOne({ cpf: identifier }).select('_id').lean(),
+            Trabalhador_js_1.default.findOne({ cpf: identifier }).select('_id').lean()
         ]);
         if (usuario)
             return usuario._id.toString();
         if (trabalhador)
             return trabalhador._id.toString();
-        throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
+        throw new errorHandler_js_1.AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
     }
     async criar(acidenteData) {
         // Resolver trabalhadorId se for CPF
-        if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId)) {
+        if (acidenteData.trabalhadorId && !mongoose_1.default.Types.ObjectId.isValid(acidenteData.trabalhadorId)) {
             acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId);
         }
-        const acidente = new Acidente(acidenteData);
+        const acidente = new Acidente_js_1.default(acidenteData);
         await acidente.save();
         // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
         const acidenteObj = acidente.toObject();
@@ -42,32 +81,32 @@ export class AcidenteService {
         };
     }
     async obter(id) {
-        let acidente = await Acidente.findById(id)
+        let acidente = await Acidente_js_1.default.findById(id)
             .populate('trabalhadorId', 'nome cpf email empresa unidade')
             .lean();
         if (!acidente) {
-            throw new AppError('Acidente não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Acidente não encontrado', 404);
         }
         // Se a população falhou (trabalhadorId é nulo ou string de ID não encontrada)
         // Mas o documento original tinha um valor, tentamos buscar manualmente
         if (!acidente.trabalhadorId) {
             // Buscar o documento bruto para ver o que tem no campo trabalhadorId
-            const bruto = await Acidente.findById(id).select('trabalhadorId').lean();
+            const bruto = await Acidente_js_1.default.findById(id).select('trabalhadorId').lean();
             if (bruto && bruto.trabalhadorId) {
                 const identifier = bruto.trabalhadorId.toString();
                 // Tentar buscar por ID ou CPF
                 let t = null;
-                if (mongoose.Types.ObjectId.isValid(identifier)) {
-                    t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+                if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
+                    t = await Trabalhador_js_1.default.findById(identifier).select('nome cpf').lean();
                     if (!t) {
-                        t = await User.findById(identifier).select('nome cpf').lean();
+                        t = await User_js_1.default.findById(identifier).select('nome cpf').lean();
                     }
                 }
                 else {
                     // É um CPF
-                    t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+                    t = await Trabalhador_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean();
                     if (!t) {
-                        t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+                        t = await User_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean();
                     }
                 }
                 if (t) {
@@ -95,13 +134,13 @@ export class AcidenteService {
         }
         if (filtros?.trabalhadorId) {
             // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
-            const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+            const { toCPFMaskedOrDigits } = await Promise.resolve().then(() => __importStar(require('../utils/cpf.js')));
             query.trabalhadorId = toCPFMaskedOrDigits(filtros.trabalhadorId);
         }
         // Filtro por CPF do trabajador
         if (filtros?.cpfTrabalhador) {
             // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
-            const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+            const { toCPFMaskedOrDigits } = await Promise.resolve().then(() => __importStar(require('../utils/cpf.js')));
             const cpfNorm = toCPFMaskedOrDigits(String(filtros.cpfTrabalhador));
             const resolvedId = await this.resolverTrabalhadorId(cpfNorm);
             query.trabalhadorId = resolvedId;
@@ -118,8 +157,8 @@ export class AcidenteService {
         if (filtros?.descricao) {
             query.descricao = { $regex: filtros.descricao, $options: 'i' };
         }
-        const total = await Acidente.countDocuments(query);
-        const acidentesBrutos = await Acidente.find(query)
+        const total = await Acidente_js_1.default.countDocuments(query);
+        const acidentesBrutos = await Acidente_js_1.default.find(query)
             .populate('trabalhadorId', 'nome cpf email empresa unidade')
             .sort({ dataAcidente: -1 })
             .skip(skip)
@@ -129,19 +168,19 @@ export class AcidenteService {
         const acidentes = await Promise.all(acidentesBrutos.map(async (acidente) => {
             if (!acidente.trabalhadorId) {
                 // Buscar o documento bruto original
-                const doc = await Acidente.findById(acidente._id).select('trabalhadorId').lean();
+                const doc = await Acidente_js_1.default.findById(acidente._id).select('trabalhadorId').lean();
                 if (doc && doc.trabalhadorId) {
                     const identifier = doc.trabalhadorId.toString();
                     let t = null;
-                    if (mongoose.Types.ObjectId.isValid(identifier)) {
-                        t = await Trabalhador.findById(identifier).select('nome cpf').lean();
+                    if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
+                        t = await Trabalhador_js_1.default.findById(identifier).select('nome cpf').lean();
                         if (!t)
-                            t = await User.findById(identifier).select('nome cpf').lean();
+                            t = await User_js_1.default.findById(identifier).select('nome cpf').lean();
                     }
                     else {
-                        t = await Trabalhador.findOne({ cpf: identifier }).select('nome cpf').lean();
+                        t = await Trabalhador_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean();
                         if (!t)
-                            t = await User.findOne({ cpf: identifier }).select('nome cpf').lean();
+                            t = await User_js_1.default.findOne({ cpf: identifier }).select('nome cpf').lean();
                     }
                     if (t)
                         acidente.trabalhadorId = t;
@@ -168,7 +207,7 @@ export class AcidenteService {
             delete acidenteData.dataCriacao;
         }
         // Resolver trabalhadorId se for CPF
-        if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId)) {
+        if (acidenteData.trabalhadorId && !mongoose_1.default.Types.ObjectId.isValid(acidenteData.trabalhadorId)) {
             acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId);
         }
         // Garantir que lesões é um array, mas SOMENTE se ele foi enviado no payload
@@ -176,12 +215,12 @@ export class AcidenteService {
             acidenteData.lesoes = [];
         }
         // Usar $set explicitamente para garantir que arrays (como lesoes) sejam substituídos corretamente
-        const acidente = await Acidente.findByIdAndUpdate(id, { $set: acidenteData }, {
+        const acidente = await Acidente_js_1.default.findByIdAndUpdate(id, { $set: acidenteData }, {
             new: true,
             runValidators: true,
         }).populate('trabalhadorId', 'nome cpf email empresa unidade').lean();
         if (!acidente) {
-            throw new AppError('Acidente não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Acidente não encontrado', 404);
         }
         // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
         const acidenteMapeado = {
@@ -192,32 +231,32 @@ export class AcidenteService {
         return acidenteMapeado;
     }
     async deletar(id) {
-        const result = await Acidente.findByIdAndDelete(id);
+        const result = await Acidente_js_1.default.findByIdAndDelete(id);
         if (!result) {
-            throw new AppError('Acidente não encontrado', 404);
+            throw new errorHandler_js_1.AppError('Acidente não encontrado', 404);
         }
         // Exclusão em cascata: remover a ficha técnica de material biológico vinculada, se existir
-        await MaterialBiologico.findOneAndDelete({ acidenteId: id });
+        await MaterialBiologico_js_1.default.findOneAndDelete({ acidenteId: id });
     }
     async obterPorTrabalhador(trabalhadorId, page = 1, limit = 10) {
         const skip = (page - 1) * limit;
         const query = { trabalhadorId };
-        const total = await Acidente.countDocuments(query);
-        const acidentes = await Acidente.find(query)
+        const total = await Acidente_js_1.default.countDocuments(query);
+        const acidentes = await Acidente_js_1.default.find(query)
             .sort({ dataAcidente: -1 })
             .skip(skip)
             .limit(limit)
             .lean();
         const pages = Math.ceil(total / limit);
         return {
-            acidentes: acidentes.map(a => ({ ...a.toObject(), _id: a._id?.toString() })),
+            acidentes: acidentes.map(a => ({ ...a, _id: a._id?.toString() })),
             total,
             pages,
         };
     }
     async obterEstatisticas() {
-        const total = await Acidente.countDocuments();
-        const porTipo = await Acidente.aggregate([
+        const total = await Acidente_js_1.default.countDocuments();
+        const porTipo = await Acidente_js_1.default.aggregate([
             {
                 $group: {
                     _id: '$tipoAcidente',
@@ -225,7 +264,7 @@ export class AcidenteService {
                 },
             },
         ]);
-        const porStatus = await Acidente.aggregate([
+        const porStatus = await Acidente_js_1.default.aggregate([
             {
                 $group: {
                     _id: '$status',
@@ -236,7 +275,7 @@ export class AcidenteService {
         // Últimos 6 meses
         const seisMesesAtras = new Date();
         seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
-        const ultimosMeses = await Acidente.aggregate([
+        const ultimosMeses = await Acidente_js_1.default.aggregate([
             {
                 $match: {
                     dataAcidente: { $gte: seisMesesAtras },
@@ -272,4 +311,5 @@ export class AcidenteService {
         };
     }
 }
-export default new AcidenteService();
+exports.AcidenteService = AcidenteService;
+exports.default = new AcidenteService();

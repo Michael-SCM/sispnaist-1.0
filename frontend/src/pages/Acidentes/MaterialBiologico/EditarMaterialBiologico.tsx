@@ -99,11 +99,18 @@ export const EditarMaterialBiologico: React.FC = () => {
     e.preventDefault();
     if (!id) return;
 
+    const acidenteId = getAcidenteIdValue();
+    if (!acidenteId) {
+      toast.error('Acidente vinculado não encontrado');
+      return;
+    }
+
     try {
       setIsLoading(true);
       await materialBiologicoService.atualizar(id, formData);
       toast.success('Ficha técnica atualizada com sucesso!');
-      navigate('/acidentes/material-biologico');
+
+      navigate(`/acidentes/${acidenteId}`);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Erro ao atualizar ficha técnica');
     } finally {
@@ -115,7 +122,7 @@ export const EditarMaterialBiologico: React.FC = () => {
     <MainLayout>
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/acidentes/material-biologico')} className="p-3 hover:bg-emerald-50 rounded-2xl transition-all text-emerald-600 active:scale-90">
+          <button onClick={() => navigate(`/acidentes/material-biologico/${id}`)} className="p-3 hover:bg-emerald-50 rounded-2xl transition-all text-emerald-600 active:scale-90">
             <ArrowLeft size={24} />
           </button>
           <div>

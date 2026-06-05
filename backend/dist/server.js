@@ -1,21 +1,27 @@
-import 'dotenv/config';
-import dns from 'node:dns';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
+const node_dns_1 = __importDefault(require("node:dns"));
 // Forçar a resolução de DNS a priorizar IPv4. 
 // Isso resolve o erro ENETUNREACH no Render, pois a plataforma não possui suporte a IPv6 de saída.
-dns.setDefaultResultOrder('ipv4first');
-import app from './app.js';
-import config from './config/config.js';
-const PORT = config.port;
-const server = app.listen(PORT, () => {
+node_dns_1.default.setDefaultResultOrder('ipv4first');
+const mongoose_1 = __importDefault(require("mongoose"));
+const app_js_1 = __importDefault(require("./app.js"));
+const config_js_1 = __importDefault(require("./config/config.js"));
+const PORT = config_js_1.default.port;
+const server = app_js_1.default.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════╗
 ║    SISPNAIST Backend Server Started    ║
 ╚════════════════════════════════════════╝
 
 🚀 Server running on: http://localhost:${PORT}
-🗄️  Database: ${config.mongodbUri}
-🌍 Environment: ${config.nodeEnv}
-🔐 CORS enabled for: ${config.corsOrigin}
+🗄️  Database: ${config_js_1.default.mongodbUri}
+🌍 Environment: ${config_js_1.default.nodeEnv}
+🔐 CORS enabled for: ${config_js_1.default.corsOrigin}
 
 API Documentation:
   POST   /api/auth/register    - Criar conta
@@ -25,21 +31,17 @@ API Documentation:
   GET    /health               - Health check
   `);
 });
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('\n🛑 SIGTERM received, shutting down gracefully...');
+async function gracefulShutdown(signal) {
+    console.log(`\n🛑 ${signal} received, shutting down gracefully...`);
     server.close(() => {
-        console.log('✓ Server closed');
-        process.exit(0);
+        console.log('✓ HTTP server closed');
     });
-});
-process.on('SIGINT', () => {
-    console.log('\n🛑 SIGINT received, shutting down gracefully...');
-    server.close(() => {
-        console.log('✓ Server closed');
-        process.exit(0);
-    });
-});
+    await mongoose_1.default.disconnect();
+    console.log('✓ MongoDB disconnected');
+    process.exit(0);
+}
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
     console.error('❌ Uncaught Exception:', error);

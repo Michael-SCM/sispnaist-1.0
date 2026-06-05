@@ -30,9 +30,6 @@ export const logAction = async (
   detalhes?: Record<string, any>
 ) => {
   try {
-    // Marca que a auditoria foi logada (para middleware não registrar novamente)
-    (req as any).auditLogged = true;
-
     const usuarioId = req.user?.id || req.user?._id || req.body?.usuarioId || 'system';
     const ip = (req.ip || req.connection?.remoteAddress || '0.0.0.0').replace('::ffff:', '');
     const userAgent = req.get('User-Agent') || 'Unknown';
