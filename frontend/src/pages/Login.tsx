@@ -17,7 +17,7 @@ interface LoginFormData {
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const setUser = useAuthStore((state) => state.setUser);
   const { values, handleChange, handleBlur, reset } = useForm<LoginFormData>({
     email: '',
     senha: '',
@@ -33,8 +33,8 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { user, token, refreshToken } = await authService.login(values.email, values.senha);
-      setAuth(user, token, refreshToken);
+      const { user } = await authService.login(values.email, values.senha);
+      setUser(user);
       toast.success('Login realizado com sucesso!');
       navigate('/dashboard');
       reset();

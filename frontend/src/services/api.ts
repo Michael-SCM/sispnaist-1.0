@@ -15,28 +15,20 @@ const axiosInstance: AxiosInstance = axios.create({
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value: any) => void;
+  resolve: () => void;
   reject: (reason?: any) => void;
 }> = [];
 
-function processQueue(error: any, token: string | null = null) {
+function processQueue(error: any) {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve();
     }
   });
   failedQueue = [];
 }
-
-axiosInstance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const { token } = useAuthStore.getState();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -51,15 +43,7 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(customError);
     }
 
-    if (originalRequest.url?.includes('/auth/refresh-token')) {
-      useAuthStore.getState().clearAuth();
-      toast.error('Sessão expirada. Faça login novamente.');
-      setTimeout(() => { window.location.href = '/login'; }, 2500);
-      return Promise.reject(error);
-    }
-
-    const { refreshToken } = useAuthStore.getState();
-    if (!refreshToken) {
+    if (originalRequest.url?.includes('/auth/refresh-token') || originalRequest.url?.includes('/auth/logout')) {
       useAuthStore.getState().clearAuth();
       toast.error('Sessão expirada. Faça login novamente.');
       setTimeout(() => { window.location.href = '/login'; }, 2500);
@@ -67,31 +51,20 @@ axiosInstance.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
-      }).then((token) => {
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return axiosInstance(originalRequest);
-      });
+      }).then(() => axiosInstance(originalRequest));
     }
 
     originalRequest._retry = true;
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
-      const newToken = data.data.accessToken;
-      const newRefreshToken = data.data.refreshToken;
-
-      useAuthStore.getState().setToken(newToken);
-      useAuthStore.getState().setRefreshToken(newRefreshToken);
-
-      processQueue(null, newToken);
-
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      await axios.post(`${API_BASE_URL}/auth/refresh-token`, {}, { withCredentials: true });
+      processQueue(null);
       return axiosInstance(originalRequest);
     } catch (refreshError) {
-      processQueue(refreshError, null);
+      processQueue(refreshError);
       useAuthStore.getState().clearAuth();
       toast.error('Sessão expirada. Faça login novamente.');
       setTimeout(() => { window.location.href = '/login'; }, 2500);

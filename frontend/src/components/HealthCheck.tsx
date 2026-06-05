@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api.js';
+import { useAuthStore } from '../store/authStore.js';
 
 export const HealthCheck: React.FC = () => {
+  const { isAuthenticated } = useAuthStore();
   const [status, setStatus] = useState<{
     frontend: boolean;
     backend: boolean;
@@ -19,37 +21,37 @@ export const HealthCheck: React.FC = () => {
     checkHealth();
   }, []);
 
+  useEffect(() => {
+    setStatus((prev) => ({ ...prev, token: isAuthenticated }));
+  }, [isAuthenticated]);
+
   const checkHealth = async () => {
     try {
-      // Tentar ler do env, se falhar usa default
       let apiUrl = '';
       try {
         apiUrl = import.meta.env.VITE_API_URL || '';
       } catch {
         apiUrl = '';
       }
-      
+
       if (!apiUrl) {
         apiUrl = 'http://localhost:3001/api';
       }
-      
-      const token = localStorage.getItem('token');
 
-      // Tentar acessar health endpoint
       try {
         const response = await api.get('/health');
         setStatus({
           frontend: true,
           backend: response.status === 200,
           apiUrl,
-          token: !!token,
+          token: isAuthenticated,
         });
       } catch (error) {
         setStatus({
           frontend: true,
           backend: false,
           apiUrl,
-          token: !!token,
+          token: isAuthenticated,
           error: `Backend não respondeu: ${(error as Error).message}`,
         });
       }

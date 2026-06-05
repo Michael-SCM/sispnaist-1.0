@@ -5,22 +5,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onre
 
 interface AuthStore {
   user: IUser | null;
-  token: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   setUser: (user: IUser | null) => void;
-  setToken: (token: string | null) => void;
-  setRefreshToken: (refreshToken: string | null) => void;
-  setAuth: (user: IUser, token: string, refreshToken?: string) => void;
   clearAuth: () => void;
   initializeAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
-  token: null,
-  refreshToken: null,
   isAuthenticated: false,
   loading: true,
 
@@ -28,20 +21,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ user, isAuthenticated: !!user });
   },
 
-  setToken: (token) => {
-    set({ token, isAuthenticated: !!token });
-  },
-
-  setRefreshToken: (refreshToken) => {
-    set({ refreshToken });
-  },
-
-  setAuth: (user, token, refreshToken) => {
-    set({ user, token, refreshToken: refreshToken || null, isAuthenticated: true });
-  },
-
   clearAuth: () => {
-    set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
+    set({ user: null, isAuthenticated: false });
   },
 
   initializeAuth: async () => {
@@ -53,12 +34,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
       });
       if (response.ok) {
         const data = await response.json();
-        set({ user: data.data.user, isAuthenticated: true, token: null, refreshToken: null, loading: false });
+        set({ user: data.data.user, isAuthenticated: true, loading: false });
       } else {
-        set({ user: null, token: null, refreshToken: null, isAuthenticated: false, loading: false });
+        set({ user: null, isAuthenticated: false, loading: false });
       }
     } catch {
-      set({ user: null, token: null, refreshToken: null, isAuthenticated: false, loading: false });
+      set({ user: null, isAuthenticated: false, loading: false });
     }
   },
 }));

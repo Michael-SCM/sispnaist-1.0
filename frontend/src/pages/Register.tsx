@@ -20,7 +20,6 @@ interface RegisterFormData {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
   const { values, handleChange, handleBlur, reset } = useForm<RegisterFormData>({
     nome: '',
     email: '',

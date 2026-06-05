@@ -18,9 +18,6 @@ export const authService = {
     } catch {
       // falha no logout remoto não impede o logout local
     }
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
   },
 
   me: async (): Promise<IUser> => {
@@ -30,21 +27,7 @@ export const authService = {
 
   updateProfile: async (userData: Partial<IUser>): Promise<IUser> => {
     const response = await api.put<{ data: { user: IUser } }>('/auth/profile', userData);
-    localStorage.setItem('user', JSON.stringify(response.data.data.user));
     return response.data.data.user;
-  },
-
-  getStoredUser: (): IUser | null => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  },
-
-  getToken: (): string | null => {
-    return localStorage.getItem('token');
-  },
-
-  isAuthenticated: (): boolean => {
-    return !!localStorage.getItem('token');
   },
 
   forgotPassword: async (email: string, dataNascimento: string): Promise<{ status: string; message: string; token?: string }> => {
