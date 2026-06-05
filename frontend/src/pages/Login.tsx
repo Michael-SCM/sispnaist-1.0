@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 import { useForm } from '../hooks/useForm.js';
 import { authService } from '../services/authService.js';
 import { useAuthStore } from '../store/authStore.js';
@@ -39,8 +40,13 @@ export const Login: React.FC = () => {
       navigate('/dashboard');
       reset();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao fazer login';
-      toast.error(message);
+      let errorMessage = 'Erro ao fazer login. Tente novamente.';
+      if (isAxiosError(error) && error.response) {
+        errorMessage = error.response.data?.message || 'Email ou senha inválidos.';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

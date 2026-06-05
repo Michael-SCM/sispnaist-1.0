@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { IUser } from '../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
+import axiosInstance from '../services/api';
 
 interface AuthStore {
   user: IUser | null;
@@ -28,16 +27,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   initializeAuth: async () => {
     try {
       set({ loading: true });
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        set({ user: data.data.user, isAuthenticated: true, loading: false });
-      } else {
-        set({ user: null, isAuthenticated: false, loading: false });
-      }
+      const response = await axiosInstance.get('/auth/me');
+      set({ user: response.data.data.user, isAuthenticated: true, loading: false });
     } catch {
       set({ user: null, isAuthenticated: false, loading: false });
     }

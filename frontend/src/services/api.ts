@@ -35,8 +35,17 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
+    const responseData = error.response?.data as any;
+
+    const authEndpoints = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email', '/auth/me'];
+    if (authEndpoints.some(url => originalRequest.url?.includes(url))) {
+      const errorMessage = responseData?.message || error.message || 'Erro na requisição';
+      const customError = new Error(errorMessage) as any;
+      if (responseData?.errors) customError.details = responseData.errors;
+      return Promise.reject(customError);
+    }
+
     if (error.response?.status !== 401 || originalRequest._retry) {
-      const responseData = error.response?.data as any;
       const errorMessage = responseData?.message || error.message || 'Erro na requisição';
       const customError = new Error(errorMessage) as any;
       if (responseData?.errors) customError.details = responseData.errors;
