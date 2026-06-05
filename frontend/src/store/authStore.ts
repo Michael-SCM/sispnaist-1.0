@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { IUser } from '../types';
-import api from '../services/api';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
 
 interface AuthStore {
   user: IUser | null;
@@ -16,7 +17,7 @@ interface AuthStore {
   initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   token: null,
   refreshToken: null,
@@ -46,9 +47,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   initializeAuth: async () => {
     try {
       set({ loading: true });
-      const response = await api.get('/auth/me');
-      const user = response.data.data.user;
-      set({ user, isAuthenticated: true, token: null, refreshToken: null, loading: false });
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        set({ user: data.data.user, isAuthenticated: true, token: null, refreshToken: null, loading: false });
+      } else {
+        set({ user: null, token: null, refreshToken: null, isAuthenticated: false, loading: false });
+      }
     } catch {
       set({ user: null, token: null, refreshToken: null, isAuthenticated: false, loading: false });
     }

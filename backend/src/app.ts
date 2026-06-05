@@ -34,6 +34,9 @@ import { seedCatalogos } from './utils/seedCatalogos.js';
 
 const app = express();
 
+// Render/Proxies: confiar no X-Forwarded-For para rate-limit e req.ip
+app.set('trust proxy', 1);
+
 // Middleware de CORS (usa lista configurável via CORS_ORIGIN no .env)
 app.use(cors({
   origin: function (origin, callback) {
