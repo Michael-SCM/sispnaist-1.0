@@ -37,5 +37,7 @@ const DoencaSchema = new Schema<IDoencaDocument>(
 );
 
 DoencaSchema.index({ trabalhadorId: 1, dataInicio: -1 });
+DoencaSchema.index({ nomeDoenca: 1 });
+DoencaSchema.index({ ativo: 1 });
 
 export default mongoose.model<IDoencaDocument>('Doenca', DoencaSchema);

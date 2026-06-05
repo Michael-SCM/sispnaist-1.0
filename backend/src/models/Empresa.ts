@@ -58,4 +58,6 @@ const EmpresaSchema = new Schema<IEmpresaDocument>(
   }
 );
 
+EmpresaSchema.index({ razaoSocial: 1 });
+
 export default mongoose.model<IEmpresaDocument>('Empresa', EmpresaSchema);

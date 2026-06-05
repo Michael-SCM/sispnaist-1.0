@@ -53,5 +53,6 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
 );
 
 UnidadeSchema.index({ empresaId: 1 });
+UnidadeSchema.index({ nome: 1 });
 
 export default mongoose.model<IUnidadeDocument>('Unidade', UnidadeSchema);

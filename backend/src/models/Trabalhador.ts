@@ -202,5 +202,7 @@ TrabalhadorSchema.index({ 'vinculo.situacao': 1 });
 TrabalhadorSchema.index({ empresa: 1 });
 TrabalhadorSchema.index({ unidade: 1 });
 TrabalhadorSchema.index({ nome: 1 });
+TrabalhadorSchema.index({ matricula: 1 });
+TrabalhadorSchema.index({ 'trabalho.setor': 1 });
 
 export default mongoose.model<ITrabalhadorDocument>('Trabalhador', TrabalhadorSchema);

@@ -104,6 +104,9 @@ const UserSchema = new Schema<IUserDocument>(
   }
 );
 
+UserSchema.index({ nome: 1 });
+UserSchema.index({ perfil: 1 });
+
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('senha')) return next();

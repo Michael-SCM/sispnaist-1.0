@@ -55,5 +55,6 @@ const AuditLogSchema = new Schema<IAuditLogDocument>(
 // Index composto para queries eficientes
 AuditLogSchema.index({ entidade: 1, dataCriacao: -1 });
 AuditLogSchema.index({ usuarioId: 1, dataCriacao: -1 });
+AuditLogSchema.index({ acao: 1 });
 
 export default mongoose.model<IAuditLogDocument>('AuditLog', AuditLogSchema);

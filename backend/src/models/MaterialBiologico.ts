@@ -59,4 +59,7 @@ const MaterialBiologicoSchema = new Schema<IMaterialBiologicoDocument>(
   }
 );
 
+MaterialBiologicoSchema.index({ tipoExposicao: 1 });
+MaterialBiologicoSchema.index({ agente: 1 });
+
 export default mongoose.model<IMaterialBiologicoDocument>('MaterialBiologico', MaterialBiologicoSchema);
