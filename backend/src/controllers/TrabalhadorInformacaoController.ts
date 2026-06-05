@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import TrabalhadorInformacaoService from '../services/TrabalhadorInformacaoService';
 import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
+import { getPaginationParams } from '../utils/pagination.js';
 
 class TrabalhadorInformacaoController {
   // GET /api/trabalhadores/:id/informacoes - Listar informações de um trabalhador
@@ -17,8 +18,7 @@ class TrabalhadorInformacaoController {
         }
       }
 
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
+      const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
       const result = await TrabalhadorInformacaoService.listarPorTrabalhador(id, page, limit);
 
       res.setHeader('X-Total-Count', result.total.toString());

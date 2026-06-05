@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import ServidorFuncionario from '../models/ServidorFuncionario';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class ServidorFuncionarioController {
   // GET /api/servidores - Listar servidores
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 20, ativo, situacaoFuncional, lotacao } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+      const { ativo, situacaoFuncional, lotacao } = req.query;
 
       const filtro: any = {};
       if (ativo === 'true') filtro.ativo = true;
@@ -19,8 +21,8 @@ class ServidorFuncionarioController {
         ServidorFuncionario.find(filtro)
           .populate('trabalhadorId', 'nome cpf matricula')
           .sort({ matriculaFuncional: 1 })
-          .skip((Number(page) - 1) * Number(limit))
-          .limit(Number(limit))
+          .skip(skip)
+          .limit(limit)
           .lean(),
         ServidorFuncionario.countDocuments(filtro)
       ]);
@@ -28,9 +30,9 @@ class ServidorFuncionarioController {
       return res.status(200).json({
         data: servidores,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

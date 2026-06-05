@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import VideoAula from '../models/VideoAula';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class VideoAulaController {
   // GET /api/video-aulas - Listar video-aulas
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 20, ativo, categoria } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+      const { ativo, categoria } = req.query;
 
       const filtro: any = {};
       if (ativo === 'true') filtro.ativo = true;
@@ -15,19 +17,21 @@ class VideoAulaController {
       if (categoria) filtro.categoria = categoria;
 
       const [videoAulas, total] = await Promise.all([
-        VideoAula.find(filtro).sort({ ordem: 1, titulo: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+        VideoAula.find(filtro).sort({ ordem: 1, titulo: 1 }).skip(skip).limit(limit).lean(),
         VideoAula.countDocuments(filtro)
       ]);
 
-      console.log('[VideoAulaController.listar] query:', { page, limit, ativo, categoria, filtro, total });
-      console.log('[VideoAulaController.listar] ids retornados:', (videoAulas || []).map((v: any) => v._id));
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[VideoAulaController.listar] query:', { page, limit, ativo, categoria, filtro, total });
+        console.log('[VideoAulaController.listar] ids retornados:', (videoAulas || []).map((v: any) => v._id));
+      }
 
       return res.status(200).json({
         data: videoAulas,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

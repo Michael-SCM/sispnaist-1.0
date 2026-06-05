@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import Parametro from '../models/Parametro';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class ParametroController {
   // GET /api/parametros - Listar todos os parâmetros
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 100, categoria, ativo } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
+      const { categoria, ativo } = req.query;
 
       const filtro: any = {};
       if (categoria) filtro.categoria = categoria;
@@ -15,16 +17,16 @@ class ParametroController {
       else if (ativo === 'false') filtro.ativo = false;
 
       const [parametros, total] = await Promise.all([
-        Parametro.find(filtro).sort({ categoria: 1, chave: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+        Parametro.find(filtro).sort({ categoria: 1, chave: 1 }).skip(skip).limit(limit).lean(),
         Parametro.countDocuments(filtro)
       ]);
 
       return res.status(200).json({
         data: parametros,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

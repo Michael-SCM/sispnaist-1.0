@@ -2,17 +2,19 @@ import { Request, Response } from 'express';
 import AuditLog from '../models/AuditLog.js';
 import auditService from '../services/AuditService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 /**
  * GET /api/audit/logs
  * Listagem de logs com filtros
  */
 export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
-  const { page = 1, limit = 20, usuarioId, entidade, acao, dataInicio, dataFim } = req.query;
+  const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+  const { usuarioId, entidade, acao, dataInicio, dataFim } = req.query;
 
   const result = await auditService.obterLogs(
-    Number(page),
-    Number(limit),
+    page,
+    limit,
     {
       usuarioId: usuarioId as string,
       entidade: entidade as string,
@@ -27,8 +29,8 @@ export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
     data: {
       items: result.logs,
       total: result.total,
-      page: Number(page),
-      pages: result.pages
+      page,
+      pages: getPaginationResult(result.total, page, limit).pages
     }
   });
 });

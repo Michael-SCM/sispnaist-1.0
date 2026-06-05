@@ -7,6 +7,7 @@ import TrabalhadorProcessoTrabalho from '../models/TrabalhadorProcessoTrabalho';
 import TrabalhadorVinculo from '../models/TrabalhadorVinculo';
 import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
+import { getPaginationParams } from '../utils/pagination.js';
 
 /**
  * Controller unificado para todos os submódulos do trabalhador.
@@ -48,9 +49,7 @@ class SubmoduloTrabalhadorController {
       if (ativo === 'true') filtro.ativo = true;
       else if (ativo === 'false') filtro.ativo = false;
 
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 100));
-      const skip = (page - 1) * limit;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
 
       const [itens, total] = await Promise.all([
         Model.find(filtro).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),

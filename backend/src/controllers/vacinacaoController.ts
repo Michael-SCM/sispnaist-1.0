@@ -5,6 +5,7 @@ import { IAuthRequest } from '../middleware/auth.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user?.perfil === 'trabalhador') {
@@ -47,7 +48,8 @@ export const obterVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 });
 
 export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  const { page, limit, vacina, trabalhadorId } = req.query;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+  const { vacina, trabalhadorId } = req.query;
   let targetTrabalhadorId = trabalhadorId as string;
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
@@ -70,8 +72,8 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
   }
 
   const result = await vacinacaoService.listar({
-    page: page ? Number(page) : 1,
-    limit: limit ? Number(limit) : 10,
+    page,
+    limit,
     vacina: vacina as string,
     trabalhadorId: targetTrabalhadorId,
   });
@@ -115,8 +117,7 @@ export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Resp
 export const obterVacinacoesPorTrabalhador = asyncHandler(
   async (req: IAuthRequest, res: Response) => {
     const { trabalhadorId } = req.params;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
     // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
     if (req.user?.perfil === 'trabalhador') {
@@ -132,12 +133,7 @@ export const obterVacinacoesPorTrabalhador = asyncHandler(
       status: 'success',
       data: {
         vacinacoes: result.vacinacoes,
-        paginacao: {
-          page,
-          limit,
-          total: result.total,
-          pages: result.pages,
-        },
+        paginacao: getPaginationResult(result.total, page, limit),
       },
     });
   }

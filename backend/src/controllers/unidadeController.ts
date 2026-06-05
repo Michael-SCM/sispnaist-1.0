@@ -3,6 +3,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import unidadeService from '../services/UnidadeService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { getPaginationParams } from '../utils/pagination.js';
 
 /**
  * @desc    Listar unidades com paginação e filtros
@@ -10,8 +11,7 @@ import { AppError } from '../middleware/errorHandler.js';
  * @access  Private/Admin
  */
 export const getUnidades = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
   
   const filtros = {
     nome: req.query.nome as string,

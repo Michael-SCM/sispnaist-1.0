@@ -49,11 +49,13 @@ class CatalogoService {
   }
 
   // Lista apenas itens ativos (equivalente ao getdados.php original)
-  async listarAtivos(entidade: string): Promise<ICatalogoItem[]> {
+  async listarAtivos(entidade: string, page: number = 1, limit: number = 100): Promise<ICatalogoItem[]> {
     this.validarEntidade(entidade);
 
     const resultado = await Catalogo.find({ entidade, ativo: true })
       .sort({ ordem: 1, nome: 1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
       .select('_id nome sigla descricao ordem')
       .lean();
 

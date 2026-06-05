@@ -3,12 +3,14 @@ import Questionario from '../models/Questionario';
 import QuestionarioItem from '../models/QuestionarioItem';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class QuestionarioController {
   // GET /api/questionarios - Listar todos os questionários
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 20, ativo, tipo } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+      const { ativo, tipo } = req.query;
 
       const filtro: any = {};
       if (ativo === 'true') filtro.ativo = true;
@@ -16,16 +18,16 @@ class QuestionarioController {
       if (tipo) filtro.tipo = tipo;
 
       const [questionarios, total] = await Promise.all([
-        Questionario.find(filtro).sort({ nome: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+        Questionario.find(filtro).sort({ nome: 1 }).skip(skip).limit(limit).lean(),
         Questionario.countDocuments(filtro)
       ]);
 
       return res.status(200).json({
         data: questionarios,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

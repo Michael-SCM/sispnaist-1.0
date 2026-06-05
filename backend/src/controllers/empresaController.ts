@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import empresaService from '../services/EmpresaService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams } from '../utils/pagination.js';
 
 /**
  * @desc    Listar empresas com paginação e filtros
@@ -9,8 +10,7 @@ import { logAction, compararDados } from '../utils/auditLogger.js';
  * @access  Private/Admin
  */
 export const getEmpresas = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
   
   const filtros = {
     razaoSocial: req.query.razaoSocial as string,

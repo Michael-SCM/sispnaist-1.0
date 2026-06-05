@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import ArquivoUpload from '../models/ArquivoUpload';
 import { AppError } from '../middleware/errorHandler';
 import { IAuthRequest } from '../types/index.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
@@ -10,23 +11,24 @@ class UploadController {
   // GET /api/uploads - Listar uploads
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { entidade, entidadeId, page = 1, limit = 20 } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+      const { entidade, entidadeId } = req.query;
 
       const filtro: any = {};
       if (entidade) filtro.entidade = entidade;
       if (entidadeId) filtro.entidadeId = entidadeId;
 
       const [uploads, total] = await Promise.all([
-        ArquivoUpload.find(filtro).sort({ dataCriacao: -1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+        ArquivoUpload.find(filtro).sort({ dataCriacao: -1 }).skip(skip).limit(limit).lean(),
         ArquivoUpload.countDocuments(filtro)
       ]);
 
       return res.status(200).json({
         data: uploads,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

@@ -7,13 +7,21 @@ const router = express.Router();
 // Rota pública para listar empresas ativas (para formulário de trabalhadores)
 router.get('/ativas', async (req, res) => {
   try {
+    const { getPaginationParams } = await import('../utils/pagination.js');
     const empresaService = (await import('../services/EmpresaService.js')).default;
-    const result = await empresaService.listar(1, 1000, {});
-    // Filtrar apenas empresas ativas
+    const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
+    const result = await empresaService.listar(page, limit, {});
+    // Filtrar apenas empresas ativas (já será paginado com filtro ativo no futuro)
     const empresasAtivas = result.empresas.filter((e: any) => e.ativa !== false);
     res.json({
       status: 'success',
-      data: { empresas: empresasAtivas, total: empresasAtivas.length },
+      data: {
+        empresas: empresasAtivas,
+        total: result.total,
+        page,
+        limit,
+        totalPages: Math.ceil(result.total / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Erro ao carregar empresas' });

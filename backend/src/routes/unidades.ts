@@ -7,13 +7,21 @@ const router = express.Router();
 // Rota pública para listar unidades ativas (para formulário de trabalhadores)
 router.get('/ativas', async (req, res) => {
   try {
+    const { getPaginationParams } = await import('../utils/pagination.js');
     const unidadeService = (await import('../services/UnidadeService.js')).default;
-    const result = await unidadeService.listar(1, 1000, {});
-    // Filtrar apenas unidades ativas
+    const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
+    const result = await unidadeService.listar(page, limit, {});
+    // Filtrar apenas unidades ativas (já será paginado com filtro ativo no futuro)
     const unidadesAtivas = result.unidades.filter((u: any) => u.ativa !== false);
     res.json({
       status: 'success',
-      data: { unidades: unidadesAtivas, total: unidadesAtivas.length },
+      data: {
+        unidades: unidadesAtivas,
+        total: result.total,
+        page,
+        limit,
+        totalPages: Math.ceil(result.total / limit),
+      },
     });
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Erro ao carregar unidades' });

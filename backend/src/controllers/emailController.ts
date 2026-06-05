@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import PadraoEmail from '../models/PadraoEmail';
 import { AppError } from '../middleware/errorHandler';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class EmailController {
   // GET /api/emails/padroes - Listar templates de email
   async listarPadroes(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 20, ativo, categoria } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+      const { ativo, categoria } = req.query;
 
       const filtro: any = {};
       if (ativo === 'true') filtro.ativo = true;
@@ -14,16 +16,16 @@ class EmailController {
       if (categoria) filtro.categoria = categoria;
 
       const [padroes, total] = await Promise.all([
-        PadraoEmail.find(filtro).sort({ nome: 1 }).skip((Number(page) - 1) * Number(limit)).limit(Number(limit)).lean(),
+        PadraoEmail.find(filtro).sort({ nome: 1 }).skip(skip).limit(limit).lean(),
         PadraoEmail.countDocuments(filtro)
       ]);
 
       return res.status(200).json({
         data: padroes,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit))
+        page,
+        limit,
+        totalPages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);

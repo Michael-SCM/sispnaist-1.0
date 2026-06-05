@@ -4,6 +4,7 @@ import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -47,8 +48,7 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const listar = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
   const filtros: any = {
     tipoAcidente: req.query.tipoAcidente as string | undefined,
@@ -72,18 +72,13 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
   }
 
 
-  const { acidentes, total, pages } = await acidenteService.listar(page, limit, filtros);
+  const { acidentes, total } = await acidenteService.listar(page, limit, filtros);
 
   res.status(200).json({
     status: 'success',
     data: {
       acidentes,
-      paginacao: {
-        page,
-        limit,
-        total,
-        pages,
-      },
+      paginacao: getPaginationResult(total, page, limit),
     },
   });
 });
@@ -132,8 +127,7 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
 
 export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { trabalhadorId } = req.params;
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
   // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -143,7 +137,7 @@ export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Respon
     }
   }
 
-  const { acidentes, total, pages } = await acidenteService.obterPorTrabalhador(
+  const { acidentes, total } = await acidenteService.obterPorTrabalhador(
     trabalhadorId,
     page,
     limit
@@ -153,12 +147,7 @@ export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Respon
     status: 'success',
     data: {
       acidentes,
-      paginacao: {
-        page,
-        limit,
-        total,
-        pages,
-      },
+      paginacao: getPaginationResult(total, page, limit),
     },
   });
 });

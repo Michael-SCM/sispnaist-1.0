@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import CatalogoService from '../services/CatalogoService';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class CatalogoController {
   /**
@@ -13,13 +14,13 @@ class CatalogoController {
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
       const { entidade } = req.params;
-      const { page = 1, limit = 100, ativo } = req.query;
+      const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
 
       const resultado = await CatalogoService.listar(
         entidade,
-        Number(page),
-        Number(limit),
-        ativo === 'true' ? true : ativo === 'false' ? false : undefined
+        page,
+        limit,
+        req.query.ativo === 'true' ? true : req.query.ativo === 'false' ? false : undefined
       );
 
       return res.status(200).json(resultado);
@@ -32,8 +33,9 @@ class CatalogoController {
   async listarAtivos(req: Request, res: Response, next: NextFunction) {
     try {
       const { entidade } = req.params;
+      const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
 
-      const resultado = await CatalogoService.listarAtivos(entidade);
+      const resultado = await CatalogoService.listarAtivos(entidade, page, limit);
 
       return res.status(200).json(resultado);
     } catch (error) {

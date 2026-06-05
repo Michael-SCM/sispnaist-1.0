@@ -3,6 +3,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import trabalhadorService from '../services/TrabalhadorService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams } from '../utils/pagination.js';
 
 /**
  * @desc    Listar trabalhadores com paginação e filtros
@@ -10,8 +11,7 @@ import { logAction, compararDados } from '../utils/auditLogger.js';
  * @access  Private
  */
 export const getTrabalhadores = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
   
   const filtros: any = {
     nome: req.query.nome as string,

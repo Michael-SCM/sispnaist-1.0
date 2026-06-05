@@ -4,6 +4,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../middleware/errorHandler.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -46,8 +47,7 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const listar = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
   const filtros: any = {
     nomeDoenca: req.query.nomeDoenca as string,
@@ -77,11 +77,11 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     }
   });
 
-  const { doencas, total, pages } = await doencaService.listar(page, limit, filtros);
+  const { doencas, total } = await doencaService.listar(page, limit, filtros);
   res.status(200).json({
     sucesso: true,
     dados: doencas,
-    paginacao: { page, limit, total, pages },
+    paginacao: getPaginationResult(total, page, limit),
   });
 });
 
@@ -126,8 +126,7 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
 
 export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { trabalhadorId } = req.params;
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
   // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -137,11 +136,11 @@ export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Respon
     }
   }
 
-  const { doencas, total, pages } = await doencaService.obterPorTrabalhador(trabalhadorId, page, limit);
+  const { doencas, total } = await doencaService.obterPorTrabalhador(trabalhadorId, page, limit);
   res.status(200).json({
     sucesso: true,
     dados: doencas,
-    paginacao: { page, limit, total, pages },
+    paginacao: getPaginationResult(total, page, limit),
   });
 });
 

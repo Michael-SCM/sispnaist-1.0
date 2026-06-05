@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import materialBiologicoService from '../services/MaterialBiologicoService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   const ficha = await materialBiologicoService.criar(req.body);
@@ -35,21 +36,20 @@ export const obterPorAcidente = asyncHandler(async (req: Request, res: Response)
 });
 
 export const listar = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
 
   const filtros = {
     tipoExposicao: req.query.tipoExposicao as string,
     agente: req.query.agente as string,
   };
 
-  const { fichas, total, pages } = await materialBiologicoService.listar(page, limit, filtros);
+  const { fichas, total } = await materialBiologicoService.listar(page, limit, filtros);
 
   res.status(200).json({
     status: 'success',
     data: {
       fichas,
-      paginacao: { page, limit, total, pages },
+      paginacao: getPaginationResult(total, page, limit),
     },
   });
 });

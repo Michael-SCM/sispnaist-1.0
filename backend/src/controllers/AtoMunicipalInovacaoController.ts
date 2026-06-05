@@ -2,29 +2,32 @@ import { Request, Response, NextFunction } from 'express';
 import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
 class AtoMunicipalInovacaoController {
   
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
-      const { page = 1, limit = 10, cidade, ano } = req.query;
+      const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+      const { cidade, ano } = req.query;
       const filter: any = { ativo: true };
 
       if (cidade) filter.nm_cidade = new RegExp(String(cidade), 'i');
       if (ano) filter.ano_ato = Number(ano);
 
-      const items = await AtoMunicipalInovacao.find(filter)
-        .sort({ ano_ato: -1, nr_ato: -1 })
-        .limit(Number(limit))
-        .skip((Number(page) - 1) * Number(limit));
-
-      const total = await AtoMunicipalInovacao.countDocuments(filter);
+      const [items, total] = await Promise.all([
+        AtoMunicipalInovacao.find(filter)
+          .sort({ ano_ato: -1, nr_ato: -1 })
+          .skip(skip)
+          .limit(limit),
+        AtoMunicipalInovacao.countDocuments(filter)
+      ]);
 
       return res.status(200).json({
         items,
         total,
-        page: Number(page),
-        pages: Math.ceil(total / Number(limit))
+        page,
+        pages: getPaginationResult(total, page, limit).pages
       });
     } catch (error) {
       next(error);
