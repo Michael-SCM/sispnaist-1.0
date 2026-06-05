@@ -26,7 +26,7 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
       status: 'error',
       message: 'Erro de validação de dados',
       errors: Object.values((err as any).errors).map((e: any) => e.message),
-      receivedBody: (err as any).receivedBody // Debug
+      ...(process.env.NODE_ENV === 'development' && { receivedBody: (err as any).receivedBody })
     });
     return;
   }
@@ -48,7 +48,9 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
     return;
   }
 
-  console.error('Unexpected error:', err);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('Unexpected error:', err);
+  }
 
   res.status(500).json({
     status: 'error',

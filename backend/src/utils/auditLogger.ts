@@ -44,7 +44,9 @@ export const logAction = async (
       userAgent
     });
 
-    console.log(`[AUDIT] ${acao} - ${entidade}:${entidadeId} by ${usuarioId}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[AUDIT] ${acao} - ${entidade}:${entidadeId} by ${usuarioId}`);
+    }
   } catch (error) {
     console.error('Erro ao salvar log de auditoria:', error);
   }

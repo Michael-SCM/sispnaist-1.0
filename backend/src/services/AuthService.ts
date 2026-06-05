@@ -38,7 +38,9 @@ export class AuthService {
     try {
       await sendVerificationEmail(userData.email, verificationToken);
     } catch (emailError: any) {
-      console.error('ERRO NO ENVIO DO E-MAIL DE CADASTRO:', emailError);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO ENVIO DO E-MAIL DE CADASTRO:', emailError);
+      }
       throw new AppError(
         'Não foi possível enviar o e-mail de confirmação. Por favor, verifique se o e-mail digitado realmente existe e está correto.',
         400

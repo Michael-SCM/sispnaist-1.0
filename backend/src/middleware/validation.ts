@@ -4,19 +4,25 @@ import { AppError } from './errorHandler.js';
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
-    console.log(`[Validation] Body BEFORE:`, JSON.stringify(req.body));
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[Validation] Body BEFORE:`, JSON.stringify(req.body));
+    }
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
     });
 
     if (error) {
-      console.log(`[Validation] Error:`, error.details);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[Validation] Error:`, error.details);
+      }
       const messages = error.details.map(d => d.message).join('; ');
       throw new AppError(messages, 400);
     }
 
-    console.log(`[Validation] Body AFTER (value):`, JSON.stringify(value));
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[Validation] Body AFTER (value):`, JSON.stringify(value));
+    }
     req.body = value;
     next();
   };

@@ -31,9 +31,13 @@ export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunct
         perfil: (decoded as any).perfil || '',
       };
 
-      console.log('[Auth] perfil decodificado:', req.user.perfil, 'id:', req.user.id);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[Auth] perfil decodificado:', req.user.perfil, 'id:', req.user.id);
+      }
     } else {
-      console.log('[Auth] decoded inesperado:', typeof decoded);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[Auth] decoded inesperado:', typeof decoded);
+      }
     }
 
     next();
@@ -66,7 +70,9 @@ export const adminMiddleware = (req: IAuthRequest, res: Response, next: NextFunc
 };
 
 export const adminOuGestorMiddleware = (req: IAuthRequest, res: Response, next: NextFunction): void => {
-  console.log('[Auth] adminOuGestorMiddleware perfil recebido:', req.user?.perfil, 'user:', req.user?.id);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[Auth] adminOuGestorMiddleware perfil recebido:', req.user?.perfil, 'user:', req.user?.id);
+  }
   if (!req.user || !['admin', 'gestor'].includes(req.user.perfil)) {
     res.status(403).json({ message: 'Sem permissão de administrador/gestor' });
     return;

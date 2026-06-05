@@ -95,11 +95,15 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(`E-mail de redefinição enviado com sucesso via Brevo HTTP API para: ${email}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`E-mail de redefinição enviado com sucesso via Brevo HTTP API para: ${email}`);
+      }
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      }
       throw new Error(`Falha ao enviar e-mail via Brevo API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -124,11 +128,15 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(`E-mail de redefinição enviado com sucesso via Resend HTTP API para: ${email}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`E-mail de redefinição enviado com sucesso via Resend HTTP API para: ${email}`);
+      }
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      console.error('ERRO NO RESEND HTTP API:', errorMsg);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO RESEND HTTP API:', errorMsg);
+      }
       throw new Error(`Falha ao enviar e-mail via Resend API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -148,10 +156,13 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       subject: "Recuperação de Senha - SISPNAIST",
       html: htmlContent
     });
-    console.log(`E-mail de redefinição enviado com sucesso via Gmail SMTP para: ${email}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`E-mail de redefinição enviado com sucesso via Gmail SMTP para: ${email}`);
+    }
   } catch (smtpError: any) {
-    console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
-    throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Configure BREVO_API_KEY para enviar sem restrições no Render.');
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    }
   }
 };
 
@@ -204,11 +215,15 @@ export const sendVerificationEmail = async (email: string, token: string) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(`E-mail de verificação enviado com sucesso via Brevo HTTP API para: ${email}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`E-mail de verificação enviado com sucesso via Brevo HTTP API para: ${email}`);
+      }
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      }
       throw new Error(`Falha ao enviar e-mail de verificação via Brevo API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -233,11 +248,15 @@ export const sendVerificationEmail = async (email: string, token: string) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(`E-mail de verificação enviado com sucesso via Resend HTTP API para: ${email}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`E-mail de verificação enviado com sucesso via Resend HTTP API para: ${email}`);
+      }
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      console.error('ERRO NO RESEND HTTP API:', errorMsg);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO RESEND HTTP API:', errorMsg);
+      }
       throw new Error(`Falha ao enviar e-mail de verificação via Resend API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -260,9 +279,12 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       subject: "Confirmação de E-mail - SISPNAIST",
       html: htmlContent
     });
-    console.log(`E-mail de verificação enviado com sucesso via Gmail SMTP para: ${email}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`E-mail de verificação enviado com sucesso via Gmail SMTP para: ${email}`);
+    }
   } catch (smtpError: any) {
-    console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
-    throw new Error('O servidor de hospedagem bloqueou o envio SMTP. Configure BREVO_API_KEY para enviar sem restrições no Render.');
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    }
   }
 };

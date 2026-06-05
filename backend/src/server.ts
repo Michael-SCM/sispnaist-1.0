@@ -10,6 +10,14 @@ import app from './app.js';
 import config from './config/config.js';
 
 
+const sanitizeMongoUri = (uri: string): string => {
+  try {
+    return uri.replace(/\/\/[^:]+:[^@]+@/, '//***:***@');
+  } catch {
+    return uri;
+  }
+};
+
 const PORT = config.port;
 
 const server = app.listen(PORT, () => {
@@ -19,7 +27,7 @@ const server = app.listen(PORT, () => {
 ╚════════════════════════════════════════╝
 
 🚀 Server running on: http://localhost:${PORT}
-🗄️  Database: ${config.mongodbUri}
+🗄️  Database: ${sanitizeMongoUri(config.mongodbUri)}
 🌍 Environment: ${config.nodeEnv}
 🔐 CORS enabled for: ${config.corsOrigin}
 
