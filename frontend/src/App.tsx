@@ -1,39 +1,84 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore.js';
 import { ProtectedRoute } from './components/ProtectedRoute.js';
-import { Login } from './pages/Login.js';
-import { Register } from './pages/Register.js';
-import { ForgotPassword } from './pages/ForgotPassword.js';
-import { ResetPassword } from './pages/ResetPassword.js';
-import { VerifyEmail } from './pages/VerifyEmail.js';
-import { Dashboard } from './pages/Dashboard.js';
-import { Home } from './pages/Home.js';
-import { ListaAcidentes, NovoAcidente, EditarAcidente, DetalhesAcidente } from './pages/Acidentes/index.js';
-import { ListaMaterialBiologico } from './pages/Acidentes/MaterialBiologico/ListaMaterialBiologico.js';
-import { NovoMaterialBiologico } from './pages/Acidentes/MaterialBiologico/NovoMaterialBiologico.js';
-import { VisualizarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/VisualizarMaterialBiologico.js';
-import { EditarMaterialBiologico } from './pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js';
-import { ListaDoencas, NovaDoenca, EditarDoenca, DetalhesDoenca } from './pages/Doencas/index.js';
-import { ListaVacinacoes, NovaVacinacao, EditarVacinacao, DetalhesVacinacao } from './pages/Vacinacoes/index.js';
-import { ListaTrabalhadores, NovoTrabalhador, EditarTrabalhador, DetalhesTrabalhador, ListaAfastamentos, FormAfastamento, ListaDependentes, FormDependente, ListaVinculos, FormVinculo, ListaOcorrenciasViolencia, FormOcorrenciaViolencia, ListaReadaptacoes, FormReadaptacao, ListaProcessosTrabalho, FormProcessoTrabalho, ListaInformacoes, FormInformacoes } from './pages/Trabalhadores/index.js';
-import ListaEmpresas from './pages/Admin/Empresas/ListaEmpresas.js';
-import FormEmpresa from './pages/Admin/Empresas/FormEmpresa.js';
-import ListaUnidades from './pages/Admin/Unidades/ListaUnidades.js';
-import FormUnidade from './pages/Admin/Unidades/FormUnidade.js';
-import ListaUsuarios from './pages/Admin/Usuarios/ListaUsuarios.js';
-import EditarUsuario from './pages/Admin/Usuarios/EditarUsuario.js';
-import ListaCatalogos from './pages/Admin/Catalogos/ListaCatalogos.js';
-import ItensCatalogo from './pages/Admin/Catalogos/ItensCatalogo.js';
-import Auditoria from './pages/Admin/Auditoria.js';
-import ListaAtos from './pages/AtosMunicipais/ListaAtos.js';
-import FormAto from './pages/AtosMunicipais/FormAto.js';
-import Monitoramento from './pages/Monitoramento.js';
-import { ListaVideoAulas, FormVideoAula, VideoPlayer } from './pages/VideoAulas/index.js';
-
 
 import './styles/globals.css';
+
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+    </div>
+  );
+}
+
+const Login = React.lazy(() => import('./pages/Login.js').then(m => ({ default: m.Login })));
+const Register = React.lazy(() => import('./pages/Register.js').then(m => ({ default: m.Register })));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword.js').then(m => ({ default: m.ForgotPassword })));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword.js').then(m => ({ default: m.ResetPassword })));
+const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail.js').then(m => ({ default: m.VerifyEmail })));
+const Dashboard = React.lazy(() => import('./pages/Dashboard.js').then(m => ({ default: m.Dashboard })));
+const Home = React.lazy(() => import('./pages/Home.js').then(m => ({ default: m.Home })));
+
+const ListaAcidentes = React.lazy(() => import('./pages/Acidentes/ListaAcidentes.js'));
+const NovoAcidente = React.lazy(() => import('./pages/Acidentes/NovoAcidente.js'));
+const EditarAcidente = React.lazy(() => import('./pages/Acidentes/EditarAcidente.js'));
+const DetalhesAcidente = React.lazy(() => import('./pages/Acidentes/DetalhesAcidente.js'));
+
+const ListaMaterialBiologico = React.lazy(() => import('./pages/Acidentes/MaterialBiologico/ListaMaterialBiologico.js').then(m => ({ default: m.ListaMaterialBiologico })));
+const NovoMaterialBiologico = React.lazy(() => import('./pages/Acidentes/MaterialBiologico/NovoMaterialBiologico.js').then(m => ({ default: m.NovoMaterialBiologico })));
+const VisualizarMaterialBiologico = React.lazy(() => import('./pages/Acidentes/MaterialBiologico/VisualizarMaterialBiologico.js').then(m => ({ default: m.VisualizarMaterialBiologico })));
+const EditarMaterialBiologico = React.lazy(() => import('./pages/Acidentes/MaterialBiologico/EditarMaterialBiologico.js').then(m => ({ default: m.EditarMaterialBiologico })));
+
+const ListaDoencas = React.lazy(() => import('./pages/Doencas/ListaDoencas.js'));
+const NovaDoenca = React.lazy(() => import('./pages/Doencas/NovaDoenca.js'));
+const EditarDoenca = React.lazy(() => import('./pages/Doencas/EditarDoenca.js'));
+const DetalhesDoenca = React.lazy(() => import('./pages/Doencas/DetalhesDoenca.js'));
+
+const ListaVacinacoes = React.lazy(() => import('./pages/Vacinacoes/ListaVacinacoes.js'));
+const NovaVacinacao = React.lazy(() => import('./pages/Vacinacoes/NovaVacinacao.js'));
+const EditarVacinacao = React.lazy(() => import('./pages/Vacinacoes/EditarVacinacao.js'));
+const DetalhesVacinacao = React.lazy(() => import('./pages/Vacinacoes/DetalhesVacinacao.js'));
+
+const ListaVideoAulas = React.lazy(() => import('./pages/VideoAulas/ListaVideoAulas.js'));
+const FormVideoAula = React.lazy(() => import('./pages/VideoAulas/FormVideoAula.js'));
+const VideoPlayer = React.lazy(() => import('./pages/VideoAulas/VideoPlayer.js'));
+
+const ListaTrabalhadores = React.lazy(() => import('./pages/Trabalhadores/ListaTrabalhadores.js'));
+const NovoTrabalhador = React.lazy(() => import('./pages/Trabalhadores/NovoTrabalhador.js'));
+const EditarTrabalhador = React.lazy(() => import('./pages/Trabalhadores/EditarTrabalhador.js'));
+const DetalhesTrabalhador = React.lazy(() => import('./pages/Trabalhadores/DetalhesTrabalhador.js'));
+
+const ListaAfastamentos = React.lazy(() => import('./pages/Trabalhadores/Afastamentos/ListaAfastamentos.js'));
+const FormAfastamento = React.lazy(() => import('./pages/Trabalhadores/Afastamentos/FormAfastamento.js'));
+const ListaDependentes = React.lazy(() => import('./pages/Trabalhadores/Dependentes/ListaDependentes.js'));
+const FormDependente = React.lazy(() => import('./pages/Trabalhadores/Dependentes/FormDependente.js'));
+const ListaVinculos = React.lazy(() => import('./pages/Trabalhadores/Vinculos/ListaVinculos.js'));
+const FormVinculo = React.lazy(() => import('./pages/Trabalhadores/Vinculos/FormVinculo.js'));
+const ListaOcorrenciasViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/ListaOcorrenciasViolencia.js'));
+const FormOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/FormOcorrenciaViolencia.js'));
+const ListaReadaptacoes = React.lazy(() => import('./pages/Trabalhadores/Readaptacoes/ListaReadaptacoes.js'));
+const FormReadaptacao = React.lazy(() => import('./pages/Trabalhadores/Readaptacoes/FormReadaptacao.js'));
+const ListaProcessosTrabalho = React.lazy(() => import('./pages/Trabalhadores/ProcessosTrabalho/ListaProcessosTrabalho.js'));
+const FormProcessoTrabalho = React.lazy(() => import('./pages/Trabalhadores/ProcessosTrabalho/FormProcessoTrabalho.js'));
+const ListaInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/ListaInformacoes.js'));
+const FormInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/FormInformacoes.js'));
+
+const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
+const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
+const Monitoramento = React.lazy(() => import('./pages/Monitoramento.js'));
+
+const ListaEmpresas = React.lazy(() => import('./pages/Admin/Empresas/ListaEmpresas.js'));
+const FormEmpresa = React.lazy(() => import('./pages/Admin/Empresas/FormEmpresa.js'));
+const ListaUnidades = React.lazy(() => import('./pages/Admin/Unidades/ListaUnidades.js'));
+const FormUnidade = React.lazy(() => import('./pages/Admin/Unidades/FormUnidade.js'));
+const ListaUsuarios = React.lazy(() => import('./pages/Admin/Usuarios/ListaUsuarios.js'));
+const EditarUsuario = React.lazy(() => import('./pages/Admin/Usuarios/EditarUsuario.js'));
+const ListaCatalogos = React.lazy(() => import('./pages/Admin/Catalogos/ListaCatalogos.js'));
+const ItensCatalogo = React.lazy(() => import('./pages/Admin/Catalogos/ItensCatalogo.js'));
+const Auditoria = React.lazy(() => import('./pages/Admin/Auditoria.js'));
 
 const App: React.FC = () => {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
@@ -45,21 +90,22 @@ const App: React.FC = () => {
   return (
     <Router>
       <Toaster position="top-right" />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
         
         {/* Acidentes Routes */}
         <Route
@@ -566,6 +612,7 @@ const App: React.FC = () => {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </Router>
   );
 };

@@ -1,0 +1,1 @@
+const c=s=>(s??"").replace(/\D/g,""),i=s=>{const e=c(s).slice(0,11);return e.length<=3?e:e.length<=6?`${e.slice(0,3)}.${e.slice(3)}`:e.length<=9?`${e.slice(0,3)}.${e.slice(3,6)}.${e.slice(6)}`:`${e.slice(0,3)}.${e.slice(3,6)}.${e.slice(6,9)}-${e.slice(9,11)}`},l=s=>c(s).slice(0,11);export{i as m,l as u};
