@@ -24,7 +24,8 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction):
     req.path === '/auth/login' ||
     req.path === '/auth/register' ||
     req.path === '/auth/forgot-password' ||
-    req.path === '/auth/reset-password'
+    req.path === '/auth/reset-password' ||
+    req.path === '/auth/verify-email'
   ) return next();
 
   // Request with Authorization is CORS-preflighted → safe
