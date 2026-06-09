@@ -122,9 +122,15 @@ export class AcidenteService {
     }
 
     if (filtros?.trabalhadorId) {
-      // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
-      const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
-      query.trabalhadorId = toCPFMaskedOrDigits(filtros.trabalhadorId);
+      // Se já for ObjectId válido, usa direto (vem do controller para perfil trabalhador)
+      if (mongoose.Types.ObjectId.isValid(filtros.trabalhadorId)) {
+        query.trabalhadorId = filtros.trabalhadorId;
+      } else {
+        // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
+        const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
+        const cpfNorm = toCPFMaskedOrDigits(filtros.trabalhadorId);
+        query.trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
+      }
     }
 
 
