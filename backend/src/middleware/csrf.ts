@@ -19,11 +19,12 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction):
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
 
   // Skip for auth endpoints that don't require a prior session
+  // (middleware mounted at '/api', so req.path is relative)
   if (
-    req.path === '/api/auth/login' ||
-    req.path === '/api/auth/register' ||
-    req.path === '/api/auth/forgot-password' ||
-    req.path === '/api/auth/reset-password'
+    req.path === '/auth/login' ||
+    req.path === '/auth/register' ||
+    req.path === '/auth/forgot-password' ||
+    req.path === '/auth/reset-password'
   ) return next();
 
   // Request with Authorization is CORS-preflighted → safe
