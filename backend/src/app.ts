@@ -70,7 +70,7 @@ app.use(helmet({
     },
   },
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  xXssProtection: { mode: 'block' },
+  xXssProtection: true,
 }));
 
 // Parser de requisições
