@@ -30,6 +30,10 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction):
   // Request with Authorization is CORS-preflighted → safe
   if (req.headers.authorization) return next();
 
+  // Auth token cookie (httpOnly) indica sessão legítima do frontend.
+  // CORS preflight já valida a origem, e o cookie httpOnly não é legível por JS.
+  if (req.cookies?.token) return next();
+
   // Cookie-based auth: validate CSRF token
   const headerToken = req.headers[CSRF_HEADER] as string | undefined;
   const cookieToken = req.cookies?.[CSRF_COOKIE];
