@@ -93,8 +93,17 @@ export const Register: React.FC = () => {
         senha: values.senha,
       });
 
-      toast.success(response.message || 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar sua conta.');
-      navigate('/login');
+      const link = response.data?.verificationLink;
+
+      if (link) {
+        toast.success('Cadastro realizado! Verifique seu e-mail para ativar sua conta.', { duration: 5000 });
+        setTimeout(() => window.open(link, '_blank'), 1000);
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        toast.success(response.message || 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar sua conta.');
+        navigate('/login');
+      }
+
       reset();
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || 'Erro ao fazer cadastro';

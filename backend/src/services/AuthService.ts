@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
 
 export class AuthService {
-  async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser }> {
+  async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser; verificationLink?: string }> {
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email: userData.email }, { cpf: userData.cpf }],
@@ -57,16 +57,17 @@ export class AuthService {
     await user.save();
 
     // Em desenvolvimento, logar o link para facilitar testes
+    const verificationLink = `${config.frontendUrl}/verify-email?token=${verificationToken}`;
     if (process.env.NODE_ENV !== 'production') {
       console.log(`\n=== LINK DE CONFIRMAÇÃO DE E-MAIL (DESENVOLVIMENTO) ===`);
-      console.log(`${config.frontendUrl}/verify-email?token=${verificationToken}`);
+      console.log(verificationLink);
       console.log(`======================================================\n`);
     }
 
     const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
-    return { user: userObj };
+    return { user: userObj, verificationLink: process.env.NODE_ENV !== 'production' ? verificationLink : undefined };
   }
 
   private async generateTokens(user: IUserDocument): Promise<{ accessToken: string; refreshToken: string }> {

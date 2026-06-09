@@ -2,8 +2,8 @@ import api from './api.js';
 import { IUser, IAuthResponse } from '../types/index.js';
 
 export const authService = {
-  register: async (userData: Partial<IUser> & { senha: string }): Promise<{ status: string; message: string; data?: { user: IUser } }> => {
-    const response = await api.post<{ status: string; message: string; data?: { user: IUser } }>('/auth/register', userData);
+  register: async (userData: Partial<IUser> & { senha: string }): Promise<{ status: string; message: string; data?: { user: IUser; verificationLink?: string } }> => {
+    const response = await api.post<{ status: string; message: string; data?: { user: IUser; verificationLink?: string } }>('/auth/register', userData);
     return response.data;
   },
 

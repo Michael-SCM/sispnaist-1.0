@@ -51,15 +51,19 @@ const clearAuthCookies = (res: Response) => {
 };
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { user } = await authService.register(req.body);
+  const { user, verificationLink } = await authService.register(req.body);
 
-  res.status(201).json({
+  const response: any = {
     status: 'success',
     message: 'Cadastro realizado com sucesso! Por favor, verifique seu e-mail para ativar sua conta.',
-    data: {
-      user,
-    },
-  });
+    data: { user },
+  };
+
+  if (verificationLink) {
+    response.data.verificationLink = verificationLink;
+  }
+
+  res.status(201).json(response);
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
