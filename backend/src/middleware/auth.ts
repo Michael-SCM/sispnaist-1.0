@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
+import User from '../models/User.js';
 
 export interface IAuthRequest extends Request {
   user?: {
@@ -11,7 +12,7 @@ export interface IAuthRequest extends Request {
   };
 }
 
-export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunction): void => {
+export const authMiddleware = async (req: IAuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
 
@@ -20,24 +21,37 @@ export const authMiddleware = (req: IAuthRequest, res: Response, next: NextFunct
       return;
     }
 
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = jwt.verify(token, config.jwtSecret) as any;
     
-    if (typeof decoded === 'object' && decoded !== null) {
-      req.user = {
-        id: (decoded as any).id || '',
-        cpf: (decoded as any).cpf || '',
-        email: (decoded as any).email || '',
-        perfil: (decoded as any).perfil || '',
-      };
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[Auth] perfil decodificado:', req.user.perfil, 'id:', req.user.id);
-      }
-    } else {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[Auth] decoded inesperado:', typeof decoded);
-      }
+    if (!decoded || typeof decoded !== 'object') {
+      res.status(401).json({ message: 'Token inválido ou expirado' });
+      return;
     }
+
+    // Verificar se o usuário ainda existe, está ativo e tokenVersion é compatível
+    const user = await User.findById(decoded.id).select('ativo tokenVersion').lean();
+    if (!user) {
+      res.status(401).json({ message: 'Usuário não encontrado' });
+      return;
+    }
+
+    if (!user.ativo) {
+      res.status(401).json({ message: 'Conta desativada. Entre em contato com o administrador.' });
+      return;
+    }
+
+    // Token sem tokenVersion (emitido antes da migração) é aceito
+    if (decoded.tokenVersion !== undefined && user.tokenVersion !== undefined && decoded.tokenVersion < user.tokenVersion) {
+      res.status(401).json({ message: 'Sessão expirada. Faça login novamente.' });
+      return;
+    }
+
+    req.user = {
+      id: decoded.id || '',
+      cpf: decoded.cpf || '',
+      email: decoded.email || '',
+      perfil: decoded.perfil || '',
+    };
 
     next();
   } catch (error) {

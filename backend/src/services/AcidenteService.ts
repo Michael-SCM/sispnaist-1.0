@@ -150,7 +150,8 @@ export class AcidenteService {
     }
 
     if (filtros?.descricao) {
-      query.descricao = { $regex: filtros.descricao, $options: 'i' };
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.descricao = { $regex: escapeRegex(filtros.descricao), $options: 'i' };
     }
 
     const total = await Acidente.countDocuments(query);

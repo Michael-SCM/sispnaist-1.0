@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import AtoMunicipalInovacaoController from '../controllers/AtoMunicipalInovacaoController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { validateRequest } from '../middleware/validation.js';
+import { atoMunicipalSchema, atoMunicipalUpdateSchema } from '../utils/validations.js';
 
 const router = Router();
 
@@ -9,8 +11,8 @@ router.use(authMiddleware);
 
 router.get('/', AtoMunicipalInovacaoController.listar);
 router.get('/:id', AtoMunicipalInovacaoController.obter);
-router.post('/', AtoMunicipalInovacaoController.criar);
-router.put('/:id', AtoMunicipalInovacaoController.atualizar);
+router.post('/', validateRequest(atoMunicipalSchema), AtoMunicipalInovacaoController.criar);
+router.put('/:id', validateRequest(atoMunicipalUpdateSchema), AtoMunicipalInovacaoController.atualizar);
 router.delete('/:id', AtoMunicipalInovacaoController.deletar);
 
 export default router;

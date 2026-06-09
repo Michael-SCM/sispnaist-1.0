@@ -2,18 +2,30 @@ import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
 import { AppError } from '../middleware/errorHandler.js';
 
+const INPUT_RE = /^[\w\s.,\-/À-ÿ]+$/;
+const ID_RE = /^\d+$/;
+
+function sanitizeQuery(val: unknown): string {
+  if (typeof val !== 'string' || val.length > 100 || !INPUT_RE.test(val)) {
+    throw new AppError('Parâmetro de busca inválido', 400);
+  }
+  return encodeURIComponent(val);
+}
+
 class EnderecoController {
   
   // Busca bairros pelo nome (Proxy para o webservice original)
   async buscarBairros(req: Request, res: Response, next: NextFunction) {
     try {
       const { pesquisa } = req.query;
-      if (!pesquisa) throw new AppError('Termo de pesquisa é obrigatório', 400);
+      if (!pesquisa || typeof pesquisa !== 'string') {
+        throw new AppError('Termo de pesquisa é obrigatório', 400);
+      }
 
-      // Usando a URL do sistema original
-      const url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaBairro.php?valorPesquisa=${pesquisa}`;
+      const termo = sanitizeQuery(pesquisa);
+      const url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaBairro.php?valorPesquisa=${termo}`;
       
-      const response = await axios.get(url);
+      const response = await axios.get(url, { timeout: 5000 });
       return res.status(200).json(response.data);
     } catch (error) {
       next(error);
@@ -26,28 +38,32 @@ class EnderecoController {
       const { bairroId, nomeBairro, pesquisa } = req.query;
       
       let url = '';
-      if (bairroId) {
-        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?id_fk_bairro=${bairroId}`;
-      } else if (nomeBairro) {
-        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?bairro=${nomeBairro}`;
-      } else if (pesquisa) {
-        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?valorPesquisa=${pesquisa}`;
+      if (bairroId && typeof bairroId === 'string' && ID_RE.test(bairroId)) {
+        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?id_fk_bairro=${encodeURIComponent(bairroId)}`;
+      } else if (nomeBairro && typeof nomeBairro === 'string') {
+        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?bairro=${sanitizeQuery(nomeBairro)}`;
+      } else if (pesquisa && typeof pesquisa === 'string') {
+        url = `http://www.paineldolegislador.com.br/ozielaraujo/sisleg/ws/geral/consultaLogradouro.php?valorPesquisa=${sanitizeQuery(pesquisa)}`;
       } else {
         throw new AppError('Parâmetros de busca insuficientes', 400);
       }
 
-      const response = await axios.get(url);
+      const response = await axios.get(url, { timeout: 5000 });
       return res.status(200).json(response.data);
     } catch (error) {
       next(error);
     }
   }
 
-  // Busca CEP (ViaCEP)
+  // Busca CEP (ViaCEP) — apenas formato 8 dígitos ou XXXXX-XXX
   async buscarCEP(req: Request, res: Response, next: NextFunction) {
     try {
       const { cep } = req.params;
-      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      const cepLimpo = cep.replace(/\D/g, '');
+      if (!/^\d{8}$/.test(cepLimpo)) {
+        throw new AppError('CEP deve conter 8 dígitos numéricos', 400);
+      }
+      const response = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`, { timeout: 5000 });
       return res.status(200).json(response.data);
     } catch (error) {
       next(error);

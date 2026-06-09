@@ -87,7 +87,7 @@ class CatalogoService {
     // Verifica se já existe item com mesmo nome
     const existente = await Catalogo.findOne({
       entidade,
-      nome: { $regex: new RegExp(`^${dados.nome}$`, 'i') }
+      nome: { $regex: new RegExp(`^${dados.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
     });
 
     if (existente) {
@@ -120,7 +120,7 @@ class CatalogoService {
     if (dados.nome && dados.nome !== item.nome) {
       const existente = await Catalogo.findOne({
         entidade,
-        nome: { $regex: new RegExp(`^${dados.nome}$`, 'i') },
+        nome: { $regex: new RegExp(`^${dados.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
         _id: { $ne: id }
       });
 

@@ -2,6 +2,8 @@ import User, { IUserDocument } from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
 
+const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export class UserService {
   async listar(
     page: number = 1,
@@ -17,11 +19,11 @@ export class UserService {
     const query: any = {};
 
     if (filtros?.nome) {
-      query.nome = { $regex: filtros.nome, $options: 'i' };
+      query.nome = { $regex: escapeRegex(filtros.nome), $options: 'i' };
     }
 
     if (filtros?.email) {
-      query.email = { $regex: filtros.email, $options: 'i' };
+      query.email = { $regex: escapeRegex(filtros.email), $options: 'i' };
     }
 
     if (filtros?.cpf) {

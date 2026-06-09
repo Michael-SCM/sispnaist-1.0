@@ -64,7 +64,8 @@ export class DoencaService {
 
 
     if (filtros?.nomeDoenca) {
-      const nomeDoenca = String(filtros.nomeDoenca).trim();
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const nomeDoenca = escapeRegex(String(filtros.nomeDoenca).trim());
       const pattern = new RegExp('^' + nomeDoenca, 'i');
       query.nomeDoenca = { $regex: pattern };
     }

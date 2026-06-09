@@ -9,6 +9,8 @@ import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViole
 import { AppError } from '../middleware/errorHandler.js';
 import { ITrabalhador } from '../types/index.js';
 
+const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export class TrabalhadorService {
   async listar(
     page: number = 1,
@@ -25,16 +27,12 @@ export class TrabalhadorService {
 
 
     if (filtros?.nome) {
-      // Filtrar começando pelas iniciais do nome (prefixo)
-      // Ex: "jo" -> nomes que começam com "Jo" (ignora acentos)
-      const nome = String(filtros.nome).trim();
+      const nome = escapeRegex(String(filtros.nome).trim());
       const pattern = new RegExp('^' + nome, 'i');
       query.nome = { $regex: pattern };
     }
 
     if (filtros?.cpf) {
-      // Normaliza para bater com o padrão do banco (XXX.XXX.XXX-XX) ou pelo menos remove máscara.
-      // O backend aceita tanto CPF mascarado quanto apenas dígitos.
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
       query.cpf = toCPFMaskedOrDigits(filtros.cpf);
     }
@@ -45,7 +43,7 @@ export class TrabalhadorService {
     }
 
     if (filtros?.setor) {
-      query['trabalho.setor'] = { $regex: filtros.setor, $options: 'i' };
+      query['trabalho.setor'] = { $regex: escapeRegex(filtros.setor), $options: 'i' };
     }
 
     const [total, trabalhadores] = await Promise.all([

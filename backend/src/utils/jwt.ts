@@ -6,6 +6,7 @@ interface TokenPayload {
   cpf: string;
   email: string;
   perfil: string;
+  tokenVersion?: number;
 }
 
 export const generateToken = (payload: TokenPayload): string => {

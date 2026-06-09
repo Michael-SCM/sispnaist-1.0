@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validateRequest } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from '../utils/validations.js';
+import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema, refreshTokenSchema, changePasswordSchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -67,7 +67,16 @@ router.post(
   authController.verifyEmail
 );
 
-router.post('/refresh-token', refreshLimiter, authController.refreshToken);
+router.post(
+  '/change-password',
+  authMiddleware,
+  validateRequest(changePasswordSchema),
+  authController.changePassword
+);
+
+router.post('/revoke-sessions', authMiddleware, authController.revokeAllSessions);
+
+router.post('/refresh-token', refreshLimiter, validateRequest(refreshTokenSchema), authController.refreshToken);
 router.post('/logout', authController.logout);
 
 export default router;

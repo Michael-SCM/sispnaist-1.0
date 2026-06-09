@@ -3,6 +3,8 @@ import { AppError } from '../middleware/errorHandler.js';
 import { IEmpresa } from '../types/index.js';
 import Unidade from '../models/Unidade.js';
 
+const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export class EmpresaService {
   async listar(
     page: number = 1,
@@ -16,7 +18,7 @@ export class EmpresaService {
     const query: any = {};
 
     if (filtros?.razaoSocial) {
-      query.razaoSocial = { $regex: filtros.razaoSocial, $options: 'i' };
+      query.razaoSocial = { $regex: escapeRegex(filtros.razaoSocial), $options: 'i' };
     }
 
     if (filtros?.cnpj) {

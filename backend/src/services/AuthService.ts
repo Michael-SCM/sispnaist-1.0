@@ -70,11 +70,18 @@ export class AuthService {
   }
 
   private async generateTokens(user: IUserDocument): Promise<{ accessToken: string; refreshToken: string }> {
+    // Garantir que o tokenVersion esteja definido
+    const tokenVersion = user.tokenVersion ?? 1;
+    if (user.tokenVersion === undefined) {
+      await User.findByIdAndUpdate(user._id, { tokenVersion: 1 });
+    }
+
     const payload = {
       id: user._id.toString(),
       cpf: user.cpf,
       email: user.email,
       perfil: user.perfil || 'trabalhador',
+      tokenVersion,
     };
 
     const accessToken = generateToken(payload);
@@ -230,6 +237,36 @@ export class AuthService {
     await User.findByIdAndUpdate(userId, {
       $unset: { refreshToken: '', refreshTokenExpires: '' },
     });
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    const user = await User.findById(userId).select('+senha');
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    const isPasswordValid = await (user as IUserDocument).comparePassword(currentPassword);
+    if (!isPasswordValid) {
+      throw new AppError('Senha atual incorreta', 401);
+    }
+
+    user.senha = newPassword;
+    user.tokenVersion = (user.tokenVersion || 1) + 1;
+    user.refreshToken = undefined;
+    user.refreshTokenExpires = undefined;
+    await user.save();
+  }
+
+  async revokeAllSessions(userId: string): Promise<void> {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    user.tokenVersion = (user.tokenVersion || 1) + 1;
+    user.refreshToken = undefined;
+    user.refreshTokenExpires = undefined;
+    await user.save();
   }
 
   async verifyEmail(token: string): Promise<void> {

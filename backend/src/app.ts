@@ -29,6 +29,8 @@ import atosMunicipaisRoutes from './routes/atosMunicipais.js';
 import enderecosRoutes from './routes/enderecos.js';
 import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
+import csrfRoutes from './routes/csrf.js';
+import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
 
@@ -55,7 +57,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'"],
       imgSrc: ["'self'", "data:"],
       fontSrc: ["'self'"],
       frameSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
@@ -68,6 +70,7 @@ app.use(helmet({
     },
   },
   crossOriginResourcePolicy: { policy: "cross-origin" },
+  xXssProtection: { mode: 'block' },
 }));
 
 // Parser de requisições
@@ -99,6 +102,9 @@ app.use('/api', (req, res, next) => {
   }
   next();
 });
+
+// Proteção CSRF para todas as rotas de escrita
+app.use('/api', csrfProtection);
 
 // Conectar ao MongoDB e rodar seeds
 connectDB().then(() => {
@@ -241,6 +247,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/csrf-token', csrfRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/acidentes', acidentesRoutes);
 app.use('/api/doencas', doencasRoutes);

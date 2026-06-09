@@ -88,13 +88,23 @@ class ExportController {
    */
   async exportarTrabalhadoresPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      // Extrair filtros da query string
+      // Extrair filtros da query string com sanitização
       const filtros: Record<string, any> = {};
 
-      if (req.query.nome) filtros.nome = { $regex: req.query.nome, $options: 'i' };
-      if (req.query.cpf) filtros.cpf = req.query.cpf;
-      if (req.query.matricula) filtros.matricula = req.query.matricula;
-      if (req.query.setor) filtros['trabalho.setor'] = { $regex: req.query.setor, $options: 'i' };
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      if (req.query.nome && typeof req.query.nome === 'string') {
+        filtros.nome = { $regex: escapeRegex(req.query.nome), $options: 'i' };
+      }
+      if (req.query.cpf && typeof req.query.cpf === 'string') {
+        filtros.cpf = req.query.cpf;
+      }
+      if (req.query.matricula && typeof req.query.matricula === 'string') {
+        filtros.matricula = req.query.matricula;
+      }
+      if (req.query.setor && typeof req.query.setor === 'string') {
+        filtros['trabalho.setor'] = { $regex: escapeRegex(req.query.setor), $options: 'i' };
+      }
 
       await pdfService.gerarPdfTrabalhadores(res, filtros);
     } catch (error) {
@@ -107,10 +117,11 @@ class ExportController {
    */
   async exportarAcidentesPDF(req: Request, res: Response, next: NextFunction) {
     try {
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const filtros: Record<string, any> = {};
 
-      if (req.query.status) filtros.status = req.query.status;
-      if (req.query.tipo) filtros.tipoAcidente = { $regex: req.query.tipo, $options: 'i' };
+      if (req.query.status && typeof req.query.status === 'string') filtros.status = req.query.status;
+      if (req.query.tipo && typeof req.query.tipo === 'string') filtros.tipoAcidente = { $regex: escapeRegex(req.query.tipo), $options: 'i' };
 
       await pdfService.gerarPdfAcidentes(res, filtros);
     } catch (error) {

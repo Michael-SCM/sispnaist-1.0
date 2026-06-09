@@ -105,14 +105,22 @@ class SubmoduloTrabalhadorController {
         throw new AppError('Sem permissão para cadastrar registros em submódulos de trabalhadores', 403);
       }
 
-      const dados = req.body;
-
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
       }
 
-      // Adiciona o trabalhadorId
+      // Sanitização: mantém apenas campos definidos no schema do Mongoose
+      const allowedPaths = Object.keys(Model.schema.paths).filter(
+        (p: string) => !p.startsWith('_') && p !== '__v'
+      );
+      const dados: Record<string, unknown> = {};
+      for (const key of Object.keys(req.body)) {
+        if (allowedPaths.includes(key)) {
+          dados[key] = req.body[key];
+        }
+      }
+
       const item = await Model.create({ ...dados, trabalhadorId: id });
 
       return res.status(201).json(item);
@@ -130,11 +138,20 @@ class SubmoduloTrabalhadorController {
         throw new AppError('Sem permissão para atualizar registros em submódulos de trabalhadores', 403);
       }
 
-      const dados = req.body;
-
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
+      }
+
+      // Sanitização: mantém apenas campos definidos no schema do Mongoose
+      const allowedPaths = Object.keys(Model.schema.paths).filter(
+        (p: string) => !p.startsWith('_') && p !== '__v'
+      );
+      const dados: Record<string, unknown> = {};
+      for (const key of Object.keys(req.body)) {
+        if (allowedPaths.includes(key)) {
+          dados[key] = req.body[key];
+        }
       }
 
       const item = await Model.findOneAndUpdate(

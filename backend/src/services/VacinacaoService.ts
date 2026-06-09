@@ -64,7 +64,8 @@ export class VacinacaoService {
 
 
     if (filtros.vacina) {
-      const vacina = String(filtros.vacina).trim();
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const vacina = escapeRegex(String(filtros.vacina).trim());
       const pattern = new RegExp('^' + vacina, 'i');
       query.vacina = { $regex: pattern };
     }

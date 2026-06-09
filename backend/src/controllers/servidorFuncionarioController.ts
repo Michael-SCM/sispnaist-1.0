@@ -15,7 +15,10 @@ class ServidorFuncionarioController {
       if (ativo === 'true') filtro.ativo = true;
       else if (ativo === 'false') filtro.ativo = false;
       if (situacaoFuncional) filtro.situacaoFuncional = situacaoFuncional;
-      if (lotacao) filtro.lotacao = { $regex: new RegExp(String(lotacao), 'i') };
+      if (lotacao) {
+        const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        filtro.lotacao = { $regex: new RegExp(escapeRegex(String(lotacao)), 'i') };
+      }
 
       const [servidores, total] = await Promise.all([
         ServidorFuncionario.find(filtro)

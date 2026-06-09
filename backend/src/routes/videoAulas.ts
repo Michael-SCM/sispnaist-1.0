@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import videoAulaController from '../controllers/videoAulaController';
 import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth';
-import { validateRequest } from '../middleware/validation';
+import { validateRequest, validateObjectId } from '../middleware/validation';
 import Joi from 'joi';
 
 const router = Router();
@@ -17,13 +17,24 @@ const videoAulaSchema = Joi.object({
   ordem: Joi.number().integer().min(0).optional()
 });
 
+const videoAulaUpdateSchema = Joi.object({
+  titulo: Joi.string().trim().min(1).max(200).optional(),
+  descricao: Joi.string().trim().max(1000).optional(),
+  url: Joi.string().uri().optional(),
+  thumbnail: Joi.string().optional(),
+  duracao: Joi.string().optional(),
+  categoria: Joi.string().trim().empty('').optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
+  ordem: Joi.number().integer().min(0).optional()
+}).min(1);
+
 // Listar e obter são públicos para usuários autenticados
 router.get('/', authMiddleware, videoAulaController.listar);
-router.get('/:id', authMiddleware, videoAulaController.obter);
+router.get('/:id', authMiddleware, validateObjectId('id'), videoAulaController.obter);
 
 // Criar, atualizar e deletar requerem admin/gestor
 router.post('/', authMiddleware, adminOuGestorMiddleware, validateRequest(videoAulaSchema), videoAulaController.criar);
-router.put('/:id', authMiddleware, adminOuGestorMiddleware, videoAulaController.atualizar);
-router.delete('/:id', authMiddleware, adminOuGestorMiddleware, videoAulaController.deletar);
+router.put('/:id', authMiddleware, adminOuGestorMiddleware, validateObjectId('id'), validateRequest(videoAulaUpdateSchema), videoAulaController.atualizar);
+router.delete('/:id', authMiddleware, adminOuGestorMiddleware, validateObjectId('id'), videoAulaController.deletar);
 
 export default router;

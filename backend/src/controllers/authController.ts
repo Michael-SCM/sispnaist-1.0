@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import authService from '../services/AuthService.js';
@@ -23,6 +24,19 @@ const setAuthCookies = (res: Response, token: string, refreshToken?: string) => 
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
     });
   }
+};
+
+const setCsrfCookie = (res: Response): string => {
+  const token = crypto.randomBytes(32).toString('hex');
+  const isProduction = config.nodeEnv === 'production';
+  res.cookie('csrf-token', token, {
+    httpOnly: false,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  return token;
 };
 
 const clearAuthCookies = (res: Response) => {
@@ -53,11 +67,13 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { user, accessToken, refreshToken } = await authService.login(email, senha);
 
   setAuthCookies(res, accessToken, refreshToken);
+  const csrfToken = setCsrfCookie(res);
 
   res.status(200).json({
     status: 'success',
     data: {
       user,
+      csrfToken,
     },
   });
 });
@@ -142,6 +158,38 @@ export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
   res.status(200).json({
     status: 'success',
     message: 'Logout realizado com sucesso',
+  });
+});
+
+export const changePassword = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  const { senhaAtual, novaSenha } = req.body;
+  await authService.changePassword(req.user.id, senhaAtual, novaSenha);
+
+  clearAuthCookies(res);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Senha alterada com sucesso. Faça login novamente.',
+  });
+});
+
+export const revokeAllSessions = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  await authService.revokeAllSessions(req.user.id);
+  clearAuthCookies(res);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Todas as sessões foram revogadas. Faça login novamente.',
   });
 });
 

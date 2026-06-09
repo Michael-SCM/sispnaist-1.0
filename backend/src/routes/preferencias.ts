@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import preferenciaController from '../controllers/preferenciaController';
 import { authMiddleware } from '../middleware/auth';
+import { validateRequest } from '../middleware/validation';
+import { preferenciaSchema } from '../utils/validations';
 
 const router = Router();
 
@@ -9,10 +11,10 @@ router.use(authMiddleware);
 
 // Preferências do usuário logado
 router.get('/minhas', preferenciaController.obterMinhas);
-router.put('/minhas', preferenciaController.atualizarMinhas);
+router.put('/minhas', validateRequest(preferenciaSchema), preferenciaController.atualizarMinhas);
 
 // Preferências de outros usuário (requer admin no controller)
 router.get('/usuario/:usuarioId', preferenciaController.obter);
-router.put('/usuario/:usuarioId', preferenciaController.atualizar);
+router.put('/usuario/:usuarioId', validateRequest(preferenciaSchema), preferenciaController.atualizar);
 
 export default router;

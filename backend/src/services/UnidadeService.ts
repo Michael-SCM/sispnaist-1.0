@@ -2,6 +2,8 @@ import Unidade, { IUnidadeDocument } from '../models/Unidade.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUnidade } from '../types/index.js';
 
+const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export class UnidadeService {
   async listar(
     page: number = 1,
@@ -15,7 +17,7 @@ export class UnidadeService {
     const query: any = {};
 
     if (filtros?.nome) {
-      query.nome = { $regex: filtros.nome, $options: 'i' };
+      query.nome = { $regex: escapeRegex(filtros.nome), $options: 'i' };
     }
 
     if (filtros?.empresaId) {

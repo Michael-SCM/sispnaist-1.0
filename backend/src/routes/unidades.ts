@@ -1,6 +1,8 @@
 import express from 'express';
 import * as unidadeController from '../controllers/unidadeController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
+import { validateRequest } from '../middleware/validation.js';
+import { unidadeSchema, unidadeUpdateSchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -11,7 +13,6 @@ router.get('/ativas', async (req, res) => {
     const unidadeService = (await import('../services/UnidadeService.js')).default;
     const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
     const result = await unidadeService.listar(page, limit, {});
-    // Filtrar apenas unidades ativas (já será paginado com filtro ativo no futuro)
     const unidadesAtivas = result.unidades.filter((u: any) => u.ativa !== false);
     res.json({
       status: 'success',
@@ -36,9 +37,9 @@ router.get('/empresa/:empresaId', unidadeController.getUnidadesPorEmpresa);
 
 // Rotas restritas a Admin
 router.get('/', adminMiddleware, unidadeController.getUnidades);
-router.post('/', adminMiddleware, unidadeController.createUnidade);
+router.post('/', adminMiddleware, validateRequest(unidadeSchema), unidadeController.createUnidade);
 router.get('/:id', adminMiddleware, unidadeController.getUnidade);
-router.put('/:id', adminMiddleware, unidadeController.updateUnidade);
+router.put('/:id', adminMiddleware, validateRequest(unidadeUpdateSchema), unidadeController.updateUnidade);
 router.delete('/:id', adminMiddleware, unidadeController.deleteUnidade);
 
 export default router;

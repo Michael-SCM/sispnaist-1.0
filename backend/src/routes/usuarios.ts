@@ -1,6 +1,8 @@
 import express from 'express';
 import * as userController from '../controllers/userController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
+import { validateRequest } from '../middleware/validation.js';
+import { updateUserSchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -10,7 +12,7 @@ router.use(adminMiddleware);
 
 router.get('/', userController.getUsers);
 router.get('/:id', userController.getUser);
-router.put('/:id', userController.updateUser);
+router.put('/:id', validateRequest(updateUserSchema), userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 
 export default router;

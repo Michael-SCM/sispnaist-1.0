@@ -7,6 +7,7 @@ export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade'
   senha?: string;
   refreshToken?: string;
   refreshTokenExpires?: Date;
+  tokenVersion?: number;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -95,6 +96,10 @@ const UserSchema = new Schema<IUserDocument>(
     refreshTokenExpires: {
       type: Date,
       select: false,
+    },
+    tokenVersion: {
+      type: Number,
+      default: 1,
     },
   },
   { 

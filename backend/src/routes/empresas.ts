@@ -1,6 +1,8 @@
 import express from 'express';
 import * as empresaController from '../controllers/empresaController.js';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
+import { validateRequest } from '../middleware/validation.js';
+import { empresaSchema, empresaUpdateSchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -11,7 +13,6 @@ router.get('/ativas', async (req, res) => {
     const empresaService = (await import('../services/EmpresaService.js')).default;
     const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
     const result = await empresaService.listar(page, limit, {});
-    // Filtrar apenas empresas ativas (já será paginado com filtro ativo no futuro)
     const empresasAtivas = result.empresas.filter((e: any) => e.ativa !== false);
     res.json({
       status: 'success',
@@ -36,9 +37,9 @@ router.get('/unidade/:unidadeId', empresaController.getEmpresaPorUnidade);
 
 router.use(adminMiddleware);
 router.get('/', empresaController.getEmpresas);
-router.post('/', empresaController.createEmpresa);
+router.post('/', validateRequest(empresaSchema), empresaController.createEmpresa);
 router.get('/:id', empresaController.getEmpresa);
-router.put('/:id', empresaController.updateEmpresa);
+router.put('/:id', validateRequest(empresaUpdateSchema), empresaController.updateEmpresa);
 router.delete('/:id', empresaController.deleteEmpresa);
 
 export default router;
