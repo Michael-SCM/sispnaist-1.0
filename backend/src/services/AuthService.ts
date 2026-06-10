@@ -5,6 +5,7 @@ import { IUser } from '../types/index.js';
 import { sendResetPasswordEmail, sendVerificationEmail, validateEmailDomain } from '../utils/emailService.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
+import bcrypt from 'bcryptjs';
 
 export class AuthService {
   async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser; verificationLink?: string }> {
@@ -88,11 +89,14 @@ export class AuthService {
     const accessToken = generateToken(payload);
     const refreshToken = generateRefreshToken(payload);
 
+    // Hash do refreshToken antes de armazenar (bcrypt)
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+
     const refreshExpires = new Date();
     refreshExpires.setDate(refreshExpires.getDate() + 7);
 
     await User.findByIdAndUpdate(user._id, {
-      refreshToken,
+      refreshToken: refreshTokenHash,
       refreshTokenExpires: refreshExpires,
     });
 
@@ -223,12 +227,18 @@ export class AuthService {
     }
 
     const user = await User.findById(payload.id).select('+refreshToken +refreshTokenExpires');
-    if (!user || user.refreshToken !== token) {
+    if (!user || !user.refreshToken) {
       throw new AppError('Refresh token inválido ou revogado', 401);
     }
 
     if (user.refreshTokenExpires && user.refreshTokenExpires < new Date()) {
       throw new AppError('Refresh token expirado', 401);
+    }
+
+    // Comparar o token recebido com o hash armazenado via bcrypt
+    const isTokenValid = await bcrypt.compare(token, user.refreshToken);
+    if (!isTokenValid) {
+      throw new AppError('Refresh token inválido ou revogado', 401);
     }
 
     return this.generateTokens(user);
