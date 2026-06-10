@@ -5,6 +5,8 @@ import MaterialBiologico from '../models/MaterialBiologico.js';
 import { Parser } from 'json2csv';
 import pdfService from '../services/PdfService.js';
 import analyticsService from '../services/AnalyticsService.js';
+import { toCPFMaskedOrDigits } from '../utils/cpf.js';
+import mongoose from 'mongoose';
 
 class ExportController {
 
@@ -97,7 +99,7 @@ class ExportController {
         filtros.nome = { $regex: escapeRegex(req.query.nome), $options: 'i' };
       }
       if (req.query.cpf && typeof req.query.cpf === 'string') {
-        filtros.cpf = req.query.cpf;
+        filtros.cpf = toCPFMaskedOrDigits(req.query.cpf);
       }
       if (req.query.matricula && typeof req.query.matricula === 'string') {
         filtros.matricula = req.query.matricula;
@@ -123,8 +125,8 @@ class ExportController {
       if (req.query.status && typeof req.query.status === 'string') filtros.status = req.query.status;
       if (req.query.tipoAcidente && typeof req.query.tipoAcidente === 'string') filtros.tipoAcidente = req.query.tipoAcidente;
       if (req.query.cpfTrabalhador && typeof req.query.cpfTrabalhador === 'string') {
-        const cpfDigits = req.query.cpfTrabalhador.replace(/\D/g, '');
-        const trabalhador = await Trabalhador.findOne({ cpf: cpfDigits }).select('_id').lean();
+        const cpfFormatado = toCPFMaskedOrDigits(req.query.cpfTrabalhador);
+        const trabalhador = await Trabalhador.findOne({ cpf: cpfFormatado }).select('_id').lean();
         if (trabalhador) {
           filtros.trabalhadorId = trabalhador._id.toString();
         }
@@ -160,7 +162,17 @@ class ExportController {
       if (req.query.nomeDoenca && typeof req.query.nomeDoenca === 'string') {
         filtros.nomeDoenca = { $regex: escapeRegex(req.query.nomeDoenca), $options: 'i' };
       }
-      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') filtros.trabalhadorId = req.query.trabalhadorId;
+      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') {
+        if (mongoose.Types.ObjectId.isValid(req.query.trabalhadorId)) {
+          filtros.trabalhadorId = req.query.trabalhadorId;
+        } else {
+          const cpfFormatado = toCPFMaskedOrDigits(req.query.trabalhadorId);
+          const trabalhador = await Trabalhador.findOne({ cpf: cpfFormatado }).select('_id').lean();
+          if (trabalhador) {
+            filtros.trabalhadorId = trabalhador._id.toString();
+          }
+        }
+      }
       if ((req.query.dataInicio || req.query.dataFim) && (typeof req.query.dataInicio === 'string' || typeof req.query.dataFim === 'string')) {
         filtros.dataInicio = {};
         if (req.query.dataInicio && typeof req.query.dataInicio === 'string') {
@@ -188,7 +200,17 @@ class ExportController {
       if (req.query.vacina && typeof req.query.vacina === 'string') {
         filtros.vacina = { $regex: escapeRegex(req.query.vacina), $options: 'i' };
       }
-      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') filtros.trabalhadorId = req.query.trabalhadorId;
+      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') {
+        if (mongoose.Types.ObjectId.isValid(req.query.trabalhadorId)) {
+          filtros.trabalhadorId = req.query.trabalhadorId;
+        } else {
+          const cpfFormatado = toCPFMaskedOrDigits(req.query.trabalhadorId);
+          const trabalhador = await Trabalhador.findOne({ cpf: cpfFormatado }).select('_id').lean();
+          if (trabalhador) {
+            filtros.trabalhadorId = trabalhador._id.toString();
+          }
+        }
+      }
 
       await pdfService.gerarPdfVacinacoes(res, filtros);
     } catch (error) {
