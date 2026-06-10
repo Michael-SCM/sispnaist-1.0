@@ -30,22 +30,34 @@ const downloadBlob = (blob: Blob, filename: string) => {
 };
 
 /**
- * Exporta trabalhadores em formato PDF corporativo
- * Faz fetch da rota /export/trabalhadores/pdf, recebe o blob de PDF
- * e dispara o download no navegador
+ * Remove chaves undefined/null/'' de um objeto de filtros
  */
-export const exportTrabalhadores = async (): Promise<void> => {
+const cleanParams = (filtros?: Record<string, any>): Record<string, any> | undefined => {
+  if (!filtros) return undefined;
+  const params: Record<string, any> = {};
+  for (const [key, value] of Object.entries(filtros)) {
+    if (value !== undefined && value !== null && value !== '') {
+      params[key] = value instanceof Boolean ? value.toString() : value;
+    }
+  }
+  return Object.keys(params).length > 0 ? params : undefined;
+};
+
+/**
+ * Exporta trabalhadores em formato PDF corporativo
+ * Aceita filtros opcionais para restringir os dados exportados
+ */
+export const exportTrabalhadores = async (filtros?: Record<string, any>): Promise<void> => {
   try {
     const response = await api.get('/export/trabalhadores/pdf', {
-      responseType: 'blob', // Importante: diz ao axios para tratar como binary
+      responseType: 'blob',
+      params: cleanParams(filtros),
     });
 
-    // Nome do arquivo do header Content-Disposition ou gerado automaticamente
     const filename =
       getFilenameFromContentDisposition(response.headers['content-disposition']) ??
       `relatorio_trabalhadores_${new Date().toISOString().split('T')[0]}.pdf`;
 
-    // Dispara o download no navegador
     downloadBlob(response.data, filename);
   } catch (error) {
     console.error('Erro ao exportar PDF:', error);
@@ -55,11 +67,13 @@ export const exportTrabalhadores = async (): Promise<void> => {
 
 /**
  * Exporta acidentes em formato PDF corporativo
+ * Aceita filtros opcionais para restringir os dados exportados
  */
-export const exportAcidentes = async (): Promise<void> => {
+export const exportAcidentes = async (filtros?: Record<string, any>): Promise<void> => {
   try {
     const response = await api.get('/export/acidentes/pdf', {
       responseType: 'blob',
+      params: cleanParams(filtros),
     });
 
     const filename =
@@ -75,11 +89,13 @@ export const exportAcidentes = async (): Promise<void> => {
 
 /**
  * Exporta doenças em formato PDF corporativo
+ * Aceita filtros opcionais para restringir os dados exportados
  */
-export const exportDoencas = async (): Promise<void> => {
+export const exportDoencas = async (filtros?: Record<string, any>): Promise<void> => {
   try {
     const response = await api.get('/export/doencas/pdf', {
       responseType: 'blob',
+      params: cleanParams(filtros),
     });
 
     const filename =
@@ -94,12 +110,14 @@ export const exportDoencas = async (): Promise<void> => {
 };
 
 /**
- * Exporta vaccineções em formato PDF corporativo
+ * Exporta vacinações em formato PDF corporativo
+ * Aceita filtros opcionais para restringir os dados exportados
  */
-export const exportVacinacoes = async (): Promise<void> => {
+export const exportVacinacoes = async (filtros?: Record<string, any>): Promise<void> => {
   try {
     const response = await api.get('/export/vacinacoes/pdf', {
       responseType: 'blob',
+      params: cleanParams(filtros),
     });
 
     const filename =

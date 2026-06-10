@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import catalogoController from '../controllers/catalogoController';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware, adminMiddleware } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { catalogoSchema, catalogoUpdateSchema } from '../utils/validations';
 
@@ -14,19 +14,19 @@ const router = Router();
  */
 
 // Rota especial: listar todas as entidades disponíveis
-router.get('/listar-todos', authMiddleware, catalogoController.listarEntidades);
+router.get('/listar-todos', authMiddleware, adminMiddleware, catalogoController.listarEntidades);
 
 // Rota para executar seed de catálogos (apenas admin)
-router.post('/seed', authMiddleware, catalogoController.seed);
+router.post('/seed', authMiddleware, adminMiddleware, catalogoController.seed);
 
 // Listar apenas itens ativos de uma entidade (equivalente ao getdados.php)
-router.get('/:entidade/ativos', authMiddleware, catalogoController.listarAtivos);
+router.get('/:entidade/ativos', authMiddleware, adminMiddleware, catalogoController.listarAtivos);
 
 // CRUD completo para qualquer catálogo
-router.get('/:entidade', authMiddleware, catalogoController.listar);
-router.get('/:entidade/:id', authMiddleware, catalogoController.obter);
-router.post('/:entidade', authMiddleware, validateRequest(catalogoSchema), catalogoController.criar);
-router.put('/:entidade/:id', authMiddleware, validateRequest(catalogoUpdateSchema), catalogoController.atualizar);
-router.delete('/:entidade/:id', authMiddleware, catalogoController.deletar);
+router.get('/:entidade', authMiddleware, adminMiddleware, catalogoController.listar);
+router.get('/:entidade/:id', authMiddleware, adminMiddleware, catalogoController.obter);
+router.post('/:entidade', authMiddleware, adminMiddleware, validateRequest(catalogoSchema), catalogoController.criar);
+router.put('/:entidade/:id', authMiddleware, adminMiddleware, validateRequest(catalogoUpdateSchema), catalogoController.atualizar);
+router.delete('/:entidade/:id', authMiddleware, adminMiddleware, catalogoController.deletar);
 
 export default router;

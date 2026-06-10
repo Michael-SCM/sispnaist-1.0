@@ -123,7 +123,7 @@ export const ListaAcidentes: React.FC = () => {
               onClick={async () => {
                 try {
                   toast.loading('Gerando relatório PDF...', { id: 'export-acidentes' });
-                  await exportAcidentes();
+                  await exportAcidentes(filtros);
                   toast.success('Relatório PDF gerado com sucesso!', { id: 'export-acidentes' });
                 } catch (e) {
                   toast.error('Erro ao exportar acidentes', { id: 'export-acidentes' });

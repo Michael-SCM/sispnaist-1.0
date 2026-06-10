@@ -4,12 +4,12 @@ import {
   gerarRelatorioVacinacoes,
   gerarRelatorioDoencas,
 } from '../controllers/reportController.js';
-import { authMiddleware } from '../middleware/auth.js';
+import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 
-// Todas as rotas exigem autenticação
-router.use(authMiddleware);
+// Todas as rotas exigem autenticação e perfil admin/gestor
+router.use(authMiddleware, adminOuGestorMiddleware);
 
 // Relatórios em JSON (base para PDF/XLS no frontend)
 router.get('/acidentes', gerarRelatorioAcidentes);

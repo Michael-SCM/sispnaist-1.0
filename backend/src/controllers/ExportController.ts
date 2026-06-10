@@ -121,7 +121,26 @@ class ExportController {
       const filtros: Record<string, any> = {};
 
       if (req.query.status && typeof req.query.status === 'string') filtros.status = req.query.status;
-      if (req.query.tipo && typeof req.query.tipo === 'string') filtros.tipoAcidente = { $regex: escapeRegex(req.query.tipo), $options: 'i' };
+      if (req.query.tipoAcidente && typeof req.query.tipoAcidente === 'string') filtros.tipoAcidente = req.query.tipoAcidente;
+      if (req.query.cpfTrabalhador && typeof req.query.cpfTrabalhador === 'string') {
+        const cpfDigits = req.query.cpfTrabalhador.replace(/\D/g, '');
+        const trabalhador = await Trabalhador.findOne({ cpf: cpfDigits }).select('_id').lean();
+        if (trabalhador) {
+          filtros.trabalhadorId = trabalhador._id.toString();
+        }
+      }
+      if ((req.query.dataInicio || req.query.dataFim) && (typeof req.query.dataInicio === 'string' || typeof req.query.dataFim === 'string')) {
+        filtros.dataAcidente = {};
+        if (req.query.dataInicio && typeof req.query.dataInicio === 'string') {
+          filtros.dataAcidente.$gte = new Date(req.query.dataInicio);
+        }
+        if (req.query.dataFim && typeof req.query.dataFim === 'string') {
+          filtros.dataAcidente.$lte = new Date(req.query.dataFim);
+        }
+      }
+      if (req.query.descricao && typeof req.query.descricao === 'string') {
+        filtros.descricao = { $regex: escapeRegex(req.query.descricao), $options: 'i' };
+      }
 
       await pdfService.gerarPdfAcidentes(res, filtros);
     } catch (error) {
@@ -134,9 +153,23 @@ class ExportController {
    */
   async exportarDoencasPDF(req: Request, res: Response, next: NextFunction) {
     try {
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const filtros: Record<string, any> = {};
 
       if (req.query.ativo !== undefined) filtros.ativo = req.query.ativo === 'true';
+      if (req.query.nomeDoenca && typeof req.query.nomeDoenca === 'string') {
+        filtros.nomeDoenca = { $regex: escapeRegex(req.query.nomeDoenca), $options: 'i' };
+      }
+      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') filtros.trabalhadorId = req.query.trabalhadorId;
+      if ((req.query.dataInicio || req.query.dataFim) && (typeof req.query.dataInicio === 'string' || typeof req.query.dataFim === 'string')) {
+        filtros.dataInicio = {};
+        if (req.query.dataInicio && typeof req.query.dataInicio === 'string') {
+          filtros.dataInicio.$gte = new Date(req.query.dataInicio);
+        }
+        if (req.query.dataFim && typeof req.query.dataFim === 'string') {
+          filtros.dataInicio.$lte = new Date(req.query.dataFim);
+        }
+      }
 
       await pdfService.gerarPdfDoencas(res, filtros);
     } catch (error) {
@@ -149,7 +182,15 @@ class ExportController {
    */
   async exportarVacinacoesPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      await pdfService.gerarPdfVacinacoes(res, {});
+      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const filtros: Record<string, any> = {};
+
+      if (req.query.vacina && typeof req.query.vacina === 'string') {
+        filtros.vacina = { $regex: escapeRegex(req.query.vacina), $options: 'i' };
+      }
+      if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') filtros.trabalhadorId = req.query.trabalhadorId;
+
+      await pdfService.gerarPdfVacinacoes(res, filtros);
     } catch (error) {
       next(error);
     }
