@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { informacaoService, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
+import { uploadService } from '../../../services/uploadService.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import { ITrabalhador } from '../../../types/index.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
@@ -15,7 +16,12 @@ import {
   Cigarette,
   Zap,
   Stethoscope,
-  Pill
+  Pill,
+  ClipboardList,
+  FileUp,
+  Download,
+  Trash2,
+  Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -35,6 +41,12 @@ interface FormData {
   macosCigarro: number;
   usoOutraDroga: boolean;
   frequenciaUso: string;
+  exames: {
+    realizados: string;
+    resultados: string;
+    periodicidade: string;
+    anexos: string[];
+  };
 }
 
 const INITIAL_FORM: FormData = {
@@ -53,6 +65,12 @@ const INITIAL_FORM: FormData = {
   macosCigarro: 0,
   usoOutraDroga: false,
   frequenciaUso: '',
+  exames: {
+    realizados: '',
+    resultados: '',
+    periodicidade: '',
+    anexos: [],
+  },
 };
 
 export const FormInformacoes: React.FC = () => {
@@ -65,6 +83,7 @@ export const FormInformacoes: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
 
   // Catálogos
   const { itens: doencasBase } = useCatalogo('doencaBase');
@@ -111,6 +130,12 @@ export const FormInformacoes: React.FC = () => {
           macosCigarro: info.macosCigarro || 0,
           usoOutraDroga: info.usoOutraDroga || false,
           frequenciaUso: info.frequenciaUso || '',
+          exames: {
+            realizados: info.exames?.realizados || '',
+            resultados: info.exames?.resultados || '',
+            periodicidade: info.exames?.periodicidade || '',
+            anexos: info.exames?.anexos || [],
+          },
         });
       } else {
         toast.error('Informações não encontradas');
@@ -127,10 +152,18 @@ export const FormInformacoes: React.FC = () => {
     const { name, value, type } = e.target;
     const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
-    setFormData({
-      ...formData,
-      [name]: finalValue,
-    });
+    if (name.startsWith('exames.')) {
+      const field = name.replace('exames.', '');
+      setFormData({
+        ...formData,
+        exames: { ...formData.exames, [field]: finalValue },
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: finalValue,
+      });
+    }
 
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
@@ -142,6 +175,45 @@ export const FormInformacoes: React.FC = () => {
     setFormData({
       ...formData,
       [name]: value === '' ? 0 : parseInt(value, 10) || 0,
+    });
+  };
+
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Apenas arquivos PDF são permitidos');
+      return;
+    }
+
+    setIsUploadingFile(true);
+    try {
+      const upload = await uploadService.criar(file, 'informacao', id!, file.name);
+      const uploadId = (upload as any)._id || (upload as any).id;
+      setFormData({
+        ...formData,
+        exames: {
+          ...formData.exames,
+          anexos: [...formData.exames.anexos, uploadId],
+        },
+      });
+      toast.success('PDF enviado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao enviar PDF');
+    } finally {
+      setIsUploadingFile(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = (uploadId: string) => {
+    setFormData({
+      ...formData,
+      exames: {
+        ...formData.exames,
+        anexos: formData.exames.anexos.filter((id) => id !== uploadId),
+      },
     });
   };
 
@@ -457,6 +529,95 @@ export const FormInformacoes: React.FC = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Seção: Exames */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <ClipboardList size={20} />
+                Exames
+              </h3>
+              <div className="p-6 bg-teal-50 rounded-2xl space-y-4">
+                <div>
+                  <label className={labelCls}>Exames Realizados</label>
+                  <textarea
+                    name="exames.realizados"
+                    value={formData.exames.realizados}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-white border border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                    placeholder="Descreva os exames realizados..."
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Resultados</label>
+                  <textarea
+                    name="exames.resultados"
+                    value={formData.exames.resultados}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-white border border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                    placeholder="Resultados dos exames..."
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Periodicidade</label>
+                  <input
+                    type="text"
+                    name="exames.periodicidade"
+                    value={formData.exames.periodicidade}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-white border border-teal-200 rounded-2xl focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                    placeholder="Ex: Semestral, Anual, A cada 6 meses..."
+                  />
+                </div>
+                <div className="border-t border-teal-200 pt-4">
+                  <label className={labelCls}>Anexos (PDFs de Exames)</label>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-dashed border-teal-300 rounded-2xl cursor-pointer hover:bg-teal-50 transition-all text-teal-700 font-bold text-sm">
+                      <FileUp size={18} />
+                      {isUploadingFile ? 'Enviando...' : 'Selecionar PDF'}
+                      <input
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleUploadFile}
+                        disabled={isUploadingFile}
+                        className="hidden"
+                      />
+                    </label>
+                    {isUploadingFile && <Loader2 size={20} className="animate-spin text-teal-600" />}
+                  </div>
+                  {formData.exames.anexos.length > 0 && (
+                    <ul className="mt-3 space-y-2">
+                      {formData.exames.anexos.map((uploadId) => (
+                        <li key={uploadId} className="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-teal-200">
+                          <span className="text-sm font-medium text-slate-600 truncate max-w-[250px]">
+                            {uploadId}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => uploadService.download(uploadId)}
+                              className="p-1.5 text-teal-600 hover:bg-teal-100 rounded-lg transition-all"
+                              title="Download"
+                            >
+                              <Download size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile(uploadId)}
+                              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                              title="Remover"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
 

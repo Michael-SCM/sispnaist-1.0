@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { informacaoService, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
+import { uploadService } from '../../../services/uploadService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../../types/index.js';
 import {
@@ -20,7 +21,9 @@ import {
   AlertCircle,
   Wine,
   Cigarette,
-  Zap
+  Zap,
+  ClipboardList,
+  Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -105,6 +108,7 @@ export const ListaInformacoes: React.FC = () => {
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Medicamentos</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Saúde</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Exames</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Vícios</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
@@ -113,12 +117,12 @@ export const ListaInformacoes: React.FC = () => {
                 {isLoading ? (
                   Array.from({ length: 2 }).map((_, i) => (
                     <tr key={i} className="animate-pulse">
-                      <td colSpan={4} className="px-8 py-6 h-24 bg-slate-50/20"></td>
+                      <td colSpan={5} className="px-8 py-6 h-24 bg-slate-50/20"></td>
                     </tr>
                   ))
                 ) : informacoes.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-8 py-12 text-center text-slate-400">
+                    <td colSpan={5} className="px-8 py-12 text-center text-slate-400">
                       <Pill className="mx-auto h-12 w-12 text-slate-200 mb-4" />
                       <p className="text-lg font-medium">Nenhuma informação registrada</p>
                     </td>
@@ -167,6 +171,18 @@ export const ListaInformacoes: React.FC = () => {
                           )}
                           {!info.allergy && !info.acompanhamentoMedico && !info.acompanhamentoReabilitacao && (
                             <span className="text-slate-400 text-xs">Sem registros</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col gap-2">
+                          {info.exames && (info.exames.realizados || info.exames.resultados) ? (
+                            <span className="inline-flex w-fit px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-teal-100 text-teal-700">
+                              <ClipboardList size={10} className="mr-1 mt-0.5" />
+                              {(info.exames.anexos?.length ?? 0) > 0 ? `${info.exames.anexos.length} anexo(s)` : 'Registrado'}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">Sem exames</span>
                           )}
                         </div>
                       </td>
@@ -357,6 +373,52 @@ export const ListaInformacoes: React.FC = () => {
                       </div>
                     )}
                   </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-3">
+                  <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Exames</h4>
+                  {informacaoSelecionada.exames ? (
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Exames Realizados</span>
+                        <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                          {informacaoSelecionada.exames.realizados || 'Não informado'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Resultados</span>
+                        <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                          {informacaoSelecionada.exames.resultados || 'Não informado'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Periodicidade</span>
+                        <span className="font-semibold text-slate-700 block mt-1">
+                          {informacaoSelecionada.exames.periodicidade || 'Não informada'}
+                        </span>
+                      </div>
+                      {(informacaoSelecionada.exames.anexos?.length ?? 0) > 0 && (
+                        <div>
+                          <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Anexos</span>
+                          <ul className="mt-1 space-y-1">
+                            {informacaoSelecionada.exames.anexos.map((uploadId) => (
+                              <li key={uploadId}>
+                                <button
+                                  onClick={() => uploadService.download(uploadId)}
+                                  className="flex items-center gap-2 text-sm text-teal-600 hover:text-teal-800 font-medium"
+                                >
+                                  <Download size={14} />
+                                  {uploadId}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-slate-400 text-sm">Nenhum exame registrado</span>
+                  )}
                 </div>
 
                 <div className="border-t border-slate-100 pt-3">

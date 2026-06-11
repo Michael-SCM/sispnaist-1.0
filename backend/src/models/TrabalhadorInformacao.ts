@@ -1,5 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface IExame {
+  realizados: string;
+  resultados: string;
+  periodicidade: string;
+  anexos: string[];
+}
+
 export interface ITrabalhadorInformacao extends Document {
   trabalhadorId: string;
   doencaBase: string;
@@ -17,8 +24,19 @@ export interface ITrabalhadorInformacao extends Document {
   macosCigarro: number;
   usoOutraDroga: boolean;
   frequenciaUso: string;
+  exames: IExame[];
   ativo: boolean;
 }
+
+const ExameSchema = new Schema<IExame>(
+  {
+    realizados: { type: String, default: '' },
+    resultados: { type: String, default: '' },
+    periodicidade: { type: String, default: '' },
+    anexos: { type: [String], default: [] },
+  },
+  { _id: false }
+);
 
 const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
   {
@@ -86,6 +104,10 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
     frequenciaUso: {
       type: String,
       default: '',
+    },
+    exames: {
+      type: [ExameSchema],
+      default: [],
     },
     ativo: {
       type: Boolean,

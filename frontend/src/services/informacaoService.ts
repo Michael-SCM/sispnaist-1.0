@@ -1,5 +1,12 @@
 import api from './api.js';
 
+export interface IExame {
+  realizados: string;
+  resultados: string;
+  periodicidade: string;
+  anexos: string[];
+}
+
 export interface ITrabalhadorInformacao {
   _id?: string;
   trabalhadorId: string;
@@ -18,6 +25,7 @@ export interface ITrabalhadorInformacao {
   macosCigarro: number;
   usoOutraDroga: boolean;
   frequenciaUso: string;
+  exames: IExame[];
   ativo: boolean;
 }
 
