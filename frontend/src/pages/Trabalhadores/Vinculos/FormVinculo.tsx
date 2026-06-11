@@ -53,7 +53,7 @@ const INITIAL_FORM: FormData = {
   dataInicio: '',
   dataPosse: '',
   dataFim: '',
-  situacao: 'Ativo',
+  situacao: '',
   empresaTerceirizada: '',
   setor: '',
   cargo: '',
@@ -62,7 +62,7 @@ const INITIAL_FORM: FormData = {
   salario: '',
   insalubridadePericulosidade: '',
   observacoes: '',
-  ativo: true,
+  ativo: false,
   terceirizado: false,
   temPosse: false,
 };
@@ -89,51 +89,52 @@ export const FormVinculo: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      carregarTrabalhador();
-      if (isEdicao && vinculoId) {
-        carregarVinculo();
-      }
+      carregarDados();
     }
-    carregarEmpresasUnidades();
   }, [id, vinculoId]);
 
-  const carregarEmpresasUnidades = async () => {
+  useEffect(() => {
+    if (unidades.length > 0 && formData.empresa) {
+      const unidadesDaEmpresa = unidades.filter(
+        (u) => String((u as any).empresaId) === String(formData.empresa)
+      );
+      if (unidadesDaEmpresa.length > 0) {
+        setUnidadesFiltradas(unidadesDaEmpresa);
+      }
+    }
+  }, [unidades]);
+
+  const carregarDados = async () => {
     try {
       const [r1, r2] = await Promise.all([
         empresaService.listarAtivas(),
         unidadeService.listarAtivas(),
       ]);
-      setEmpresas(r1.data?.empresas || r1.empresas || []);
-      setUnidades(r2.data?.unidades || r2.unidades || []);
+      const empresasData = r1.data?.empresas || r1.empresas || [];
+      const unidadesData = r2.data?.unidades || r2.unidades || [];
+      setEmpresas(empresasData);
+      setUnidades(unidadesData);
+
+      if (isEdicao && vinculoId) {
+        await carregarVinculo(unidadesData);
+      } else {
+        await carregarTrabalhador(unidadesData);
+      }
     } catch (e) {
       console.error(e);
     }
   };
 
-  const carregarTrabalhador = async () => {
+  const carregarTrabalhador = async (_unidadesData: IUnidade[]) => {
     try {
       const t = await trabalhadorService.obterPorId(id!);
       setTrabalhador(t);
-      if (!isEdicao) {
-        setFormData((prev) => ({
-          ...prev,
-          empresa: (t as any).empresa || '',
-          unidade: (t as any).unidade || '',
-          matricula: t.matricula || '',
-        }));
-        if ((t as any).empresa) {
-          const unidadesDaEmpresa = unidades.filter(
-            (u) => String((u as any).empresaId) === String((t as any).empresa)
-          );
-          setUnidadesFiltradas(unidadesDaEmpresa);
-        }
-      }
     } catch {
       toast.error('Erro ao carregar trabalhador');
     }
   };
 
-  const carregarVinculo = async () => {
+  const carregarVinculo = async (unidadesData: IUnidade[]) => {
     try {
       setIsCarregando(true);
       const lista = await submoduloTrabalhadorService.listarVinculos(id!);
@@ -141,8 +142,9 @@ export const FormVinculo: React.FC = () => {
       if (vinculo) {
         const temPosse = !!vinculo.dataPosse;
         const terceirizado = !!vinculo.empresaTerceirizada;
+        const empId = (vinculo as any).empresa || '';
         setFormData({
-          empresa: (vinculo as any).empresa || '',
+          empresa: empId,
           unidade: (vinculo as any).unidade || '',
           tipoVinculo: vinculo.tipoVinculo || '',
           matricula: vinculo.matricula || '',
@@ -165,9 +167,9 @@ export const FormVinculo: React.FC = () => {
           terceirizado,
           temPosse,
         });
-        if (vinculo.empresa) {
-          const unidadesDaEmpresa = unidades.filter(
-            (u) => String((u as any).empresaId) === String((vinculo as any).empresa)
+        if (empId) {
+          const unidadesDaEmpresa = unidadesData.filter(
+            (u) => String((u as any).empresaId) === String(empId)
           );
           setUnidadesFiltradas(unidadesDaEmpresa);
         }

@@ -232,6 +232,23 @@ export const ListaVinculos: React.FC = () => {
               <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Empresa</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {(vinculoSelecionado as any).empresa || 'Não informada'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Unidade</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {(vinculoSelecionado as any).unidade || 'Não informada'}
+                    </span>
+                  </div>
+                </div>
+
+                <hr className="border-slate-100" />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
                     <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Cargo</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.cargo || 'Não informado'}
@@ -313,43 +330,50 @@ export const ListaVinculos: React.FC = () => {
                     </span>
                   </div>
                   <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Empresa Terceirizada</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {vinculoSelecionado.empresaTerceirizada || 'Não informada'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
                     <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Posse</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.dataPosse ? new Date(vinculoSelecionado.dataPosse).toLocaleDateString('pt-BR') : 'Não informada'}
                     </span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Início</span>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Início (Serviço)</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.dataInicio ? new Date(vinculoSelecionado.dataInicio).toLocaleDateString('pt-BR') : '-'}
                     </span>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Fim</span>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Fim (Rescisão)</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.dataFim ? new Date(vinculoSelecionado.dataFim).toLocaleDateString('pt-BR') : 'Em vigor'}
                     </span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Situação</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.situacao || 'Não informada'}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 pt-4">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status:</span>
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      vinculoSelecionado.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {vinculoSelecionado.ativo ? 'Ativo' : 'Encerrado'}
-                    </span>
-                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status:</span>
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                    vinculoSelecionado.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {vinculoSelecionado.ativo ? 'Ativo' : 'Encerrado'}
+                  </span>
                 </div>
 
                 <div>
