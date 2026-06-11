@@ -522,13 +522,6 @@ export const EditarTrabalhador: React.FC = () => {
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={MapPin} title="Endereço Residencial" />
             <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {renderInput('endereco.cep', 'CEP', formData.endereco?.cep || '', { required: true })}
-              <div className="md:col-span-2">
-                {renderInput('endereco.logradouro', 'Logradouro', formData.endereco?.logradouro || '', { required: true })}
-              </div>
-              {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '', { required: true })}
-              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '')}
-              {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '', { required: true })}
               <div className="md:col-span-2">
                 <AutocompleteCidade
                   label="Cidade"
@@ -547,6 +540,13 @@ export const EditarTrabalhador: React.FC = () => {
                 />
               </div>
               {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '', { required: true })}
+              {renderInput('endereco.cep', 'CEP', formData.endereco?.cep || '', { required: true })}
+              <div className="md:col-span-2">
+                {renderInput('endereco.logradouro', 'Logradouro', formData.endereco?.logradouro || '', { required: true })}
+              </div>
+              {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '', { required: true })}
+              {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '')}
+              {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '', { required: true })}
             </div>
           </div>
 
