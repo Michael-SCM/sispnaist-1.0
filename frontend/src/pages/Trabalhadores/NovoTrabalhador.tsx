@@ -17,6 +17,7 @@ const empresaIdToString = (v: any): string => {
 
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
+import { AutocompleteCidade } from '../../components/AutocompleteCidade.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
   Building, Calendar, Heart, Shield, Clock, AlertTriangle,
@@ -193,6 +194,9 @@ export const NovoTrabalhador: React.FC = () => {
       'endereco.cidade': 'Cidade',
       'endereco.estado': 'Estado',
       'dataNascimento': 'Data de Nascimento',
+      'nacionalidade.cidade': 'Cidade Natal',
+      'nacionalidade.estado': 'Estado (UF)',
+      'nacionalidade.pais': 'País',
       'empresa': 'Empresa',
       'unidade': 'Unidade',
       'trabalho.dataEntrada': 'Data de Entrada em Serviço',
@@ -391,9 +395,22 @@ export const NovoTrabalhador: React.FC = () => {
               </div>
               {/* Nacionalidade */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {renderInput('nacionalidade.cidade', 'Cidade Natal', formData.nacionalidade?.cidade || '', { placeholder: 'Cidade onde nasceu' })}
-                {renderInput('nacionalidade.estado', 'Estado (UF)', formData.nacionalidade?.estado || '', { placeholder: 'UF' })}
-                {renderInput('nacionalidade.pais', 'País', formData.nacionalidade?.pais || '', { placeholder: 'Brasil' })}
+                <AutocompleteCidade
+                  cidade={formData.nacionalidade?.cidade || ''}
+                  estado={formData.nacionalidade?.estado || ''}
+                  onChange={(cidade, estado, pais) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      nacionalidade: {
+                        ...prev.nacionalidade,
+                        cidade,
+                        ...(estado ? { estado, pais } : {}),
+                      },
+                    }));
+                  }}
+                />
+                {renderInput('nacionalidade.estado', 'Estado (UF)', formData.nacionalidade?.estado || '', { required: true, placeholder: 'UF' })}
+                {renderInput('nacionalidade.pais', 'País', formData.nacionalidade?.pais || '', { required: true, placeholder: 'Brasil' })}
               </div>
               {/* Email */}
               <div>
