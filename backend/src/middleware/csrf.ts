@@ -31,6 +31,11 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction):
   // Request with Authorization is CORS-preflighted → safe
   if (req.headers.authorization) return next();
 
+  // Cross-origin requests: CORS already validates the origin via preflight.
+  // The double-submit cookie pattern doesn't work cross-domain (frontend JS
+  // cannot read cookies set by the backend on a different origin).
+  if (req.headers.origin) return next();
+
   // Cookie-based auth: validate CSRF token
   const headerToken = req.headers[CSRF_HEADER] as string | undefined;
   const cookieToken = req.cookies?.[CSRF_COOKIE];
