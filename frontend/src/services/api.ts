@@ -4,6 +4,11 @@ import { useAuthStore } from '../store/authStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
 
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -11,6 +16,14 @@ const axiosInstance: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const csrfToken = getCookie('csrf-token');
+  if (csrfToken && config.headers) {
+    config.headers['X-CSRF-Token'] = csrfToken;
+  }
+  return config;
 });
 
 let isRefreshing = false;
