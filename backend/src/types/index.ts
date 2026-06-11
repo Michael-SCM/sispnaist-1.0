@@ -28,6 +28,7 @@ export interface ITrabalhador {
   _id?: string;
   cpf: string;
   nome: string;
+  nomeSocial?: string;
   nomeMae: string;
   matricula: string;
   cartaoSus: string;
@@ -47,6 +48,8 @@ export interface ITrabalhador {
   escolaridade: string;
   estadoCivil: string;
   tipoSanguineo?: string;
+  insalubridadePericulosidade?: string;
+  neurodivergencias?: string[];
   
   // Deficiência
   deficiencia?: {

@@ -288,6 +288,7 @@ export interface ITrabalhador {
   _id?: string;
   cpf: string;
   nome: string;
+  nomeSocial?: string;
   nomeMae?: string;
   matricula?: string;
   cartaoSus?: string;
@@ -303,6 +304,8 @@ export interface ITrabalhador {
   // Dados Pessoais/Diversos
   sexo?: string;
   genero?: string;
+  insalubridadePericulosidade?: string;
+  neurodivergencias?: string[];
   raca?: string;
   escolaridade?: string;
   estadoCivil?: string;

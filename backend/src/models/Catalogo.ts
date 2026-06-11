@@ -39,7 +39,8 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
         'outroVinculo', 'funcao', 'grauSatisfacao', 'bairro', 'tipoDroga',
         'padraoEmail', 'parametro', 'parentesco', 'sorologia',
-        'acompanhamentoReadaptacao'
+        'acompanhamentoReadaptacao', 'neurodivergencia',
+        'insalubridadePericulosidade'
       ]
     },
     nome: { type: String, required: true, trim: true },

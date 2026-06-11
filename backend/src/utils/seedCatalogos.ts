@@ -421,6 +421,27 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Insatisfeito', ordem: 4 },
     { nome: 'Muito Insatisfeito', ordem: 5 },
   ]},
+  // Insalubridade/Periculosidade
+  { entidade: 'insalubridadePericulosidade', itens: [
+    { nome: 'Não se aplica', ordem: 1 },
+    { nome: 'Insalubridade - Grau Mínimo', ordem: 2 },
+    { nome: 'Insalubridade - Grau Médio', ordem: 3 },
+    { nome: 'Insalubridade - Grau Máximo', ordem: 4 },
+    { nome: 'Periculosidade', ordem: 5 },
+  ]},
+  // Neurodivergências
+  { entidade: 'neurodivergencia', itens: [
+    { nome: 'TDAH', sigla: 'TDAH', ordem: 1 },
+    { nome: 'TEA - Transtorno do Espectro Autista', sigla: 'TEA', ordem: 2 },
+    { nome: 'Dislexia', ordem: 3 },
+    { nome: 'Discalculia', ordem: 4 },
+    { nome: 'Disgrafia', ordem: 5 },
+    { nome: 'Dispraxia', ordem: 6 },
+    { nome: 'Síndrome de Tourette', ordem: 7 },
+    { nome: 'Altas Habilidades / Superdotação', ordem: 8 },
+    { nome: 'TOC - Transtorno Obsessivo-Compulsivo', sigla: 'TOC', ordem: 9 },
+    { nome: 'Transtorno do Processamento Sensorial', ordem: 10 },
+  ]},
   // Tipo de Violência Sexual
   { entidade: 'tipoViolenciaSexual', itens: [
     { nome: 'Assédio Sexual', ordem: 1 },

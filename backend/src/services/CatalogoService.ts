@@ -186,7 +186,9 @@ class CatalogoService {
       'regimeAcompanhamento', 'equipamentoProtecao', 'tipoVinculo',
 
       'outroVinculo', 'funcao', 'bairro', 'tipoDroga',
-      'padraoEmail', 'parametro', 'parentesco', 'sorologia'
+      'padraoEmail', 'parametro', 'parentesco', 'sorologia',
+      'neurodivergencia',
+      'insalubridadePericulosidade'
     ];
 
     if (!entidadesValidas.includes(entidade)) {

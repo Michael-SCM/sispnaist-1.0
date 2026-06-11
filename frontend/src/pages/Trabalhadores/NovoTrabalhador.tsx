@@ -20,7 +20,7 @@ import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
   Building, Calendar, Heart, Shield, Clock, AlertTriangle,
-  Phone, CreditCard, BookOpen
+  Phone, CreditCard, BookOpen, Brain
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF } from '../../utils/cpfMask.js';
@@ -55,6 +55,8 @@ export const NovoTrabalhador: React.FC = () => {
   const { itens: temposDeficiencia } = useCatalogo('tempoDeficiencia');
   const { itens: grausDeficiencia } = useCatalogo('grauDeficiencia');
   const { itens: tiposAfastamento } = useCatalogo('tipoAfastamento');
+  const { itens: neurodivergenciasLista } = useCatalogo('neurodivergencia');
+  const { itens: insalubridadeLista } = useCatalogo('insalubridadePericulosidade');
 
   // Checkboxes state
   const [checks, setChecks] = useState({
@@ -89,6 +91,7 @@ export const NovoTrabalhador: React.FC = () => {
     sexo: '', genero: '', raca: '', escolaridade: '', estadoCivil: '',
     nomeMae: '', matricula: '', cartaoSus: '', celular: '', telefoneContato: '',
     endereco: {}, deficiencia: {},
+    neurodivergencias: [],
     vinculo: { situacao: 'Ativo' },
     trabalho: {},
     historico: {},
@@ -152,6 +155,18 @@ export const NovoTrabalhador: React.FC = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleNeurodivergenciaToggle = (nome: string) => {
+    setFormData((prev) => {
+      const current = prev.neurodivergencias || [];
+      return {
+        ...prev,
+        neurodivergencias: current.includes(nome)
+          ? current.filter((n) => n !== nome)
+          : [...current, nome],
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -359,10 +374,11 @@ export const NovoTrabalhador: React.FC = () => {
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={User} title="Informações Gerais" />
             <div className="p-8 space-y-6">
-              {/* CPF + Nome + Nome da Mãe */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* CPF + Nome + Nome Social + Nome da Mãe */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {renderInput('cpf', 'CPF', maskCPF(formData.cpf || ''), { required: true, placeholder: '000.000.000-00',})}
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true, placeholder: 'Nome completo do trabalhador' })}
+                {renderInput('nomeSocial', 'Nome Social', formData.nomeSocial || '', { placeholder: 'Nome social (opcional)' })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}
               </div>
               {/* Matrícula, Cartão SUS, Celular, Nascimento */}
@@ -415,6 +431,27 @@ export const NovoTrabalhador: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* Neurodivergências */}
+              <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Brain size={18} className="text-purple-500" />
+                  <span className="text-sm font-bold text-slate-600">Neurodivergências</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-2">
+                  {neurodivergenciasLista.map((item) => (
+                    <label key={item._id || item.nome} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-slate-50 rounded-lg px-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.neurodivergencias?.includes(item.nome) || false}
+                        onChange={() => handleNeurodivergenciaToggle(item.nome)}
+                        className="w-4 h-4 rounded text-purple-600"
+                      />
+                      <span className="text-sm text-slate-700 leading-tight">{item.nome}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -434,9 +471,9 @@ export const NovoTrabalhador: React.FC = () => {
             </div>
           </div>
 
-          {/* ═══════════ SERVIÇO ═══════════ */}
+          {/* ═══════════ VÍNCULO EMPREGATÍCIO ═══════════ */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-            <SectionHeader icon={Building} title="Serviço" />
+            <SectionHeader icon={Briefcase} title="Vínculo Empregatício" />
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -481,13 +518,9 @@ export const NovoTrabalhador: React.FC = () => {
                 </div>
                 {renderSelect('vinculo.tipo', 'Tipo de Vínculo *', tiposVinculo, formData.vinculo?.tipo || '')}
               </div>
-            </div>
-          </div>
 
-          {/* ═══════════ TRABALHO ═══════════ */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-            <SectionHeader icon={Briefcase} title="Trabalho" />
-            <div className="p-8 space-y-6">
+              <hr className="border-slate-100" />
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {renderInput('trabalho.setor', 'Setor de Trabalho', formData.trabalho?.setor || '', { required: true })}
                 {renderInput('trabalho.cargo', 'Cargo', formData.trabalho?.cargo || '', { required: true })}
@@ -498,6 +531,12 @@ export const NovoTrabalhador: React.FC = () => {
                 {renderSelect('vinculo.turno', 'Turno de Trabalho *', turnosTrabalho, formData.vinculo?.turno || '')}
                 {renderSelect('vinculo.jornada', 'Jornada de Trabalho *', jornadasTrabalho, formData.vinculo?.jornada || '')}
                 {renderSelect('vinculo.situacao', 'Situação do Trabalho *', situacoesTrabalho, formData.vinculo?.situacao || '')}
+              </div>
+
+              <hr className="border-slate-100" />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {renderSelect('insalubridadePericulosidade', 'Insalubridade / Periculosidade', insalubridadeLista, formData.insalubridadePericulosidade || '')}
               </div>
             </div>
           </div>

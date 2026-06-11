@@ -654,6 +654,7 @@ export const criarTrabalhadorSchema = Joi.object({
     .min(3)
     .max(100)
     .required(),
+  nomeSocial: Joi.string().trim().allow('', null),
   nomeMae: Joi.string().trim().allow('', null),
   matricula: Joi.string().trim().allow('', null),
   cartaoSus: Joi.string().trim().allow('', null),
@@ -669,6 +670,8 @@ export const criarTrabalhadorSchema = Joi.object({
   escolaridade: Joi.string().trim().allow('', null),
   estadoCivil: Joi.string().trim().allow('', null),
   tipoSanguineo: Joi.string().trim().allow('', null),
+  insalubridadePericulosidade: Joi.string().trim().allow('', null),
+  neurodivergencias: Joi.array().items(Joi.string().trim()).optional(),
   deficiencia: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     tempo: Joi.string().trim().allow('', null),
@@ -728,6 +731,7 @@ export const atualizarTrabalhadorSchema = Joi.object({
     .min(3)
     .max(100)
     .optional(),
+  nomeSocial: Joi.string().trim().allow('', null),
   nomeMae: Joi.string().trim().allow('', null),
   matricula: Joi.string().trim().allow('', null),
   cartaoSus: Joi.string().trim().allow('', null),
@@ -743,6 +747,8 @@ export const atualizarTrabalhadorSchema = Joi.object({
   escolaridade: Joi.string().trim().allow('', null),
   estadoCivil: Joi.string().trim().allow('', null),
   tipoSanguineo: Joi.string().trim().allow('', null),
+  insalubridadePericulosidade: Joi.string().trim().allow('', null),
+  neurodivergencias: Joi.array().items(Joi.string().trim()).optional(),
   deficiencia: Joi.object({
     tipo: Joi.string().trim().allow('', null),
     tempo: Joi.string().trim().allow('', null),

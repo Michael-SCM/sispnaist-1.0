@@ -20,6 +20,10 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       required: [true, 'Nome é obrigatório'],
       trim: true,
     },
+    nomeSocial: {
+      type: String,
+      trim: true,
+    },
     nomeMae: {
       type: String,
       required: [true, 'Nome da mãe é obrigatório'],
@@ -90,6 +94,8 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       required: [true, 'Estado civil é obrigatório'],
     },
     tipoSanguineo: String,
+    insalubridadePericulosidade: String,
+    neurodivergencias: [{ type: String }],
 
     // Deficiência
     deficiencia: {

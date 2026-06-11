@@ -28,7 +28,8 @@ import {
   ChevronRight,
   ShieldAlert,
   RefreshCcw,
-  Clock
+  Clock,
+  Brain
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -128,6 +129,7 @@ export const DetalhesTrabalhador: React.FC = () => {
               </div>
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Nome da Mãe" value={trabalhador.nomeMae} icon={Users2} color="text-pink-500" />
+                {trabalhador.nomeSocial && <InfoCard label="Nome Social" value={trabalhador.nomeSocial} icon={User} color="text-violet-500" />}
                 <InfoCard label="Nascimento" value={trabalhador.dataNascimento ? new Date(trabalhador.dataNascimento).toLocaleDateString('pt-BR') : '-'} icon={Calendar} color="text-blue-500" />
                 <InfoCard label="Matrícula" value={trabalhador.matricula} icon={ClipboardList} color="text-amber-500" />
                 <InfoCard label="Cartão SUS" value={trabalhador.cartaoSus} icon={Heart} color="text-rose-500" />
@@ -136,6 +138,17 @@ export const DetalhesTrabalhador: React.FC = () => {
                 <InfoCard label="Raça" value={trabalhador.raca} icon={User} color="text-amber-400" />
                 <InfoCard label="Escolaridade" value={trabalhador.escolaridade} icon={GraduationCap} color="text-indigo-500" />
                 <InfoCard label="Estado Civil" value={trabalhador.estadoCivil} icon={Scale} color="text-slate-500" />
+                {trabalhador.neurodivergencias && trabalhador.neurodivergencias.length > 0 && (
+                  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50 md:col-span-2">
+                    <div className="p-2 bg-white rounded-xl shadow-sm text-purple-500">
+                      <Brain size={18} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Neurodivergências</p>
+                      <p className="text-sm font-bold text-slate-700">{trabalhador.neurodivergencias.join(', ')}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -156,6 +169,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                 <InfoCard label="Turno" value={trabalhador.vinculo?.turno} icon={Clock} color="text-rose-600" />
                 <InfoCard label="Jornada" value={trabalhador.vinculo?.jornada} icon={ClipboardList} color="text-teal-600" />
                 <InfoCard label="Empresa Terceirizada" value={trabalhador.trabalho?.empresaTerceirizada} icon={Building} color="text-orange-600" />
+                {trabalhador.insalubridadePericulosidade && <InfoCard label="Insalub./Periculosidade" value={trabalhador.insalubridadePericulosidade} icon={ShieldAlert} color="text-amber-600" />}
               </div>
             </div>
 
