@@ -489,7 +489,24 @@ export const NovoTrabalhador: React.FC = () => {
               {renderInput('endereco.numero', 'Número', formData.endereco?.numero || '', { required: true })}
               {renderInput('endereco.complemento', 'Complemento', formData.endereco?.complemento || '')}
               {renderInput('endereco.bairro', 'Bairro', formData.endereco?.bairro || '', { required: true })}
-              {renderInput('endereco.cidade', 'Cidade', formData.endereco?.cidade || '', { required: true })}
+              <div className="md:col-span-2">
+                <AutocompleteCidade
+                  label="Cidade"
+                  cidade={formData.endereco?.cidade || ''}
+                  estado={formData.endereco?.estado || ''}
+                  onChange={(cidade, estado) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      endereco: {
+                        ...prev.endereco,
+                        cidade,
+                        ...(estado ? { estado } : {}),
+                      },
+                    }));
+                  }}
+                  error={errors['endereco.cidade']}
+                />
+              </div>
               {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '', { required: true })}
             </div>
           </div>

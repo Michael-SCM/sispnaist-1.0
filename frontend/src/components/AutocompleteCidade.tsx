@@ -6,13 +6,14 @@ interface AutocompleteCidadeProps {
   cidade: string;
   estado: string;
   onChange: (cidade: string, estado?: string, pais?: string) => void;
+  label?: string;
   error?: string;
 }
 
 const inputCls = "w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all";
 
 export const AutocompleteCidade: React.FC<AutocompleteCidadeProps> = ({
-  cidade, estado, onChange, error
+  cidade, estado, onChange, label = 'Cidade Natal', error
 }) => {
   const [termo, setTermo] = useState(cidade);
   const [sugestoes, setSugestoes] = useState<Municipio[]>([]);
@@ -96,7 +97,7 @@ export const AutocompleteCidade: React.FC<AutocompleteCidadeProps> = ({
   return (
     <div className="relative">
       <label className="block text-sm font-bold text-slate-600 mb-2">
-        Cidade Natal <span className="text-red-500"> *</span>
+        {label} <span className="text-red-500"> *</span>
       </label>
       <div className="relative">
         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
