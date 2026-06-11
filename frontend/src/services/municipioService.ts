@@ -13,7 +13,8 @@ function normalize(str: string): string {
 async function carregarLocal(): Promise<Municipio[]> {
   if (cacheLocal) return cacheLocal;
   const res = await fetch('/data/municipios-brasil.json');
-  cacheLocal = await res.json();
+  const raw: { n: string; u: string }[] = await res.json();
+  cacheLocal = raw.map((m) => ({ ...m, p: 'Brasil' }));
   return cacheLocal!;
 }
 
