@@ -301,6 +301,13 @@ export interface ITrabalhador {
   empresa?: string; // ObjectId da Empresa
   unidade?: string; // ObjectId da Unidade
 
+  // Nacionalidade
+  nacionalidade?: {
+    cidade?: string;
+    estado?: string;
+    pais?: string;
+  };
+
   // Dados Pessoais/Diversos
   sexo?: string;
   genero?: string;

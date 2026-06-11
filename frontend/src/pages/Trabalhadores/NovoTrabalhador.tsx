@@ -389,9 +389,15 @@ export const NovoTrabalhador: React.FC = () => {
                 {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
                 {renderInput('dataNascimento', 'Data de Nascimento', formData.dataNascimento ? String(formData.dataNascimento).split('T')[0] : '', { type: 'date', required: true })}
               </div>
+              {/* Nacionalidade */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {renderInput('nacionalidade.cidade', 'Cidade Natal', formData.nacionalidade?.cidade || '', { placeholder: 'Cidade onde nasceu' })}
+                {renderInput('nacionalidade.estado', 'Estado (UF)', formData.nacionalidade?.estado || '', { placeholder: 'UF' })}
+                {renderInput('nacionalidade.pais', 'País', formData.nacionalidade?.pais || '', { placeholder: 'Brasil' })}
+              </div>
               {/* Email */}
               <div>
-                <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500">*</span></label>
+                <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500"> *</span></label>
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className={inputCls} placeholder="email@exemplo.com" />
               </div>
               {/* Sexo, Gênero, Raça, Escolaridade, Estado Civil */}

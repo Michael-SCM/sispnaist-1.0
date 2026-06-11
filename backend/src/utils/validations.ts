@@ -664,6 +664,11 @@ export const criarTrabalhadorSchema = Joi.object({
   dataNascimento: Joi.date().required().messages({
     'any.required': 'Data de nascimento é obrigatória',
   }),
+  nacionalidade: Joi.object({
+    cidade: Joi.string().trim().allow('', null),
+    estado: Joi.string().trim().allow('', null),
+    pais: Joi.string().trim().allow('', null),
+  }).optional(),
   sexo: Joi.string().trim().allow('', null),
   genero: Joi.string().trim().allow('', null),
   raca: Joi.string().trim().allow('', null),
@@ -741,6 +746,11 @@ export const atualizarTrabalhadorSchema = Joi.object({
   dataNascimento: Joi.date().required().messages({
     'any.required': 'Data de nascimento é obrigatória',
   }),
+  nacionalidade: Joi.object({
+    cidade: Joi.string().trim().allow('', null),
+    estado: Joi.string().trim().allow('', null),
+    pais: Joi.string().trim().allow('', null),
+  }).optional(),
   sexo: Joi.string().trim().allow('', null),
   genero: Joi.string().trim().allow('', null),
   raca: Joi.string().trim().allow('', null),

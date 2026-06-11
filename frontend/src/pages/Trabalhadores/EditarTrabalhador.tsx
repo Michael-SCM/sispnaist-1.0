@@ -425,6 +425,21 @@ export const EditarTrabalhador: React.FC = () => {
                 {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
                 {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date', required: true })}
               </div>
+              {/* Nacionalidade */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className={labelCls}>Cidade Natal</label>
+                  <input type="text" name="nacionalidade.cidade" value={formData.nacionalidade?.cidade || ''} onChange={handleChange} className={inputCls} placeholder="Cidade onde nasceu" />
+                </div>
+                <div>
+                  <label className={labelCls}>Estado (UF)</label>
+                  <input type="text" name="nacionalidade.estado" value={formData.nacionalidade?.estado || ''} onChange={handleChange} className={inputCls} placeholder="UF" />
+                </div>
+                <div>
+                  <label className={labelCls}>País</label>
+                  <input type="text" name="nacionalidade.pais" value={formData.nacionalidade?.pais || ''} onChange={handleChange} className={inputCls} placeholder="Brasil" />
+                </div>
+              </div>
               <div>
                 <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500">*</span></label>
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className={inputCls} />

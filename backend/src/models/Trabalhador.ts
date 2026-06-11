@@ -72,6 +72,13 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       required: [true, 'Unidade é obrigatória'],
     },
 
+    // Nacionalidade
+    nacionalidade: {
+      cidade: String,
+      estado: String,
+      pais: String,
+    },
+
     // Dados Pessoais/Diversos
     sexo: {
       type: String,
