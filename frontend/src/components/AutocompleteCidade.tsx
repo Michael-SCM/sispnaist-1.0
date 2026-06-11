@@ -57,8 +57,8 @@ export const AutocompleteCidade: React.FC<AutocompleteCidadeProps> = ({
   };
 
   const selecionar = (m: Municipio) => {
-    setTermo(`${m.n} - ${m.u}`);
-    onChange(m.n, m.u, 'Brasil');
+    setTermo(`${m.n}${m.u ? ` - ${m.u}` : ''}`);
+    onChange(m.n, m.u, m.p);
     setIsOpen(false);
     setSugestoes([]);
   };
@@ -130,16 +130,16 @@ export const AutocompleteCidade: React.FC<AutocompleteCidadeProps> = ({
           {sugestoes.map((m, i) => (
             <button
               type="button"
-              key={`${m.n}-${m.u}`}
+              key={`${m.n}-${m.u}-${m.p}`}
               onClick={() => selecionar(m)}
               onMouseEnter={() => setHighlightIndex(i)}
               className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors ${
                 i === highlightIndex ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'
               }`}
             >
-              <span className="font-medium">{m.n}</span>
-              <span className="text-xs font-black uppercase bg-slate-100 px-2 py-0.5 rounded-lg text-slate-500">
-                {m.u}
+              <span className="font-medium min-w-0 truncate">{m.n}</span>
+              <span className="text-xs font-black whitespace-nowrap bg-slate-100 px-2 py-0.5 rounded-lg text-slate-500 ml-2">
+                {m.u}{m.p && m.p !== 'Brasil' ? `, ${m.p}` : ''}
               </span>
             </button>
           ))}
