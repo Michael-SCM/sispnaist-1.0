@@ -497,7 +497,6 @@ export const NovoTrabalhador: React.FC = () => {
                       },
                     }));
                   }}
-                  error={errors['endereco.cidade']}
                 />
               </div>
               {renderInput('endereco.estado', 'Estado (UF)', formData.endereco?.estado || '', { required: true })}

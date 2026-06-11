@@ -53,7 +53,7 @@ export const AutocompleteCidade: React.FC<AutocompleteCidadeProps> = ({
     onChange(val);
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => buscar(val), 300);
+    debounceRef.current = setTimeout(() => buscar(val), 150);
   };
 
   const selecionar = (m: Municipio) => {
