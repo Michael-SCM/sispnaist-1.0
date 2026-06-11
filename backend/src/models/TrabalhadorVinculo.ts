@@ -7,20 +7,24 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ITrabalhadorVinculo extends Document {
   trabalhadorId: mongoose.Types.ObjectId;
-  tipoVinculo: string;        // vinculado a tb_tipo_vinculo
-  funcao?: string;            // vinculado a tb_funcao
+  empresa?: mongoose.Types.ObjectId;
+  unidade?: mongoose.Types.ObjectId;
+  tipoVinculo: string;
+  funcao?: string;
   matricula: string;
-  jornadaTrabalho: string;   // vinculado a tb_jornada_trabalho
-  turnoTrabalho?: string;     // vinculado a tb_turno_trabalho
+  jornadaTrabalho: string;
+  turnoTrabalho?: string;
   dataInicio: Date;
+  dataPosse?: Date;
   dataFim?: Date;
-  situacao?: string;          // Ativo, Afastado, Desligado, etc.
+  situacao?: string;
   empresaTerceirizada?: string;
   setor?: string;
   cargo?: string;
-  ocupacao?: string;          // CBO
-  cargaHoraria?: number;      // carga horária semanal
+  ocupacao?: string;
+  cargaHoraria?: number;
   salario?: number;
+  insalubridadePericulosidade?: string;
   observacoes?: string;
   ativo: boolean;
   dataCriacao: Date;
@@ -32,12 +36,15 @@ export interface ITrabalhadorVinculoDocument extends ITrabalhadorVinculo {}
 const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
   {
     trabalhadorId: { type: Schema.Types.ObjectId as any, ref: 'Trabalhador', required: true, index: true },
+    empresa: { type: Schema.Types.ObjectId as any, ref: 'Empresa' },
+    unidade: { type: Schema.Types.ObjectId as any, ref: 'Unidade' },
     tipoVinculo: { type: String, required: true, trim: true },
     matricula: { type: String, required: true, trim: true },
     funcao: { type: String, trim: true },
     jornadaTrabalho: { type: String, required: true, trim: true },
     turnoTrabalho: { type: String, trim: true },
     dataInicio: { type: Date, required: true },
+    dataPosse: { type: Date },
     dataFim: { type: Date },
     situacao: { type: String, trim: true, default: 'Ativo' },
     empresaTerceirizada: { type: String, trim: true },
@@ -46,6 +53,7 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
     ocupacao: { type: String, trim: true },
     cargaHoraria: { type: Number, min: 1, max: 168 },
     salario: { type: Number, min: 0 },
+    insalubridadePericulosidade: { type: String, trim: true },
     observacoes: { type: String, trim: true },
     ativo: { type: Boolean, default: true }
   },

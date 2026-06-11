@@ -30,11 +30,15 @@ export interface ITrabalhadorDependente {
 export interface ITrabalhadorVinculo {
   _id?: string;
   trabalhadorId: string;
+  empresa?: string;
+  unidade?: string;
   tipoVinculo: string;
+  matricula?: string;
   funcao?: string;
   jornadaTrabalho?: string;
   turnoTrabalho?: string;
   dataInicio: string;
+  dataPosse?: string;
   dataFim?: string;
   situacao?: string;
   empresaTerceirizada?: string;
@@ -43,6 +47,7 @@ export interface ITrabalhadorVinculo {
   ocupacao?: string;
   cargaHoraria?: number;
   salario?: number;
+  insalubridadePericulosidade?: string;
   observacoes?: string;
   ativo?: boolean;
   dataCriacao?: string;

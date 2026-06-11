@@ -124,6 +124,32 @@ export class TrabalhadorService {
 
     const trabalhador = new Trabalhador(trabalhadorData);
     await trabalhador.save();
+
+    const dataEntrada = (trabalhadorData as any).trabalho?.dataEntrada;
+    if (dataEntrada) {
+      const vinculoData: Record<string, unknown> = {
+        trabalhadorId: trabalhador._id,
+        empresa: trabalhadorData.empresa,
+        unidade: trabalhadorData.unidade,
+        tipoVinculo: (trabalhadorData as any).vinculo?.tipo || '',
+        matricula: trabalhadorData.matricula || '',
+        funcao: (trabalhadorData as any).trabalho?.funcao || '',
+        jornadaTrabalho: (trabalhadorData as any).vinculo?.jornada || '',
+        turnoTrabalho: (trabalhadorData as any).vinculo?.turno || '',
+        dataInicio: dataEntrada,
+        dataPosse: (trabalhadorData as any).trabalho?.dataPosse || undefined,
+        situacao: (trabalhadorData as any).vinculo?.situacao || 'Ativo',
+        empresaTerceirizada: (trabalhadorData as any).trabalho?.empresaTerceirizada || '',
+        setor: (trabalhadorData as any).trabalho?.setor || '',
+        cargo: (trabalhadorData as any).trabalho?.cargo || '',
+        ocupacao: (trabalhadorData as any).trabalho?.ocupacao || '',
+        insalubridadePericulosidade: trabalhadorData.insalubridadePericulosidade || '',
+        ativo: true,
+      };
+
+      await TrabalhadorVinculo.create(vinculoData);
+    }
+
     return trabalhador.toObject() as unknown as ITrabalhador;
   }
 

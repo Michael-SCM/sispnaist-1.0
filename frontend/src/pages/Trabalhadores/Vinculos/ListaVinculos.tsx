@@ -292,15 +292,30 @@ export const ListaVinculos: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Insalubridade / Periculosidade</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {vinculoSelecionado.insalubridadePericulosidade || 'Não informada'}
+                    </span>
+                  </div>
+                  <div>
                     <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Carga Horária</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.cargaHoraria ? `${vinculoSelecionado.cargaHoraria}h semanais` : 'Não informada'}
                     </span>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Salário</span>
                     <span className="font-semibold text-slate-700 block">
                       {vinculoSelecionado.salario ? `R$ ${Number(vinculoSelecionado.salario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Posse</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {vinculoSelecionado.dataPosse ? new Date(vinculoSelecionado.dataPosse).toLocaleDateString('pt-BR') : 'Não informada'}
                     </span>
                   </div>
                 </div>
