@@ -15,8 +15,7 @@ import {
   Calendar,
   ChevronRight,
   ShieldCheck,
-  Eye,
-  X
+  Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -26,7 +25,7 @@ export const ListaVinculos: React.FC = () => {
   const [vinculos, setVinculos] = useState<ITrabalhadorVinculo[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [vinculoSelecionado, setVinculoSelecionado] = useState<ITrabalhadorVinculo | null>(null);
+
 
   useEffect(() => {
     if (id) {
@@ -124,7 +123,7 @@ export const ListaVinculos: React.FC = () => {
                     <tr 
                       key={v._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => setVinculoSelecionado(v)}
+                      onClick={() => navigate(`/trabalhadores/${id}/vinculos/${v._id}`)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex flex-col gap-1">
@@ -167,7 +166,7 @@ export const ListaVinculos: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setVinculoSelecionado(v);
+                              navigate(`/trabalhadores/${id}/vinculos/${v._id}`);
                             }}
                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                             title="Visualizar Detalhes"
@@ -202,226 +201,7 @@ export const ListaVinculos: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal de Detalhes */}
-      {vinculoSelecionado && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
-              onClick={() => setVinculoSelecionado(null)}
-            ></div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
-              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-                    <Briefcase size={18} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900">Detalhes do Vínculo</h3>
-                </div>
-                <button 
-                  onClick={() => setVinculoSelecionado(null)}
-                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Empresa</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {(vinculoSelecionado as any).empresa || 'Não informada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Unidade</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {(vinculoSelecionado as any).unidade || 'Não informada'}
-                    </span>
-                  </div>
-                </div>
-
-                <hr className="border-slate-100" />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Cargo</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.cargo || 'Não informado'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Função</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.funcao || 'Não informada'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo de Vínculo</span>
-                    <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-black uppercase w-fit block mt-0.5">
-                      {vinculoSelecionado.tipoVinculo}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Matrícula</span>
-                    <span className="font-semibold text-slate-700 font-mono block">
-                      {vinculoSelecionado.matricula || 'Sem matrícula'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Setor</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.setor || 'Não informado'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Ocupação</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.ocupacao || 'Não informada'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Jornada de Trabalho</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.jornadaTrabalho || 'Não informada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Turno de Trabalho</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.turnoTrabalho || 'Não informado'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Insalubridade / Periculosidade</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.insalubridadePericulosidade || 'Não informada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Carga Horária</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.cargaHoraria ? `${vinculoSelecionado.cargaHoraria}h semanais` : 'Não informada'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Salário</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.salario ? `R$ ${Number(vinculoSelecionado.salario).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'Não informado'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Empresa Terceirizada</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.empresaTerceirizada || 'Não informada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Residente?</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.residente ? 'Sim' : 'Não'}
-                    </span>
-                  </div>
-                </div>
-
-                {vinculoSelecionado.residente && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Anos de Residência</span>
-                      <span className="font-semibold text-slate-700 block">
-                        {vinculoSelecionado.anosResidencia || 'Não informado'}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Posse</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.dataPosse ? new Date(vinculoSelecionado.dataPosse).toLocaleDateString('pt-BR') : 'Não informada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Início (Serviço)</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.dataInicio ? new Date(vinculoSelecionado.dataInicio).toLocaleDateString('pt-BR') : '-'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Fim (Rescisão)</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.dataFim ? new Date(vinculoSelecionado.dataFim).toLocaleDateString('pt-BR') : 'Em vigor'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Situação</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {vinculoSelecionado.situacao || 'Não informada'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status:</span>
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                    vinculoSelecionado.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {vinculoSelecionado.ativo ? 'Ativo' : 'Encerrado'}
-                  </span>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {vinculoSelecionado.observacoes || 'Nenhuma observação cadastrada'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-                <button 
-                  onClick={() => {
-                    setVinculoSelecionado(null);
-                    navigate(`/trabalhadores/${id}/vinculos/${vinculoSelecionado._id}/editar`);
-                  }}
-                  className="px-4 py-2 text-sm bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Editar Registro
-                </button>
-                <button 
-                  onClick={() => setVinculoSelecionado(null)}
-                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </MainLayout>
   );
 };

@@ -56,6 +56,7 @@ const FormAfastamento = React.lazy(() => import('./pages/Trabalhadores/Afastamen
 const ListaDependentes = React.lazy(() => import('./pages/Trabalhadores/Dependentes/ListaDependentes.js'));
 const FormDependente = React.lazy(() => import('./pages/Trabalhadores/Dependentes/FormDependente.js'));
 const ListaVinculos = React.lazy(() => import('./pages/Trabalhadores/Vinculos/ListaVinculos.js'));
+const DetalhesVinculo = React.lazy(() => import('./pages/Trabalhadores/Vinculos/DetalhesVinculo.js'));
 const FormVinculo = React.lazy(() => import('./pages/Trabalhadores/Vinculos/FormVinculo.js'));
 const ListaOcorrenciasViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/ListaOcorrenciasViolencia.js'));
 const FormOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/FormOcorrenciaViolencia.js'));
@@ -379,6 +380,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormVinculo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/vinculos/:vinculoId"
+          element={
+            <ProtectedRoute>
+              <DetalhesVinculo />
             </ProtectedRoute>
           }
         />

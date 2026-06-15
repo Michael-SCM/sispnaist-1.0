@@ -269,7 +269,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                 {[
                   { label: 'Afastamentos', icon: Stethoscope, path: 'afastamentos', color: 'text-amber-400' },
                   { label: 'Dependentes', icon: Users2, path: 'dependentes', color: 'text-rose-400' },
-                  { label: 'Vínculos', icon: ClipboardList, path: 'vinculos', color: 'text-blue-400' },
+                  { label: 'Vínculos Empregatícios', icon: ClipboardList, path: 'vinculos', color: 'text-blue-400' },
                   { label: 'Ocorrências de Violência', icon: ShieldAlert, path: 'ocorrencias-violencia', color: 'text-red-400' },
                   { label: 'Readaptações', icon: RefreshCcw, path: 'readaptacoes', color: 'text-purple-400' },
                   { label: 'Processos de Trabalho', icon: Briefcase, path: 'processos-trabalho', color: 'text-cyan-400' },
