@@ -131,6 +131,8 @@ export const ListaInformacoes: React.FC = () => {
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Tipo Sanguíneo" value={info.tipoSanguineo} icon={Droplet} color="text-red-500" />
                 <InfoCard label="Medicamentos" value={info.medicamentos} icon={Pill} color="text-purple-500" />
+                <InfoCard label="Doador de Sangue?" value={info.doadorSangue ? 'Sim' : 'Não'} icon={Droplet} color="text-emerald-500" />
+                <InfoCard label="Doador de Órgãos?" value={info.doadorOrgaos ? 'Sim' : 'Não'} icon={Heart} color="text-emerald-500" />
                 <InfoCard label="Doença Preexistente?" value={info.doencaPreexistente ? 'Sim' : 'Não'} icon={User} color="text-rose-500" />
                 {info.doencaPreexistente && <InfoCard label="Descrição" value={info.descricaoDoencaPreexistente} icon={User} color="text-rose-500" />}
                 <InfoCard label="Histórico Familiar?" value={info.historicoFamiliar ? 'Sim' : 'Não'} icon={Users} color="text-violet-500" />
@@ -150,17 +152,6 @@ export const ListaInformacoes: React.FC = () => {
               </div>
             </div>
 
-            {/* Hábitos e Estilo de Vida */}
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <SectionHeader icon={Wine} title="Hábitos e Estilo de Vida" />
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoCard label="Consumo de Álcool" value={info.usoAlcool ? `Sim (${info.dosesAlcool} doses/dia)` : 'Não'} icon={Wine} color="text-yellow-500" />
-                <InfoCard label="Uso de Cigarro" value={info.usoCigarro ? `Sim (${info.macosCigarro} maços/dia)` : 'Não'} icon={Cigarette} color="text-orange-500" />
-                <InfoCard label="Uso de Outras Substâncias" value={info.usoOutraDroga ? 'Sim' : 'Não'} icon={Zap} color="text-purple-500" />
-                {info.usoOutraDroga && <InfoCard label="Descrição das Substâncias" value={info.outraDrogaDescricao} icon={Zap} color="text-violet-500" />}
-              </div>
-            </div>
-
             {/* Gestação / Lactação */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
               <SectionHeader icon={Baby} title="Gestação / Lactação" />
@@ -176,6 +167,17 @@ export const ListaInformacoes: React.FC = () => {
                   </>
                 )}
                 <InfoCard label="Lactante?" value={info.lactante ? 'Sim' : 'Não'} icon={Baby} color="text-pink-500" />
+              </div>
+            </div>
+
+            {/* Hábitos e Estilo de Vida */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={Wine} title="Hábitos e Estilo de Vida" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Consumo de Álcool" value={info.usoAlcool ? `Sim (${info.dosesAlcool} doses/dia)` : 'Não'} icon={Wine} color="text-yellow-500" />
+                <InfoCard label="Uso de Cigarro" value={info.usoCigarro ? `Sim (${info.macosCigarro} maços/dia)` : 'Não'} icon={Cigarette} color="text-orange-500" />
+                <InfoCard label="Uso de Outras Substâncias" value={info.usoOutraDroga ? 'Sim' : 'Não'} icon={Zap} color="text-purple-500" />
+                {info.usoOutraDroga && <InfoCard label="Descrição das Substâncias" value={info.outraDrogaDescricao} icon={Zap} color="text-violet-500" />}
               </div>
             </div>
 

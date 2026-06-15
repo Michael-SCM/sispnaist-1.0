@@ -33,6 +33,8 @@ interface FormData {
   tipoDroga: string;
   tipoSanguineo: string;
   medicamentos: string;
+  doadorSangue: boolean;
+  doadorOrgaos: boolean;
   doencaPreexistente: boolean;
   descricaoDoencaPreexistente: string;
   historicoFamiliar: boolean;
@@ -71,6 +73,8 @@ const INITIAL_FORM: FormData = {
   tipoDroga: '',
   tipoSanguineo: '',
   medicamentos: '',
+  doadorSangue: false,
+  doadorOrgaos: false,
   doencaPreexistente: false,
   descricaoDoencaPreexistente: '',
   historicoFamiliar: false,
@@ -150,6 +154,8 @@ export const FormInformacoes: React.FC = () => {
           tipoDroga: info.tipoDroga || '',
           tipoSanguineo: info.tipoSanguineo || '',
           medicamentos: info.medicamentos || '',
+          doadorSangue: info.doadorSangue || false,
+          doadorOrgaos: info.doadorOrgaos || false,
           doencaPreexistente: info.doencaPreexistente || false,
           descricaoDoencaPreexistente: info.descricaoDoencaPreexistente || '',
           historicoFamiliar: info.historicoFamiliar || false,
@@ -383,6 +389,36 @@ export const FormInformacoes: React.FC = () => {
                 </div>
               </div>
 
+              {/* Doador */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 p-4 bg-emerald-50 rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="doadorSangue"
+                    id="doadorSangue"
+                    checked={formData.doadorSangue}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500"
+                  />
+                  <label htmlFor="doadorSangue" className="text-sm font-bold text-slate-600">
+                    Doador de Sangue
+                  </label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="doadorOrgaos"
+                    id="doadorOrgaos"
+                    checked={formData.doadorOrgaos}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500"
+                  />
+                  <label htmlFor="doadorOrgaos" className="text-sm font-bold text-slate-600">
+                    Doador de Órgãos
+                  </label>
+                </div>
+              </div>
+
               {/* Doenças Preexistentes */}
               <div className="p-6 bg-rose-50 rounded-2xl space-y-4 mt-6">
                 <div className="flex items-center gap-3">
@@ -533,6 +569,103 @@ export const FormInformacoes: React.FC = () => {
               </div>
             </div>
 
+            {/* Seção: Gestação/Lactação */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <Baby size={20} />
+                Gestação / Lactação
+              </h3>
+              <div className="p-6 bg-pink-50 rounded-2xl space-y-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="gestante"
+                    id="gestante"
+                    checked={formData.gestante}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                  />
+                  <label htmlFor="gestante" className="text-sm font-bold text-slate-600">
+                    Está gestante?
+                  </label>
+                </div>
+                {formData.gestante && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Data da Última Menstruação (DUM)</label>
+                      <input
+                        type="date"
+                        name="dataUltimaMenstruacao"
+                        value={formData.dataUltimaMenstruacao}
+                        onChange={handleChange}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Semanas de Gestação</label>
+                      <input
+                        type="number"
+                        name="semanasGestacao"
+                        value={formData.semanasGestacao}
+                        onChange={handleNumberChange}
+                        min="0"
+                        max="45"
+                        className={inputCls}
+                        placeholder="Ex: 20"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Data Prevista para o Parto</label>
+                      <input
+                        type="date"
+                        name="dataPartoPrevista"
+                        value={formData.dataPartoPrevista}
+                        onChange={handleChange}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="preNatal"
+                        id="preNatal"
+                        checked={formData.preNatal}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                      />
+                      <label htmlFor="preNatal" className="text-sm font-bold text-slate-600">
+                        Realiza acompanhamento pré-natal?
+                      </label>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>Complicações / Observações</label>
+                      <textarea
+                        name="complicacoesGestacao"
+                        value={formData.complicacoesGestacao}
+                        onChange={handleChange}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-white border border-pink-200 rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
+                        placeholder="Descreva intercorrências, complicações ou observações relevantes..."
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 pt-2 border-t border-pink-200">
+                  <input
+                    type="checkbox"
+                    name="lactante"
+                    id="lactante"
+                    checked={formData.lactante}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                  />
+                  <label htmlFor="lactante" className="text-sm font-bold text-slate-600">
+                    Está em período de lactação?
+                  </label>
+                </div>
+              </div>
+            </div>
+
             {/* Seção: Uso de Substâncias */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
@@ -657,103 +790,6 @@ export const FormInformacoes: React.FC = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Seção: Gestação/Lactação */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
-                <Baby size={20} />
-                Gestação / Lactação
-              </h3>
-              <div className="p-6 bg-pink-50 rounded-2xl space-y-4">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    name="gestante"
-                    id="gestante"
-                    checked={formData.gestante}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
-                  />
-                  <label htmlFor="gestante" className="text-sm font-bold text-slate-600">
-                    Está gestante?
-                  </label>
-                </div>
-                {formData.gestante && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>Data da Última Menstruação (DUM)</label>
-                      <input
-                        type="date"
-                        name="dataUltimaMenstruacao"
-                        value={formData.dataUltimaMenstruacao}
-                        onChange={handleChange}
-                        className={inputCls}
-                      />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Semanas de Gestação</label>
-                      <input
-                        type="number"
-                        name="semanasGestacao"
-                        value={formData.semanasGestacao}
-                        onChange={handleNumberChange}
-                        min="0"
-                        max="45"
-                        className={inputCls}
-                        placeholder="Ex: 20"
-                      />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Data Prevista para o Parto</label>
-                      <input
-                        type="date"
-                        name="dataPartoPrevista"
-                        value={formData.dataPartoPrevista}
-                        onChange={handleChange}
-                        className={inputCls}
-                      />
-                    </div>
-                    <div className="flex items-center gap-3 pt-7">
-                      <input
-                        type="checkbox"
-                        name="preNatal"
-                        id="preNatal"
-                        checked={formData.preNatal}
-                        onChange={handleChange}
-                        className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
-                      />
-                      <label htmlFor="preNatal" className="text-sm font-bold text-slate-600">
-                        Realiza acompanhamento pré-natal?
-                      </label>
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className={labelCls}>Complicações / Observações</label>
-                      <textarea
-                        name="complicacoesGestacao"
-                        value={formData.complicacoesGestacao}
-                        onChange={handleChange}
-                        rows={2}
-                        className="w-full px-4 py-3 bg-white border border-pink-200 rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
-                        placeholder="Descreva intercorrências, complicações ou observações relevantes..."
-                      />
-                    </div>
-                  </div>
-                )}
-                <div className="flex items-center gap-3 pt-2 border-t border-pink-200">
-                  <input
-                    type="checkbox"
-                    name="lactante"
-                    id="lactante"
-                    checked={formData.lactante}
-                    onChange={handleChange}
-                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
-                  />
-                  <label htmlFor="lactante" className="text-sm font-bold text-slate-600">
-                    Está em período de lactação?
-                  </label>
-                </div>
               </div>
             </div>
 

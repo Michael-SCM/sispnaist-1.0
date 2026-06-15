@@ -70,6 +70,14 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         type: String,
         default: '',
     },
+    doadorSangue: {
+        type: Boolean,
+        default: false,
+    },
+    doadorOrgaos: {
+        type: Boolean,
+        default: false,
+    },
     doencaPreexistente: {
         type: Boolean,
         default: false,
