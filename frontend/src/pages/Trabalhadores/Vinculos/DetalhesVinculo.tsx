@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
-import { ITrabalhadorVinculo, ITrabalhador } from '../../../types/index.js';
+import empresaService from '../../../services/empresaService.js';
+import unidadeService from '../../../services/unidadeService.js';
+import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade } from '../../../types/index.js';
 import {
   ArrowLeft, Edit, Trash2, Building, MapPin, Briefcase, CreditCard,
   UserCheck, Clock, Calendar, Flag, Home,
@@ -35,6 +37,8 @@ export const DetalhesVinculo: React.FC = () => {
   const navigate = useNavigate();
   const [vinculo, setVinculo] = useState<ITrabalhadorVinculo | null>(null);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
+  const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
+  const [unidades, setUnidades] = useState<IUnidade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -46,11 +50,15 @@ export const DetalhesVinculo: React.FC = () => {
   const carregarDados = async () => {
     try {
       setIsLoading(true);
-      const [t, vinculos] = await Promise.all([
+      const [t, vinculos, r1, r2] = await Promise.all([
         trabalhadorService.obterPorId(id!),
         submoduloTrabalhadorService.listarVinculos(id!),
+        empresaService.listarAtivas(),
+        unidadeService.listarAtivas(),
       ]);
       setTrabalhador(t);
+      setEmpresas(r1.data?.empresas || r1.empresas || []);
+      setUnidades(r2.data?.unidades || r2.unidades || []);
       const encontrado = vinculos.find((v: ITrabalhadorVinculo) => v._id === vinculoId);
       if (encontrado) {
         setVinculo(encontrado);
@@ -92,6 +100,8 @@ export const DetalhesVinculo: React.FC = () => {
   if (!vinculo) return null;
 
   const v = vinculo;
+  const empresaNome = v.empresa ? (empresas.find(e => e._id === v.empresa)?.razaoSocial || v.empresa) : undefined;
+  const unidadeNome = v.unidade ? (unidades.find(u => u._id === v.unidade)?.nome || v.unidade) : undefined;
 
   return (
     <MainLayout>
@@ -116,8 +126,8 @@ export const DetalhesVinculo: React.FC = () => {
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
           <SectionHeader icon={Briefcase} title="Dados do Vínculo" />
           <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InfoCard label="Empresa" value={(v as any).empresa} icon={Building} color="text-slate-600" />
-            <InfoCard label="Unidade" value={(v as any).unidade} icon={MapPin} color="text-slate-600" />
+            <InfoCard label="Empresa" value={empresaNome} icon={Building} color="text-slate-600" />
+            <InfoCard label="Unidade" value={unidadeNome} icon={MapPin} color="text-slate-600" />
             <InfoCard label="Tipo de Vínculo" value={v.tipoVinculo} icon={Briefcase} color="text-blue-500" />
             <InfoCard label="Matrícula" value={v.matricula} icon={CreditCard} color="text-slate-600" />
             <InfoCard label="Cargo" value={v.cargo} icon={Shield} color="text-purple-500" />
