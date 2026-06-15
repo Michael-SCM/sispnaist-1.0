@@ -569,6 +569,8 @@ export const FormInformacoes: React.FC = () => {
               </div>
             </div>
 
+            {trabalhador?.sexo === 'F' && (
+            <>
             {/* Seção: Gestação/Lactação */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
@@ -665,6 +667,8 @@ export const FormInformacoes: React.FC = () => {
                 </div>
               </div>
             </div>
+            </>
+            )}
 
             {/* Seção: Uso de Substâncias */}
             <div className="space-y-4">

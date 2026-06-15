@@ -152,7 +152,7 @@ export const ListaInformacoes: React.FC = () => {
               </div>
             </div>
 
-            {/* Gestação / Lactação */}
+            {trabalhador?.sexo === 'F' && (
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
               <SectionHeader icon={Baby} title="Gestação / Lactação" />
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,6 +169,7 @@ export const ListaInformacoes: React.FC = () => {
                 <InfoCard label="Lactante?" value={info.lactante ? 'Sim' : 'Não'} icon={Baby} color="text-pink-500" />
               </div>
             </div>
+            )}
 
             {/* Hábitos e Estilo de Vida */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
