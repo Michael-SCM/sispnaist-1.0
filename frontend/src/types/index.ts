@@ -348,6 +348,8 @@ export interface ITrabalhador {
   trabalho?: {
     dataPosse?: string;
     empresaTerceirizada?: string;
+    residente?: boolean;
+    anosResidencia?: string;
     dataEntrada?: string;
     setor?: string;
     cargo?: string;

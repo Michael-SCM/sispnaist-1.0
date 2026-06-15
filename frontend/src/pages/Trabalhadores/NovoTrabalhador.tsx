@@ -64,6 +64,7 @@ export const NovoTrabalhador: React.FC = () => {
     deficiencia: false,
     posse: false,
     terceirizado: false,
+    residente: false,
     aposentadoria: false,
     obito: false,
     remocao: false,
@@ -546,6 +547,35 @@ export const NovoTrabalhador: React.FC = () => {
                 {checks.terceirizado && (
                   <div className="pl-8">
                     {renderInput('trabalho.empresaTerceirizada', 'Nome da Empresa Terceirizada', formData.trabalho?.empresaTerceirizada || '', { required: true })}
+                  </div>
+                )}
+              </div>
+
+              {/* Residente? */}
+              <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
+                <label className={checkboxRowCls}>
+                  <input
+                    type="checkbox"
+                    checked={checks.residente}
+                    onChange={e => {
+                      const checked = e.target.checked;
+                      setChecks(p => ({ ...p, residente: checked }));
+                      setFormData(prev => ({
+                        ...prev,
+                        trabalho: {
+                          ...prev.trabalho,
+                          residente: checked,
+                          anosResidencia: checked ? prev.trabalho?.anosResidencia || '' : '',
+                        }
+                      }));
+                    }}
+                    className="w-5 h-5 rounded-lg text-blue-600"
+                  />
+                  <span className="text-sm font-bold text-slate-600">Residente?</span>
+                </label>
+                {checks.residente && (
+                  <div className="pl-8">
+                    {renderInput('trabalho.anosResidencia', 'Quantos anos de residencia', formData.trabalho?.anosResidencia || '')}
                   </div>
                 )}
               </div>

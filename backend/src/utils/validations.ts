@@ -708,6 +708,8 @@ export const criarTrabalhadorSchema = Joi.object({
   trabalho: Joi.object({
     dataPosse: Joi.date().allow(null),
     empresaTerceirizada: Joi.string().trim().allow('', null),
+    residente: Joi.boolean().optional(),
+    anosResidencia: Joi.string().trim().allow('', null),
     dataEntrada: Joi.date().allow(null),
     setor: Joi.string().trim().allow('', null),
     cargo: Joi.string().trim().allow('', null),
@@ -790,6 +792,8 @@ export const atualizarTrabalhadorSchema = Joi.object({
   trabalho: Joi.object({
     dataPosse: Joi.date().allow(null),
     empresaTerceirizada: Joi.string().trim().allow('', null),
+    residente: Joi.boolean().optional(),
+    anosResidencia: Joi.string().trim().allow('', null),
     dataEntrada: Joi.date().allow(null),
     setor: Joi.string().trim().allow('', null),
     cargo: Joi.string().trim().allow('', null),

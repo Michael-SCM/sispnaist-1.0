@@ -168,6 +168,8 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
     trabalho: {
       dataPosse: Date,
       empresaTerceirizada: String,
+      residente: { type: Boolean, default: false },
+      anosResidencia: String,
       dataEntrada: {
         type: Date,
         required: [true, 'Data de entrada em serviço é obrigatória'],

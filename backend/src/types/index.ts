@@ -82,6 +82,8 @@ export interface ITrabalhador {
   trabalho?: {
     dataPosse?: Date;
     empresaTerceirizada?: string;
+    residente?: boolean;
+    anosResidencia?: string;
     dataEntrada: Date;
     setor: string;
     cargo: string;

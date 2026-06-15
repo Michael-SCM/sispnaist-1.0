@@ -140,6 +140,8 @@ export class TrabalhadorService {
         dataPosse: (trabalhadorData as any).trabalho?.dataPosse || undefined,
         situacao: (trabalhadorData as any).vinculo?.situacao || 'Ativo',
         empresaTerceirizada: (trabalhadorData as any).trabalho?.empresaTerceirizada || '',
+        residente: (trabalhadorData as any).trabalho?.residente || false,
+        anosResidencia: (trabalhadorData as any).trabalho?.anosResidencia || '',
         setor: (trabalhadorData as any).trabalho?.setor || '',
         cargo: (trabalhadorData as any).trabalho?.cargo || '',
         ocupacao: (trabalhadorData as any).trabalho?.ocupacao || '',
