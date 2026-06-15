@@ -18,14 +18,17 @@ export interface ITrabalhadorInformacao {
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
+  acompanhamentoMedicoMotivo: string;
   acompanhamentoReabilitacao: boolean;
   usoAlcool: boolean;
   dosesAlcool: number;
   usoCigarro: boolean;
   macosCigarro: number;
   usoOutraDroga: boolean;
+  outraDrogaDescricao: string;
   frequenciaUso: string;
   exames: IExame[];
+  observacoes: string;
   ativo: boolean;
 }
 

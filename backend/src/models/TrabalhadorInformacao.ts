@@ -17,14 +17,17 @@ export interface ITrabalhadorInformacao extends Document {
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
+  acompanhamentoMedicoMotivo: string;
   acompanhamentoReabilitacao: boolean;
   usoAlcool: boolean;
   dosesAlcool: number;
   usoCigarro: boolean;
   macosCigarro: number;
   usoOutraDroga: boolean;
+  outraDrogaDescricao: string;
   frequenciaUso: string;
   exames: IExame[];
+  observacoes: string;
   ativo: boolean;
 }
 
@@ -77,6 +80,10 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       type: Boolean,
       default: false,
     },
+    acompanhamentoMedicoMotivo: {
+      type: String,
+      default: '',
+    },
     acompanhamentoReabilitacao: {
       type: Boolean,
       default: false,
@@ -101,6 +108,10 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       type: Boolean,
       default: false,
     },
+    outraDrogaDescricao: {
+      type: String,
+      default: '',
+    },
     frequenciaUso: {
       type: String,
       default: '',
@@ -108,6 +119,10 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
     exames: {
       type: [ExameSchema],
       default: [],
+    },
+    observacoes: {
+      type: String,
+      default: '',
     },
     ativo: {
       type: Boolean,

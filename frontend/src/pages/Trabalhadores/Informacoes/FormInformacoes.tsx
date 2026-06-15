@@ -34,12 +34,14 @@ interface FormData {
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
+  acompanhamentoMedicoMotivo: string;
   acompanhamentoReabilitacao: boolean;
   usoAlcool: boolean;
   dosesAlcool: number;
   usoCigarro: boolean;
   macosCigarro: number;
   usoOutraDroga: boolean;
+  outraDrogaDescricao: string;
   frequenciaUso: string;
   exames: {
     realizados: string;
@@ -47,6 +49,7 @@ interface FormData {
     periodicidade: string;
     anexos: string[];
   };
+  observacoes: string;
 }
 
 const INITIAL_FORM: FormData = {
@@ -58,12 +61,14 @@ const INITIAL_FORM: FormData = {
   allergy: false,
   descricaoAlergia: '',
   acompanhamentoMedico: false,
+  acompanhamentoMedicoMotivo: '',
   acompanhamentoReabilitacao: false,
   usoAlcool: false,
   dosesAlcool: 0,
   usoCigarro: false,
   macosCigarro: 0,
   usoOutraDroga: false,
+  outraDrogaDescricao: '',
   frequenciaUso: '',
   exames: {
     realizados: '',
@@ -71,6 +76,7 @@ const INITIAL_FORM: FormData = {
     periodicidade: '',
     anexos: [],
   },
+  observacoes: '',
 };
 
 export const FormInformacoes: React.FC = () => {
@@ -123,12 +129,14 @@ export const FormInformacoes: React.FC = () => {
           allergy: info.allergy || false,
           descricaoAlergia: info.descricaoAlergia || '',
           acompanhamentoMedico: info.acompanhamentoMedico || false,
+          acompanhamentoMedicoMotivo: info.acompanhamentoMedicoMotivo || '',
           acompanhamentoReabilitacao: info.acompanhamentoReabilitacao || false,
           usoAlcool: info.usoAlcool || false,
           dosesAlcool: info.dosesAlcool || 0,
           usoCigarro: info.usoCigarro || false,
           macosCigarro: info.macosCigarro || 0,
           usoOutraDroga: info.usoOutraDroga || false,
+          outraDrogaDescricao: info.outraDrogaDescricao || '',
           frequenciaUso: info.frequenciaUso || '',
           exames: {
             realizados: info.exames?.realizados || '',
@@ -136,6 +144,7 @@ export const FormInformacoes: React.FC = () => {
             periodicidade: info.exames?.periodicidade || '',
             anexos: info.exames?.anexos || [],
           },
+          observacoes: info.observacoes || '',
         });
       } else {
         toast.error('Informações não encontradas');
@@ -383,7 +392,7 @@ export const FormInformacoes: React.FC = () => {
                 Acompanhamentos
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-4 bg-blue-50 rounded-2xl space-y-2">
+                <div className="p-4 bg-blue-50 rounded-2xl space-y-3">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -397,6 +406,19 @@ export const FormInformacoes: React.FC = () => {
                       Acompanhamento médico?
                     </label>
                   </div>
+                  {formData.acompanhamentoMedico && (
+                    <div>
+                      <label className={labelCls}>Motivo do Acompanhamento</label>
+                      <textarea
+                        name="acompanhamentoMedicoMotivo"
+                        value={formData.acompanhamentoMedicoMotivo}
+                        onChange={handleChange}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-white border border-blue-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        placeholder="Descreva o motivo do acompanhamento médico..."
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 bg-green-50 rounded-2xl space-y-2">
                   <div className="flex items-center gap-3">
@@ -517,6 +539,17 @@ export const FormInformacoes: React.FC = () => {
                       </select>
                     </div>
                     <div>
+                      <label className={labelCls}>Descrição das Substâncias</label>
+                      <textarea
+                        name="outraDrogaDescricao"
+                        value={formData.outraDrogaDescricao}
+                        onChange={handleChange}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-white border border-purple-200 rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                        placeholder="Descreva as substâncias utilizadas..."
+                      />
+                    </div>
+                    <div>
                       <label className={labelCls}>Frequência de uso</label>
                       <input
                         type="text"
@@ -618,6 +651,24 @@ export const FormInformacoes: React.FC = () => {
                     </ul>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Seção: Observações */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <ClipboardList size={20} />
+                Observações
+              </h3>
+              <div className="p-6 bg-slate-50 rounded-2xl">
+                <textarea
+                  name="observacoes"
+                  value={formData.observacoes}
+                  onChange={handleChange}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                  placeholder="Observações gerais..."
+                />
               </div>
             </div>
 

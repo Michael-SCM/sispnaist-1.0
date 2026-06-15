@@ -7,9 +7,29 @@ import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../../types/index.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
-  Zap, ClipboardList, Download, Loader2, Stethoscope
+  Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
+  Droplet, Activity, Calendar, Eye, FileUp
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
+  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
+    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
+      <Icon size={18} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
+      <p className="text-sm font-bold text-slate-700">{value ?? '-'}</p>
+    </div>
+  </div>
+);
+
+const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
+  <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+    <Icon size={20} className="text-amber-600" />
+    <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">{title}</h2>
+  </div>
+);
 
 export const ListaInformacoes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -88,7 +108,7 @@ export const ListaInformacoes: React.FC = () => {
 
         {/* Conteúdo */}
         {!info ? (
-          /* Estado vazio - botão centralizado */
+          /* Estado vazio */
           <div className="flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-100 shadow-xl p-16 space-y-6">
             <div className="p-5 bg-amber-50 rounded-full">
               <Stethoscope size={48} className="text-amber-600" />
@@ -103,163 +123,101 @@ export const ListaInformacoes: React.FC = () => {
             </button>
           </div>
         ) : (
-          /* Detalhamento completo */
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-            <div className="bg-slate-50 px-8 py-5 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Heart size={20} className="text-amber-600" />
-                <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Histórico e Informações de Saúde</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`)}
-                  className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition-all active:scale-95 text-sm"
-                >
-                  <Edit size={16} />
-                  Editar Informações
-                </button>
-                <button
-                  onClick={() => handleDeletar(info._id!)}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl transition-all active:scale-95 text-sm"
-                >
-                  <Trash2 size={16} />
-                  Excluir
-                </button>
+          /* Detalhamento completo - estilo DetalhesTrabalhador */
+          <div className="space-y-6">
+            {/* Dados de Saúde */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={Heart} title="Dados de Saúde" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Tipo Sanguíneo" value={info.tipoSanguineo} icon={Droplet} color="text-red-500" />
+                <InfoCard label="Medicamentos" value={info.medicamentos} icon={Pill} color="text-purple-500" />
               </div>
             </div>
 
-            <div className="p-8 space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo Sanguíneo</span>
-                  <span className="font-semibold text-slate-700 block text-lg">{info.tipoSanguineo || 'Não informado'}</span>
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Medicamentos de Uso Contínuo</span>
-                  <span className="font-semibold text-slate-700 block text-lg">{info.medicamentos || 'Nenhum informado'}</span>
-                </div>
+            {/* Alergias e Acompanhamentos */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={AlertCircle} title="Alergias e Acompanhamentos" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Possui Alergias?" value={info.allergy ? 'Sim' : 'Não'} icon={AlertCircle} color="text-red-500" />
+                {info.allergy && <InfoCard label="Descrição das Alergias" value={info.descricaoAlergia} icon={AlertCircle} color="text-orange-500" />}
+                <InfoCard label="Acompanhamento Médico?" value={info.acompanhamentoMedico ? 'Sim' : 'Não'} icon={Heart} color="text-blue-500" />
+                {info.acompanhamentoMedico && <InfoCard label="Motivo do Acompanhamento" value={info.acompanhamentoMedicoMotivo} icon={Heart} color="text-indigo-500" />}
+                <InfoCard label="Programa de Reabilitação?" value={info.acompanhamentoReabilitacao ? 'Sim' : 'Não'} icon={Activity} color="text-green-500" />
               </div>
+            </div>
 
-              <hr className="border-slate-100" />
-
-              <div>
-                <h3 className="text-sm font-black uppercase text-slate-400 tracking-wider mb-4">Alergias e Acompanhamento Médico</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Possui Alergias?</span>
-                    <span className="font-semibold text-slate-700 block">{info.allergy ? 'Sim' : 'Não'}</span>
-                  </div>
-                  {info.allergy && (
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição das Alergias</span>
-                      <span className="font-semibold text-slate-700 block">{info.alergiasDescricao || 'Não descritas'}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-6 mt-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Acompanhamento Médico?</span>
-                    <span className="font-semibold text-slate-700 block">{info.acompanhamentoMedico ? 'Sim' : 'Não'}</span>
-                  </div>
-                  {info.acompanhamentoMedico && (
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo do Acompanhamento</span>
-                      <span className="font-semibold text-slate-700 block">{info.acompanhamentoMedicoMotivo || 'Não informado'}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-4">
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Programa de Reabilitação?</span>
-                  <span className="font-semibold text-slate-700 block">{info.acompanhamentoReabilitacao ? 'Sim' : 'Não'}</span>
-                </div>
+            {/* Hábitos e Estilo de Vida */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={Wine} title="Hábitos e Estilo de Vida" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Consumo de Álcool" value={info.usoAlcool ? `Sim (${info.dosesAlcool} doses/dia)` : 'Não'} icon={Wine} color="text-yellow-500" />
+                <InfoCard label="Uso de Cigarro" value={info.usoCigarro ? `Sim (${info.macosCigarro} maços/dia)` : 'Não'} icon={Cigarette} color="text-orange-500" />
+                <InfoCard label="Uso de Outras Substâncias" value={info.usoOutraDroga ? 'Sim' : 'Não'} icon={Zap} color="text-purple-500" />
+                {info.usoOutraDroga && <InfoCard label="Descrição das Substâncias" value={info.outraDrogaDescricao} icon={Zap} color="text-violet-500" />}
               </div>
+            </div>
 
-              <hr className="border-slate-100" />
-
-              <div>
-                <h3 className="text-sm font-black uppercase text-slate-400 tracking-wider mb-4">Hábitos e Estilo de Vida</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Consumo de Álcool</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {info.usoAlcool ? `Sim (${info.dosesAlcool} doses/semana)` : 'Não'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Uso de Cigarro / Tabaco</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {info.usoCigarro ? `Sim (${info.macosCigarro} maços/dia)` : 'Não'}
-                    </span>
-                  </div>
+            {/* Exames */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={ClipboardList} title="Exames" />
+              <div className="p-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InfoCard label="Exames Realizados" value={info.exames?.realizados || 'Não informado'} icon={ClipboardList} color="text-teal-500" />
+                  <InfoCard label="Resultados" value={info.exames?.resultados || 'Não informado'} icon={Eye} color="text-cyan-500" />
+                  <InfoCard label="Periodicidade" value={info.exames?.periodicidade} icon={Calendar} color="text-teal-500" />
                 </div>
-                <div className="grid grid-cols-2 gap-6 mt-4">
+                {(info.exames?.anexos?.length ?? 0) > 0 && (
                   <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Uso de Outras Substâncias</span>
-                    <span className="font-semibold text-slate-700 block">{info.usoOutraDroga ? 'Sim' : 'Não'}</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Anexos</p>
+                    <div className="flex flex-wrap gap-2">
+                      {info.exames.anexos.map((uploadId) => (
+                        <button
+                          key={uploadId}
+                          onClick={() => uploadService.download(uploadId)}
+                          className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl border border-teal-200 transition-all text-sm font-medium"
+                        >
+                          <FileUp size={14} />
+                          <span className="truncate max-w-[200px]">{uploadId}</span>
+                          <Download size={14} />
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {info.usoOutraDroga && (
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição das Substâncias</span>
-                      <span className="font-semibold text-slate-700 block">{info.outraDrogaDescricao || 'Não informada'}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <hr className="border-slate-100" />
-
-              <div>
-                <h3 className="text-sm font-black uppercase text-slate-400 tracking-wider mb-4">Exames</h3>
-                {info.exames ? (
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Exames Realizados</span>
-                      <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                        {info.exames.realizados || 'Não informado'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Resultados</span>
-                      <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                        {info.exames.resultados || 'Não informado'}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Periodicidade</span>
-                      <span className="font-semibold text-slate-700 block mt-1">{info.exames.periodicidade || 'Não informada'}</span>
-                    </div>
-                    {(info.exames.anexos?.length ?? 0) > 0 && (
-                      <div>
-                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Anexos</span>
-                        <ul className="mt-2 space-y-2">
-                          {info.exames.anexos.map((uploadId) => (
-                            <li key={uploadId}>
-                              <button
-                                onClick={() => uploadService.download(uploadId)}
-                                className="flex items-center gap-2 text-sm text-teal-600 hover:text-teal-800 font-medium"
-                              >
-                                <Download size={14} />
-                                {uploadId}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-slate-400 text-sm">Nenhum exame registrado</span>
                 )}
               </div>
+            </div>
 
-              <hr className="border-slate-100" />
-
-              <div>
-                <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações Gerais</span>
-                <p className="text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                  {info.observacoes || 'Nenhuma observação complementar registrada'}
-                </p>
+            {/* Observações */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={FileText} title="Observações" />
+              <div className="p-8">
+                <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="p-3 bg-white rounded-2xl shadow-sm text-slate-600">
+                    <FileText size={24} />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 whitespace-pre-line">
+                    {info.observacoes || 'Nenhuma observação complementar registrada'}
+                  </p>
+                </div>
               </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`)}
+                className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+              >
+                <Edit size={20} />
+                Editar Informações
+              </button>
+              <button
+                onClick={() => handleDeletar(info._id!)}
+                className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+              >
+                <Trash2 size={20} />
+                Excluir
+              </button>
             </div>
           </div>
         )}
