@@ -100,13 +100,13 @@ export const FormVinculo: React.FC = () => {
   useEffect(() => {
     if (unidades.length > 0 && formData.empresa) {
       const unidadesDaEmpresa = unidades.filter(
-        (u) => String((u as any).empresaId) === String(formData.empresa)
+        (u) => String((u as any).empresaId?._id || (u as any).empresaId) === String(formData.empresa)
       );
       if (unidadesDaEmpresa.length > 0) {
         setUnidadesFiltradas(unidadesDaEmpresa);
       }
     }
-  }, [unidades]);
+  }, [unidades, formData.empresa]);
 
   const carregarDados = async () => {
     try {
@@ -176,7 +176,7 @@ export const FormVinculo: React.FC = () => {
         });
         if (empId) {
           const unidadesDaEmpresa = unidadesData.filter(
-            (u) => String((u as any).empresaId) === String(empId)
+            (u) => String((u as any).empresaId?._id || (u as any).empresaId) === String(empId)
           );
           setUnidadesFiltradas(unidadesDaEmpresa);
         }
@@ -216,7 +216,7 @@ export const FormVinculo: React.FC = () => {
     if (name === 'empresa') {
       if (value) {
         const unidadesDaEmpresa = unidades.filter(
-          (u) => String((u as any).empresaId) === value
+          (u) => String((u as any).empresaId?._id || (u as any).empresaId) === value
         );
         setUnidadesFiltradas(unidadesDaEmpresa);
         setFormData((prev) => ({ ...prev, empresa: value, unidade: '' }));
@@ -231,9 +231,9 @@ export const FormVinculo: React.FC = () => {
       if (value) {
         const unidadeSelecionada = unidades.find((u) => u._id === value);
         if (unidadeSelecionada) {
-          const empresaId = String((unidadeSelecionada as any).empresaId);
+          const empresaId = String((unidadeSelecionada as any).empresaId?._id || (unidadeSelecionada as any).empresaId);
           setUnidadesFiltradas(
-            unidades.filter((u) => String((u as any).empresaId) === empresaId)
+            unidades.filter((u) => String((u as any).empresaId?._id || (u as any).empresaId) === empresaId)
           );
           setFormData((prev) => ({ ...prev, empresa: empresaId, unidade: value }));
         }
