@@ -20,6 +20,10 @@ export interface ITrabalhadorInformacao {
   tipoDroga: string;
   tipoSanguineo: string;
   medicamentos: string;
+  doencaPreexistente: boolean;
+  descricaoDoencaPreexistente: string;
+  historicoFamiliar: boolean;
+  descricaoHistoricoFamiliar: string;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;

@@ -31,6 +31,10 @@ interface FormData {
   tipoDroga: string;
   tipoSanguineo: string;
   medicamentos: string;
+  doencaPreexistente: boolean;
+  descricaoDoencaPreexistente: string;
+  historicoFamiliar: boolean;
+  descricaoHistoricoFamiliar: string;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
@@ -58,6 +62,10 @@ const INITIAL_FORM: FormData = {
   tipoDroga: '',
   tipoSanguineo: '',
   medicamentos: '',
+  doencaPreexistente: false,
+  descricaoDoencaPreexistente: '',
+  historicoFamiliar: false,
+  descricaoHistoricoFamiliar: '',
   allergy: false,
   descricaoAlergia: '',
   acompanhamentoMedico: false,
@@ -126,6 +134,10 @@ export const FormInformacoes: React.FC = () => {
           tipoDroga: info.tipoDroga || '',
           tipoSanguineo: info.tipoSanguineo || '',
           medicamentos: info.medicamentos || '',
+          doencaPreexistente: info.doencaPreexistente || false,
+          descricaoDoencaPreexistente: info.descricaoDoencaPreexistente || '',
+          historicoFamiliar: info.historicoFamiliar || false,
+          descricaoHistoricoFamiliar: info.descricaoHistoricoFamiliar || '',
           allergy: info.allergy || false,
           descricaoAlergia: info.descricaoAlergia || '',
           acompanhamentoMedico: info.acompanhamentoMedico || false,
@@ -346,6 +358,66 @@ export const FormInformacoes: React.FC = () => {
                     placeholder="Medicamentos em uso"
                   />
                 </div>
+              </div>
+
+              {/* Doenças Preexistentes */}
+              <div className="p-6 bg-rose-50 rounded-2xl space-y-4 mt-6">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="doencaPreexistente"
+                    id="doencaPreexistente"
+                    checked={formData.doencaPreexistente}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-rose-600 rounded border-rose-300 focus:ring-rose-500"
+                  />
+                  <label htmlFor="doencaPreexistente" className="text-sm font-bold text-slate-600">
+                    Possui doença preexistente?
+                  </label>
+                </div>
+                {formData.doencaPreexistente && (
+                  <div>
+                    <label className={labelCls}>Descreva a(s) doença(s) preexistente(s)</label>
+                    <textarea
+                      name="descricaoDoencaPreexistente"
+                      value={formData.descricaoDoencaPreexistente}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white border border-rose-200 rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all"
+                      placeholder="Ex: Hipertensão (CID I10), Diabetes tipo 2 (CID E11) — informar diagnóstico, tratamento e médico responsável..."
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Histórico Familiar */}
+              <div className="p-6 bg-violet-50 rounded-2xl space-y-4 mt-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="historicoFamiliar"
+                    id="historicoFamiliar"
+                    checked={formData.historicoFamiliar}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-violet-600 rounded border-violet-300 focus:ring-violet-500"
+                  />
+                  <label htmlFor="historicoFamiliar" className="text-sm font-bold text-slate-600">
+                    Possui histórico familiar relevante?
+                  </label>
+                </div>
+                {formData.historicoFamiliar && (
+                  <div>
+                    <label className={labelCls}>Descreva o histórico familiar</label>
+                    <textarea
+                      name="descricaoHistoricoFamiliar"
+                      value={formData.descricaoHistoricoFamiliar}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-white border border-violet-200 rounded-2xl focus:ring-2 focus:ring-violet-500 outline-none transition-all"
+                      placeholder="Ex: Pai com hipertensão, mãe com diabetes, irmão com cardiopatia — informar o grau de parentesco e a condição..."
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

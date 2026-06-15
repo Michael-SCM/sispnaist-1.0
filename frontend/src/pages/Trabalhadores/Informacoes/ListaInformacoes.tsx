@@ -8,7 +8,7 @@ import { ITrabalhador } from '../../../types/index.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
   Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
-  Droplet, Activity, Calendar, Eye, FileUp
+  Droplet, Activity, Calendar, Eye, FileUp, User, Users
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -131,6 +131,10 @@ export const ListaInformacoes: React.FC = () => {
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Tipo Sanguíneo" value={info.tipoSanguineo} icon={Droplet} color="text-red-500" />
                 <InfoCard label="Medicamentos" value={info.medicamentos} icon={Pill} color="text-purple-500" />
+                <InfoCard label="Doença Preexistente?" value={info.doencaPreexistente ? 'Sim' : 'Não'} icon={User} color="text-rose-500" />
+                {info.doencaPreexistente && <InfoCard label="Descrição" value={info.descricaoDoencaPreexistente} icon={User} color="text-rose-500" />}
+                <InfoCard label="Histórico Familiar?" value={info.historicoFamiliar ? 'Sim' : 'Não'} icon={Users} color="text-violet-500" />
+                {info.historicoFamiliar && <InfoCard label="Descrição" value={info.descricaoHistoricoFamiliar} icon={Users} color="text-violet-500" />}
               </div>
             </div>
 

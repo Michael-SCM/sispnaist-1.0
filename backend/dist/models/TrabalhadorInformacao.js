@@ -70,6 +70,22 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         type: String,
         default: '',
     },
+    doencaPreexistente: {
+        type: Boolean,
+        default: false,
+    },
+    descricaoDoencaPreexistente: {
+        type: String,
+        default: '',
+    },
+    historicoFamiliar: {
+        type: Boolean,
+        default: false,
+    },
+    descricaoHistoricoFamiliar: {
+        type: String,
+        default: '',
+    },
     allergy: {
         type: Boolean,
         default: false,

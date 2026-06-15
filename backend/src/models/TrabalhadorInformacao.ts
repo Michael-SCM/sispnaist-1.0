@@ -19,6 +19,10 @@ export interface ITrabalhadorInformacao extends Document {
   tipoDroga: string;
   tipoSanguineo: string;
   medicamentos: string;
+  doencaPreexistente: boolean;
+  descricaoDoencaPreexistente: string;
+  historicoFamiliar: boolean;
+  descricaoHistoricoFamiliar: string;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
@@ -78,6 +82,22 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       default: '',
     },
     medicamentos: {
+      type: String,
+      default: '',
+    },
+    doencaPreexistente: {
+      type: Boolean,
+      default: false,
+    },
+    descricaoDoencaPreexistente: {
+      type: String,
+      default: '',
+    },
+    historicoFamiliar: {
+      type: Boolean,
+      default: false,
+    },
+    descricaoHistoricoFamiliar: {
       type: String,
       default: '',
     },
