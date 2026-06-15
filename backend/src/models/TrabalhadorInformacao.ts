@@ -35,6 +35,13 @@ export interface ITrabalhadorInformacao extends Document {
   usoOutraDroga: boolean;
   outraDrogaDescricao: string;
   frequenciaUso: string;
+  gestante: boolean;
+  dataUltimaMenstruacao: string;
+  semanasGestacao: number;
+  dataPartoPrevista: string;
+  preNatal: boolean;
+  lactante: boolean;
+  complicacoesGestacao: string;
   exames: IExame[];
   observacoes: string;
   ativo: boolean;
@@ -146,6 +153,34 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       default: '',
     },
     frequenciaUso: {
+      type: String,
+      default: '',
+    },
+    gestante: {
+      type: Boolean,
+      default: false,
+    },
+    dataUltimaMenstruacao: {
+      type: String,
+      default: '',
+    },
+    semanasGestacao: {
+      type: Number,
+      default: 0,
+    },
+    dataPartoPrevista: {
+      type: String,
+      default: '',
+    },
+    preNatal: {
+      type: Boolean,
+      default: false,
+    },
+    lactante: {
+      type: Boolean,
+      default: false,
+    },
+    complicacoesGestacao: {
       type: String,
       default: '',
     },

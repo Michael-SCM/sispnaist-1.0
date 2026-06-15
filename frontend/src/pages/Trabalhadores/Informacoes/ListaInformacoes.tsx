@@ -8,7 +8,7 @@ import { ITrabalhador } from '../../../types/index.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
   Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
-  Droplet, Activity, Calendar, Eye, FileUp, User, Users
+  Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -158,6 +158,24 @@ export const ListaInformacoes: React.FC = () => {
                 <InfoCard label="Uso de Cigarro" value={info.usoCigarro ? `Sim (${info.macosCigarro} maços/dia)` : 'Não'} icon={Cigarette} color="text-orange-500" />
                 <InfoCard label="Uso de Outras Substâncias" value={info.usoOutraDroga ? 'Sim' : 'Não'} icon={Zap} color="text-purple-500" />
                 {info.usoOutraDroga && <InfoCard label="Descrição das Substâncias" value={info.outraDrogaDescricao} icon={Zap} color="text-violet-500" />}
+              </div>
+            </div>
+
+            {/* Gestação / Lactação */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={Baby} title="Gestação / Lactação" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Gestante?" value={info.gestante ? 'Sim' : 'Não'} icon={Baby} color="text-pink-500" />
+                {info.gestante && (
+                  <>
+                    <InfoCard label="DUM" value={info.dataUltimaMenstruacao} icon={Calendar} color="text-pink-500" />
+                    <InfoCard label="Semanas de Gestação" value={info.semanasGestacao} icon={Baby} color="text-pink-500" />
+                    <InfoCard label="Data Prevista do Parto" value={info.dataPartoPrevista} icon={Calendar} color="text-pink-500" />
+                    <InfoCard label="Pré-natal?" value={info.preNatal ? 'Sim' : 'Não'} icon={Heart} color="text-pink-500" />
+                    {info.complicacoesGestacao && <InfoCard label="Complicações" value={info.complicacoesGestacao} icon={AlertCircle} color="text-pink-500" />}
+                  </>
+                )}
+                <InfoCard label="Lactante?" value={info.lactante ? 'Sim' : 'Não'} icon={Baby} color="text-pink-500" />
               </div>
             </div>
 

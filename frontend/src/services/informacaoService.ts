@@ -36,6 +36,13 @@ export interface ITrabalhadorInformacao {
   usoOutraDroga: boolean;
   outraDrogaDescricao: string;
   frequenciaUso: string;
+  gestante: boolean;
+  dataUltimaMenstruacao: string;
+  semanasGestacao: number;
+  dataPartoPrevista: string;
+  preNatal: boolean;
+  lactante: boolean;
+  complicacoesGestacao: string;
   exames: IExame[];
   observacoes: string;
   ativo: boolean;

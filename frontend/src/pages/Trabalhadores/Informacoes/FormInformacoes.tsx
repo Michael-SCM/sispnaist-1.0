@@ -21,7 +21,9 @@ import {
   FileUp,
   Download,
   Trash2,
-  Loader2
+  Loader2,
+  Baby,
+  Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -47,6 +49,13 @@ interface FormData {
   usoOutraDroga: boolean;
   outraDrogaDescricao: string;
   frequenciaUso: string;
+  gestante: boolean;
+  dataUltimaMenstruacao: string;
+  semanasGestacao: number;
+  dataPartoPrevista: string;
+  preNatal: boolean;
+  lactante: boolean;
+  complicacoesGestacao: string;
   exames: {
     realizados: string;
     resultados: string;
@@ -78,6 +87,13 @@ const INITIAL_FORM: FormData = {
   usoOutraDroga: false,
   outraDrogaDescricao: '',
   frequenciaUso: '',
+  gestante: false,
+  dataUltimaMenstruacao: '',
+  semanasGestacao: 0,
+  dataPartoPrevista: '',
+  preNatal: false,
+  lactante: false,
+  complicacoesGestacao: '',
   exames: {
     realizados: '',
     resultados: '',
@@ -150,6 +166,13 @@ export const FormInformacoes: React.FC = () => {
           usoOutraDroga: info.usoOutraDroga || false,
           outraDrogaDescricao: info.outraDrogaDescricao || '',
           frequenciaUso: info.frequenciaUso || '',
+          gestante: info.gestante || false,
+          dataUltimaMenstruacao: info.dataUltimaMenstruacao || '',
+          semanasGestacao: info.semanasGestacao || 0,
+          dataPartoPrevista: info.dataPartoPrevista || '',
+          preNatal: info.preNatal || false,
+          lactante: info.lactante || false,
+          complicacoesGestacao: info.complicacoesGestacao || '',
           exames: {
             realizados: info.exames?.[0]?.realizados || '',
             resultados: info.exames?.[0]?.resultados || '',
@@ -634,6 +657,103 @@ export const FormInformacoes: React.FC = () => {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Seção: Gestação/Lactação */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <Baby size={20} />
+                Gestação / Lactação
+              </h3>
+              <div className="p-6 bg-pink-50 rounded-2xl space-y-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="gestante"
+                    id="gestante"
+                    checked={formData.gestante}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                  />
+                  <label htmlFor="gestante" className="text-sm font-bold text-slate-600">
+                    Está gestante?
+                  </label>
+                </div>
+                {formData.gestante && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Data da Última Menstruação (DUM)</label>
+                      <input
+                        type="date"
+                        name="dataUltimaMenstruacao"
+                        value={formData.dataUltimaMenstruacao}
+                        onChange={handleChange}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Semanas de Gestação</label>
+                      <input
+                        type="number"
+                        name="semanasGestacao"
+                        value={formData.semanasGestacao}
+                        onChange={handleNumberChange}
+                        min="0"
+                        max="45"
+                        className={inputCls}
+                        placeholder="Ex: 20"
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Data Prevista para o Parto</label>
+                      <input
+                        type="date"
+                        name="dataPartoPrevista"
+                        value={formData.dataPartoPrevista}
+                        onChange={handleChange}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="preNatal"
+                        id="preNatal"
+                        checked={formData.preNatal}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                      />
+                      <label htmlFor="preNatal" className="text-sm font-bold text-slate-600">
+                        Realiza acompanhamento pré-natal?
+                      </label>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>Complicações / Observações</label>
+                      <textarea
+                        name="complicacoesGestacao"
+                        value={formData.complicacoesGestacao}
+                        onChange={handleChange}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-white border border-pink-200 rounded-2xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
+                        placeholder="Descreva intercorrências, complicações ou observações relevantes..."
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 pt-2 border-t border-pink-200">
+                  <input
+                    type="checkbox"
+                    name="lactante"
+                    id="lactante"
+                    checked={formData.lactante}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-pink-600 rounded border-pink-300 focus:ring-pink-500"
+                  />
+                  <label htmlFor="lactante" className="text-sm font-bold text-slate-600">
+                    Está em período de lactação?
+                  </label>
+                </div>
               </div>
             </div>
 

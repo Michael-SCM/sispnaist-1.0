@@ -130,6 +130,34 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         type: String,
         default: '',
     },
+    gestante: {
+        type: Boolean,
+        default: false,
+    },
+    dataUltimaMenstruacao: {
+        type: String,
+        default: '',
+    },
+    semanasGestacao: {
+        type: Number,
+        default: 0,
+    },
+    dataPartoPrevista: {
+        type: String,
+        default: '',
+    },
+    preNatal: {
+        type: Boolean,
+        default: false,
+    },
+    lactante: {
+        type: Boolean,
+        default: false,
+    },
+    complicacoesGestacao: {
+        type: String,
+        default: '',
+    },
     exames: {
         type: [ExameSchema],
         default: [],
