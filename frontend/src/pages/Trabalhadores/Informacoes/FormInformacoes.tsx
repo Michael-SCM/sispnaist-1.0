@@ -39,6 +39,13 @@ interface FormData {
   descricaoDoencaPreexistente: string;
   historicoFamiliar: boolean;
   descricaoHistoricoFamiliar: string;
+  teveCovid: boolean;
+  ultimoContagio: string;
+  teveSequela: boolean;
+  descricaoSequela: string;
+  foiInternado: boolean;
+  diasInternacao: number;
+  foiIntubado: boolean;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
@@ -79,6 +86,13 @@ const INITIAL_FORM: FormData = {
   descricaoDoencaPreexistente: '',
   historicoFamiliar: false,
   descricaoHistoricoFamiliar: '',
+  teveCovid: false,
+  ultimoContagio: '',
+  teveSequela: false,
+  descricaoSequela: '',
+  foiInternado: false,
+  diasInternacao: 0,
+  foiIntubado: false,
   allergy: false,
   descricaoAlergia: '',
   acompanhamentoMedico: false,
@@ -160,6 +174,13 @@ export const FormInformacoes: React.FC = () => {
           descricaoDoencaPreexistente: info.descricaoDoencaPreexistente || '',
           historicoFamiliar: info.historicoFamiliar || false,
           descricaoHistoricoFamiliar: info.descricaoHistoricoFamiliar || '',
+          teveCovid: info.teveCovid || false,
+          ultimoContagio: info.ultimoContagio || '',
+          teveSequela: info.teveSequela || false,
+          descricaoSequela: info.descricaoSequela || '',
+          foiInternado: info.foiInternado || false,
+          diasInternacao: info.diasInternacao || 0,
+          foiIntubado: info.foiIntubado || false,
           allergy: info.allergy || false,
           descricaoAlergia: info.descricaoAlergia || '',
           acompanhamentoMedico: info.acompanhamentoMedico || false,
@@ -478,6 +499,105 @@ export const FormInformacoes: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {/* COVID-19 */}
+              <div className="p-6 bg-amber-50 rounded-2xl space-y-4 mt-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="teveCovid"
+                    id="teveCovid"
+                    checked={formData.teveCovid}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                  />
+                  <label htmlFor="teveCovid" className="text-sm font-bold text-slate-600">
+                    Já teve COVID-19?
+                  </label>
+                </div>
+                {formData.teveCovid && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Último Contágio</label>
+                      <input
+                        type="date"
+                        name="ultimoContagio"
+                        value={formData.ultimoContagio}
+                        onChange={handleChange}
+                        className={inputCls}
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="teveSequela"
+                        id="teveSequela"
+                        checked={formData.teveSequela}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                      />
+                      <label htmlFor="teveSequela" className="text-sm font-bold text-slate-600">
+                        Teve sequela?
+                      </label>
+                    </div>
+                    {formData.teveSequela && (
+                      <div className="md:col-span-2">
+                        <label className={labelCls}>Descreva a(s) sequela(s)</label>
+                        <textarea
+                          name="descricaoSequela"
+                          value={formData.descricaoSequela}
+                          onChange={handleChange}
+                          rows={2}
+                          className="w-full px-4 py-3 bg-white border border-amber-200 rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                          placeholder="Ex: Fadiga persistente, perda de olfato, problemas respiratórios..."
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="foiInternado"
+                        id="foiInternado"
+                        checked={formData.foiInternado}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                      />
+                      <label htmlFor="foiInternado" className="text-sm font-bold text-slate-600">
+                        Foi internado?
+                      </label>
+                    </div>
+                    {formData.foiInternado && (
+                      <>
+                        <div>
+                          <label className={labelCls}>Dias de Internação</label>
+                          <input
+                            type="number"
+                            name="diasInternacao"
+                            value={formData.diasInternacao}
+                            onChange={handleNumberChange}
+                            min="0"
+                            className={inputCls}
+                            placeholder="Quantidade de dias"
+                          />
+                        </div>
+                        <div className="flex items-center gap-3 pt-7">
+                          <input
+                            type="checkbox"
+                            name="foiIntubado"
+                            id="foiIntubado"
+                            checked={formData.foiIntubado}
+                            onChange={handleChange}
+                            className="w-5 h-5 text-amber-600 rounded border-amber-300 focus:ring-amber-500"
+                          />
+                          <label htmlFor="foiIntubado" className="text-sm font-bold text-slate-600">
+                            Foi intubado?
+                          </label>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Seção: Alergias */}
@@ -569,7 +689,7 @@ export const FormInformacoes: React.FC = () => {
               </div>
             </div>
 
-            {trabalhador?.sexo === 'F' && (
+            {trabalhador?.sexo?.[0] === 'F' && (
             <>
             {/* Seção: Gestação/Lactação */}
             <div className="space-y-4">

@@ -94,6 +94,34 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         type: String,
         default: '',
     },
+    teveCovid: {
+        type: Boolean,
+        default: false,
+    },
+    ultimoContagio: {
+        type: String,
+        default: '',
+    },
+    teveSequela: {
+        type: Boolean,
+        default: false,
+    },
+    descricaoSequela: {
+        type: String,
+        default: '',
+    },
+    foiInternado: {
+        type: Boolean,
+        default: false,
+    },
+    diasInternacao: {
+        type: Number,
+        default: 0,
+    },
+    foiIntubado: {
+        type: Boolean,
+        default: false,
+    },
     allergy: {
         type: Boolean,
         default: false,

@@ -8,7 +8,7 @@ import { ITrabalhador } from '../../../types/index.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
   Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
-  Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby
+  Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby, AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -137,6 +137,21 @@ export const ListaInformacoes: React.FC = () => {
                 {info.doencaPreexistente && <InfoCard label="Descrição" value={info.descricaoDoencaPreexistente} icon={User} color="text-rose-500" />}
                 <InfoCard label="Histórico Familiar?" value={info.historicoFamiliar ? 'Sim' : 'Não'} icon={Users} color="text-violet-500" />
                 {info.historicoFamiliar && <InfoCard label="Descrição" value={info.descricaoHistoricoFamiliar} icon={Users} color="text-violet-500" />}
+                <InfoCard label="Já teve COVID-19?" value={info.teveCovid ? 'Sim' : 'Não'} icon={AlertTriangle} color="text-amber-500" />
+                {info.teveCovid && (
+                  <>
+                    <InfoCard label="Último Contágio" value={info.ultimoContagio} icon={Calendar} color="text-amber-500" />
+                    <InfoCard label="Teve Sequela?" value={info.teveSequela ? 'Sim' : 'Não'} icon={AlertTriangle} color="text-amber-500" />
+                    {info.teveSequela && <InfoCard label="Descrição da Sequela" value={info.descricaoSequela} icon={AlertTriangle} color="text-amber-500" />}
+                    <InfoCard label="Foi Internado?" value={info.foiInternado ? 'Sim' : 'Não'} icon={Heart} color="text-amber-500" />
+                    {info.foiInternado && (
+                      <>
+                        <InfoCard label="Dias de Internação" value={info.diasInternacao} icon={Calendar} color="text-amber-500" />
+                        <InfoCard label="Foi Intubado?" value={info.foiIntubado ? 'Sim' : 'Não'} icon={Heart} color="text-amber-500" />
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
@@ -152,7 +167,7 @@ export const ListaInformacoes: React.FC = () => {
               </div>
             </div>
 
-            {trabalhador?.sexo === 'F' && (
+            {trabalhador?.sexo?.[0] === 'F' && (
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
               <SectionHeader icon={Baby} title="Gestação / Lactação" />
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">

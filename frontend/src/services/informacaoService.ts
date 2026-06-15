@@ -26,6 +26,13 @@ export interface ITrabalhadorInformacao {
   descricaoDoencaPreexistente: string;
   historicoFamiliar: boolean;
   descricaoHistoricoFamiliar: string;
+  teveCovid: boolean;
+  ultimoContagio: string;
+  teveSequela: boolean;
+  descricaoSequela: string;
+  foiInternado: boolean;
+  diasInternacao: number;
+  foiIntubado: boolean;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;

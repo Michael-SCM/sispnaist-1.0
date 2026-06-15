@@ -25,6 +25,13 @@ export interface ITrabalhadorInformacao extends Document {
   descricaoDoencaPreexistente: string;
   historicoFamiliar: boolean;
   descricaoHistoricoFamiliar: string;
+  teveCovid: boolean;
+  ultimoContagio: string;
+  teveSequela: boolean;
+  descricaoSequela: string;
+  foiInternado: boolean;
+  diasInternacao: number;
+  foiIntubado: boolean;
   allergy: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
@@ -117,6 +124,34 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
     descricaoHistoricoFamiliar: {
       type: String,
       default: '',
+    },
+    teveCovid: {
+      type: Boolean,
+      default: false,
+    },
+    ultimoContagio: {
+      type: String,
+      default: '',
+    },
+    teveSequela: {
+      type: Boolean,
+      default: false,
+    },
+    descricaoSequela: {
+      type: String,
+      default: '',
+    },
+    foiInternado: {
+      type: Boolean,
+      default: false,
+    },
+    diasInternacao: {
+      type: Number,
+      default: 0,
+    },
+    foiIntubado: {
+      type: Boolean,
+      default: false,
     },
     allergy: {
       type: Boolean,
