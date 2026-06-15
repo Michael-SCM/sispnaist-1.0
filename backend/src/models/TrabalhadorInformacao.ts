@@ -1,10 +1,15 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export interface IAnexo {
+  id: string;
+  nome: string;
+}
+
 export interface IExame {
   realizados: string;
   resultados: string;
   periodicidade: string;
-  anexos: string[];
+  anexos: IAnexo[];
 }
 
 export interface ITrabalhadorInformacao extends Document {
@@ -31,12 +36,20 @@ export interface ITrabalhadorInformacao extends Document {
   ativo: boolean;
 }
 
+const AnexoSchema = new Schema<IAnexo>(
+  {
+    id: { type: String, required: true },
+    nome: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const ExameSchema = new Schema<IExame>(
   {
     realizados: { type: String, default: '' },
     resultados: { type: String, default: '' },
     periodicidade: { type: String, default: '' },
-    anexos: { type: [String], default: [] },
+    anexos: { type: [AnexoSchema], default: [] },
   },
   { _id: false }
 );

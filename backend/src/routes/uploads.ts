@@ -50,6 +50,7 @@ router.get('/', uploadController.listar);
 router.get('/:id', uploadController.obter);
 router.post('/', upload.single('file'), uploadController.criar);
 router.get('/:id/download', uploadController.download);
+router.get('/:id/view', uploadController.visualizar);
 router.delete('/:id', uploadController.deletar);
 
 export default router;

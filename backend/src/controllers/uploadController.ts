@@ -129,6 +129,29 @@ class UploadController {
       next(error);
     }
   }
+
+  // GET /api/uploads/:id/view - Visualizar arquivo inline (abre no navegador)
+  async visualizar(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const upload = await ArquivoUpload.findById(id);
+
+      if (!upload) {
+        throw new AppError('Upload não encontrado', 404);
+      }
+
+      if (!fs.existsSync(upload.caminho)) {
+        throw new AppError('Arquivo não encontrado no servidor', 404);
+      }
+
+      res.setHeader('Content-Disposition', `inline; filename="${upload.nomeOriginal}"`);
+      res.setHeader('Content-Type', upload.mimeType);
+      res.sendFile(path.resolve(upload.caminho));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new UploadController();

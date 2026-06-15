@@ -58,6 +58,11 @@ export const uploadService = {
     window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/download`, '_blank');
   },
 
+  // Visualizar inline (abre PDF no navegador)
+  visualizar: async (id: string): Promise<void> => {
+    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/view`, '_blank');
+  },
+
   deletar: async (id: string): Promise<void> => {
     await api.delete(`/uploads/${id}`);
   },

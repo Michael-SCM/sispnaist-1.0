@@ -34,6 +34,16 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const AnexoSchema = new mongoose_1.Schema({
+    id: { type: String, required: true },
+    nome: { type: String, required: true },
+}, { _id: false });
+const ExameSchema = new mongoose_1.Schema({
+    realizados: { type: String, default: '' },
+    resultados: { type: String, default: '' },
+    periodicidade: { type: String, default: '' },
+    anexos: { type: [AnexoSchema], default: [] },
+}, { _id: false });
 const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
     trabalhadorId: {
         type: String,
@@ -72,6 +82,10 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false,
     },
+    acompanhamentoMedicoMotivo: {
+        type: String,
+        default: '',
+    },
     acompanhamentoReabilitacao: {
         type: Boolean,
         default: false,
@@ -97,6 +111,14 @@ const TrabalhadorInformacaoSchema = new mongoose_1.Schema({
         default: false,
     },
     frequenciaUso: {
+        type: String,
+        default: '',
+    },
+    exames: {
+        type: [ExameSchema],
+        default: [],
+    },
+    observacoes: {
         type: String,
         default: '',
     },

@@ -1,10 +1,15 @@
 import api from './api.js';
 
+export interface IAnexo {
+  id: string;
+  nome: string;
+}
+
 export interface IExame {
   realizados: string;
   resultados: string;
   periodicidade: string;
-  anexos: string[];
+  anexos: IAnexo[];
 }
 
 export interface ITrabalhadorInformacao {

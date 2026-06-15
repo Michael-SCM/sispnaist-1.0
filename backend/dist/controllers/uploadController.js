@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = __importDefault(require("path"));
 const ArquivoUpload_1 = __importDefault(require("../models/ArquivoUpload"));
 const errorHandler_1 = require("../middleware/errorHandler");
 const fs_1 = __importDefault(require("fs"));
@@ -106,6 +107,25 @@ class UploadController {
                 throw new errorHandler_1.AppError('Arquivo não encontrado no servidor', 404);
             }
             res.download(upload.caminho, upload.nomeOriginal);
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    // GET /api/uploads/:id/view - Visualizar arquivo inline (abre no navegador)
+    async visualizar(req, res, next) {
+        try {
+            const { id } = req.params;
+            const upload = await ArquivoUpload_1.default.findById(id);
+            if (!upload) {
+                throw new errorHandler_1.AppError('Upload não encontrado', 404);
+            }
+            if (!fs_1.default.existsSync(upload.caminho)) {
+                throw new errorHandler_1.AppError('Arquivo não encontrado no servidor', 404);
+            }
+            res.setHeader('Content-Disposition', `inline; filename="${upload.nomeOriginal}"`);
+            res.setHeader('Content-Type', upload.mimeType);
+            res.sendFile(path_1.default.resolve(upload.caminho));
         }
         catch (error) {
             next(error);

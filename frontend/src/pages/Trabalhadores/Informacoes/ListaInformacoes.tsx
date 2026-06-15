@@ -166,24 +166,32 @@ export const ListaInformacoes: React.FC = () => {
                   <InfoCard label="Resultados" value={info.exames?.[0]?.resultados || 'Não informado'} icon={Eye} color="text-cyan-500" />
                   <InfoCard label="Periodicidade" value={info.exames?.[0]?.periodicidade} icon={Calendar} color="text-teal-500" />
                 </div>
-                {(info.exames?.[0]?.anexos?.length ?? 0) > 0 && (
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Anexos</p>
-                    <div className="flex flex-wrap gap-2">
-                      {info.exames[0].anexos.map((uploadId) => (
-                        <button
-                          key={uploadId}
-                          onClick={() => uploadService.download(uploadId)}
-                          className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl border border-teal-200 transition-all text-sm font-medium"
-                        >
-                          <FileUp size={14} />
-                          <span className="truncate max-w-[200px]">{uploadId}</span>
-                          <Download size={14} />
-                        </button>
-                      ))}
+                {(() => {
+                  const anexos = info.exames?.[0]?.anexos;
+                  if (!anexos?.length) return null;
+                  return (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Anexos</p>
+                      <div className="flex flex-wrap gap-2">
+                        {anexos.map((a: any) => {
+                          const id = a.id || a;
+                          const nome = a.nome || a;
+                          return (
+                            <button
+                              key={id}
+                              onClick={() => uploadService.visualizar(id)}
+                              className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl border border-teal-200 transition-all text-sm font-medium"
+                            >
+                              <FileUp size={14} />
+                              <span className="truncate max-w-[200px]">{nome}</span>
+                              <Download size={14} />
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
 

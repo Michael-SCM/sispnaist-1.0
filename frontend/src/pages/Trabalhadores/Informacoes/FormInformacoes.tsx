@@ -47,7 +47,7 @@ interface FormData {
     realizados: string;
     resultados: string;
     periodicidade: string;
-    anexos: string[];
+    anexos: { id: string; nome: string }[];
   };
   observacoes: string;
 }
@@ -142,7 +142,7 @@ export const FormInformacoes: React.FC = () => {
             realizados: info.exames?.[0]?.realizados || '',
             resultados: info.exames?.[0]?.resultados || '',
             periodicidade: info.exames?.[0]?.periodicidade || '',
-            anexos: info.exames?.[0]?.anexos || [],
+            anexos: info.exames?.[0]?.anexos?.map(a => ({ id: a.id || a, nome: a.nome || a })) || [],
           },
           observacoes: info.observacoes || '',
         });
@@ -199,12 +199,11 @@ export const FormInformacoes: React.FC = () => {
     setIsUploadingFile(true);
     try {
       const upload = await uploadService.criar(file, 'informacao', infoId || id!, file.name);
-      const uploadId = (upload as any)._id || (upload as any).id;
       setFormData({
         ...formData,
         exames: {
           ...formData.exames,
-          anexos: [...formData.exames.anexos, uploadId],
+          anexos: [...formData.exames.anexos, { id: upload._id!, nome: file.name }],
         },
       });
       toast.success('PDF enviado com sucesso!');
@@ -221,7 +220,7 @@ export const FormInformacoes: React.FC = () => {
       ...formData,
       exames: {
         ...formData.exames,
-        anexos: formData.exames.anexos.filter((id) => id !== uploadId),
+        anexos: formData.exames.anexos.filter((a) => a.id !== uploadId),
       },
     });
   };
@@ -624,23 +623,23 @@ export const FormInformacoes: React.FC = () => {
                   </div>
                   {formData.exames.anexos.length > 0 && (
                     <ul className="mt-3 space-y-2">
-                      {formData.exames.anexos.map((uploadId) => (
-                        <li key={uploadId} className="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-teal-200">
+                      {formData.exames.anexos.map((anexo) => (
+                        <li key={anexo.id} className="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-teal-200">
                           <span className="text-sm font-medium text-slate-600 truncate max-w-[250px]">
-                            {uploadId}
+                            {anexo.nome}
                           </span>
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              onClick={() => uploadService.download(uploadId)}
+                              onClick={() => uploadService.visualizar(anexo.id)}
                               className="p-1.5 text-teal-600 hover:bg-teal-100 rounded-lg transition-all"
-                              title="Download"
+                              title="Visualizar"
                             >
                               <Download size={16} />
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleRemoveFile(uploadId)}
+                              onClick={() => handleRemoveFile(anexo.id)}
                               className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
                               title="Remover"
                             >
