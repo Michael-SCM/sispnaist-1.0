@@ -19,6 +19,8 @@ export interface ITrabalhadorVinculo extends Document {
   dataFim?: Date;
   situacao?: string;
   empresaTerceirizada?: string;
+  residente?: boolean;
+  anosResidencia?: string;
   setor?: string;
   cargo?: string;
   ocupacao?: string;
@@ -48,6 +50,8 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
     dataFim: { type: Date },
     situacao: { type: String, trim: true, default: 'Ativo' },
     empresaTerceirizada: { type: String, trim: true },
+    residente: { type: Boolean, default: false },
+    anosResidencia: { type: String, trim: true },
     setor: { type: String, trim: true },
     cargo: { type: String, trim: true },
     ocupacao: { type: String, trim: true },

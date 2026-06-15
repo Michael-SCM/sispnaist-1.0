@@ -39,6 +39,8 @@ interface FormData {
   observacoes: string;
   ativo: boolean;
   terceirizado: boolean;
+  residente: boolean;
+  anosResidencia: string;
   temPosse: boolean;
 }
 
@@ -64,6 +66,8 @@ const INITIAL_FORM: FormData = {
   observacoes: '',
   ativo: false,
   terceirizado: false,
+  residente: false,
+  anosResidencia: '',
   temPosse: false,
 };
 
@@ -142,6 +146,7 @@ export const FormVinculo: React.FC = () => {
       if (vinculo) {
         const temPosse = !!vinculo.dataPosse;
         const terceirizado = !!vinculo.empresaTerceirizada;
+        const residente = !!vinculo.residente;
         const empId = (vinculo as any).empresa || '';
         setFormData({
           empresa: empId,
@@ -156,6 +161,8 @@ export const FormVinculo: React.FC = () => {
           dataFim: vinculo.dataFim ? vinculo.dataFim.split('T')[0] : '',
           situacao: vinculo.situacao || 'Ativo',
           empresaTerceirizada: vinculo.empresaTerceirizada || '',
+          residente,
+          anosResidencia: vinculo.anosResidencia || '',
           setor: vinculo.setor || '',
           cargo: vinculo.cargo || '',
           ocupacao: vinculo.ocupacao || '',
@@ -266,6 +273,8 @@ export const FormVinculo: React.FC = () => {
         dataFim: formData.dataFim || undefined,
         situacao: formData.situacao,
         empresaTerceirizada: formData.terceirizado ? formData.empresaTerceirizada : '',
+        residente: formData.residente,
+        anosResidencia: formData.residente ? formData.anosResidencia : '',
         setor: formData.setor,
         cargo: formData.cargo,
         ocupacao: formData.ocupacao,
@@ -402,6 +411,32 @@ export const FormVinculo: React.FC = () => {
                       onChange={handleChange}
                       className={inputCls}
                       placeholder="Nome da empresa"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Residente? */}
+              <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
+                <label className={checkboxRowCls}>
+                  <input
+                    type="checkbox"
+                    name="residente"
+                    checked={formData.residente}
+                    onChange={handleChange}
+                    className="w-5 h-5 rounded-lg text-blue-600"
+                  />
+                  <span className="text-sm font-bold text-slate-600">Residente?</span>
+                </label>
+                {formData.residente && (
+                  <div className="pl-8">
+                    <label className={labelCls}>Quantos anos de residencia</label>
+                    <input
+                      name="anosResidencia"
+                      value={formData.anosResidencia}
+                      onChange={handleChange}
+                      className={inputCls}
+                      placeholder="Ex: 3 anos"
                     />
                   </div>
                 )}

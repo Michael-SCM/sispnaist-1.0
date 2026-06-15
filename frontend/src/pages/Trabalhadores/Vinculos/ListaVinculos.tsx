@@ -335,7 +335,24 @@ export const ListaVinculos: React.FC = () => {
                       {vinculoSelecionado.empresaTerceirizada || 'Não informada'}
                     </span>
                   </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Residente?</span>
+                    <span className="font-semibold text-slate-700 block">
+                      {vinculoSelecionado.residente ? 'Sim' : 'Não'}
+                    </span>
+                  </div>
                 </div>
+
+                {vinculoSelecionado.residente && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Anos de Residência</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {vinculoSelecionado.anosResidencia || 'Não informado'}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>

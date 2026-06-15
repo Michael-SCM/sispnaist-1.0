@@ -8,6 +8,7 @@ import TrabalhadorVinculo from '../models/TrabalhadorVinculo';
 import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
+import { logAction, compararDados } from '../utils/auditLogger.js';
 
 /**
  * Controller unificado para todos os submódulos do trabalhador.
@@ -123,6 +124,9 @@ class SubmoduloTrabalhadorController {
 
       const item = await Model.create({ ...dados, trabalhadorId: id });
 
+      const entidade = submodulo === 'vinculos' ? 'Vinculo' : submodulo.slice(0, -1);
+      await logAction(req, 'CREATE', entidade, item._id.toString(), item);
+
       return res.status(201).json(item);
     } catch (error) {
       next(error);
@@ -154,15 +158,20 @@ class SubmoduloTrabalhadorController {
         }
       }
 
+      const itemAntigo = await Model.findOne({ _id: itemId, trabalhadorId: id });
+      if (!itemAntigo) {
+        throw new AppError('Item não encontrado', 404);
+      }
+
       const item = await Model.findOneAndUpdate(
         { _id: itemId, trabalhadorId: id },
         dados,
         { new: true, runValidators: true }
       );
 
-      if (!item) {
-        throw new AppError('Item não encontrado', 404);
-      }
+      const entidade = submodulo === 'vinculos' ? 'Vinculo' : submodulo.slice(0, -1);
+      const mudancas = compararDados(itemAntigo, item);
+      await logAction(req, 'UPDATE', entidade, itemId, mudancas);
 
       return res.status(200).json(item);
     } catch (error) {
@@ -184,12 +193,15 @@ class SubmoduloTrabalhadorController {
         throw new AppError(`Submódulo "${submodulo}" não é válido`, 400);
       }
 
-      // Hard delete - remoção permanente do banco
-      const resultado = await Model.deleteOne({ _id: itemId, trabalhadorId: id });
-
-      if (resultado.deletedCount === 0) {
+      const item = await Model.findOne({ _id: itemId, trabalhadorId: id });
+      if (!item) {
         throw new AppError('Item não encontrado', 404);
       }
+
+      const entidade = submodulo === 'vinculos' ? 'Vinculo' : submodulo.slice(0, -1);
+      await logAction(req, 'DELETE', entidade, itemId, item);
+
+      await Model.deleteOne({ _id: itemId, trabalhadorId: id });
 
       return res.status(204).send();
     } catch (error) {

@@ -435,6 +435,8 @@ export interface ITrabalhadorVinculo {
   dataFim?: Date;
   situacao?: string;
   empresaTerceirizada?: string;
+  residente?: boolean;
+  anosResidencia?: string;
   setor?: string;
   cargo?: string;
   ocupacao?: string;
