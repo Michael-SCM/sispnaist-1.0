@@ -386,6 +386,20 @@ export interface IPreferenciaUsuario {
   ocultarAlertaOrientacao?: boolean;
 }
 
+export interface IArquivoUpload {
+  _id?: string;
+  entidade: string;
+  entidadeId: string;
+  nomeOriginal: string;
+  nomeArmazenado: string;
+  caminho: string;
+  mimeType: string;
+  tamanho: number;
+  descricao?: string;
+  enviadoPor: string;
+  url?: string;
+}
+
 export interface IVideoAula {
   _id?: string;
   titulo: string;

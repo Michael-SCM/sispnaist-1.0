@@ -162,15 +162,15 @@ export const ListaInformacoes: React.FC = () => {
               <SectionHeader icon={ClipboardList} title="Exames" />
               <div className="p-8 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InfoCard label="Exames Realizados" value={info.exames?.realizados || 'Não informado'} icon={ClipboardList} color="text-teal-500" />
-                  <InfoCard label="Resultados" value={info.exames?.resultados || 'Não informado'} icon={Eye} color="text-cyan-500" />
-                  <InfoCard label="Periodicidade" value={info.exames?.periodicidade} icon={Calendar} color="text-teal-500" />
+                  <InfoCard label="Exames Realizados" value={info.exames?.[0]?.realizados || 'Não informado'} icon={ClipboardList} color="text-teal-500" />
+                  <InfoCard label="Resultados" value={info.exames?.[0]?.resultados || 'Não informado'} icon={Eye} color="text-cyan-500" />
+                  <InfoCard label="Periodicidade" value={info.exames?.[0]?.periodicidade} icon={Calendar} color="text-teal-500" />
                 </div>
-                {(info.exames?.anexos?.length ?? 0) > 0 && (
+                {(info.exames?.[0]?.anexos?.length ?? 0) > 0 && (
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Anexos</p>
                     <div className="flex flex-wrap gap-2">
-                      {info.exames.anexos.map((uploadId) => (
+                      {info.exames[0].anexos.map((uploadId) => (
                         <button
                           key={uploadId}
                           onClick={() => uploadService.download(uploadId)}

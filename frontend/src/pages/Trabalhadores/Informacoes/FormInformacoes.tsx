@@ -139,10 +139,10 @@ export const FormInformacoes: React.FC = () => {
           outraDrogaDescricao: info.outraDrogaDescricao || '',
           frequenciaUso: info.frequenciaUso || '',
           exames: {
-            realizados: info.exames?.realizados || '',
-            resultados: info.exames?.resultados || '',
-            periodicidade: info.exames?.periodicidade || '',
-            anexos: info.exames?.anexos || [],
+            realizados: info.exames?.[0]?.realizados || '',
+            resultados: info.exames?.[0]?.resultados || '',
+            periodicidade: info.exames?.[0]?.periodicidade || '',
+            anexos: info.exames?.[0]?.anexos || [],
           },
           observacoes: info.observacoes || '',
         });
@@ -198,7 +198,7 @@ export const FormInformacoes: React.FC = () => {
 
     setIsUploadingFile(true);
     try {
-      const upload = await uploadService.criar(file, 'informacao', id!, file.name);
+      const upload = await uploadService.criar(file, 'informacao', infoId || id!, file.name);
       const uploadId = (upload as any)._id || (upload as any).id;
       setFormData({
         ...formData,
@@ -231,11 +231,12 @@ export const FormInformacoes: React.FC = () => {
     setIsLoading(true);
 
     try {
+      const payload = { ...formData, exames: [formData.exames] };
       if (isEdicao && infoId) {
-        await informacaoService.atualizar(id!, infoId, formData);
+        await informacaoService.atualizar(id!, infoId, payload as any);
         toast.success('Informações atualizadas com sucesso!');
       } else {
-        await informacaoService.criar(id!, formData);
+        await informacaoService.criar(id!, payload as any);
         toast.success('Informações salvas com sucesso!');
       }
       navigate(`/trabalhadores/${id}/informacoes`);

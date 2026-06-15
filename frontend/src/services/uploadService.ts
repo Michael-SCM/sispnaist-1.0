@@ -28,8 +28,8 @@ export const uploadService = {
   },
 
   obter: async (id: string): Promise<IArquivoUpload> => {
-    const response = await api.get<{ data: IArquivoUpload }>(`/uploads/${id}`);
-    return response.data.data;
+    const response = await api.get<IArquivoUpload>(`/uploads/${id}`);
+    return response.data;
   },
 
   // Upload de arquivo (multipart/form-data)
@@ -45,12 +45,12 @@ export const uploadService = {
     formData.append('entidadeId', entidadeId);
     if (descricao) formData.append('descricao', descricao);
 
-    const response = await api.post<{ data: IArquivoUpload }>('/uploads', formData, {
+    const response = await api.post<IArquivoUpload>('/uploads', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data.data;
+    return response.data;
   },
 
   // Download
