@@ -8,7 +8,7 @@ import { ITrabalhador } from '../../../types/index.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
   Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
-  Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby, AlertTriangle
+  Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby, AlertTriangle, Accessibility
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -185,6 +185,26 @@ export const ListaInformacoes: React.FC = () => {
               </div>
             </div>
             )}
+
+            {/* Limitações */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+              <SectionHeader icon={Accessibility} title="Limitações" />
+              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard label="Possui Limitação?" value={info.limitacao ? 'Sim' : 'Não'} icon={Accessibility} color="text-orange-500" />
+                {info.limitacao && (
+                  <>
+                    <InfoCard label="Tipo" value={info.tipoLimitacao} icon={Accessibility} color="text-orange-500" />
+                    <InfoCard label="Descrição" value={info.descricaoLimitacao} icon={Accessibility} color="text-orange-500" />
+                    <InfoCard label="Origem / Causa" value={info.causaLimitacao} icon={Accessibility} color="text-orange-500" />
+                    <InfoCard label="Parte/Função Afetada" value={info.parteCorpoAtingida} icon={Accessibility} color="text-orange-500" />
+                    <InfoCard label="Necessita Adaptação?" value={info.necessitaAdaptacao ? 'Sim' : 'Não'} icon={Accessibility} color="text-orange-500" />
+                    {info.necessitaAdaptacao && <InfoCard label="Adaptações Necessárias" value={info.descricaoAdaptacao} icon={Accessibility} color="text-orange-500" />}
+                    <InfoCard label="Readaptação Profissional?" value={info.readaptacaoProfissional ? 'Sim' : 'Não'} icon={Accessibility} color="text-orange-500" />
+                    {info.readaptacaoProfissional && <InfoCard label="Processo de Readaptação" value={info.descricaoReadaptacao} icon={Accessibility} color="text-orange-500" />}
+                  </>
+                )}
+              </div>
+            </div>
 
             {/* Hábitos e Estilo de Vida */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">

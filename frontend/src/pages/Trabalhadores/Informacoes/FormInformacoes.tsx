@@ -23,7 +23,8 @@ import {
   Trash2,
   Loader2,
   Baby,
-  Calendar
+  Calendar,
+  Accessibility
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -65,6 +66,15 @@ interface FormData {
   preNatal: boolean;
   lactante: boolean;
   complicacoesGestacao: string;
+  limitacao: boolean;
+  tipoLimitacao: string;
+  descricaoLimitacao: string;
+  causaLimitacao: string;
+  parteCorpoAtingida: string;
+  necessitaAdaptacao: boolean;
+  descricaoAdaptacao: string;
+  readaptacaoProfissional: boolean;
+  descricaoReadaptacao: string;
   exames: {
     realizados: string;
     resultados: string;
@@ -112,6 +122,15 @@ const INITIAL_FORM: FormData = {
   preNatal: false,
   lactante: false,
   complicacoesGestacao: '',
+  limitacao: false,
+  tipoLimitacao: '',
+  descricaoLimitacao: '',
+  causaLimitacao: '',
+  parteCorpoAtingida: '',
+  necessitaAdaptacao: false,
+  descricaoAdaptacao: '',
+  readaptacaoProfissional: false,
+  descricaoReadaptacao: '',
   exames: {
     realizados: '',
     resultados: '',
@@ -200,6 +219,15 @@ export const FormInformacoes: React.FC = () => {
           preNatal: info.preNatal || false,
           lactante: info.lactante || false,
           complicacoesGestacao: info.complicacoesGestacao || '',
+          limitacao: info.limitacao || false,
+          tipoLimitacao: info.tipoLimitacao || '',
+          descricaoLimitacao: info.descricaoLimitacao || '',
+          causaLimitacao: info.causaLimitacao || '',
+          parteCorpoAtingida: info.parteCorpoAtingida || '',
+          necessitaAdaptacao: info.necessitaAdaptacao || false,
+          descricaoAdaptacao: info.descricaoAdaptacao || '',
+          readaptacaoProfissional: info.readaptacaoProfissional || false,
+          descricaoReadaptacao: info.descricaoReadaptacao || '',
           exames: {
             realizados: info.exames?.[0]?.realizados || '',
             resultados: info.exames?.[0]?.resultados || '',
@@ -789,6 +817,139 @@ export const FormInformacoes: React.FC = () => {
             </div>
             </>
             )}
+
+            {/* Seção: Limitações */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <Accessibility size={20} />
+                Limitações
+              </h3>
+              <div className="p-6 bg-orange-50 rounded-2xl space-y-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="limitacao"
+                    id="limitacao"
+                    checked={formData.limitacao}
+                    onChange={handleChange}
+                    className="w-5 h-5 text-orange-600 rounded border-orange-300 focus:ring-orange-500"
+                  />
+                  <label htmlFor="limitacao" className="text-sm font-bold text-slate-600">
+                    Possui alguma limitação?
+                  </label>
+                </div>
+                {formData.limitacao && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelCls}>Tipo de Limitação</label>
+                      <select
+                        name="tipoLimitacao"
+                        value={formData.tipoLimitacao}
+                        onChange={handleChange}
+                        className={selectCls}
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="Física">Física</option>
+                        <option value="Cognitiva">Cognitiva</option>
+                        <option value="Sensorial">Sensorial</option>
+                        <option value="Psicológica/Emocional">Psicológica / Emocional</option>
+                        <option value="Outra">Outra</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Origem / Causa</label>
+                      <select
+                        name="causaLimitacao"
+                        value={formData.causaLimitacao}
+                        onChange={handleChange}
+                        className={selectCls}
+                      >
+                        <option value="">Selecione...</option>
+                        <option value="Congênita">Congênita</option>
+                        <option value="Acidente de trabalho">Acidente de trabalho</option>
+                        <option value="Doença ocupacional">Doença ocupacional</option>
+                        <option value="Doença não ocupacional">Doença não ocupacional</option>
+                        <option value="Outra">Outra</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>Descreva a limitação</label>
+                      <textarea
+                        name="descricaoLimitacao"
+                        value={formData.descricaoLimitacao}
+                        onChange={handleChange}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-white border border-orange-200 rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                        placeholder="Descreva a limitação e seu impacto no dia a dia..."
+                      />
+                    </div>
+                    <div>
+                      <label className={labelCls}>Parte do Corpo / Função Afetada</label>
+                      <input
+                        type="text"
+                        name="parteCorpoAtingida"
+                        value={formData.parteCorpoAtingida}
+                        onChange={handleChange}
+                        className={inputCls}
+                        placeholder="Ex: Membros inferiores, visão, cognição..."
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="necessitaAdaptacao"
+                        id="necessitaAdaptacao"
+                        checked={formData.necessitaAdaptacao}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-orange-600 rounded border-orange-300 focus:ring-orange-500"
+                      />
+                      <label htmlFor="necessitaAdaptacao" className="text-sm font-bold text-slate-600">
+                        Necessita de adaptação no trabalho?
+                      </label>
+                    </div>
+                    {formData.necessitaAdaptacao && (
+                      <div className="md:col-span-2">
+                        <label className={labelCls}>Descreva as adaptações necessárias</label>
+                        <textarea
+                          name="descricaoAdaptacao"
+                          value={formData.descricaoAdaptacao}
+                          onChange={handleChange}
+                          rows={2}
+                          className="w-full px-4 py-3 bg-white border border-orange-200 rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                          placeholder="Ex: Pausas frequentes, mobiliário adaptado, redução de carga horária..."
+                        />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 pt-7">
+                      <input
+                        type="checkbox"
+                        name="readaptacaoProfissional"
+                        id="readaptacaoProfissional"
+                        checked={formData.readaptacaoProfissional}
+                        onChange={handleChange}
+                        className="w-5 h-5 text-orange-600 rounded border-orange-300 focus:ring-orange-500"
+                      />
+                      <label htmlFor="readaptacaoProfissional" className="text-sm font-bold text-slate-600">
+                        Está em processo de readaptação profissional?
+                      </label>
+                    </div>
+                    {formData.readaptacaoProfissional && (
+                      <div className="md:col-span-2">
+                        <label className={labelCls}>Descreva o processo de readaptação</label>
+                        <textarea
+                          name="descricaoReadaptacao"
+                          value={formData.descricaoReadaptacao}
+                          onChange={handleChange}
+                          rows={2}
+                          className="w-full px-4 py-3 bg-white border border-orange-200 rounded-2xl focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                          placeholder="Ex: Realocação de função, treinamento, acompanhamento médico..."
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Seção: Uso de Substâncias */}
             <div className="space-y-4">

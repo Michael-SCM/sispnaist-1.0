@@ -52,6 +52,15 @@ export interface ITrabalhadorInformacao {
   preNatal: boolean;
   lactante: boolean;
   complicacoesGestacao: string;
+  limitacao: boolean;
+  tipoLimitacao: string;
+  descricaoLimitacao: string;
+  causaLimitacao: string;
+  parteCorpoAtingida: string;
+  necessitaAdaptacao: boolean;
+  descricaoAdaptacao: string;
+  readaptacaoProfissional: boolean;
+  descricaoReadaptacao: string;
   exames: IExame[];
   observacoes: string;
   ativo: boolean;

@@ -51,6 +51,15 @@ export interface ITrabalhadorInformacao extends Document {
   preNatal: boolean;
   lactante: boolean;
   complicacoesGestacao: string;
+  limitacao: boolean;
+  tipoLimitacao: string;
+  descricaoLimitacao: string;
+  causaLimitacao: string;
+  parteCorpoAtingida: string;
+  necessitaAdaptacao: boolean;
+  descricaoAdaptacao: string;
+  readaptacaoProfissional: boolean;
+  descricaoReadaptacao: string;
   exames: IExame[];
   observacoes: string;
   ativo: boolean;
@@ -226,6 +235,42 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       default: false,
     },
     complicacoesGestacao: {
+      type: String,
+      default: '',
+    },
+    limitacao: {
+      type: Boolean,
+      default: false,
+    },
+    tipoLimitacao: {
+      type: String,
+      default: '',
+    },
+    descricaoLimitacao: {
+      type: String,
+      default: '',
+    },
+    causaLimitacao: {
+      type: String,
+      default: '',
+    },
+    parteCorpoAtingida: {
+      type: String,
+      default: '',
+    },
+    necessitaAdaptacao: {
+      type: Boolean,
+      default: false,
+    },
+    descricaoAdaptacao: {
+      type: String,
+      default: '',
+    },
+    readaptacaoProfissional: {
+      type: Boolean,
+      default: false,
+    },
+    descricaoReadaptacao: {
       type: String,
       default: '',
     },
