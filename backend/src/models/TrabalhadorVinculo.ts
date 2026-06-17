@@ -1,3 +1,37 @@
+export interface IAvaliacaoItem {
+  presente: boolean;
+  observacao?: string;
+}
+
+export interface IAvaliacaoRiscosOcupacionais {
+  agentesFisicos: IAvaliacaoItem;
+  agentesQuimicos: IAvaliacaoItem;
+  agentesBiologicos: IAvaliacaoItem;
+  riscosErgonomicos: IAvaliacaoItem;
+  riscosAcidentes: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoCondicoesTrabalho {
+  infraestrutura: IAvaliacaoItem;
+  equipamentos: IAvaliacaoItem;
+  organizacaoTrabalho: IAvaliacaoItem;
+  cargaTrabalho: IAvaliacaoItem;
+  jornadaTrabalho: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoRelacoesTrabalho {
+  violencia: IAvaliacaoItem;
+  assedio: IAvaliacaoItem;
+  climaOrganizacional: IAvaliacaoItem;
+  satisfacaoTrabalho: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoAmbienteTrabalho {
+  riscosOcupacionais: IAvaliacaoRiscosOcupacionais;
+  condicoesTrabalho: IAvaliacaoCondicoesTrabalho;
+  relacoesTrabalho: IAvaliacaoRelacoesTrabalho;
+}
+
 import mongoose, { Document, Schema } from 'mongoose';
 
 /**
@@ -29,11 +63,17 @@ export interface ITrabalhadorVinculo extends Document {
   insalubridadePericulosidade?: string;
   observacoes?: string;
   ativo: boolean;
+  avaliacaoAmbienteTrabalho?: IAvaliacaoAmbienteTrabalho;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
 
 export interface ITrabalhadorVinculoDocument extends ITrabalhadorVinculo {}
+
+const SubdimensaoItemSchema = new Schema({
+  presente: { type: Boolean, default: false },
+  observacao: { type: String, trim: true },
+}, { _id: false });
 
 const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
   {
@@ -59,7 +99,29 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
     salario: { type: Number, min: 0 },
     insalubridadePericulosidade: { type: String, trim: true },
     observacoes: { type: String, trim: true },
-    ativo: { type: Boolean, default: true }
+    ativo: { type: Boolean, default: true },
+    avaliacaoAmbienteTrabalho: {
+      riscosOcupacionais: {
+        agentesFisicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        agentesQuimicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        agentesBiologicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        riscosErgonomicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        riscosAcidentes: { type: SubdimensaoItemSchema, default: () => ({}) },
+      },
+      condicoesTrabalho: {
+        infraestrutura: { type: SubdimensaoItemSchema, default: () => ({}) },
+        equipamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        organizacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+        cargaTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+        jornadaTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+      },
+      relacoesTrabalho: {
+        violencia: { type: SubdimensaoItemSchema, default: () => ({}) },
+        assedio: { type: SubdimensaoItemSchema, default: () => ({}) },
+        climaOrganizacional: { type: SubdimensaoItemSchema, default: () => ({}) },
+        satisfacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+      },
+    },
   },
   {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },

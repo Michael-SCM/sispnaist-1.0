@@ -5,10 +5,11 @@ import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalha
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import empresaService from '../../../services/empresaService.js';
 import unidadeService from '../../../services/unidadeService.js';
-import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade } from '../../../types/index.js';
+import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade, IAvaliacaoAmbienteTrabalho } from '../../../types/index.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import {
-  ArrowLeft, Save, Briefcase, Building, Calendar, Clock, DollarSign, Info, Loader2
+  ArrowLeft, Save, Briefcase, Building, Calendar, Clock, DollarSign, Info, Loader2,
+  AlertTriangle, Shield, HeartHandshake
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -42,7 +43,33 @@ interface FormData {
   residente: boolean;
   anosResidencia: string;
   temPosse: boolean;
+  avaliacaoAmbienteTrabalho: IAvaliacaoAmbienteTrabalho;
 }
+
+const ITEM_AUSENTE = { presente: false, observacao: '' };
+
+const INITIAL_AVALIACAO: IAvaliacaoAmbienteTrabalho = {
+  riscosOcupacionais: {
+    agentesFisicos: { ...ITEM_AUSENTE },
+    agentesQuimicos: { ...ITEM_AUSENTE },
+    agentesBiologicos: { ...ITEM_AUSENTE },
+    riscosErgonomicos: { ...ITEM_AUSENTE },
+    riscosAcidentes: { ...ITEM_AUSENTE },
+  },
+  condicoesTrabalho: {
+    infraestrutura: { ...ITEM_AUSENTE },
+    equipamentos: { ...ITEM_AUSENTE },
+    organizacaoTrabalho: { ...ITEM_AUSENTE },
+    cargaTrabalho: { ...ITEM_AUSENTE },
+    jornadaTrabalho: { ...ITEM_AUSENTE },
+  },
+  relacoesTrabalho: {
+    violencia: { ...ITEM_AUSENTE },
+    assedio: { ...ITEM_AUSENTE },
+    climaOrganizacional: { ...ITEM_AUSENTE },
+    satisfacaoTrabalho: { ...ITEM_AUSENTE },
+  },
+};
 
 const INITIAL_FORM: FormData = {
   empresa: '',
@@ -69,7 +96,39 @@ const INITIAL_FORM: FormData = {
   residente: false,
   anosResidencia: '',
   temPosse: false,
+  avaliacaoAmbienteTrabalho: { ...INITIAL_AVALIACAO },
 };
+
+const AvaliacaoItemField = ({
+  label, subdimensao, campo, data, onChange,
+}: {
+  label: string; subdimensao: string; campo: string;
+  data?: { presente?: boolean; observacao?: string };
+  onChange: (subdimensao: string, campo: string, subcampo: string, value: boolean | string) => void;
+}) => (
+  <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
+    <label className="flex items-center gap-3 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={data?.presente ?? false}
+        onChange={(e) => onChange(subdimensao, campo, 'presente', e.target.checked)}
+        className="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 transition-all"
+      />
+      <span className="text-sm font-bold text-slate-600">{label}</span>
+    </label>
+    {(data?.presente ?? false) && (
+      <div className="pl-8">
+        <input
+          type="text"
+          value={data?.observacao ?? ''}
+          onChange={(e) => onChange(subdimensao, campo, 'observacao', e.target.value)}
+          className="w-full px-4 py-2 bg-slate-50 border-transparent rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+          placeholder="Observação..."
+        />
+      </div>
+    )}
+  </div>
+);
 
 export const FormVinculo: React.FC = () => {
   const { id, vinculoId } = useParams<{ id: string; vinculoId: string }>();
@@ -148,6 +207,16 @@ export const FormVinculo: React.FC = () => {
         const terceirizado = !!vinculo.empresaTerceirizada;
         const residente = !!vinculo.residente;
         const empId = (vinculo as any).empresa || '';
+        const avaliacao = vinculo.avaliacaoAmbienteTrabalho || INITIAL_AVALIACAO;
+        const preencherItens = (obj: any): any => {
+          if (!obj || typeof obj !== 'object') return { presente: false, observacao: '' };
+          if ('presente' in obj) return { presente: obj.presente ?? false, observacao: obj.observacao ?? '' };
+          const result: any = {};
+          for (const k of Object.keys(obj)) {
+            result[k] = preencherItens(obj[k]);
+          }
+          return result;
+        };
         setFormData({
           empresa: empId,
           unidade: (vinculo as any).unidade || '',
@@ -173,6 +242,7 @@ export const FormVinculo: React.FC = () => {
           ativo: vinculo.ativo !== false,
           terceirizado,
           temPosse,
+          avaliacaoAmbienteTrabalho: preencherItens(avaliacao),
         });
         if (empId) {
           const unidadesDaEmpresa = unidadesData.filter(
@@ -249,6 +319,22 @@ export const FormVinculo: React.FC = () => {
     }
   };
 
+  const handleAvaliacaoChange = (subdimensao: string, campo: string, subcampo: string, value: boolean | string) => {
+    setFormData((prev) => ({
+      ...prev,
+      avaliacaoAmbienteTrabalho: {
+        ...prev.avaliacaoAmbienteTrabalho,
+        [subdimensao]: {
+          ...(prev.avaliacaoAmbienteTrabalho as any)[subdimensao],
+          [campo]: {
+            ...(prev.avaliacaoAmbienteTrabalho as any)[subdimensao]?.[campo],
+            [subcampo]: value,
+          },
+        },
+      },
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -283,6 +369,7 @@ export const FormVinculo: React.FC = () => {
         insalubridadePericulosidade: formData.insalubridadePericulosidade || undefined,
         observacoes: formData.observacoes || undefined,
         ativo: formData.ativo,
+        avaliacaoAmbienteTrabalho: formData.avaliacaoAmbienteTrabalho,
       };
 
       if (isEdicao) {
@@ -643,6 +730,87 @@ export const FormVinculo: React.FC = () => {
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-sm"
                   placeholder="Notas adicionais..."
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Avaliação do Ambiente de Trabalho */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+            <SectionHeader icon={AlertTriangle} title="Avaliação do Ambiente de Trabalho" />
+            <div className="p-8 space-y-8">
+              {/* Riscos Ocupacionais */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield size={18} className="text-red-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Riscos Ocupacionais</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries({
+                    agentesFisicos: 'Agentes Físicos', agentesQuimicos: 'Agentes Químicos',
+                    agentesBiologicos: 'Agentes Biológicos', riscosErgonomicos: 'Riscos Ergonômicos',
+                    riscosAcidentes: 'Riscos de Acidentes',
+                  }).map(([key, label]) => (
+                    <AvaliacaoItemField
+                      key={key}
+                      label={label}
+                      subdimensao="riscosOcupacionais"
+                      campo={key}
+                      data={(formData.avaliacaoAmbienteTrabalho as any)?.riscosOcupacionais?.[key]}
+                      onChange={handleAvaliacaoChange}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <hr className="border-slate-200" />
+
+              {/* Condições de Trabalho */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Briefcase size={18} className="text-amber-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Condições de Trabalho</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries({
+                    infraestrutura: 'Infraestrutura', equipamentos: 'Equipamentos (EPIs/EPCs)',
+                    organizacaoTrabalho: 'Organização do Trabalho', cargaTrabalho: 'Carga de Trabalho',
+                    jornadaTrabalho: 'Jornada de Trabalho',
+                  }).map(([key, label]) => (
+                    <AvaliacaoItemField
+                      key={key}
+                      label={label}
+                      subdimensao="condicoesTrabalho"
+                      campo={key}
+                      data={(formData.avaliacaoAmbienteTrabalho as any)?.condicoesTrabalho?.[key]}
+                      onChange={handleAvaliacaoChange}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <hr className="border-slate-200" />
+
+              {/* Relações de Trabalho */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <HeartHandshake size={18} className="text-purple-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Relações de Trabalho</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries({
+                    violencia: 'Violência', assedio: 'Assédio Moral/Sexual',
+                    climaOrganizacional: 'Clima Organizacional', satisfacaoTrabalho: 'Satisfação no Trabalho',
+                  }).map(([key, label]) => (
+                    <AvaliacaoItemField
+                      key={key}
+                      label={label}
+                      subdimensao="relacoesTrabalho"
+                      campo={key}
+                      data={(formData.avaliacaoAmbienteTrabalho as any)?.relacoesTrabalho?.[key]}
+                      onChange={handleAvaliacaoChange}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>

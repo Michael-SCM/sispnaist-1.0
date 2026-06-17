@@ -27,6 +27,40 @@ export interface ITrabalhadorDependente {
   dataAtualizacao?: string;
 }
 
+export interface IAvaliacaoItem {
+  presente: boolean;
+  observacao?: string;
+}
+
+export interface IAvaliacaoRiscosOcupacionais {
+  agentesFisicos: IAvaliacaoItem;
+  agentesQuimicos: IAvaliacaoItem;
+  agentesBiologicos: IAvaliacaoItem;
+  riscosErgonomicos: IAvaliacaoItem;
+  riscosAcidentes: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoCondicoesTrabalho {
+  infraestrutura: IAvaliacaoItem;
+  equipamentos: IAvaliacaoItem;
+  organizacaoTrabalho: IAvaliacaoItem;
+  cargaTrabalho: IAvaliacaoItem;
+  jornadaTrabalho: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoRelacoesTrabalho {
+  violencia: IAvaliacaoItem;
+  assedio: IAvaliacaoItem;
+  climaOrganizacional: IAvaliacaoItem;
+  satisfacaoTrabalho: IAvaliacaoItem;
+}
+
+export interface IAvaliacaoAmbienteTrabalho {
+  riscosOcupacionais: IAvaliacaoRiscosOcupacionais;
+  condicoesTrabalho: IAvaliacaoCondicoesTrabalho;
+  relacoesTrabalho: IAvaliacaoRelacoesTrabalho;
+}
+
 export interface ITrabalhadorVinculo {
   _id?: string;
   trabalhadorId: string;
@@ -52,6 +86,7 @@ export interface ITrabalhadorVinculo {
   insalubridadePericulosidade?: string;
   observacoes?: string;
   ativo?: boolean;
+  avaliacaoAmbienteTrabalho?: IAvaliacaoAmbienteTrabalho;
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
