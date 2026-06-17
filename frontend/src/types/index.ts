@@ -124,6 +124,9 @@ export interface IEndereco {
 
 export interface IAuthResponse {
   user: IUser;
+  accessToken: string;
+  refreshToken: string;
+  csrfToken?: string;
 }
 
 export interface IAcidente {

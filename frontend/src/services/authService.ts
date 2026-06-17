@@ -8,7 +8,9 @@ export const authService = {
   },
 
   login: async (email: string, senha: string): Promise<IAuthResponse> => {
-    const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha });
+    const response = await api.post<{
+      data: IAuthResponse & { accessToken: string; refreshToken: string; csrfToken: string }
+    }>('/auth/login', { email, senha });
     return response.data.data;
   },
 
