@@ -25,7 +25,9 @@ export const csrfProtection = (req: Request, res: Response, next: NextFunction):
     req.path === '/auth/register' ||
     req.path === '/auth/forgot-password' ||
     req.path === '/auth/reset-password' ||
-    req.path === '/auth/verify-email'
+    req.path === '/auth/verify-email' ||
+    req.path === '/auth/refresh-token' ||
+    req.path === '/auth/logout'
   ) return next();
 
   // Request with Authorization is CORS-preflighted → safe
@@ -62,7 +64,7 @@ export const generateCsrfToken = (_req: Request, res: Response): void => {
   res.cookie(CSRF_COOKIE, token, {
     httpOnly: false,
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: 'lax',
     path: '/',
     maxAge: 24 * 60 * 60 * 1000,
   });

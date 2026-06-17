@@ -9,7 +9,7 @@ const setAuthCookies = (res: Response, token: string, refreshToken?: string) => 
   const cookieOptions = {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
-    sameSite: config.nodeEnv === 'production' ? 'none' as const : 'lax' as const,
+    sameSite: 'lax' as const,
     path: '/',
   };
 
@@ -32,7 +32,7 @@ const setCsrfCookie = (res: Response): string => {
   res.cookie('csrf-token', token, {
     httpOnly: false,
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: 'lax',
     path: '/',
     maxAge: 24 * 60 * 60 * 1000,
   });
@@ -43,7 +43,7 @@ const clearAuthCookies = (res: Response) => {
   const cookieOptions = {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
-    sameSite: config.nodeEnv === 'production' ? 'none' as const : 'lax' as const,
+    sameSite: 'lax' as const,
     path: '/',
   };
   res.clearCookie('token', cookieOptions);
