@@ -60,8 +60,6 @@ const INITIAL_AVALIACAO: IAvaliacaoAmbienteTrabalho = {
     infraestrutura: { ...ITEM_AUSENTE },
     equipamentos: { ...ITEM_AUSENTE },
     organizacaoTrabalho: { ...ITEM_AUSENTE },
-    cargaTrabalho: { ...ITEM_AUSENTE },
-    jornadaTrabalho: { ...ITEM_AUSENTE },
   },
   relacoesTrabalho: {
     violencia: { ...ITEM_AUSENTE },
@@ -705,35 +703,6 @@ export const FormVinculo: React.FC = () => {
             </div>
           </div>
 
-          {/* Outras Informações */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-            <SectionHeader icon={Info} title="Outras Informações" />
-            <div className="p-8 space-y-6">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  name="ativo"
-                  checked={formData.ativo}
-                  onChange={handleChange}
-                  className="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 transition-all"
-                />
-                <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Vínculo Ativo?</span>
-              </label>
-
-              <div className="pt-4">
-                <label className={labelCls}>Observações</label>
-                <textarea
-                  name="observacoes"
-                  value={formData.observacoes}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-sm"
-                  placeholder="Notas adicionais..."
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Avaliação do Ambiente de Trabalho */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={AlertTriangle} title="Avaliação do Ambiente de Trabalho" />
@@ -773,8 +742,7 @@ export const FormVinculo: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries({
                     infraestrutura: 'Infraestrutura', equipamentos: 'Equipamentos (EPIs/EPCs)',
-                    organizacaoTrabalho: 'Organização do Trabalho', cargaTrabalho: 'Carga de Trabalho',
-                    jornadaTrabalho: 'Jornada de Trabalho',
+                    organizacaoTrabalho: 'Organização do Trabalho',
                   }).map(([key, label]) => (
                     <AvaliacaoItemField
                       key={key}
@@ -811,6 +779,35 @@ export const FormVinculo: React.FC = () => {
                     />
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Outras Informações */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+            <SectionHeader icon={Info} title="Outras Informações" />
+            <div className="p-8 space-y-6">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  name="ativo"
+                  checked={formData.ativo}
+                  onChange={handleChange}
+                  className="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500 transition-all"
+                />
+                <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Vínculo Ativo?</span>
+              </label>
+
+              <div className="pt-4">
+                <label className={labelCls}>Observações</label>
+                <textarea
+                  name="observacoes"
+                  value={formData.observacoes}
+                  onChange={handleChange}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none text-sm"
+                  placeholder="Notas adicionais..."
+                />
               </div>
             </div>
           </div>

@@ -38,8 +38,7 @@ const LABELS: Record<string, string> = {
   agentesBiologicos: 'Agentes Biológicos', riscosErgonomicos: 'Riscos Ergonômicos',
   riscosAcidentes: 'Riscos de Acidentes',
   infraestrutura: 'Infraestrutura', equipamentos: 'Equipamentos (EPIs/EPCs)',
-  organizacaoTrabalho: 'Organização do Trabalho', cargaTrabalho: 'Carga de Trabalho',
-  jornadaTrabalho: 'Jornada de Trabalho',
+  organizacaoTrabalho: 'Organização do Trabalho',
   violencia: 'Violência', assedio: 'Assédio Moral/Sexual',
   climaOrganizacional: 'Clima Organizacional', satisfacaoTrabalho: 'Satisfação no Trabalho',
 };

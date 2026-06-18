@@ -44,8 +44,6 @@ export interface IAvaliacaoCondicoesTrabalho {
   infraestrutura: IAvaliacaoItem;
   equipamentos: IAvaliacaoItem;
   organizacaoTrabalho: IAvaliacaoItem;
-  cargaTrabalho: IAvaliacaoItem;
-  jornadaTrabalho: IAvaliacaoItem;
 }
 
 export interface IAvaliacaoRelacoesTrabalho {

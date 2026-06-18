@@ -117,7 +117,7 @@ class SubmoduloTrabalhadorController {
       );
       const dados: Record<string, unknown> = {};
       for (const key of Object.keys(req.body)) {
-        if (allowedPaths.includes(key)) {
+        if (allowedPaths.includes(key) || allowedPaths.some((p: string) => p.startsWith(key + '.'))) {
           dados[key] = req.body[key];
         }
       }
@@ -153,7 +153,7 @@ class SubmoduloTrabalhadorController {
       );
       const dados: Record<string, unknown> = {};
       for (const key of Object.keys(req.body)) {
-        if (allowedPaths.includes(key)) {
+        if (allowedPaths.includes(key) || allowedPaths.some((p: string) => p.startsWith(key + '.'))) {
           dados[key] = req.body[key];
         }
       }

@@ -15,8 +15,6 @@ export interface IAvaliacaoCondicoesTrabalho {
   infraestrutura: IAvaliacaoItem;
   equipamentos: IAvaliacaoItem;
   organizacaoTrabalho: IAvaliacaoItem;
-  cargaTrabalho: IAvaliacaoItem;
-  jornadaTrabalho: IAvaliacaoItem;
 }
 
 export interface IAvaliacaoRelacoesTrabalho {
@@ -112,8 +110,6 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
         infraestrutura: { type: SubdimensaoItemSchema, default: () => ({}) },
         equipamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
         organizacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
-        cargaTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
-        jornadaTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
       },
       relacoesTrabalho: {
         violencia: { type: SubdimensaoItemSchema, default: () => ({}) },
