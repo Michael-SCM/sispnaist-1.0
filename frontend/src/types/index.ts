@@ -53,10 +53,19 @@ export interface IAvaliacaoRelacoesTrabalho {
   satisfacaoTrabalho: IAvaliacaoItem;
 }
 
+export interface IAvaliacaoAcoesPrevencao {
+  pcmo: IAvaliacaoItem;
+  ppraPgr: IAvaliacaoItem;
+  programasVacinacao: IAvaliacaoItem;
+  treinamentos: IAvaliacaoItem;
+  inspecoes: IAvaliacaoItem;
+}
+
 export interface IAvaliacaoAmbienteTrabalho {
   riscosOcupacionais: IAvaliacaoRiscosOcupacionais;
   condicoesTrabalho: IAvaliacaoCondicoesTrabalho;
   relacoesTrabalho: IAvaliacaoRelacoesTrabalho;
+  acoesPrevencao: IAvaliacaoAcoesPrevencao;
 }
 
 export interface ITrabalhadorVinculo {

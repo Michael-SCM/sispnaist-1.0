@@ -24,10 +24,19 @@ export interface IAvaliacaoRelacoesTrabalho {
   satisfacaoTrabalho: IAvaliacaoItem;
 }
 
+export interface IAvaliacaoAcoesPrevencao {
+  pcmo: IAvaliacaoItem;
+  ppraPgr: IAvaliacaoItem;
+  programasVacinacao: IAvaliacaoItem;
+  treinamentos: IAvaliacaoItem;
+  inspecoes: IAvaliacaoItem;
+}
+
 export interface IAvaliacaoAmbienteTrabalho {
   riscosOcupacionais: IAvaliacaoRiscosOcupacionais;
   condicoesTrabalho: IAvaliacaoCondicoesTrabalho;
   relacoesTrabalho: IAvaliacaoRelacoesTrabalho;
+  acoesPrevencao: IAvaliacaoAcoesPrevencao;
 }
 
 import mongoose, { Document, Schema } from 'mongoose';
@@ -116,6 +125,13 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
         assedio: { type: SubdimensaoItemSchema, default: () => ({}) },
         climaOrganizacional: { type: SubdimensaoItemSchema, default: () => ({}) },
         satisfacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+      },
+      acoesPrevencao: {
+        pcmo: { type: SubdimensaoItemSchema, default: () => ({}) },
+        ppraPgr: { type: SubdimensaoItemSchema, default: () => ({}) },
+        programasVacinacao: { type: SubdimensaoItemSchema, default: () => ({}) },
+        treinamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
+        inspecoes: { type: SubdimensaoItemSchema, default: () => ({}) },
       },
     },
   },

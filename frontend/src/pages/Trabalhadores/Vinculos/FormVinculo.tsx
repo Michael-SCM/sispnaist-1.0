@@ -67,6 +67,13 @@ const INITIAL_AVALIACAO: IAvaliacaoAmbienteTrabalho = {
     climaOrganizacional: { ...ITEM_AUSENTE },
     satisfacaoTrabalho: { ...ITEM_AUSENTE },
   },
+  acoesPrevencao: {
+    pcmo: { ...ITEM_AUSENTE },
+    ppraPgr: { ...ITEM_AUSENTE },
+    programasVacinacao: { ...ITEM_AUSENTE },
+    treinamentos: { ...ITEM_AUSENTE },
+    inspecoes: { ...ITEM_AUSENTE },
+  },
 };
 
 const INITIAL_FORM: FormData = {
@@ -775,6 +782,34 @@ export const FormVinculo: React.FC = () => {
                       subdimensao="relacoesTrabalho"
                       campo={key}
                       data={(formData.avaliacaoAmbienteTrabalho as any)?.relacoesTrabalho?.[key]}
+                      onChange={handleAvaliacaoChange}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <hr className="border-slate-200" />
+
+              {/* Ações de Prevenção */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield size={18} className="text-emerald-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Ações de Prevenção</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries({
+                    pcmo: 'PCMSO',
+                    ppraPgr: 'PPRA / PGR',
+                    programasVacinacao: 'Programas de Vacinação',
+                    treinamentos: 'Treinamentos',
+                    inspecoes: 'Inspeções',
+                  }).map(([key, label]) => (
+                    <AvaliacaoItemField
+                      key={key}
+                      label={label}
+                      subdimensao="acoesPrevencao"
+                      campo={key}
+                      data={(formData.avaliacaoAmbienteTrabalho as any)?.acoesPrevencao?.[key]}
                       onChange={handleAvaliacaoChange}
                     />
                   ))}

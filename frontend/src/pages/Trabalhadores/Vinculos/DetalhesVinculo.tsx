@@ -10,7 +10,7 @@ import {
   ArrowLeft, Edit, Trash2, Building, MapPin, Briefcase, CreditCard,
   UserCheck, Clock, Calendar, Flag, Home,
   Shield, DollarSign, FileText, Loader2, CheckCircle, XCircle,
-  AlertTriangle, HeartHandshake
+  AlertTriangle, HeartHandshake, Users, Star, Activity, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -41,27 +41,58 @@ const LABELS: Record<string, string> = {
   organizacaoTrabalho: 'Organização do Trabalho',
   violencia: 'Violência', assedio: 'Assédio Moral/Sexual',
   climaOrganizacional: 'Clima Organizacional', satisfacaoTrabalho: 'Satisfação no Trabalho',
+  pcmo: 'PCMSO', ppraPgr: 'PPRA / PGR',
+  programasVacinacao: 'Programas de Vacinação', treinamentos: 'Treinamentos',
+  inspecoes: 'Inspeções',
 };
 
-const renderItens = (grupo: any) => {
+const ICONS: Record<string, any> = {
+  infraestrutura: Building, equipamentos: Shield,
+  organizacaoTrabalho: FileText,
+  climaOrganizacional: Users, satisfacaoTrabalho: Star,
+  pcmo: Activity, ppraPgr: Shield,
+  programasVacinacao: HeartHandshake, treinamentos: FileText,
+  inspecoes: Search,
+};
+
+const renderItens = (grupo: any, neutroFields?: string[]) => {
   if (!grupo) return null;
-  return Object.entries(grupo).map(([key, val]: [string, any]) => (
-    <div key={key} className={`flex items-start gap-3 p-3 rounded-xl border ${
-      val?.presente ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'
-    }`}>
-      <span className={`mt-0.5 text-sm ${val?.presente ? 'text-red-500' : 'text-green-500'}`}>
-        {val?.presente ? '⚠️' : '✅'}
-      </span>
-      <div>
-        <p className={`text-sm font-bold ${val?.presente ? 'text-red-700' : 'text-green-700'}`}>
-          {LABELS[key] || key}
-        </p>
-        {val?.observacao && (
-          <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
-        )}
+  return Object.entries(grupo).map(([key, val]: [string, any]) => {
+    const isNeutro = neutroFields?.includes(key);
+    const Icon = isNeutro ? ICONS[key] : null;
+    if (isNeutro && Icon) {
+      return (
+        <div key={key} className="flex items-start gap-3 p-3 rounded-xl border bg-slate-50 border-slate-200">
+          <div className={`p-1.5 bg-white rounded-lg shadow-sm ${val?.presente ? 'text-amber-500' : 'text-slate-400'}`}>
+            <Icon size={16} />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-slate-700">{LABELS[key] || key}</p>
+            {val?.observacao && (
+              <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
+            )}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div key={key} className={`flex items-start gap-3 p-3 rounded-xl border ${
+        val?.presente ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'
+      }`}>
+        <span className={`mt-0.5 text-sm ${val?.presente ? 'text-red-500' : 'text-green-500'}`}>
+          {val?.presente ? '⚠️' : '✅'}
+        </span>
+        <div>
+          <p className={`text-sm font-bold ${val?.presente ? 'text-red-700' : 'text-green-700'}`}>
+            {LABELS[key] || key}
+          </p>
+          {val?.observacao && (
+            <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
+          )}
+        </div>
       </div>
-    </div>
-  ));
+    );
+  });
 };
 
 export const DetalhesVinculo: React.FC = () => {
@@ -235,7 +266,7 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Condições de Trabalho</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.condicoesTrabalho)}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.condicoesTrabalho, ['infraestrutura', 'equipamentos', 'organizacaoTrabalho'])}
                 </div>
               </div>
               <hr className="border-slate-200" />
@@ -246,7 +277,18 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Relações de Trabalho</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.relacoesTrabalho)}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.relacoesTrabalho, ['climaOrganizacional', 'satisfacaoTrabalho'])}
+                </div>
+              </div>
+              <hr className="border-slate-200" />
+              {/* Ações de Prevenção */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield size={18} className="text-emerald-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Ações de Prevenção</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {renderItens(v.avaliacaoAmbienteTrabalho.acoesPrevencao, ['pcmo', 'ppraPgr', 'programasVacinacao', 'treinamentos', 'inspecoes'])}
                 </div>
               </div>
             </div>
