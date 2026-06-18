@@ -22,7 +22,7 @@ const loginSchema = {
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
-  const setUser = useAuthStore((state) => state.setUser);
+  const setAuth = useAuthStore((state) => state.setAuth);
   const { values, errors, touched, handleChange, handleBlur, setFieldError, reset } = useForm<LoginFormData>({
     email: '',
     senha: '',
@@ -65,8 +65,8 @@ export const Login: React.FC = () => {
     statusRef.current?.focus();
 
     try {
-      const { user } = await authService.login(values.email, values.senha);
-      setUser(user);
+      const { user, accessToken, refreshToken } = await authService.login(values.email, values.senha);
+      setAuth(user, accessToken, refreshToken);
       toast.success('Login realizado com sucesso!');
       navigate('/dashboard');
       reset();

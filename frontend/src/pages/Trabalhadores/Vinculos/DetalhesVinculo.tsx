@@ -5,11 +5,12 @@ import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalha
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import empresaService from '../../../services/empresaService.js';
 import unidadeService from '../../../services/unidadeService.js';
-import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade } from '../../../types/index.js';
+import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade, IAvaliacaoAmbienteTrabalho } from '../../../types/index.js';
 import {
   ArrowLeft, Edit, Trash2, Building, MapPin, Briefcase, CreditCard,
   UserCheck, Clock, Calendar, Flag, Home,
-  Shield, DollarSign, FileText, Loader2, CheckCircle, XCircle
+  Shield, DollarSign, FileText, Loader2, CheckCircle, XCircle,
+  AlertTriangle, HeartHandshake
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -31,6 +32,38 @@ const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
     <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">{title}</h2>
   </div>
 );
+
+const LABELS: Record<string, string> = {
+  agentesFisicos: 'Agentes Físicos', agentesQuimicos: 'Agentes Químicos',
+  agentesBiologicos: 'Agentes Biológicos', riscosErgonomicos: 'Riscos Ergonômicos',
+  riscosAcidentes: 'Riscos de Acidentes',
+  infraestrutura: 'Infraestrutura', equipamentos: 'Equipamentos (EPIs/EPCs)',
+  organizacaoTrabalho: 'Organização do Trabalho', cargaTrabalho: 'Carga de Trabalho',
+  jornadaTrabalho: 'Jornada de Trabalho',
+  violencia: 'Violência', assedio: 'Assédio Moral/Sexual',
+  climaOrganizacional: 'Clima Organizacional', satisfacaoTrabalho: 'Satisfação no Trabalho',
+};
+
+const renderItens = (grupo: any) => {
+  if (!grupo) return null;
+  return Object.entries(grupo).map(([key, val]: [string, any]) => (
+    <div key={key} className={`flex items-start gap-3 p-3 rounded-xl border ${
+      val?.presente ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'
+    }`}>
+      <span className={`mt-0.5 text-sm ${val?.presente ? 'text-red-500' : 'text-green-500'}`}>
+        {val?.presente ? '⚠️' : '✅'}
+      </span>
+      <div>
+        <p className={`text-sm font-bold ${val?.presente ? 'text-red-700' : 'text-green-700'}`}>
+          {LABELS[key] || key}
+        </p>
+        {val?.observacao && (
+          <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
+        )}
+      </div>
+    </div>
+  ));
+};
 
 export const DetalhesVinculo: React.FC = () => {
   const { id, vinculoId } = useParams<{ id: string; vinculoId: string }>();
@@ -180,6 +213,46 @@ export const DetalhesVinculo: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {v.avaliacaoAmbienteTrabalho && (
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+            <SectionHeader icon={AlertTriangle} title="Avaliação do Ambiente de Trabalho" />
+            <div className="p-8 space-y-6">
+              {/* Riscos Ocupacionais */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield size={18} className="text-red-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Riscos Ocupacionais</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {renderItens(v.avaliacaoAmbienteTrabalho.riscosOcupacionais)}
+                </div>
+              </div>
+              <hr className="border-slate-200" />
+              {/* Condições de Trabalho */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Briefcase size={18} className="text-amber-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Condições de Trabalho</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {renderItens(v.avaliacaoAmbienteTrabalho.condicoesTrabalho)}
+                </div>
+              </div>
+              <hr className="border-slate-200" />
+              {/* Relações de Trabalho */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <HeartHandshake size={18} className="text-purple-500" />
+                  <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Relações de Trabalho</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {renderItens(v.avaliacaoAmbienteTrabalho.relacoesTrabalho)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end gap-3">
           <button

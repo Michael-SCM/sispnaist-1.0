@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://sispnaist-1-0.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
@@ -19,6 +19,10 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
+  const { accessToken } = useAuthStore.getState();
+  if (accessToken && config.headers) {
+    config.headers['Authorization'] = `Bearer ${accessToken}`;
+  }
   const csrfToken = getCookie('csrf-token');
   if (csrfToken && config.headers) {
     config.headers['X-CSRF-Token'] = csrfToken;
@@ -28,16 +32,16 @@ axiosInstance.interceptors.request.use((config) => {
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: () => void;
+  resolve: (token: string) => void;
   reject: (reason?: any) => void;
 }> = [];
 
-function processQueue(error: any) {
+function processQueue(error: any, token?: string) {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
-    } else {
-      prom.resolve();
+    } else if (token) {
+      prom.resolve(token);
     }
   });
   failedQueue = [];
@@ -73,17 +77,37 @@ axiosInstance.interceptors.response.use(
     }
 
     if (isRefreshing) {
-      return new Promise<void>((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
-      }).then(() => axiosInstance(originalRequest));
+      }).then((token) => {
+        if (originalRequest.headers) {
+          originalRequest.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return axiosInstance(originalRequest);
+      });
     }
 
     originalRequest._retry = true;
     isRefreshing = true;
 
     try {
-      await axios.post(`${API_BASE_URL}/auth/refresh-token`, {}, { withCredentials: true });
-      processQueue(null);
+      const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
+        refreshToken: localStorage.getItem('sispnaist_refreshToken'),
+      }, { withCredentials: true });
+
+      const newToken = data.data.accessToken;
+      const newRefreshToken = data.data.refreshToken;
+
+      useAuthStore.getState().setAccessToken(newToken);
+      if (newRefreshToken) {
+        localStorage.setItem('sispnaist_refreshToken', newRefreshToken);
+      }
+
+      processQueue(null, newToken);
+
+      if (originalRequest.headers) {
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+      }
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError);
