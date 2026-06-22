@@ -142,10 +142,11 @@ export const DetalhesVinculo: React.FC = () => {
         empresaService.listarAtivas(),
         unidadeService.listarAtivas(),
       ]);
-      setTrabalhador(t);
-      setEmpresas(r1.data?.empresas || r1.empresas || []);
-      setUnidades(r2.data?.unidades || r2.unidades || []);
-      setVinculo(v);
+      if (v) {
+        setTrabalhador(t);
+        setEmpresas(r1.data?.empresas || r1.empresas || []);
+        setUnidades(r2.data?.unidades || r2.unidades || []);
+        setVinculo(v);
       } else {
         toast.error('Vínculo não encontrado');
         navigate(`/trabalhadores/${id}/vinculos`);
