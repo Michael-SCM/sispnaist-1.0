@@ -172,7 +172,9 @@ const AvaliacaoItemField = ({
 
         {subdimensao === 'acoesPrevencao' && (
           <>
+            <span className="text-xs text-slate-500">Início</span>
             <input type="date" value={data?.dataUltimaAcao?.split('T')[0] ?? ''} onChange={(e) => onChange(subdimensao, campo, 'dataUltimaAcao', e.target.value)} className={inputSm} />
+            <span className="text-xs text-slate-500">Fim</span>
             <input type="date" value={data?.proximaAcao?.split('T')[0] ?? ''} onChange={(e) => onChange(subdimensao, campo, 'proximaAcao', e.target.value)} className={inputSm} />
             <input type="text" value={data?.responsavel ?? ''} onChange={(e) => onChange(subdimensao, campo, 'responsavel', e.target.value)} className={inputSm} placeholder="Responsável" />
           </>
