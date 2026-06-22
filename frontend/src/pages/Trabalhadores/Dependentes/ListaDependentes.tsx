@@ -152,18 +152,23 @@ export const ListaDependentes: React.FC = () => {
                             <Calendar size={14} className="text-slate-400" />
                             {dep.dataNascimento ? new Date(dep.dataNascimento).toLocaleDateString('pt-BR') : '-'}
                           </div>
-                          <div className="flex items-center gap-2">
-                            {dep.dependentIR && (
-                              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black uppercase tracking-wider border border-blue-100">
-                                Dep. IR
-                              </span>
-                            )}
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
-                              dep.ativo ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-200'
-                            }`}>
-                              {dep.ativo ? 'Ativo' : 'Inativo'}
-                            </span>
-                          </div>
+                  <div className="flex items-center gap-2">
+                    {dep.dependentIR && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-black uppercase tracking-wider border border-blue-100">
+                        Dep. IR
+                      </span>
+                    )}
+                    {dep.temDeficiencia && (
+                      <span className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded text-[10px] font-black uppercase tracking-wider border border-amber-100">
+                        Deficiência
+                      </span>
+                    )}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest ${
+                      dep.ativo ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-200'
+                    }`}>
+                      {dep.ativo ? 'Ativo' : 'Inativo'}
+                    </span>
+                  </div>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-right">
@@ -270,6 +275,33 @@ export const ListaDependentes: React.FC = () => {
                     </span>
                   </div>
                 </div>
+
+                {dependenteSelecionado.temDeficiencia && (
+                  <div className="border-t border-slate-100 pt-4 space-y-2">
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Deficiência</span>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Tipo</span>
+                        <span className="font-semibold text-slate-700 block text-sm">
+                          {dependenteSelecionado.tipoDeficiencia === 'fisica' && 'Física'}
+                          {dependenteSelecionado.tipoDeficiencia === 'cognitiva' && 'Cognitiva'}
+                          {dependenteSelecionado.tipoDeficiencia === 'sensorial' && 'Sensorial'}
+                          {dependenteSelecionado.tipoDeficiencia === 'multipla' && 'Múltipla'}
+                          {dependenteSelecionado.tipoDeficiencia === 'outro' && 'Outro'}
+                          {!dependenteSelecionado.tipoDeficiencia && 'Não especificado'}
+                        </span>
+                      </div>
+                    </div>
+                    {dependenteSelecionado.descricaoDeficiencia && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Descrição</span>
+                        <span className="font-semibold text-slate-700 block text-sm">
+                          {dependenteSelecionado.descricaoDeficiencia}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 pt-2">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status do Dependente:</span>

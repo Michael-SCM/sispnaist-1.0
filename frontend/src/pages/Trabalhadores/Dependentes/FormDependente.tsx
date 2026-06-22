@@ -26,6 +26,9 @@ interface FormData {
   dataNascimento: string;
   parentesco: string;
   dependentIR: boolean;
+  temDeficiencia: boolean;
+  tipoDeficiencia: string;
+  descricaoDeficiencia: string;
   ativo: boolean;
 }
 
@@ -35,6 +38,9 @@ const INITIAL_FORM: FormData = {
   dataNascimento: '',
   parentesco: '',
   dependentIR: false,
+  temDeficiencia: false,
+  tipoDeficiencia: '',
+  descricaoDeficiencia: '',
   ativo: true,
 };
 
@@ -82,6 +88,9 @@ export const FormDependente: React.FC = () => {
           dataNascimento: dependente.dataNascimento ? dependente.dataNascimento.split('T')[0] : '',
           parentesco: dependente.parentesco || '',
           dependentIR: dependente.dependentIR !== false,
+          temDeficiencia: dependente.temDeficiencia === true,
+          tipoDeficiencia: dependente.tipoDeficiencia || '',
+          descricaoDeficiencia: dependente.descricaoDeficiencia || '',
           ativo: dependente.ativo !== false,
         });
       } else {
@@ -133,9 +142,10 @@ export const FormDependente: React.FC = () => {
 
       const dados: Partial<ITrabalhadorDependente> = {
         ...formData,
-        // Backend valida CPF no formato XXX.XXX.XXX-XX
         cpf: formData.cpf ? maskCPF(formData.cpf) : undefined,
         dataNascimento: formData.dataNascimento || undefined,
+        tipoDeficiencia: formData.temDeficiencia ? formData.tipoDeficiencia : undefined,
+        descricaoDeficiencia: formData.temDeficiencia ? formData.descricaoDeficiencia : undefined,
       };
 
       if (isEdicao) {
@@ -259,6 +269,56 @@ export const FormDependente: React.FC = () => {
                     </select>
                     {errors.parentesco && <p className="mt-1 text-xs text-red-500 font-bold">{errors.parentesco}</p>}
                   </div>
+
+                  {formData.parentesco === 'filho' && (
+                    <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          name="temDeficiencia"
+                          checked={formData.temDeficiencia}
+                          onChange={handleChange}
+                          className="w-5 h-5 rounded-lg border-slate-200 text-rose-600 focus:ring-rose-500 transition-all"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Possui deficiência?</span>
+                          <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Tipo de deficiência do dependente</span>
+                        </div>
+                      </label>
+
+                      {formData.temDeficiencia && (
+                        <div className="pl-8 space-y-4">
+                          <div>
+                            <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Deficiência</label>
+                            <select
+                              name="tipoDeficiencia"
+                              value={formData.tipoDeficiencia}
+                              onChange={handleChange}
+                              className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-medium"
+                            >
+                              <option value="">Selecione...</option>
+                              <option value="fisica">Física</option>
+                              <option value="cognitiva">Cognitiva</option>
+                              <option value="sensorial">Sensorial</option>
+                              <option value="multipla">Múltipla</option>
+                              <option value="outro">Outro</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-bold text-slate-600 mb-2">Descrição da Deficiência</label>
+                            <textarea
+                              name="descricaoDeficiencia"
+                              value={formData.descricaoDeficiencia}
+                              onChange={handleChange}
+                              className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-medium resize-none"
+                              placeholder="Descreva o tipo de deficiência, membro afetado, etc."
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

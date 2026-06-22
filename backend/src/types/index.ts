@@ -320,6 +320,9 @@ export interface ITrabalhadorDependente {
   dataNascimento: Date;
   parentesco: string;
   dependentIR?: boolean;
+  temDeficiencia?: boolean;
+  tipoDeficiencia?: string;
+  descricaoDeficiencia?: string;
   ativo?: boolean;
 }
 

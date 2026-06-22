@@ -22,6 +22,9 @@ export interface ITrabalhadorDependente {
   cpf?: string;
   parentesco: string;      // 'conjuge', 'filho', 'enteado', 'irmao', 'mae', 'pai', 'outro'
   dependentIR?: boolean;   // dependente para imposto de renda
+  temDeficiencia?: boolean;
+  tipoDeficiencia?: string; // 'fisica', 'cognitiva', 'sensorial', 'multipla', 'outro'
+  descricaoDeficiencia?: string;
   ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;

@@ -12,6 +12,9 @@ export interface ITrabalhadorDependente extends Document {
   dataNascimento: Date;
   parentesco: string;     // 'conjuge', 'filho', 'enteado', 'irmao', 'mae', 'pai', 'outro'
   dependentIR?: boolean;   // dependente para imposto de renda
+  temDeficiencia?: boolean;
+  tipoDeficiencia?: string;
+  descricaoDeficiencia?: string;
   ativo: boolean;
   dataCriacao: Date;
   dataAtualizacao: Date;
@@ -27,6 +30,9 @@ const TrabalhadorDependenteSchema = new Schema<ITrabalhadorDependenteDocument>(
     dataNascimento: { type: Date, required: true },
     parentesco: { type: String, required: true },
     dependentIR: { type: Boolean, default: false },
+    temDeficiencia: { type: Boolean, default: false },
+    tipoDeficiencia: { type: String },
+    descricaoDeficiencia: { type: String },
     ativo: { type: Boolean, default: true }
   },
   {
