@@ -117,7 +117,11 @@ export const FormDependente: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+    let finalValue: any = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+
+    if (name === 'cpf') {
+      finalValue = maskCPF(finalValue);
+    }
 
     setFormData({
       ...formData,
@@ -225,7 +229,7 @@ export const FormDependente: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-600 mb-2">CPF</label>
                     <input
                       name="cpf"
-                      value={formData.cpf}
+                      value={maskCPF(formData.cpf || '')}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all font-mono"
                       placeholder="000.000.000-00"
