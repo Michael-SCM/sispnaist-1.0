@@ -146,6 +146,10 @@ export const DetalhesVinculo: React.FC = () => {
       setEmpresas(r1.data?.empresas || r1.empresas || []);
       setUnidades(r2.data?.unidades || r2.unidades || []);
       setVinculo(v);
+      } else {
+        toast.error('Vínculo não encontrado');
+        navigate(`/trabalhadores/${id}/vinculos`);
+      }
     } catch {
       toast.error('Erro ao carregar vínculo');
     } finally {
