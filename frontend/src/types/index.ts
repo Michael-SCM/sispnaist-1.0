@@ -30,6 +30,14 @@ export interface ITrabalhadorDependente {
 export interface IAvaliacaoItem {
   presente: boolean;
   observacao?: string;
+  intensidade?: 'baixo' | 'medio' | 'alto';
+  fonteGeradora?: string;
+  situacao?: 'adequado' | 'parcial' | 'inadequado';
+  frequencia?: 'nunca' | 'raramente' | 'as_vezes' | 'frequentemente';
+  ultimoEvento?: string;
+  dataUltimaAcao?: string;
+  proximaAcao?: string;
+  responsavel?: string;
 }
 
 export interface IAvaliacaoRiscosOcupacionais {

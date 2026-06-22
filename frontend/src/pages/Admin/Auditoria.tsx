@@ -137,13 +137,26 @@ export const Auditoria: React.FC = () => {
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Módulo / Entidade</label>
               <div className="relative">
                 <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  type="text"
-                  placeholder="Ex: Acidente, Trabalhador, Ato..."
+                <select
                   value={entidade}
                   onChange={(e) => setEntidade(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium"
-                />
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-slate-900 outline-none transition-all font-medium appearance-none"
+                >
+                  <option value="">Todas as entidades</option>
+                  <option value="Vinculo">Vínculo</option>
+                  <option value="Trabalhador">Trabalhador</option>
+                  <option value="Acidente">Acidente</option>
+                  <option value="Doenca">Doença</option>
+                  <option value="Empresa">Empresa</option>
+                  <option value="Unidade">Unidade</option>
+                  <option value="User">Usuário</option>
+                  <option value="Vacinacao">Vacinação</option>
+                  <option value="Dependente">Dependente</option>
+                  <option value="Afastamento">Afastamento</option>
+                  <option value="OcorrenciaViolencia">Ocorrência Violência</option>
+                  <option value="Readaptacao">Readaptação</option>
+                  <option value="ProcessoTrabalho">Processo de Trabalho</option>
+                </select>
               </div>
             </div>
             

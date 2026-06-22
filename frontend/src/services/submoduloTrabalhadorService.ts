@@ -72,6 +72,13 @@ export const submoduloTrabalhadorService = {
   },
 
   // VÍNCULOS
+  obterVinculo: async (trabalhadorId: string, vinculoId: string): Promise<ITrabalhadorVinculo> => {
+    const response = await api.get<ITrabalhadorVinculo>(
+      `/trabalhadores/${trabalhadorId}/vinculos/${vinculoId}`
+    );
+    return response.data;
+  },
+
   listarVinculos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorVinculo[]> => {
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());

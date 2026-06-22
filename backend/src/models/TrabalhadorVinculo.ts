@@ -1,6 +1,14 @@
 export interface IAvaliacaoItem {
   presente: boolean;
   observacao?: string;
+  intensidade?: 'baixo' | 'medio' | 'alto';
+  fonteGeradora?: string;
+  situacao?: 'adequado' | 'parcial' | 'inadequado';
+  frequencia?: 'nunca' | 'raramente' | 'as_vezes' | 'frequentemente';
+  ultimoEvento?: Date;
+  dataUltimaAcao?: Date;
+  proximaAcao?: Date;
+  responsavel?: string;
 }
 
 export interface IAvaliacaoRiscosOcupacionais {
@@ -80,6 +88,14 @@ export interface ITrabalhadorVinculoDocument extends ITrabalhadorVinculo {}
 const SubdimensaoItemSchema = new Schema({
   presente: { type: Boolean, default: false },
   observacao: { type: String, trim: true },
+  intensidade: { type: String, enum: ['baixo', 'medio', 'alto'] },
+  fonteGeradora: { type: String, trim: true },
+  situacao: { type: String, enum: ['adequado', 'parcial', 'inadequado'] },
+  frequencia: { type: String, enum: ['nunca', 'raramente', 'as_vezes', 'frequentemente'] },
+  ultimoEvento: { type: Date },
+  dataUltimaAcao: { type: Date },
+  proximaAcao: { type: Date },
+  responsavel: { type: String, trim: true },
 }, { _id: false });
 
 const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
@@ -108,31 +124,34 @@ const TrabalhadorVinculoSchema = new Schema<ITrabalhadorVinculoDocument>(
     observacoes: { type: String, trim: true },
     ativo: { type: Boolean, default: true },
     avaliacaoAmbienteTrabalho: {
-      riscosOcupacionais: {
-        agentesFisicos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        agentesQuimicos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        agentesBiologicos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        riscosErgonomicos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        riscosAcidentes: { type: SubdimensaoItemSchema, default: () => ({}) },
+      type: {
+        riscosOcupacionais: {
+          agentesFisicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          agentesQuimicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          agentesBiologicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          riscosErgonomicos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          riscosAcidentes: { type: SubdimensaoItemSchema, default: () => ({}) },
+        },
+        condicoesTrabalho: {
+          infraestrutura: { type: SubdimensaoItemSchema, default: () => ({}) },
+          equipamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          organizacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+        },
+        relacoesTrabalho: {
+          violencia: { type: SubdimensaoItemSchema, default: () => ({}) },
+          assedio: { type: SubdimensaoItemSchema, default: () => ({}) },
+          climaOrganizacional: { type: SubdimensaoItemSchema, default: () => ({}) },
+          satisfacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
+        },
+        acoesPrevencao: {
+          pcmo: { type: SubdimensaoItemSchema, default: () => ({}) },
+          ppraPgr: { type: SubdimensaoItemSchema, default: () => ({}) },
+          programasVacinacao: { type: SubdimensaoItemSchema, default: () => ({}) },
+          treinamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
+          inspecoes: { type: SubdimensaoItemSchema, default: () => ({}) },
+        },
       },
-      condicoesTrabalho: {
-        infraestrutura: { type: SubdimensaoItemSchema, default: () => ({}) },
-        equipamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        organizacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
-      },
-      relacoesTrabalho: {
-        violencia: { type: SubdimensaoItemSchema, default: () => ({}) },
-        assedio: { type: SubdimensaoItemSchema, default: () => ({}) },
-        climaOrganizacional: { type: SubdimensaoItemSchema, default: () => ({}) },
-        satisfacaoTrabalho: { type: SubdimensaoItemSchema, default: () => ({}) },
-      },
-      acoesPrevencao: {
-        pcmo: { type: SubdimensaoItemSchema, default: () => ({}) },
-        ppraPgr: { type: SubdimensaoItemSchema, default: () => ({}) },
-        programasVacinacao: { type: SubdimensaoItemSchema, default: () => ({}) },
-        treinamentos: { type: SubdimensaoItemSchema, default: () => ({}) },
-        inspecoes: { type: SubdimensaoItemSchema, default: () => ({}) },
-      },
+      default: () => ({}),
     },
   },
   {

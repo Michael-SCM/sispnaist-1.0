@@ -55,11 +55,36 @@ const ICONS: Record<string, any> = {
   inspecoes: Search,
 };
 
-const renderItens = (grupo: any, neutroFields?: string[]) => {
+const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') : null;
+
+const renderDetalhes = (val: any, subdimensao: string, campo: string) => {
+  const detalhes: string[] = [];
+  if (subdimensao === 'riscosOcupacionais') {
+    if (val?.intensidade) detalhes.push(`Intensidade: ${val.intensidade}`);
+    if (val?.fonteGeradora) detalhes.push(`Fonte: ${val.fonteGeradora}`);
+  }
+  if (subdimensao === 'condicoesTrabalho' && val?.situacao) {
+    const map: Record<string, string> = { adequado: 'Adequado', parcial: 'Parcial', inadequado: 'Inadequado' };
+    detalhes.push(`Situação: ${map[val.situacao] || val.situacao}`);
+  }
+  if (subdimensao === 'relacoesTrabalho') {
+    if (val?.frequencia) detalhes.push(`Frequência: ${val.frequencia}`);
+    if (val?.ultimoEvento) detalhes.push(`Último evento: ${formatDate(val.ultimoEvento)}`);
+  }
+  if (subdimensao === 'acoesPrevencao') {
+    if (val?.dataUltimaAcao) detalhes.push(`Última ação: ${formatDate(val.dataUltimaAcao)}`);
+    if (val?.proximaAcao) detalhes.push(`Próxima ação: ${formatDate(val.proximaAcao)}`);
+    if (val?.responsavel) detalhes.push(`Responsável: ${val.responsavel}`);
+  }
+  return detalhes.length > 0 ? detalhes : null;
+};
+
+const renderItens = (grupo: any, neutroFields?: string[], subdimensao?: string) => {
   if (!grupo) return null;
   return Object.entries(grupo).map(([key, val]: [string, any]) => {
     const isNeutro = neutroFields?.includes(key);
     const Icon = isNeutro ? ICONS[key] : null;
+    const extras = renderDetalhes(val, subdimensao || '', key);
     if (isNeutro && Icon) {
       return (
         <div key={key} className="flex items-start gap-3 p-3 rounded-xl border bg-slate-50 border-slate-200">
@@ -68,9 +93,8 @@ const renderItens = (grupo: any, neutroFields?: string[]) => {
           </div>
           <div>
             <p className="text-sm font-bold text-slate-700">{LABELS[key] || key}</p>
-            {val?.observacao && (
-              <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
-            )}
+            {val?.observacao && <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>}
+            {extras && <p className="text-xs text-slate-400 mt-0.5">{extras.join(' | ')}</p>}
           </div>
         </div>
       );
@@ -86,9 +110,8 @@ const renderItens = (grupo: any, neutroFields?: string[]) => {
           <p className={`text-sm font-bold ${val?.presente ? 'text-red-700' : 'text-green-700'}`}>
             {LABELS[key] || key}
           </p>
-          {val?.observacao && (
-            <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>
-          )}
+          {val?.observacao && <p className="text-xs text-slate-500 mt-0.5">{val.observacao}</p>}
+          {extras && <p className="text-xs text-slate-400 mt-0.5">{extras.join(' | ')}</p>}
         </div>
       </div>
     );
@@ -113,18 +136,16 @@ export const DetalhesVinculo: React.FC = () => {
   const carregarDados = async () => {
     try {
       setIsLoading(true);
-      const [t, vinculos, r1, r2] = await Promise.all([
+      const [v, t, r1, r2] = await Promise.all([
+        submoduloTrabalhadorService.obterVinculo(id!, vinculoId!),
         trabalhadorService.obterPorId(id!),
-        submoduloTrabalhadorService.listarVinculos(id!),
         empresaService.listarAtivas(),
         unidadeService.listarAtivas(),
       ]);
       setTrabalhador(t);
       setEmpresas(r1.data?.empresas || r1.empresas || []);
       setUnidades(r2.data?.unidades || r2.unidades || []);
-      const encontrado = vinculos.find((v: ITrabalhadorVinculo) => v._id === vinculoId);
-      if (encontrado) {
-        setVinculo(encontrado);
+      setVinculo(v);
       } else {
         toast.error('Vínculo não encontrado');
         navigate(`/trabalhadores/${id}/vinculos`);
@@ -255,7 +276,7 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Riscos Ocupacionais</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.riscosOcupacionais)}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.riscosOcupacionais, undefined, 'riscosOcupacionais')}
                 </div>
               </div>
               <hr className="border-slate-200" />
@@ -266,7 +287,7 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Condições de Trabalho</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.condicoesTrabalho, ['infraestrutura', 'equipamentos', 'organizacaoTrabalho'])}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.condicoesTrabalho, ['infraestrutura', 'equipamentos', 'organizacaoTrabalho'], 'condicoesTrabalho')}
                 </div>
               </div>
               <hr className="border-slate-200" />
@@ -277,7 +298,7 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Relações de Trabalho</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.relacoesTrabalho, ['climaOrganizacional', 'satisfacaoTrabalho'])}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.relacoesTrabalho, ['climaOrganizacional', 'satisfacaoTrabalho'], 'relacoesTrabalho')}
                 </div>
               </div>
               <hr className="border-slate-200" />
@@ -288,7 +309,7 @@ export const DetalhesVinculo: React.FC = () => {
                   <h3 className="font-bold text-sm uppercase tracking-wider text-slate-600">Ações de Prevenção</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {renderItens(v.avaliacaoAmbienteTrabalho.acoesPrevencao, ['pcmo', 'ppraPgr', 'programasVacinacao', 'treinamentos', 'inspecoes'])}
+                  {renderItens(v.avaliacaoAmbienteTrabalho.acoesPrevencao, ['pcmo', 'ppraPgr', 'programasVacinacao', 'treinamentos', 'inspecoes'], 'acoesPrevencao')}
                 </div>
               </div>
             </div>

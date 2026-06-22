@@ -422,33 +422,6 @@ export interface IQuestionarioItem {
   ativo?: boolean;
 }
 
-export interface ITrabalhadorVinculo {
-  _id?: string;
-  trabalhadorId: string;
-  empresa?: string;
-  unidade?: string;
-  tipoVinculo: string;
-  matricula: string;
-  funcao?: string;
-  jornadaTrabalho: string;
-  turnoTrabalho?: string;
-  dataInicio: Date;
-  dataPosse?: Date;
-  dataFim?: Date;
-  situacao?: string;
-  empresaTerceirizada?: string;
-  residente?: boolean;
-  anosResidencia?: string;
-  setor?: string;
-  cargo?: string;
-  ocupacao?: string;
-  cargaHoraria?: number;
-  salario?: number;
-  insalubridadePericulosidade?: string;
-  observacoes?: string;
-  ativo: boolean;
-}
-
 // Upload
 export interface IArquivoUpload {
   _id?: string;

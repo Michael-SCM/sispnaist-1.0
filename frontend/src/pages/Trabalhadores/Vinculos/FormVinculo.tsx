@@ -104,11 +104,14 @@ const INITIAL_FORM: FormData = {
   avaliacaoAmbienteTrabalho: { ...INITIAL_AVALIACAO },
 };
 
+const inputSm = "w-full px-3 py-2 bg-slate-50 border-transparent rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm";
+const selectSm = `${inputSm} font-medium`;
+
 const AvaliacaoItemField = ({
   label, subdimensao, campo, data, onChange,
 }: {
   label: string; subdimensao: string; campo: string;
-  data?: { presente?: boolean; observacao?: string };
+  data?: any;
   onChange: (subdimensao: string, campo: string, subcampo: string, value: boolean | string) => void;
 }) => (
   <div className="border border-slate-100 rounded-2xl p-4 space-y-3">
@@ -122,14 +125,58 @@ const AvaliacaoItemField = ({
       <span className="text-sm font-bold text-slate-600">{label}</span>
     </label>
     {(data?.presente ?? false) && (
-      <div className="pl-8">
+      <div className="pl-8 space-y-2">
         <input
           type="text"
           value={data?.observacao ?? ''}
           onChange={(e) => onChange(subdimensao, campo, 'observacao', e.target.value)}
-          className="w-full px-4 py-2 bg-slate-50 border-transparent rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+          className={inputSm}
           placeholder="Observação..."
         />
+
+        {subdimensao === 'riscosOcupacionais' && (
+          <>
+            <select value={data?.intensidade ?? ''} onChange={(e) => onChange(subdimensao, campo, 'intensidade', e.target.value)} className={selectSm}>
+              <option value="">Intensidade...</option>
+              <option value="baixo">Baixo</option>
+              <option value="medio">Médio</option>
+              <option value="alto">Alto</option>
+            </select>
+            <input type="text" value={data?.fonteGeradora ?? ''} onChange={(e) => onChange(subdimensao, campo, 'fonteGeradora', e.target.value)} className={inputSm} placeholder="Fonte geradora do risco" />
+          </>
+        )}
+
+        {subdimensao === 'condicoesTrabalho' && (
+          <select value={data?.situacao ?? ''} onChange={(e) => onChange(subdimensao, campo, 'situacao', e.target.value)} className={selectSm}>
+            <option value="">Situação...</option>
+            <option value="adequado">Adequado</option>
+            <option value="parcial">Parcialmente Adequado</option>
+            <option value="inadequado">Inadequado</option>
+          </select>
+        )}
+
+        {subdimensao === 'relacoesTrabalho' && (
+          <>
+            <select value={data?.frequencia ?? ''} onChange={(e) => onChange(subdimensao, campo, 'frequencia', e.target.value)} className={selectSm}>
+              <option value="">Frequência...</option>
+              <option value="nunca">Nunca</option>
+              <option value="raramente">Raramente</option>
+              <option value="as_vezes">Às vezes</option>
+              <option value="frequentemente">Frequentemente</option>
+            </select>
+            {(campo === 'violencia' || campo === 'assedio') && (
+              <input type="date" value={data?.ultimoEvento?.split('T')[0] ?? ''} onChange={(e) => onChange(subdimensao, campo, 'ultimoEvento', e.target.value)} className={inputSm} />
+            )}
+          </>
+        )}
+
+        {subdimensao === 'acoesPrevencao' && (
+          <>
+            <input type="date" value={data?.dataUltimaAcao?.split('T')[0] ?? ''} onChange={(e) => onChange(subdimensao, campo, 'dataUltimaAcao', e.target.value)} className={inputSm} />
+            <input type="date" value={data?.proximaAcao?.split('T')[0] ?? ''} onChange={(e) => onChange(subdimensao, campo, 'proximaAcao', e.target.value)} className={inputSm} />
+            <input type="text" value={data?.responsavel ?? ''} onChange={(e) => onChange(subdimensao, campo, 'responsavel', e.target.value)} className={inputSm} placeholder="Responsável" />
+          </>
+        )}
       </div>
     )}
   </div>
@@ -205,8 +252,7 @@ export const FormVinculo: React.FC = () => {
   const carregarVinculo = async (unidadesData: IUnidade[]) => {
     try {
       setIsCarregando(true);
-      const lista = await submoduloTrabalhadorService.listarVinculos(id!);
-      const vinculo = lista.find((v: ITrabalhadorVinculo) => v._id === vinculoId);
+      const vinculo = await submoduloTrabalhadorService.obterVinculo(id!, vinculoId!);
       if (vinculo) {
         const temPosse = !!vinculo.dataPosse;
         const terceirizado = !!vinculo.empresaTerceirizada;
@@ -215,7 +261,7 @@ export const FormVinculo: React.FC = () => {
         const avaliacao = vinculo.avaliacaoAmbienteTrabalho || INITIAL_AVALIACAO;
         const preencherItens = (obj: any): any => {
           if (!obj || typeof obj !== 'object') return { presente: false, observacao: '' };
-          if ('presente' in obj) return { presente: obj.presente ?? false, observacao: obj.observacao ?? '' };
+          if ('presente' in obj) return { ...obj, presente: obj.presente ?? false, observacao: obj.observacao ?? '' };
           const result: any = {};
           for (const k of Object.keys(obj)) {
             result[k] = preencherItens(obj[k]);
