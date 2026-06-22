@@ -1,5 +1,7 @@
 {
-  "dependencies": {
-    "mongodb": "^7.1.1"
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "cd frontend && npm run dev"
   }
 }
