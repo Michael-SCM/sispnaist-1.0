@@ -188,7 +188,8 @@ class CatalogoService {
       'outroVinculo', 'funcao', 'bairro', 'tipoDroga',
       'padraoEmail', 'parametro', 'parentesco', 'sorologia',
       'neurodivergencia',
-      'insalubridadePericulosidade'
+      'insalubridadePericulosidade',
+      'etnia'
     ];
 
     if (!entidadesValidas.includes(entidade)) {
