@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
+import { uploadService } from '../../../services/uploadService.js';
 import { ITrabalhadorHistoricoPPP, ITrabalhador } from '../../../types/index.js';
 import {
   FileText,
@@ -18,7 +19,10 @@ import {
   Loader2,
   UserCheck,
   Stethoscope,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FileUp,
+  Download,
+  Trash2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -45,6 +49,7 @@ interface FormData {
   responsavelRegistro: string;
   dataExameMedico: string;
   resultadoExame: string;
+  anexos: { id: string; nome: string }[];
   observacoes: string;
   ativo: boolean;
 }
@@ -72,6 +77,7 @@ const INITIAL_FORM: FormData = {
   responsavelRegistro: '',
   dataExameMedico: '',
   resultadoExame: '',
+  anexos: [],
   observacoes: '',
   ativo: true,
 };
@@ -86,6 +92,7 @@ export const FormHistoricoPPP: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -134,6 +141,7 @@ export const FormHistoricoPPP: React.FC = () => {
           responsavelRegistro: registro.responsavelRegistro || '',
           dataExameMedico: registro.dataExameMedico ? registro.dataExameMedico.split('T')[0] : '',
           resultadoExame: registro.resultadoExame || '',
+          anexos: registro.anexos || [],
           observacoes: registro.observacoes || '',
           ativo: registro.ativo !== false,
         });
@@ -174,6 +182,38 @@ export const FormHistoricoPPP: React.FC = () => {
     }
   };
 
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Apenas arquivos PDF são permitidos');
+      return;
+    }
+
+    setIsUploadingFile(true);
+    try {
+      const upload = await uploadService.criar(file, 'trabalhador', id!, file.name);
+      setFormData({
+        ...formData,
+        anexos: [...formData.anexos, { id: upload._id!, nome: file.name }],
+      });
+      toast.success('PDF enviado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao enviar PDF');
+    } finally {
+      setIsUploadingFile(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveFile = (uploadId: string) => {
+    setFormData({
+      ...formData,
+      anexos: formData.anexos.filter((a) => a.id !== uploadId),
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -187,6 +227,7 @@ export const FormHistoricoPPP: React.FC = () => {
 
       const dados: Partial<ITrabalhadorHistoricoPPP> = {
         ...formData,
+        anexos: formData.anexos,
         dataFim: formData.dataFim || undefined,
         descricaoAtividades: formData.descricaoAtividades || undefined,
         agentesQuimicos: formData.agentesQuimicos || undefined,
@@ -558,26 +599,74 @@ export const FormHistoricoPPP: React.FC = () => {
                   <Stethoscope size={20} className="text-blue-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Exame Médico Ocupacional</h2>
                 </div>
-                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Data do Exame</label>
-                    <input
-                      type="date"
-                      name="dataExameMedico"
-                      value={formData.dataExameMedico}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
-                    />
+                <div className="p-8 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Data do Exame</label>
+                      <input
+                        type="date"
+                        name="dataExameMedico"
+                        value={formData.dataExameMedico}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-600 mb-2">Resultado</label>
+                      <input
+                        name="resultadoExame"
+                        value={formData.resultadoExame}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        placeholder="Ex: Apto, Inapto, Apto com restrições"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Resultado</label>
-                    <input
-                      name="resultadoExame"
-                      value={formData.resultadoExame}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                      placeholder="Ex: Apto, Inapto, Apto com restrições"
-                    />
+                  <div className="border-t border-slate-100 pt-4">
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Anexos (PDFs dos Exames)</label>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 px-4 py-3 bg-slate-50 border-2 border-dashed border-blue-300 rounded-2xl cursor-pointer hover:bg-blue-50 transition-all text-blue-700 font-bold text-sm">
+                        <FileUp size={18} />
+                        {isUploadingFile ? 'Enviando...' : 'Selecionar PDF'}
+                        <input
+                          type="file"
+                          accept=".pdf,application/pdf"
+                          onChange={handleUploadFile}
+                          disabled={isUploadingFile}
+                          className="hidden"
+                        />
+                      </label>
+                      {isUploadingFile && <Loader2 size={20} className="animate-spin text-blue-600" />}
+                    </div>
+                    {formData.anexos.length > 0 && (
+                      <ul className="mt-3 space-y-2">
+                        {formData.anexos.map((anexo) => (
+                          <li key={anexo.id} className="flex items-center justify-between bg-slate-50 px-4 py-2 rounded-xl border border-slate-200">
+                            <span className="text-sm font-medium text-slate-600 truncate max-w-[250px]">
+                              {anexo.nome}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => uploadService.visualizar(anexo.id)}
+                                className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-lg transition-all"
+                                title="Visualizar"
+                              >
+                                <Download size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFile(anexo.id)}
+                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                title="Remover"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </div>
               </div>

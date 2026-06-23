@@ -67,6 +67,7 @@ const FormProcessoTrabalho = React.lazy(() => import('./pages/Trabalhadores/Proc
 const ListaInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/ListaInformacoes.js'));
 const FormInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/FormInformacoes.js'));
 const ListaHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/ListaHistoricoPPP.js'));
+const DetalhesHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/DetalhesHistoricoPPP.js'));
 const FormHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/FormHistoricoPPP.js'));
 
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
@@ -502,6 +503,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <ListaHistoricoPPP />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/historico-ppp/:pppId"
+          element={
+            <ProtectedRoute>
+              <DetalhesHistoricoPPP />
             </ProtectedRoute>
           }
         />

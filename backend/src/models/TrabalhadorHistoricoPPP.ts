@@ -42,6 +42,7 @@ export interface ITrabalhadorHistoricoPPP extends Document {
   // Exames Médicos Ocupacionais
   dataExameMedico: Date;
   resultadoExame: string;
+  anexos: { id: string; nome: string }[];
 
   observacoes: string;
   ativo: boolean;
@@ -76,6 +77,7 @@ const TrabalhadorHistoricoPPPSchema = new Schema<ITrabalhadorHistoricoPPPDocumen
     responsavelRegistro: { type: String, trim: true },
     dataExameMedico: { type: Date },
     resultadoExame: { type: String, trim: true },
+    anexos: [{ id: { type: String }, nome: { type: String } }],
     observacoes: { type: String, trim: true },
     ativo: { type: Boolean, default: true },
   },

@@ -168,6 +168,7 @@ export interface ITrabalhadorHistoricoPPP {
   responsavelRegistro?: string;
   dataExameMedico?: string;
   resultadoExame?: string;
+  anexos?: { id: string; nome: string }[];
   observacoes?: string;
   ativo?: boolean;
   dataCriacao?: string;

@@ -13,6 +13,13 @@ const SUBMODULOS = {
 
 export const submoduloTrabalhadorService = {
   // HISTÓRICO LABORAL / PPP
+  obterHistoricoPPP: async (trabalhadorId: string, itemId: string): Promise<ITrabalhadorHistoricoPPP> => {
+    const response = await api.get<ITrabalhadorHistoricoPPP>(
+      `/trabalhadores/${trabalhadorId}/historicoPPP/${itemId}`
+    );
+    return response.data;
+  },
+
   listarHistoricoPPP: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorHistoricoPPP[]> => {
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
