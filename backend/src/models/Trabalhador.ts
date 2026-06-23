@@ -92,6 +92,10 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       type: String,
       required: [true, 'Raça é obrigatória'],
     },
+    etnia: {
+      type: String,
+      required: false,
+    },
     escolaridade: {
       type: String,
       required: [true, 'Escolaridade é obrigatória'],

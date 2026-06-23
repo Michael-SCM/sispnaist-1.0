@@ -52,6 +52,7 @@ export interface ITrabalhador {
   sexo: string; // M, F, etc.
   genero: string;
   raca: string;
+  etnia?: string;
   escolaridade: string;
   estadoCivil: string;
   tipoSanguineo?: string;

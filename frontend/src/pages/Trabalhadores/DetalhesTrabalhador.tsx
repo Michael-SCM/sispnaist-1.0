@@ -136,6 +136,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                 <InfoCard label="Sexo" value={trabalhador.sexo} icon={User} color="text-blue-400" />
                 <InfoCard label="Gênero" value={trabalhador.genero} icon={User} color="text-purple-400" />
                 <InfoCard label="Raça" value={trabalhador.raca} icon={User} color="text-amber-400" />
+                <InfoCard label="Etnia" value={trabalhador.etnia} icon={User} color="text-amber-400" />
                 <InfoCard label="Escolaridade" value={trabalhador.escolaridade} icon={GraduationCap} color="text-indigo-500" />
                 <InfoCard label="Estado Civil" value={trabalhador.estadoCivil} icon={Scale} color="text-slate-500" />
                 {trabalhador.neurodivergencias && trabalhador.neurodivergencias.length > 0 && (

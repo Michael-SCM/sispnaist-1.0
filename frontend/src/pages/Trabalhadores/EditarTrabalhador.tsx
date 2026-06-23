@@ -45,6 +45,7 @@ export const EditarTrabalhador: React.FC = () => {
   const { itens: sexos } = useCatalogo('sexo');
   const { itens: generos } = useCatalogo('genero');
   const { itens: racas } = useCatalogo('racaCor');
+  const { itens: etnias } = useCatalogo('etnia');
   const { itens: escolaridades } = useCatalogo('escolaridade');
   const { itens: estadosCivis } = useCatalogo('estadoCivil');
   const { itens: tiposVinculo } = useCatalogo('tipoVinculo');
@@ -460,7 +461,7 @@ export const EditarTrabalhador: React.FC = () => {
                 <label className={labelCls}><Mail size={14} className="inline mr-1" />Email <span className="text-red-500">*</span></label>
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className={inputCls} />
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
                 <div>
                   <label className={labelCls}>Gênero <span className="text-red-500">*</span></label>
@@ -478,6 +479,7 @@ export const EditarTrabalhador: React.FC = () => {
                   </select>
                 </div>
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
+                {renderSelect('etnia', 'Etnia (PNAIST)', etnias, formData.etnia || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}
               </div>

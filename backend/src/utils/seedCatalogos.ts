@@ -73,6 +73,21 @@ const CATALOGO_DADOS: Array<{
     { nome: 'Indígena', ordem: 5 },
     { nome: 'Não informada', ordem: 6 },
   ]},
+  // Etnia / Comunidade Tradicional (PNAIST)
+  { entidade: 'etnia', itens: [
+    { nome: 'Quilombola', ordem: 1 },
+    { nome: 'Ribeirinho', ordem: 2 },
+    { nome: 'Caiçara', ordem: 3 },
+    { nome: 'Indígena (etnia específica)', ordem: 4 },
+    { nome: 'Cigano', ordem: 5 },
+    { nome: 'Povos da Floresta', ordem: 6 },
+    { nome: 'Extrativista', ordem: 7 },
+    { nome: 'Pescador Artesanal', ordem: 8 },
+    { nome: 'Assentado da Reforma Agrária', ordem: 9 },
+    { nome: 'Acampado', ordem: 10 },
+    { nome: 'Outra comunidade tradicional', ordem: 11 },
+    { nome: 'Não se aplica', ordem: 99 },
+  ]},
   // Escolaridade
   { entidade: 'escolaridade', itens: [
     { nome: 'Analfabeto', ordem: 1 },

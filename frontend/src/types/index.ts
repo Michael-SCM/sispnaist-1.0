@@ -377,6 +377,7 @@ export interface ITrabalhador {
   insalubridadePericulosidade?: string;
   neurodivergencias?: string[];
   raca?: string;
+  etnia?: string;
   escolaridade?: string;
   estadoCivil?: string;
   
