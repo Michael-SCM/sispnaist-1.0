@@ -5,6 +5,7 @@ import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViole
 import TrabalhadorReadaptacao from '../models/TrabalhadorReadaptacao';
 import TrabalhadorProcessoTrabalho from '../models/TrabalhadorProcessoTrabalho';
 import TrabalhadorVinculo from '../models/TrabalhadorVinculo';
+import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP';
 import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
@@ -23,7 +24,8 @@ const SUBMODULO_MODELS: any = {
   ocorrenciasViolencia: TrabalhadorOcorrenciaViolencia,
   readaptacoes: TrabalhadorReadaptacao,
   processosTrabalho: TrabalhadorProcessoTrabalho,
-  vinculos: TrabalhadorVinculo
+  vinculos: TrabalhadorVinculo,
+  historicoPPP: TrabalhadorHistoricoPPP
 };
 
 class SubmoduloTrabalhadorController {

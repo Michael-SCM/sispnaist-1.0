@@ -66,6 +66,8 @@ const ListaProcessosTrabalho = React.lazy(() => import('./pages/Trabalhadores/Pr
 const FormProcessoTrabalho = React.lazy(() => import('./pages/Trabalhadores/ProcessosTrabalho/FormProcessoTrabalho.js'));
 const ListaInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/ListaInformacoes.js'));
 const FormInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/FormInformacoes.js'));
+const ListaHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/ListaHistoricoPPP.js'));
+const FormHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/FormHistoricoPPP.js'));
 
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
 const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
@@ -492,6 +494,30 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormInformacoes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/historico-ppp"
+          element={
+            <ProtectedRoute>
+              <ListaHistoricoPPP />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/historico-ppp/novo"
+          element={
+            <ProtectedRoute>
+              <FormHistoricoPPP />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/historico-ppp/:pppId/editar"
+          element={
+            <ProtectedRoute>
+              <FormHistoricoPPP />
             </ProtectedRoute>
           }
         />

@@ -6,6 +6,7 @@ import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
 import TrabalhadorProcessoTrabalho from '../models/TrabalhadorProcessoTrabalho.js';
 import TrabalhadorReadaptacao from '../models/TrabalhadorReadaptacao.js';
 import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViolencia.js';
+import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { ITrabalhador } from '../types/index.js';
 
@@ -82,7 +83,7 @@ export class TrabalhadorService {
     }
 
     // Buscar todos os submódulos
-    const [vinculo, informacao, dependentes, afastamentos, processosTrabalho, readaptacoes, ocorrenciasViolencia] = await Promise.all([
+    const [vinculo, informacao, dependentes, afastamentos, processosTrabalho, readaptacoes, ocorrenciasViolencia, historicoPPP] = await Promise.all([
       TrabalhadorVinculo.find({ trabalhadorId: id }).lean(),
       TrabalhadorInformacao.findOne({ trabalhadorId: id.toString() }).lean(),
       TrabalhadorDependente.find({ trabalhadorId: id }).lean(),
@@ -90,6 +91,7 @@ export class TrabalhadorService {
       TrabalhadorProcessoTrabalho.find({ trabalhadorId: id }).lean(),
       TrabalhadorReadaptacao.find({ trabalhadorId: id }).lean(),
       TrabalhadorOcorrenciaViolencia.find({ trabalhadorId: id }).lean(),
+      TrabalhadorHistoricoPPP.find({ trabalhadorId: id }).lean(),
     ]);
 
     return {
@@ -101,8 +103,9 @@ export class TrabalhadorService {
         afastamentos: afastamentos || [],
         processosTrabalho: processosTrabalho || [],
         readaptacoes: readaptacoes || [],
-        ocorrenciasViolencia: ocorrenciasViolencia || [],
-      }
+      ocorrenciasViolencia: ocorrenciasViolencia || [],
+      historicoPPP: historicoPPP || [],
+    }
     };
   }
 

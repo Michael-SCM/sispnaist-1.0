@@ -143,6 +143,37 @@ export interface ITrabalhadorProcessoTrabalho {
   dataAtualizacao?: string;
 }
 
+export interface ITrabalhadorHistoricoPPP {
+  _id?: string;
+  trabalhadorId: string;
+  dataInicio: string;
+  dataFim?: string;
+  empresa: string;
+  cargo: string;
+  funcao?: string;
+  setor: string;
+  descricaoAtividades?: string;
+  agentesQuimicos?: string;
+  agentesFisicos?: string;
+  agentesBiologicos?: string;
+  agentesErgonomicos?: string;
+  tecnicaMedicao?: string;
+  resultadoMedicao?: string;
+  limiteTolerancia?: string;
+  epcEficaz?: boolean;
+  epiEficaz?: boolean;
+  ltcatNumero?: string;
+  dataLtcat?: string;
+  responsavelNome?: string;
+  responsavelRegistro?: string;
+  dataExameMedico?: string;
+  resultadoExame?: string;
+  observacoes?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface IUser {
   _id?: string;
   cpf: string;

@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho } from '../types';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP } from '../types';
 
 const SUBMODULOS = {
   dependentes: 'dependentes',
@@ -7,10 +7,42 @@ const SUBMODULOS = {
   ocorrenciasViolencia: 'ocorrenciasViolencia',
   readaptacoes: 'readaptacoes',
   processosTrabalho: 'processosTrabalho',
-  vinculos: 'vinculos'
+  vinculos: 'vinculos',
+  historicoPPP: 'historicoPPP'
 } as const;
 
 export const submoduloTrabalhadorService = {
+  // HISTÓRICO LABORAL / PPP
+  listarHistoricoPPP: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorHistoricoPPP[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorHistoricoPPP[]>(
+      `/trabalhadores/${trabalhadorId}/historicoPPP?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  criarHistoricoPPP: async (trabalhadorId: string, data: Partial<ITrabalhadorHistoricoPPP>): Promise<ITrabalhadorHistoricoPPP> => {
+    const response = await api.post<ITrabalhadorHistoricoPPP>(
+      `/trabalhadores/${trabalhadorId}/historicoPPP`,
+      data
+    );
+    return response.data;
+  },
+
+  atualizarHistoricoPPP: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorHistoricoPPP>): Promise<ITrabalhadorHistoricoPPP> => {
+    const response = await api.put<ITrabalhadorHistoricoPPP>(
+      `/trabalhadores/${trabalhadorId}/historicoPPP/${itemId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deletarHistoricoPPP: async (trabalhadorId: string, itemId: string): Promise<void> => {
+    await api.delete(`/trabalhadores/${trabalhadorId}/historicoPPP/${itemId}`);
+  },
+
+  // DEPENDENTES
   // DEPENDENTES
   listarDependentes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorDependente[]> => {
     const params = new URLSearchParams();
