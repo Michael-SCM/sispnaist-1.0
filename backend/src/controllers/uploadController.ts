@@ -3,9 +3,6 @@ import ArquivoUpload from '../models/ArquivoUpload';
 import { AppError } from '../middleware/errorHandler';
 import { IAuthRequest } from '../types/index.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
-import fs from 'fs';
-import path from 'path';
-import config from '../config/config.js';
 
 class UploadController {
   // GET /api/uploads - Listar uploads
@@ -66,14 +63,18 @@ class UploadController {
         throw new AppError('Usuário não autenticado', 401);
       }
 
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = file.originalname.split('.').pop();
+      const nomeArmazenado = `${uniqueSuffix}.${ext}`;
+
       const upload = await ArquivoUpload.create({
         entidade,
         entidadeId,
         nomeOriginal: file.originalname,
-        nomeArmazenado: file.filename,
-        caminho: file.path,
+        nomeArmazenado,
         mimeType: file.mimetype,
         tamanho: file.size,
+        data: file.buffer,
         descricao,
         enviadoPor: (req.user as any).id
       });
@@ -95,12 +96,6 @@ class UploadController {
         throw new AppError('Upload não encontrado', 404);
       }
 
-      // Remove arquivo físico
-      if (fs.existsSync(upload.caminho)) {
-        fs.unlinkSync(upload.caminho);
-      }
-
-      // Remove registro do banco
       await upload.deleteOne();
 
       return res.status(204).send();
@@ -120,11 +115,13 @@ class UploadController {
         throw new AppError('Upload não encontrado', 404);
       }
 
-      if (!fs.existsSync(upload.caminho)) {
+      if (!upload.data) {
         throw new AppError('Arquivo não encontrado no servidor', 404);
       }
 
-      res.download(upload.caminho, upload.nomeOriginal);
+      res.setHeader('Content-Disposition', `attachment; filename="${upload.nomeOriginal}"`);
+      res.setHeader('Content-Type', upload.mimeType);
+      res.send(upload.data);
     } catch (error) {
       next(error);
     }
@@ -141,13 +138,13 @@ class UploadController {
         throw new AppError('Upload não encontrado', 404);
       }
 
-      if (!fs.existsSync(upload.caminho)) {
+      if (!upload.data) {
         throw new AppError('Arquivo não encontrado no servidor', 404);
       }
 
       res.setHeader('Content-Disposition', `inline; filename="${upload.nomeOriginal}"`);
       res.setHeader('Content-Type', upload.mimeType);
-      res.sendFile(path.resolve(upload.caminho));
+      res.send(upload.data);
     } catch (error) {
       next(error);
     }

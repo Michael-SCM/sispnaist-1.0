@@ -10,9 +10,9 @@ export interface IArquivoUpload extends Document {
   entidadeId: string;         // ID da entidade associada
   nomeOriginal: string;       // nome original do arquivo
   nomeArmazenado: string;     // nome gerado para armazenamento
-  caminho: string;            // path do arquivo
   mimeType: string;           // 'image/jpeg', 'application/pdf', etc.
   tamanho: number;            // tamanho em bytes
+  data: Buffer;               // conteúdo do arquivo
   descricao?: string;
   enviadoPor: string;         // ObjectId do User
   dataCriacao: Date;
@@ -24,9 +24,9 @@ const ArquivoUploadSchema = new Schema<IArquivoUpload>(
     entidadeId: { type: Schema.Types.ObjectId as any, required: true, index: true },
     nomeOriginal: { type: String, required: true },
     nomeArmazenado: { type: String, required: true },
-    caminho: { type: String, required: true },
     mimeType: { type: String, required: true },
     tamanho: { type: Number, required: true },
+    data: { type: Buffer, required: true },
     descricao: { type: String, trim: true },
     enviadoPor: { type: Schema.Types.ObjectId as any, ref: 'User', required: true }
   },

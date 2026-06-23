@@ -1,41 +1,20 @@
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import uploadController from '../controllers/uploadController';
 import { authMiddleware } from '../middleware/auth';
 import config from '../config/config.js';
 
 const router = Router();
 
-const uploadDir = config.uploadDir || path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configuração do Multer para upload de arquivos
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: config.maxFileSize || 10485760 // 10MB default
   },
   fileFilter: function (req, file, cb) {
-    // Aceita tipos comuns de arquivos
     const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|xls|xlsx|csv|txt/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
+    if (mimetype) {
       return cb(null, true);
     } else {
       cb(new Error('Tipo de arquivo não permitido'));
