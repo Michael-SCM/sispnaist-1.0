@@ -1,4 +1,5 @@
 import api from './api.js';
+import { useAuthStore } from '../store/authStore.js';
 import { IArquivoUpload } from '../types';
 
 interface ListarUploadsResponse {
@@ -55,12 +56,14 @@ export const uploadService = {
 
   // Download
   download: async (id: string): Promise<void> => {
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/download`, '_blank');
+    const token = useAuthStore.getState().accessToken;
+    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/download?token=${token}`, '_blank');
   },
 
   // Visualizar inline (abre PDF no navegador)
   visualizar: async (id: string): Promise<void> => {
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/view`, '_blank');
+    const token = useAuthStore.getState().accessToken;
+    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/view?token=${token}`, '_blank');
   },
 
   deletar: async (id: string): Promise<void> => {
