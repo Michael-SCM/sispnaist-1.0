@@ -103,7 +103,7 @@ export const NovoTrabalhador: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     let { name, value } = e.target as { name: string; value: string };
 
-    
+
     // Máscara de CPF
     if (name === 'cpf') {
       value = value.replace(/\D/g, '');
@@ -174,7 +174,7 @@ export const NovoTrabalhador: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validação de campos obrigatórios (Baseado no legado PHP)
     const camposObrigatorios: { [key: string]: string } = {
       'nome': 'Nome Completo',
@@ -213,10 +213,10 @@ export const NovoTrabalhador: React.FC = () => {
     };
 
     for (const [path, label] of Object.entries(camposObrigatorios)) {
-      const value = path.includes('.') 
+      const value = path.includes('.')
         ? path.split('.').reduce((obj, key) => (obj as any)?.[key], formData)
         : formData[path as keyof ITrabalhador];
-      
+
       if (!value) {
         toast.error(`O campo "${label}" é obrigatório`);
         return;
@@ -273,7 +273,7 @@ export const NovoTrabalhador: React.FC = () => {
 
     try {
       setIsLoading(true);
-      
+
       // Remove campos vazios para evitar erros de validação no backend
       const cleaned = Object.fromEntries(
         Object.entries(formData).filter(([_, value]) => value !== '')
@@ -285,7 +285,7 @@ export const NovoTrabalhador: React.FC = () => {
         cpf: maskCPF(String(formData.cpf || '')),
         genero: formData.genero
       };
-      
+
       console.log('PAYLOAD FINAL:', payload);
 
       const novo = await trabalhadorService.criar(payload);
@@ -382,7 +382,7 @@ export const NovoTrabalhador: React.FC = () => {
             <div className="p-8 space-y-6">
               {/* CPF + Nome + Nome Social + Nome da Mãe */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {renderInput('cpf', 'CPF', maskCPF(formData.cpf || ''), { required: true, placeholder: '000.000.000-00',})}
+                {renderInput('cpf', 'CPF', maskCPF(formData.cpf || ''), { required: true, placeholder: '000.000.000-00', })}
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true, placeholder: 'Nome completo do trabalhador' })}
                 {renderInput('nomeSocial', 'Nome Social', formData.nomeSocial || '', { placeholder: 'Nome social (opcional)' })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}
@@ -424,13 +424,13 @@ export const NovoTrabalhador: React.FC = () => {
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
                 <div>
                   <label className={labelCls}>Gênero <span className="text-red-500">*</span></label>
-                  <select 
-                    name="genero" 
-                    value={formData.genero || ''} 
+                  <select
+                    name="genero"
+                    value={formData.genero || ''}
                     onChange={(e) => {
                       console.log('MUDANÇA NO GÊNERO:', e.target.value);
                       handleChange(e);
-                    }} 
+                    }}
                     className={selectCls}
                   >
                     <option value="">Selecione...</option>
@@ -438,7 +438,7 @@ export const NovoTrabalhador: React.FC = () => {
                   </select>
                 </div>
                 {renderSelect('raca', 'Raça *', racas, formData.raca || '')}
-                {renderSelect('etnia', 'Etnia (PNAIST)', etnias, formData.etnia || '')}
+                {renderSelect('etnia', 'Etnia', etnias, formData.etnia || '')}
                 {renderSelect('escolaridade', 'Escolaridade *', escolaridades, formData.escolaridade || '')}
                 {renderSelect('estadoCivil', 'Estado Civil *', estadosCivis, formData.estadoCivil || '')}
               </div>
