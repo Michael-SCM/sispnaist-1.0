@@ -69,6 +69,9 @@ const FormInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informaco
 const ListaHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/ListaHistoricoPPP.js'));
 const DetalhesHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/DetalhesHistoricoPPP.js'));
 const FormHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/FormHistoricoPPP.js'));
+const ListaRiscosOcupacionais = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/ListaRiscosOcupacionais.js'));
+const FormRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/FormRiscoOcupacional.js'));
+const DetalhesRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/DetalhesRiscoOcupacional.js'));
 
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
 const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
@@ -527,6 +530,38 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormHistoricoPPP />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/riscos-ocupacionais"
+          element={
+            <ProtectedRoute>
+              <ListaRiscosOcupacionais />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/riscos-ocupacionais/novo"
+          element={
+            <ProtectedRoute>
+              <FormRiscoOcupacional />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/riscos-ocupacionais/:riscoId/editar"
+          element={
+            <ProtectedRoute>
+              <FormRiscoOcupacional />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/riscos-ocupacionais/:riscoId"
+          element={
+            <ProtectedRoute>
+              <DetalhesRiscoOcupacional />
             </ProtectedRoute>
           }
         />

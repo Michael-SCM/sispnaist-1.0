@@ -190,7 +190,8 @@ class CatalogoService {
       'neurodivergencia',
       'insalubridadePericulosidade',
       'etnia',
-      'frequenciaAssedio'
+      'frequenciaAssedio',
+      'tipoRisco'
     ];
 
     if (!entidadesValidas.includes(entidade)) {

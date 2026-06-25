@@ -368,6 +368,31 @@ export interface ITrabalhadorOcorrenciaViolencia {
   ativo?: boolean;
 }
 
+export interface ITrabalhadorRiscoOcupacional {
+  _id?: string;
+  trabalhadorId: string;
+  vinculoId?: string;
+  empresaId: string;
+  unidadeId: string;
+  categoria: string;
+  tipoRisco: string;
+  presente: boolean;
+  observacao?: string;
+  intensidade?: string;
+  fonteGeradora?: string;
+  frequenciaExposicao?: string;
+  duracaoExposicao?: string;
+  epcUtilizado?: boolean;
+  epcDescricao?: string;
+  epiUtilizado?: boolean;
+  epiDescricao?: string;
+  caEpis?: string[];
+  medidasControle?: string;
+  dataAvaliacao?: Date;
+  avaliador?: string;
+  ativo?: boolean;
+}
+
 export interface ITrabalhadorReadaptacao {
   _id?: string;
   trabalhadorId: string;

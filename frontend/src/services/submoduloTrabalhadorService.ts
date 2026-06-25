@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP } from '../types';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional } from '../types';
 
 const SUBMODULOS = {
   dependentes: 'dependentes',
@@ -235,5 +235,35 @@ export const submoduloTrabalhadorService = {
 
   deletarProcessoTrabalho: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/processosTrabalho/${itemId}`);
+  },
+
+  // RISCOS OCUPACIONAIS
+  listarRiscosOcupacionais: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorRiscoOcupacional[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorRiscoOcupacional[]>(
+      `/trabalhadores/${trabalhadorId}/riscosOcupacionais?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  criarRiscoOcupacional: async (trabalhadorId: string, data: Partial<ITrabalhadorRiscoOcupacional>): Promise<ITrabalhadorRiscoOcupacional> => {
+    const response = await api.post<ITrabalhadorRiscoOcupacional>(
+      `/trabalhadores/${trabalhadorId}/riscosOcupacionais`,
+      data
+    );
+    return response.data;
+  },
+
+  atualizarRiscoOcupacional: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorRiscoOcupacional>): Promise<ITrabalhadorRiscoOcupacional> => {
+    const response = await api.put<ITrabalhadorRiscoOcupacional>(
+      `/trabalhadores/${trabalhadorId}/riscosOcupacionais/${itemId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deletarRiscoOcupacional: async (trabalhadorId: string, itemId: string): Promise<void> => {
+    await api.delete(`/trabalhadores/${trabalhadorId}/riscosOcupacionais/${itemId}`);
   },
 };

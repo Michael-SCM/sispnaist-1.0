@@ -159,6 +159,33 @@ export interface ITrabalhadorProcessoTrabalho {
   dataAtualizacao?: string;
 }
 
+export interface ITrabalhadorRiscoOcupacional {
+  _id?: string;
+  trabalhadorId: string;
+  vinculoId?: string;
+  empresaId: string;
+  unidadeId: string;
+  categoria: string;
+  tipoRisco: string;
+  presente: boolean;
+  observacao?: string;
+  intensidade?: string;
+  fonteGeradora?: string;
+  frequenciaExposicao?: string;
+  duracaoExposicao?: string;
+  epcUtilizado?: boolean;
+  epcDescricao?: string;
+  epiUtilizado?: boolean;
+  epiDescricao?: string;
+  caEpis?: string[];
+  medidasControle?: string;
+  dataAvaliacao?: string;
+  avaliador?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface ITrabalhadorHistoricoPPP {
   _id?: string;
   trabalhadorId: string;

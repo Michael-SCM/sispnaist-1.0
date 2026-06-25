@@ -42,7 +42,8 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'acompanhamentoReadaptacao', 'neurodivergencia',
         'insalubridadePericulosidade',
         'etnia',
-        'frequenciaAssedio'
+        'frequenciaAssedio',
+        'tipoRisco'
       ]
     },
     nome: { type: String, required: true, trim: true },

@@ -30,7 +30,8 @@ import {
   RefreshCcw,
   Clock,
   Brain,
-  FileText
+  FileText,
+  Shield
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -276,7 +277,8 @@ export const DetalhesTrabalhador: React.FC = () => {
                   { label: 'Readaptações', icon: RefreshCcw, path: 'readaptacoes', color: 'text-purple-400' },
                   { label: 'Processos de Trabalho', icon: Briefcase, path: 'processos-trabalho', color: 'text-cyan-400' },
                   { label: 'Informações Históricas', icon: Stethoscope, path: 'informacoes', color: 'text-teal-400' },
-                  { label: 'Histórico Laboral / PPP', icon: FileText, path: 'historico-ppp', color: 'text-blue-400' }
+                  { label: 'Histórico Laboral / PPP', icon: FileText, path: 'historico-ppp', color: 'text-blue-400' },
+                  { label: 'Riscos Ocupacionais', icon: Shield, path: 'riscos-ocupacionais', color: 'text-amber-400' }
                 ].map((item) => (
                   <Link
                     key={item.path}

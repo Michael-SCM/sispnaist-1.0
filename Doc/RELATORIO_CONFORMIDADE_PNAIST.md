@@ -25,13 +25,13 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **43 de 61 requisitos** identificados (~70%), possui **3 requisitos parcialmente implementados** e **15 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **46 de 61 requisitos** identificados (~75%), possui **1 requisito parcialmente implementado** e **14 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 43 | 70% |
-| ⚠️ Parcial | 3 | 5% |
-| ❌ Não implementado | 15 | 25% |
+| ✅ Implementado | 46 | 75% |
+| ⚠️ Parcial | 1 | 2% |
+| ❌ Não implementado | 14 | 23% |
 
 **Principais Pontos Fortes:**
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
@@ -98,7 +98,7 @@ Cada requisito foi classificado como:
 | 20 | Local de trabalho | ✅ | Vinculado a `Empresa` + `Unidade` |
 | 21 | Adicionais (insalubridade/periculosidade) | ✅ | Catálogo `insalubridadePericulosidade` + campo no trabalhador |
 | 22 | Residente | ✅ | `residente` (boolean) + `anosResidencia` |
-| 23 | **Histórico laboral (PPP)** | ❌ | Sem modelo ou integração com Perfil Profissiográfico Previdenciário |
+| 23 | **Histórico laboral (PPP)** | ✅ | Módulo `TrabalhadorHistoricoPPP` completo (model, formulário, listagem, detalhes) com campos de vínculo, riscos ocupacionais, exames, e monitoração longitudinal |
 
 #### Subdimensão: Histórico de Saúde
 
@@ -128,7 +128,7 @@ Cada requisito foi classificado como:
 | 36 | Agentes biológicos | ✅ | idem |
 | 37 | Riscos ergonômicos | ✅ | idem |
 | 38 | Riscos de acidentes | ✅ | idem |
-| 39 | **Detalhamento de riscos** | ⚠️ | `IAvaliacaoItem` permite intensidade, fonte geradora, situação. Mas não há tabela separada `tb_risco_ocupacional` como sugere o documento. |
+| 39 | **Detalhamento de riscos** | ✅ | Modelo `TrabalhadorRiscoOcupacional` com coleção própria, CRUD completo, campos detalhados (categoria, tipo, intensidade, EPIs, medidas de controle), e formulário dedicado com selects vinculados empresa↔unidade |
 
 #### Subdimensão: Condições de Trabalho
 
@@ -145,7 +145,7 @@ Cada requisito foi classificado como:
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
 | 45 | Violência | ✅ | Módulo `TrabalhadorOcorrenciaViolencia` completo (18 campos) |
-| 46 | **Assédio moral/sexual** | ⚠️ | `avaliacaoAmbienteTrabalho.relacoesTrabalho.assedio` existe no backend, mas sem formulário dedicado no frontend |
+| 46 | **Assédio moral/sexual** | ✅ | Formulário dedicado no submódulo `OcorrenciasViolencia` com botão de toggle para alternar entre Violência e Assédio Moral/Sexual, exibindo campos específicos (frequência, autor, testemunhas) |
 | 47 | Clima organizacional | ✅ | `relacoesTrabalho.climaOrganizacional` |
 | 48 | Satisfação no trabalho | ✅ | `relacoesTrabalho.satisfacaoTrabalho` + catálogo `grauSatisfacao` |
 
@@ -239,20 +239,20 @@ Cada requisito foi classificado como:
 
 | Dimensão | Total | ✅ | ⚠️ | ❌ | % Cobertura |
 |----------|-------|---|---|---|-------------|
-| Dados do Trabalhador | 33 | 30 | 0 | 3 | 91% |
-| Ambiente e Processo de Trabalho | 15 | 13 | 2 | 0 | 87% |
+| Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
+| Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
 | Aspectos Transversais | 21 | 6 | 2 | 13 | 29% |
-| **Total** | **82** | **61** | **3** | **18** | **74%** |
+| **Total** | **82** | **64** | **1** | **17** | **78%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
 ### Por Status
 
 ```
-✅ Implementado:    61 requisitos (74%)
-⚠️ Parcial:          3 requisitos (4%)
-❌ Não implementado: 18 requisitos (22%)
+✅ Implementado:    64 requisitos (78%)
+⚠️ Parcial:          1 requisitos (1%)
+❌ Não implementado: 17 requisitos (21%)
 ```
 
 ---
