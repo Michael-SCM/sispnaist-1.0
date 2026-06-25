@@ -49,6 +49,13 @@ export const Header: React.FC = React.memo(() => {
                   Treinamentos
                 </Link>
 
+                <Link
+                  to="/minha-conta"
+                  className="hover:text-blue-100 transition text-sm border-l border-blue-400 pl-4"
+                >
+                  Minha Conta
+                </Link>
+
                 {user?.perfil === 'admin' && (
                   <>
                     <Link
@@ -170,6 +177,14 @@ export const Header: React.FC = React.memo(() => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Treinamentos
+            </Link>
+
+            <Link
+              to="/minha-conta"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Minha Conta
             </Link>
 
             {user?.perfil === 'admin' && (

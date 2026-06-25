@@ -238,6 +238,9 @@ export interface IUser {
   isVerified?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
+  consentimentoLGPD?: boolean;
+  dataAceiteLGPD?: string;
+  versaoTermo?: string;
 }
 
 export interface IEndereco {

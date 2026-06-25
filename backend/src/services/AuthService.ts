@@ -54,6 +54,9 @@ export class AuthService {
       isVerified: false,
       verificationToken,
       verificationTokenExpires,
+      consentimentoLGPD: userData.consentimentoLGPD || false,
+      dataAceiteLGPD: userData.consentimentoLGPD ? new Date() : undefined,
+      versaoTermo: userData.versaoTermo || '1.0',
     });
     await user.save();
 
@@ -314,6 +317,43 @@ export class AuthService {
       if (error instanceof AppError) throw error;
       throw new AppError('Link de verificação inválido ou expirado', 400);
     }
+  }
+
+  // LGPD
+  async registerConsent(userId: string, consentimentoLGPD: boolean, versaoTermo?: string): Promise<void> {
+    await User.findByIdAndUpdate(userId, {
+      consentimentoLGPD,
+      dataAceiteLGPD: consentimentoLGPD ? new Date() : undefined,
+      ...(versaoTermo && { versaoTermo }),
+    });
+  }
+
+  async exportData(userId: string): Promise<any> {
+    const user = await User.findById(userId).select('-senha -verificationToken -verificationTokenExpires -refreshToken -refreshTokenExpires');
+    if (!user) throw new AppError('Usuário não encontrado', 404);
+
+    const dados: any = {
+      dadosCadastrais: user.toObject(),
+      dataSolicitacao: new Date().toISOString(),
+    };
+
+    return dados;
+  }
+
+  async deleteAccount(userId: string): Promise<void> {
+    const user = await User.findById(userId);
+    if (!user) throw new AppError('Usuário não encontrado', 404);
+
+    user.dataSolicitacaoExclusao = new Date();
+    user.anonimizado = true;
+    user.dataAnonimizacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    user.nome = 'Usuário Removido';
+    user.cpf = `000.000.000-${String(userId).slice(-2).padStart(2, '0')}`;
+    user.email = `removido-${userId}@sispnaist.local`;
+    user.telefone = undefined;
+    user.endereco = undefined;
+    user.ativo = false;
+    await user.save();
   }
 }
 

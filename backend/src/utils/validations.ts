@@ -34,6 +34,10 @@ export const registerSchema = Joi.object({
     'date.base': 'Data de nascimento inválida',
     'any.required': 'Data de nascimento é obrigatória',
   }),
+  consentimentoLGPD: Joi.boolean().valid(true).required().messages({
+    'any.only': 'Você precisa aceitar os Termos de Uso e a Política de Privacidade',
+    'any.required': 'Aceite os Termos de Uso e a Política de Privacidade',
+  }),
 });
 
 // Validação genérica para catálogos/tabelas auxiliares

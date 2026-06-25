@@ -22,6 +22,13 @@ export interface IUser {
   verificationTokenExpires?: Date;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
+  // LGPD
+  consentimentoLGPD?: boolean;
+  dataAceiteLGPD?: Date;
+  versaoTermo?: string;
+  dataSolicitacaoExclusao?: Date;
+  anonimizado?: boolean;
+  dataAnonimizacao?: Date;
 }
 
 export interface ITrabalhador {

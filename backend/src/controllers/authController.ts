@@ -212,3 +212,47 @@ export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     message: 'E-mail verificado e conta ativada com sucesso! Você já pode fazer login.',
   });
 });
+
+export const registerConsent = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  const { consentimentoLGPD, versaoTermo } = req.body;
+  await authService.registerConsent(req.user.id, consentimentoLGPD, versaoTermo);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Consentimento registrado com sucesso.',
+  });
+});
+
+export const exportData = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  const dados = await authService.exportData(req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    data: dados,
+  });
+});
+
+export const deleteAccount = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  await authService.deleteAccount(req.user.id);
+  clearAuthCookies(res);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Solicitação de exclusão de conta registrada. Seus dados serão anonimizados em até 30 dias.',
+  });
+});

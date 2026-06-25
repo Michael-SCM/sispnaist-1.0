@@ -250,6 +250,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/csrf-token', csrfRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/lgpd', authRoutes);
 app.use('/api/acidentes', acidentesRoutes);
 app.use('/api/doencas', doencasRoutes);
 app.use('/api/vacinacoes', vacinacoesRoutes);

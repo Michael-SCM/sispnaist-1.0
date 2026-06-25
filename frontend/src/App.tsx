@@ -16,6 +16,9 @@ function LoadingFallback() {
 
 const Login = React.lazy(() => import('./pages/Login.js').then(m => ({ default: m.Login })));
 const Register = React.lazy(() => import('./pages/Register.js').then(m => ({ default: m.Register })));
+const TermosDeUso = React.lazy(() => import('./pages/TermosDeUso.js').then(m => ({ default: m.TermosDeUso })));
+const PoliticaPrivacidade = React.lazy(() => import('./pages/PoliticaPrivacidade.js').then(m => ({ default: m.PoliticaPrivacidade })));
+const MinhaConta = React.lazy(() => import('./pages/MinhaConta.js').then(m => ({ default: m.MinhaConta })));
 const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword.js').then(m => ({ default: m.ForgotPassword })));
 const ResetPassword = React.lazy(() => import('./pages/ResetPassword.js').then(m => ({ default: m.ResetPassword })));
 const VerifyEmail = React.lazy(() => import('./pages/VerifyEmail.js').then(m => ({ default: m.VerifyEmail })));
@@ -113,6 +116,8 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/termos" element={<TermosDeUso />} />
+          <Route path="/privacidade" element={<PoliticaPrivacidade />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
@@ -121,6 +126,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/minha-conta"
+            element={
+              <ProtectedRoute>
+                <MinhaConta />
               </ProtectedRoute>
             }
           />

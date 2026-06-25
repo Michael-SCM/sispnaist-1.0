@@ -25,6 +25,7 @@ interface RegisterFormData {
   dataNascimento: string;
   senha: string;
   confirmarSenha: string;
+  consentimentoLGPD: boolean;
   [key: string]: string | number | boolean;
 }
 
@@ -35,6 +36,7 @@ const registerSchema = {
   dataNascimento: [required(), dateOfBirth()],
   senha: [required(), password()],
   confirmarSenha: [required(), matchField(() => values.senha, 'senha')],
+  consentimentoLGPD: [required()],
 };
 
 let values: RegisterFormData;
@@ -48,6 +50,7 @@ export const Register: React.FC = () => {
     dataNascimento: '',
     senha: '',
     confirmarSenha: '',
+    consentimentoLGPD: false,
   });
   values = form.values;
   const { errors, touched, handleChange, handleBlur, setFieldError, reset, setValues } = form;
@@ -91,6 +94,8 @@ export const Register: React.FC = () => {
         cpf: maskCPF(values.cpf),
         dataNascimento: values.dataNascimento,
         senha: values.senha,
+        consentimentoLGPD: values.consentimentoLGPD,
+        versaoTermo: '1.0',
       });
 
       const link = response.data?.verificationLink;
@@ -239,6 +244,41 @@ export const Register: React.FC = () => {
               <p id="register-confirmarSenha-error" className="text-red-600 text-xs mt-1" role="alert">{errors.confirmarSenha}</p>
             )}
           </div>
+
+          <div className="flex items-start gap-3">
+            <input
+              id="register-consentimentoLGPD"
+              type="checkbox"
+              name="consentimentoLGPD"
+              checked={values.consentimentoLGPD as boolean}
+              onChange={(e) => {
+                setValues({ ...values, consentimentoLGPD: e.target.checked });
+                if (touched.consentimentoLGPD) {
+                  const error = validateField({ ...values, consentimentoLGPD: e.target.checked }, registerSchema, 'consentimentoLGPD');
+                  if (error) setFieldError('consentimentoLGPD', error);
+                  else setFieldError('consentimentoLGPD', '');
+                }
+              }}
+              onBlur={handleFieldBlur}
+              className={`mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${errors.consentimentoLGPD && touched.consentimentoLGPD ? 'border-red-500' : ''}`}
+              disabled={isLoading}
+              aria-invalid={!!(errors.consentimentoLGPD && touched.consentimentoLGPD)}
+              aria-describedby="register-consentimentoLGPD-error"
+            />
+            <label htmlFor="register-consentimentoLGPD" className="text-sm text-gray-600 leading-relaxed">
+              Li e aceito os{' '}
+              <a href="/termos" target="_blank" className="text-blue-700 underline hover:text-blue-900" rel="noopener noreferrer">
+                Termos de Uso
+              </a>{' '}
+              e a{' '}
+              <a href="/privacidade" target="_blank" className="text-blue-700 underline hover:text-blue-900" rel="noopener noreferrer">
+                Política de Privacidade
+              </a>
+            </label>
+          </div>
+          {errors.consentimentoLGPD && touched.consentimentoLGPD && (
+            <p id="register-consentimentoLGPD-error" className="text-red-600 text-xs -mt-2" role="alert">{errors.consentimentoLGPD}</p>
+          )}
 
           <button
             type="submit"

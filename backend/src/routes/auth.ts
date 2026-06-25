@@ -79,4 +79,9 @@ router.post('/revoke-sessions', authMiddleware, authController.revokeAllSessions
 router.post('/refresh-token', refreshLimiter, validateRequest(refreshTokenSchema), authController.refreshToken);
 router.post('/logout', authController.logout);
 
+// LGPD
+router.post('/consent', authMiddleware, authController.registerConsent);
+router.get('/export-data', authMiddleware, authController.exportData);
+router.post('/delete-account', authMiddleware, authController.deleteAccount);
+
 export default router;

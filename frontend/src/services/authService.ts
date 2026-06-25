@@ -46,4 +46,20 @@ export const authService = {
     const response = await api.post<{ status: string; message: string }>('/auth/verify-email', { token });
     return response.data.message;
   },
+
+  // LGPD
+  registerConsent: async (consentimentoLGPD: boolean, versaoTermo?: string): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/consent', { consentimentoLGPD, versaoTermo });
+    return response.data.message;
+  },
+
+  exportData: async (): Promise<any> => {
+    const response = await api.get<{ status: string; data: any }>('/auth/export-data');
+    return response.data.data;
+  },
+
+  deleteAccount: async (): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/delete-account');
+    return response.data.message;
+  },
 };

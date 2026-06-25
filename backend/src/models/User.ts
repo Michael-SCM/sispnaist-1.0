@@ -101,6 +101,28 @@ const UserSchema = new Schema<IUserDocument>(
       type: Number,
       default: 1,
     },
+    // LGPD
+    consentimentoLGPD: {
+      type: Boolean,
+      default: false,
+    },
+    dataAceiteLGPD: {
+      type: Date,
+    },
+    versaoTermo: {
+      type: String,
+      default: '1.0',
+    },
+    dataSolicitacaoExclusao: {
+      type: Date,
+    },
+    anonimizado: {
+      type: Boolean,
+      default: false,
+    },
+    dataAnonimizacao: {
+      type: Date,
+    },
   },
   { 
     collection: 'usuarios', 
@@ -115,6 +137,15 @@ UserSchema.index(
   {
     expireAfterSeconds: 30 * 24 * 60 * 60,
     partialFilterExpression: { isVerified: false },
+  }
+);
+
+// TTL index: dados anonimizados são automaticamente deletados após 5 anos
+UserSchema.index(
+  { dataAnonimizacao: 1 },
+  {
+    expireAfterSeconds: 5 * 365 * 24 * 60 * 60,
+    partialFilterExpression: { anonimizado: true },
   }
 );
 
