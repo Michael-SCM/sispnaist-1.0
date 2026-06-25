@@ -82,6 +82,7 @@ router.post('/logout', authController.logout);
 // LGPD
 router.post('/consent', authMiddleware, authController.registerConsent);
 router.get('/export-data', authMiddleware, authController.exportData);
+router.get('/export-data/pdf', authMiddleware, authController.exportDataPDF);
 router.post('/delete-account', authMiddleware, authController.deleteAccount);
 
 export default router;

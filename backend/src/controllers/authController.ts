@@ -4,6 +4,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import authService from '../services/AuthService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import config from '../config/config.js';
+import { generateExportPDF } from '../utils/pdfExport.js';
 
 const setAuthCookies = (res: Response, token: string, refreshToken?: string) => {
   const cookieOptions = {
@@ -239,6 +240,27 @@ export const exportData = asyncHandler(async (req: IAuthRequest, res: Response) 
   res.status(200).json({
     status: 'success',
     data: dados,
+  });
+});
+
+export const exportDataPDF = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  const dados = await authService.exportData(req.user.id);
+  const doc = generateExportPDF(dados);
+
+  const chunks: Buffer[] = [];
+  doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+  doc.on('end', () => {
+    const pdfBuffer = Buffer.concat(chunks);
+    const nome = `${dados.dadosCadastrais?.nome?.replace(/\s+/g, '_') || 'meus-dados'}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(nome)}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.end(pdfBuffer);
   });
 });
 

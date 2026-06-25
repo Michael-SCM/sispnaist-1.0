@@ -58,6 +58,16 @@ export const authService = {
     return response.data.data;
   },
 
+  exportDataPDF: async (): Promise<void> => {
+    const response = await api.get('/auth/export-data/pdf', { responseType: 'blob' });
+    const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meus-dados-${new Date().toISOString().split('T')[0]}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
   deleteAccount: async (): Promise<string> => {
     const response = await api.post<{ status: string; message: string }>('/auth/delete-account');
     return response.data.message;

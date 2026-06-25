@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout.js';
 import { useAuthStore } from '../store/authStore.js';
 import { authService } from '../services/authService.js';
-import { Loader2, Download, Trash2, CheckCircle, AlertTriangle, User } from 'lucide-react';
+import { Loader2, Download, Trash2, CheckCircle, AlertTriangle, User, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const MinhaConta: React.FC = () => {
@@ -16,14 +16,7 @@ export const MinhaConta: React.FC = () => {
   const handleExportData = async () => {
     setIsExporting(true);
     try {
-      const dados = await authService.exportData();
-      const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `meus-dados-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await authService.exportDataPDF();
       toast.success('Dados exportados com sucesso!');
     } catch {
       toast.error('Erro ao exportar dados');
@@ -89,15 +82,15 @@ export const MinhaConta: React.FC = () => {
           </div>
           <div className="p-8">
             <p className="text-sm text-slate-600 mb-4">
-              Baixe todos os seus dados cadastrais em formato JSON. Este arquivo contém todas as informações que o sistema possui sobre você.
+              Baixe todos os seus dados em formato PDF. Este relatório contém seus dados cadastrais, profissionais, LGPD, dependentes, acidentes, doenças, vacinações, afastamentos e demais registros no sistema.
             </p>
             <button
               onClick={handleExportData}
               disabled={isExporting}
               className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-50"
             >
-              {isExporting ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
-              {isExporting ? 'Exportando...' : 'Exportar meus dados'}
+              {isExporting ? <Loader2 size={20} className="animate-spin" /> : <FileText size={20} />}
+              {isExporting ? 'Exportando...' : 'Exportar meus dados (PDF)'}
             </button>
           </div>
         </div>
