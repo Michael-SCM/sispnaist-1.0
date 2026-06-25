@@ -186,18 +186,35 @@ export const Register: React.FC = () => {
 
           {renderField('nome', 'Nome Completo', 'name')}
           {renderField('email', 'Email', 'email', { type: 'email' })}
-          {renderField('cpf', 'CPF (XXX.XXX.XXX-XX)', 'off', {
-            placeholder: '000.000.000-00',
-            onChange: (e) => {
-              const unmasked = unmaskCPF(e.target.value);
-              (setValues as any)({ ...values, cpf: unmasked });
-              if (touched.cpf) {
-                const error = validateField({ ...values, cpf: unmasked }, registerSchema, 'cpf');
-                if (error) setFieldError('cpf', error);
-                else setFieldError('cpf', '');
-              }
-            },
-          })}
+          <div>
+            <label htmlFor="register-cpf" className="label">CPF (XXX.XXX.XXX-XX)</label>
+            <input
+              id="register-cpf"
+              type="text"
+              name="cpf"
+              value={maskCPF(values.cpf || '')}
+              onChange={(e) => {
+                const unmasked = unmaskCPF(e.target.value);
+                (setValues as any)({ ...values, cpf: unmasked });
+                if (touched.cpf) {
+                  const error = validateField({ ...values, cpf: unmasked }, registerSchema, 'cpf');
+                  if (error) setFieldError('cpf', error);
+                  else setFieldError('cpf', '');
+                }
+              }}
+              onBlur={handleFieldBlur}
+              className={`input${errorClass('cpf')}`}
+              placeholder="000.000.000-00"
+              autoComplete="off"
+              disabled={isLoading}
+              aria-invalid={!!(errors.cpf && touched.cpf)}
+              aria-describedby={errors.cpf && touched.cpf ? 'register-cpf-error' : undefined}
+              required
+            />
+            {errors.cpf && touched.cpf && (
+              <p id="register-cpf-error" className="text-red-600 text-xs mt-1" role="alert">{errors.cpf}</p>
+            )}
+          </div>
           {renderField('dataNascimento', 'Data de Nascimento', 'bday', { type: 'date' })}
 
           <div>

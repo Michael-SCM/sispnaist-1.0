@@ -70,7 +70,7 @@ export function validate<T extends Record<string, any>>(
     const rules = schema[field];
     if (!rules) continue;
     for (const rule of rules) {
-      const error = rule(values[field] || '');
+      const error = rule(values[field] != null ? String(values[field]) : '');
       if (error) {
         errors[field as string] = error;
         break;
@@ -88,7 +88,7 @@ export function validateField<T extends Record<string, any>>(
   const rules = schema[field];
   if (!rules) return undefined;
   for (const rule of rules) {
-    const error = rule(values[field] || '');
+    const error = rule(values[field] != null ? String(values[field]) : '');
     if (error) return error;
   }
   return undefined;
