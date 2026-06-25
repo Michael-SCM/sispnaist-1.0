@@ -59,12 +59,23 @@ export const authService = {
   },
 
   exportDataPDF: async (): Promise<void> => {
-    const response = await api.get('/auth/export-data/pdf', { responseType: 'blob' });
-    const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const response = await api.get('/auth/export-data/pdf', {
+      responseType: 'blob',
+    });
+
+    const contentDisposition = response.headers['content-disposition'];
+    const match = contentDisposition?.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]+)["']?/i);
+    const fallbackMatch = contentDisposition?.match(/filename=["']?([^"';\n]+)["']?/i);
+    const filename = decodeURIComponent(match?.[1] ?? fallbackMatch?.[1] ?? `meus-dados-lgpd_${new Date().toISOString().split('T')[0]}.pdf`);
+
+    const url = URL.createObjectURL(response.data);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `meus-dados-${new Date().toISOString().split('T')[0]}.pdf`;
+    a.download = filename;
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   },
 

@@ -1,16 +1,4 @@
 import User, { IUserDocument } from '../models/User.js';
-import Trabalhador from '../models/Trabalhador.js';
-import Acidente from '../models/Acidente.js';
-import Vacinacao from '../models/Vacinacao.js';
-import Doenca from '../models/Doenca.js';
-import TrabalhadorDependente from '../models/TrabalhadorDependente.js';
-import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
-import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
-import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViolencia.js';
-import TrabalhadorReadaptacao from '../models/TrabalhadorReadaptacao.js';
-import TrabalhadorRiscoOcupacional from '../models/TrabalhadorRiscoOcupacional.js';
-import TrabalhadorVinculo from '../models/TrabalhadorVinculo.js';
-import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP.js';
 import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
@@ -341,58 +329,11 @@ export class AuthService {
   }
 
   async exportData(userId: string): Promise<any> {
-    const user = await User.findById(userId)
-      .select('-senha -verificationToken -verificationTokenExpires -refreshToken -refreshTokenExpires')
-      .populate('empresa')
-      .populate('unidade');
+    const user = await User.findById(userId).select('-senha -verificationToken -verificationTokenExpires -refreshToken -refreshTokenExpires');
     if (!user) throw new AppError('Usuário não encontrado', 404);
-
-    const cpf = user.cpf;
-    const trabalhador = await Trabalhador.findOne({ cpf }).lean();
-
-    const ids = [user._id.toString()];
-    if (trabalhador) ids.push(trabalhador._id.toString());
-
-    const [
-      acidentes,
-      vacinacoes,
-      doencas,
-      dependentes,
-      afastamentos,
-      informacaoSaude,
-      ocorrenciasViolencia,
-      readaptacoes,
-      riscosOcupacionais,
-      vinculos,
-      historicosPPP,
-    ] = await Promise.all([
-      Acidente.find({ trabalhadorId: { $in: ids } }).sort({ dataAcidente: -1 }).lean(),
-      Vacinacao.find({ trabalhadorId: { $in: ids } }).sort({ dataVacinacao: -1 }).lean(),
-      Doenca.find({ trabalhadorId: { $in: ids } }).sort({ dataInicio: -1 }).lean(),
-      TrabalhadorDependente.find({ trabalhadorId: { $in: ids }, ativo: true }).lean(),
-      TrabalhadorAfastamento.find({ trabalhadorId: { $in: ids }, ativo: true }).sort({ dataInicio: -1 }).lean(),
-      TrabalhadorInformacao.findOne({ trabalhadorId: { $in: ids } }).lean(),
-      TrabalhadorOcorrenciaViolencia.find({ trabalhadorId: { $in: ids } }).sort({ dataOcorrencia: -1 }).lean(),
-      TrabalhadorReadaptacao.find({ trabalhadorId: { $in: ids } }).sort({ dataReadaptacao: -1 }).lean(),
-      TrabalhadorRiscoOcupacional.find({ trabalhadorId: { $in: ids }, ativo: true }).lean(),
-      TrabalhadorVinculo.find({ trabalhadorId: { $in: ids }, ativo: true }).sort({ dataInicio: -1 }).lean(),
-      TrabalhadorHistoricoPPP.find({ trabalhadorId: { $in: ids } }).sort({ dataInicio: -1 }).lean(),
-    ]);
 
     const dados: any = {
       dadosCadastrais: user.toObject(),
-      trabalhador: trabalhador || null,
-      acidentes,
-      vacinacoes,
-      doencas,
-      dependentes,
-      afastamentos,
-      informacaoSaude: informacaoSaude || null,
-      ocorrenciasViolencia,
-      readaptacoes,
-      riscosOcupacionais,
-      vinculos,
-      historicosPPP,
       dataSolicitacao: new Date().toISOString(),
     };
 

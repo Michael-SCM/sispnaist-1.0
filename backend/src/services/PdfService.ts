@@ -1784,6 +1784,193 @@ export class PdfService {
     return y;
   }
 
+  /**
+   * Gera PDF com os dados pessoais do usuário (LGPD)
+   */
+  async gerarPdfExportData(
+    res: Response,
+    dados: any
+  ): Promise<void> {
+    const dataEmissao = this.formatarDataBrasil(this.getDataBrasilia());
+    const filename = `meus-dados-lgpd_${this.getDataBrasilia().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 0,
+      bufferPages: true,
+    });
+
+    doc.pipe(res);
+
+    let yPos = this.MARGEM_TOPO;
+
+    // Cabeçalho
+    yPos = this.renderizarCabecalho(doc, dataEmissao);
+
+    // Título específico para exportação de dados
+    const x = this.MARGEM_ESQUERDA;
+    doc
+      .fillColor(this.COR_TEXTO)
+      .fontSize(14)
+      .font('Helvetica-Bold')
+      .text('Exportação de Dados Pessoais (LGPD)', x, yPos);
+
+    yPos += 18;
+
+    doc
+      .fillColor(this.COR_TEXTO_CLARO)
+      .fontSize(9)
+      .font('Helvetica')
+      .text(`Solicitação realizada em: ${dataEmissao}`, x, yPos);
+
+    yPos += 30;
+
+    // Caixa de informações da solicitação
+    doc
+      .fillColor(this.COR_SECUNDARIA)
+      .rect(x, yPos, this.larguraUtil, 35)
+      .fill();
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(9)
+      .font('Helvetica-Bold')
+      .text('SOLICITAÇÃO DE EXPORTAÇÃO DE DADOS', x + 10, yPos + 3);
+
+    doc
+      .fillColor('#ffffff')
+      .fontSize(9)
+      .font('Helvetica')
+      .text(
+        `Base legal: Art. 18, inciso II da Lei nº 13.709/2018 (LGPD)`,
+        x + 10,
+        yPos + 18
+      );
+
+    yPos += 50;
+
+    // Dados Cadastrais
+    const dadosCadastrais = dados.dadosCadastrais || {};
+
+    yPos = this.renderizarSecaoDados(doc, 'Dados Cadastrais', [
+      { label: 'Nome', value: dadosCadastrais.nome || '-' },
+      { label: 'CPF', value: this.formatarCpf(dadosCadastrais.cpf) },
+      { label: 'E-mail', value: dadosCadastrais.email || '-' },
+      { label: 'Telefone', value: dadosCadastrais.telefone || '-' },
+      { label: 'Data de Nascimento', value: this.formatarData(dadosCadastrais.dataNascimento) },
+      { label: 'Sexo', value: dadosCadastrais.sexo || '-' },
+      { label: 'Matrícula', value: dadosCadastrais.matricula || '-' },
+    ], yPos);
+
+    // Endereço
+    if (dadosCadastrais.endereco) {
+      const end = dadosCadastrais.endereco;
+      yPos = this.renderizarSecaoDados(doc, 'Endereço', [
+        { label: 'Logradouro', value: end.logradouro || '-' },
+        { label: 'Número', value: end.numero || '-' },
+        { label: 'Complemento', value: end.complemento || '-' },
+        { label: 'Bairro', value: end.bairro || '-' },
+        { label: 'Cidade', value: end.cidade || '-' },
+        { label: 'Estado', value: end.estado || '-' },
+        { label: 'CEP', value: end.cep || '-' },
+      ], yPos);
+    }
+
+    // Informações da Conta
+    yPos = this.renderizarSecaoDados(doc, 'Informações da Conta', [
+      { label: 'Perfil', value: dadosCadastrais.perfil || '-' },
+      { label: 'Conta verificada', value: dadosCadastrais.isVerified ? 'Sim' : 'Não' },
+      { label: 'Conta ativa', value: dadosCadastrais.ativo !== false ? 'Sim' : 'Não' },
+      { label: 'Data de criação', value: this.formatarData(dadosCadastrais.createdAt) },
+      { label: 'Última atualização', value: this.formatarData(dadosCadastrais.updatedAt) },
+    ], yPos);
+
+    // Consentimento LGPD
+    yPos = this.renderizarSecaoDados(doc, 'Consentimento LGPD', [
+      { label: 'Consentimento', value: dadosCadastrais.consentimentoLGPD ? 'Aceito' : 'Não registrado' },
+      { label: 'Data de aceite', value: dadosCadastrais.dataAceiteLGPD ? this.formatarData(new Date(dadosCadastrais.dataAceiteLGPD)) : '-' },
+      { label: 'Versão do termo', value: dadosCadastrais.versaoTermo || '-' },
+    ], yPos);
+
+    // Rodapé
+    this.renderizarRodape(doc);
+
+    doc.end();
+  }
+
+  /**
+   * Renderiza uma seção formatada de dados pessoais
+   */
+  private renderizarSecaoDados(
+    doc: PDFKit.PDFDocument,
+    titulo: string,
+    campos: { label: string; value: string }[],
+    yInicio: number
+  ): number {
+    const x = this.MARGEM_ESQUERDA;
+    let y = yInicio;
+
+    // Verificar se precisa de nova página
+    const espacoNecessario = 30 + campos.length * 20 + 20;
+    if (this.yMax - y < espacoNecessario) {
+      doc.addPage();
+      y = this.MARGEM_TOPO + 30;
+    }
+
+    // Título da seção
+    doc
+      .fillColor(this.COR_PRIMARIA)
+      .fontSize(11)
+      .font('Helvetica-Bold')
+      .text(titulo, x, y);
+
+    y += 18;
+
+    // Linha separadora
+    doc
+      .moveTo(x, y)
+      .lineTo(x + this.larguraUtil, y)
+      .lineWidth(1)
+      .strokeColor(this.COR_BORDA)
+      .stroke();
+
+    y += 10;
+
+    // Campos
+    const larguraLabel = 120;
+    const larguraValue = this.larguraUtil - larguraLabel - 10;
+
+    campos.forEach((campo) => {
+      if (this.yMax - y < 20) {
+        doc.addPage();
+        y = this.MARGEM_TOPO + 30;
+      }
+
+      // Label
+      doc
+        .fillColor(this.COR_TEXTO_CLARO)
+        .fontSize(8)
+        .font('Helvetica-Bold')
+        .text(campo.label, x, y + 2, { width: larguraLabel });
+
+      // Value
+      doc
+        .fillColor(this.COR_TEXTO)
+        .fontSize(9)
+        .font('Helvetica')
+        .text(campo.value, x + larguraLabel + 10, y + 2, { width: larguraValue });
+
+      y += 18;
+    });
+
+    y += 15;
+
+    return y;
+  }
+
   private renderizarAlertasCriticos(doc: PDFKit.PDFDocument, alertas: { trabalhador: string; motivo: string; nivel: string }[], yInicio: number): number {
     const x = this.MARGEM_ESQUERDA;
     let y = yInicio;
