@@ -1,6 +1,20 @@
 import api from './api.js';
 import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional } from '../types';
 
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000;
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (entry && Date.now() - entry.timestamp < CACHE_TTL) return entry.data as T;
+  cache.delete(key);
+  return null;
+}
+
+function setCache(key: string, data: any) {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 const SUBMODULOS = {
   dependentes: 'dependentes',
   afastamentos: 'afastamentos',
@@ -21,11 +35,15 @@ export const submoduloTrabalhadorService = {
   },
 
   listarHistoricoPPP: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorHistoricoPPP[]> => {
+    const key = `historicoPPP-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorHistoricoPPP[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorHistoricoPPP[]>(
       `/trabalhadores/${trabalhadorId}/historicoPPP?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -52,11 +70,15 @@ export const submoduloTrabalhadorService = {
   // DEPENDENTES
   // DEPENDENTES
   listarDependentes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorDependente[]> => {
+    const key = `dependentes-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorDependente[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorDependente[]>(
       `/trabalhadores/${trabalhadorId}/dependentes?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -82,11 +104,15 @@ export const submoduloTrabalhadorService = {
 
   // AFASTAMENTOS
   listarAfastamentos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorAfastamento[]> => {
+    const key = `afastamentos-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorAfastamento[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorAfastamento[]>(
       `/trabalhadores/${trabalhadorId}/afastamentos?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -119,11 +145,15 @@ export const submoduloTrabalhadorService = {
   },
 
   listarVinculos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorVinculo[]> => {
+    const key = `vinculos-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorVinculo[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorVinculo[]>(
       `/trabalhadores/${trabalhadorId}/vinculos?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -149,11 +179,15 @@ export const submoduloTrabalhadorService = {
 
   // OCORRÊNCIAS DE VIOLÊNCIA
   listarOcorrenciasViolencia: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorOcorrenciaViolencia[]> => {
+    const key = `ocorrenciasViolencia-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorOcorrenciaViolencia[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorOcorrenciaViolencia[]>(
       `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -179,11 +213,15 @@ export const submoduloTrabalhadorService = {
 
   // READAPTAÇÕES
   listarReadaptacoes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorReadaptacao[]> => {
+    const key = `readaptacoes-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorReadaptacao[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorReadaptacao[]>(
       `/trabalhadores/${trabalhadorId}/readaptacoes?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -209,11 +247,15 @@ export const submoduloTrabalhadorService = {
 
   // PROCESSOS DE TRABALHO
   listarProcessosTrabalho: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorProcessoTrabalho[]> => {
+    const key = `processosTrabalho-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorProcessoTrabalho[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorProcessoTrabalho[]>(
       `/trabalhadores/${trabalhadorId}/processosTrabalho?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 
@@ -239,11 +281,15 @@ export const submoduloTrabalhadorService = {
 
   // RISCOS OCUPACIONAIS
   listarRiscosOcupacionais: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorRiscoOcupacional[]> => {
+    const key = `riscosOcupacionais-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorRiscoOcupacional[]>(key);
+    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorRiscoOcupacional[]>(
       `/trabalhadores/${trabalhadorId}/riscosOcupacionais?${params.toString()}`
     );
+    setCache(key, response.data);
     return response.data;
   },
 

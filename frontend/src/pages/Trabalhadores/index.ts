@@ -13,7 +13,6 @@ export { ListaOcorrenciasViolencia } from './OcorrenciasViolencia/ListaOcorrenci
 export { FormOcorrenciaViolencia } from './OcorrenciasViolencia/FormOcorrenciaViolencia.js';
 export { ListaReadaptacoes } from './Readaptacoes/ListaReadaptacoes.js';
 export { FormReadaptacao } from './Readaptacoes/FormReadaptacao.js';
-export { ListaProcessosTrabalho } from './ProcessosTrabalho/ListaProcessosTrabalho.js';
-export { FormProcessoTrabalho } from './ProcessosTrabalho/FormProcessoTrabalho.js';
+
 export { ListaInformacoes } from './Informacoes/ListaInformacoes.js';
 export { FormInformacoes } from './Informacoes/FormInformacoes.js';

@@ -34,6 +34,7 @@ import {
   Shield
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { InfoCard } from '../../components/InfoCard.js';
 
 export const DetalhesTrabalhador: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,18 +72,6 @@ export const DetalhesTrabalhador: React.FC = () => {
   }
 
   if (!trabalhador) return null;
-
-  const InfoCard = ({ label, value, icon: Icon, color }: { label: string, value?: string | number | null, icon: any, color: string }) => (
-    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
-      <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
-        <Icon size={18} />
-      </div>
-      <div>
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-        <p className="text-sm font-bold text-slate-700">{value || '-'}</p>
-      </div>
-    </div>
-  );
 
   return (
     <MainLayout>

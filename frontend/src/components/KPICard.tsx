@@ -28,7 +28,7 @@ const corIconeMap = {
   orange: 'text-orange-600 bg-orange-100',
 };
 
-export const KPICard: React.FC<IKPICardProps> = ({
+export const KPICard: React.FC<IKPICardProps> = React.memo(({
   titulo,
   valor,
   icone = '📊',
@@ -68,4 +68,4 @@ export const KPICard: React.FC<IKPICardProps> = ({
       </div>
     </div>
   );
-};
+});

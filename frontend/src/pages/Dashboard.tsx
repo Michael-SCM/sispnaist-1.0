@@ -1,12 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 import { useAnalyticsStore } from '../store/analyticsStore.js';
 import { MainLayout } from '../layouts/MainLayout.js';
 import { KPICard } from '../components/KPICard.js';
-import { AcidentesPorMes, PieChartComponent, BarChartComponent } from '../components/charts/index.js';
 import { AlertaOrientacaoMobile } from '../components/AlertaOrientacaoMobile.js';
 import { format } from 'date-fns';
+
+const AcidentesPorMes = lazy(() => import('../components/charts/AcidentesPorMes.js').then(m => ({ default: m.AcidentesPorMes })));
+const PieChartComponent = lazy(() => import('../components/charts/PieChartComponent.js').then(m => ({ default: m.PieChartComponent })));
+const BarChartComponent = lazy(() => import('../components/charts/BarChartComponent.js').then(m => ({ default: m.BarChartComponent })));
+
+const ChartFallback = () => (
+  <div className="flex items-center justify-center h-64 bg-slate-50 rounded-2xl border border-slate-100">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 export const Dashboard: React.FC = () => {
   const user = useAuthStore((state) => state.user);
@@ -186,28 +195,32 @@ const {
         </div>
 
         {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <AcidentesPorMes
-            dados={graficos.acidentesUltimosMeses}
-            titulo="Acidentes - Últimos 6 Meses"
-          />
-          <PieChartComponent
-            dados={graficos.acidentesPorTipo}
-            titulo="Acidentes por Tipo"
-          />
-        </div>
+        <Suspense fallback={<ChartFallback />}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <AcidentesPorMes
+              dados={graficos.acidentesUltimosMeses}
+              titulo="Acidentes - Últimos 6 Meses"
+            />
+            <PieChartComponent
+              dados={graficos.acidentesPorTipo}
+              titulo="Acidentes por Tipo"
+            />
+          </div>
+        </Suspense>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <PieChartComponent
-            dados={graficos.acidentesPorStatus}
-            titulo="Acidentes por Status"
-            cores={['#ef4444', '#f59e0b', '#10b981']}
-          />
-          <BarChartComponent
-            dados={graficos.trabalhadoresPorEmpresa}
-            titulo="Trabalhadores por Empresa"
-          />
-        </div>
+        <Suspense fallback={<ChartFallback />}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <PieChartComponent
+              dados={graficos.acidentesPorStatus}
+              titulo="Acidentes por Status"
+              cores={['#ef4444', '#f59e0b', '#10b981']}
+            />
+            <BarChartComponent
+              dados={graficos.trabalhadoresPorEmpresa}
+              titulo="Trabalhadores por Empresa"
+            />
+          </div>
+        </Suspense>
 
         {/* Tabelas de Resumo */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

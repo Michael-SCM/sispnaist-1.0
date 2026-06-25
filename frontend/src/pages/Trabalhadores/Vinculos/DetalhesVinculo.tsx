@@ -13,18 +13,7 @@ import {
   AlertTriangle, HeartHandshake, Users, Star, Activity, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
-  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
-    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
-      <Icon size={18} />
-    </div>
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-      <p className="text-sm font-bold text-slate-700">{value ?? '-'}</p>
-    </div>
-  </div>
-);
+import { InfoCard } from '../../../components/InfoCard.js';
 
 const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
   <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">

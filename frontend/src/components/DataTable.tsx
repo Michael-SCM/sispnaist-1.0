@@ -24,7 +24,7 @@ interface DataTableProps<T> {
   }>;
 }
 
-export const DataTable = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
+const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
   (
     {
       columns,
@@ -142,7 +142,9 @@ export const DataTable = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
   }
 );
 
-DataTable.displayName = 'DataTable';
+DataTableInner.displayName = 'DataTable';
+
+export const DataTable = React.memo(DataTableInner);
 
 // Pagination Component
 interface PaginationProps {
@@ -152,7 +154,7 @@ interface PaginationProps {
   isLoading?: boolean;
 }
 
-export const Pagination: React.FC<PaginationProps> = ({
+export const Pagination: React.FC<PaginationProps> = React.memo(({
   currentPage,
   totalPages,
   onPageChange,
@@ -229,4 +231,4 @@ export const Pagination: React.FC<PaginationProps> = ({
       </span>
     </div>
   );
-};
+});

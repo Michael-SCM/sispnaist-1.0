@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 import { authService } from '../services/authService.js';
 
-export const Header: React.FC = () => {
+export const Header: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -217,4 +217,4 @@ export const Header: React.FC = () => {
       </div>
     </header>
   );
-};
+});
