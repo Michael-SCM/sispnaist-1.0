@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
-import { empresaService } from '../../../services/empresaService.js';
-import { unidadeService } from '../../../services/unidadeService.js';
+import empresaService from '../../../services/empresaService.js';
+import unidadeService from '../../../services/unidadeService.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import { ITrabalhadorRiscoOcupacional, ITrabalhador, IEmpresa, IUnidade } from '../../../types/index.js';
 import {
