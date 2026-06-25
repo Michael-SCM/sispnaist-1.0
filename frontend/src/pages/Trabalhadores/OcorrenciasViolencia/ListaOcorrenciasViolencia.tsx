@@ -147,7 +147,9 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className="text-sm text-slate-600 max-w-[200px] truncate block">{ocorrencia.motivoViolencia}</span>
+                        <span className="text-sm text-slate-600 max-w-[200px] truncate block">
+                          {ocorrencia.motivoViolencia || ocorrencia.frequenciaAssedio || '-'}
+                        </span>
                       </td>
                       <td className="px-8 py-6">
                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
@@ -254,49 +256,106 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo da Violência</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {ocorrenciaSelecionada.motivoViolencia || 'Não informado'}
-                  </p>
-                </div>
+                {/* Assédio: mostra frequência e testemunhas */}
+                {(ocorrenciaSelecionada.tipoViolencia === 'Psicológica/Moral' || ocorrenciaSelecionada.tipoViolencia === 'Sexual') ? (
+                  <>
+                    {ocorrenciaSelecionada.frequenciaAssedio && (
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Frequência do Assédio</span>
+                        <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                          {ocorrenciaSelecionada.frequenciaAssedio}
+                        </p>
+                      </div>
+                    )}
+                    {ocorrenciaSelecionada.testemunhas && (
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Testemunhas</span>
+                        <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                          {ocorrenciaSelecionada.testemunhas}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo da Violência</span>
+                      <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
+                        {ocorrenciaSelecionada.motivoViolencia || 'Não informado'}
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Meio de Agressão</span>
+                        <span className="font-semibold text-slate-700 block">
+                          {ocorrenciaSelecionada.meioAgressao || 'Não informado'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Pessoas Envolvidas</span>
+                        <span className="font-semibold text-slate-700 block">
+                          {ocorrenciaSelecionada.pessoasEnvolvidas || 'Não informado'}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Descrição dos Fatos</span>
                   <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {ocorrenciaSelecionada.descricao || 'Nenhuma descrição fornecida'}
+                    {ocorrenciaSelecionada.descricaoOcorrencia || ocorrenciaSelecionada.descricao || 'Nenhuma descrição fornecida'}
                   </p>
                 </div>
 
                 <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Conduta Tomada</span>
+                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Atendimento Realizado</span>
                   <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {ocorrenciaSelecionada.condutaTomada || 'Nenhuma conduta registrada'}
+                    {ocorrenciaSelecionada.atendimentoRealizado || 'Não informado'}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Comunicado a Órgão Externo</span>
+                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo de Autor</span>
                     <span className="font-semibold text-slate-700 block">
-                      {ocorrenciaSelecionada.comunicacaoOrgao ? 'Sim' : 'Não'}
+                      {ocorrenciaSelecionada.tipoAutorViolencia || 'Não informado'}
                     </span>
                   </div>
-                  {ocorrenciaSelecionada.comunicacaoOrgao && (
+                  {!ocorrenciaSelecionada.condutaViolencia ? (
                     <div>
-                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Órgão Comunicado</span>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Reincidência</span>
                       <span className="font-semibold text-slate-700 block">
-                        {ocorrenciaSelecionada.orgaoComunicado || 'Não especificado'}
+                        {ocorrenciaSelecionada.reincidencia ? 'Sim' : 'Não'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Conduta de Violência</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {ocorrenciaSelecionada.condutaViolencia || 'Não informado'}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {ocorrenciaSelecionada.observacoes || 'Nenhuma observação cadastrada'}
-                  </p>
+                <div className="grid grid-cols-2 gap-4">
+                  {ocorrenciaSelecionada.boletimOcorrencia && (
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Boletim de Ocorrência</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {ocorrenciaSelecionada.boletimOcorrencia}
+                      </span>
+                    </div>
+                  )}
+                  {ocorrenciaSelecionada.medidasTomadas && (
+                    <div>
+                      <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Medidas Tomadas</span>
+                      <span className="font-semibold text-slate-700 block">
+                        {ocorrenciaSelecionada.medidasTomadas}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 pt-2">

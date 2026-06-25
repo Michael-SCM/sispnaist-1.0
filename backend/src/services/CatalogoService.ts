@@ -189,7 +189,8 @@ class CatalogoService {
       'padraoEmail', 'parametro', 'parentesco', 'sorologia',
       'neurodivergencia',
       'insalubridadePericulosidade',
-      'etnia'
+      'etnia',
+      'frequenciaAssedio'
     ];
 
     if (!entidadesValidas.includes(entidade)) {

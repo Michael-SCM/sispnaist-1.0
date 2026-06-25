@@ -41,7 +41,8 @@ const CatalogoSchema = new Schema<ICatalogoItem>(
         'padraoEmail', 'parametro', 'parentesco', 'sorologia',
         'acompanhamentoReadaptacao', 'neurodivergencia',
         'insalubridadePericulosidade',
-        'etnia'
+        'etnia',
+        'frequenciaAssedio'
       ]
     },
     nome: { type: String, required: true, trim: true },

@@ -98,7 +98,7 @@ Cada requisito foi classificado como:
 | 20 | Local de trabalho | ✅ | Vinculado a `Empresa` + `Unidade` |
 | 21 | Adicionais (insalubridade/periculosidade) | ✅ | Catálogo `insalubridadePericulosidade` + campo no trabalhador |
 | 22 | Residente | ✅ | `residente` (boolean) + `anosResidencia` |
-| 23 | **Histórico laboral (PPP)** | ❌ | Sem modelo ou integração com Perfil Profissiográfico Previdenciário |
+| 23 | **Histórico laboral (PPP)** | ✅ | Modelo implementado com CRUD completo, anexos (PDF), vínculo por trabalhador, detalhes por InfoCard |
 
 #### Subdimensão: Histórico de Saúde
 
