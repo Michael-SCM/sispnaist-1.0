@@ -14,7 +14,7 @@ import {
   Info,
   CheckCircle2,
   Loader2,
-  AlertTriangle
+  UserX
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -23,9 +23,12 @@ interface FormData {
   localOcorrencia: string;
   tipoViolencia: string;
   tipoViolenciaSexual: string;
+  isAssedio: boolean;
   motivoViolencia: string;
   meioAgressao: string;
   tipoAutorViolencia: string;
+  frequenciaAssedio: string;
+  testemunhas: string;
   descricaoOcorrencia: string;
   reincidencia: boolean;
   atendimentoRealizado: string;
@@ -42,9 +45,12 @@ const INITIAL_FORM: FormData = {
   localOcorrencia: '',
   tipoViolencia: '',
   tipoViolenciaSexual: '',
+  isAssedio: false,
   motivoViolencia: '',
   meioAgressao: '',
   tipoAutorViolencia: '',
+  frequenciaAssedio: '',
+  testemunhas: '',
   descricaoOcorrencia: '',
   reincidencia: false,
   atendimentoRealizado: '',
@@ -72,6 +78,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
   const { itens: motivosViolencia } = useCatalogo('motivoViolencia');
   const { itens: meiosAgressao } = useCatalogo('meioAgressao');
   const { itens: tiposAutor } = useCatalogo('tipoAutorViolencia');
+  const { itens: frequenciasAssedio } = useCatalogo('frequenciaAssedio');
 
   useEffect(() => {
     if (id) {
@@ -102,9 +109,12 @@ export const FormOcorrenciaViolencia: React.FC = () => {
           localOcorrencia: ocorrencia.localOcorrencia || '',
           tipoViolencia: ocorrencia.tipoViolencia || '',
           tipoViolenciaSexual: ocorrencia.tipoViolenciaSexual || '',
+          isAssedio: (ocorrencia as any).isAssedio || false,
           motivoViolencia: ocorrencia.motivoViolencia || '',
           meioAgressao: ocorrencia.meioAgressao || '',
           tipoAutorViolencia: ocorrencia.tipoAutorViolencia || '',
+          frequenciaAssedio: (ocorrencia as any).frequenciaAssedio || '',
+          testemunhas: (ocorrencia as any).testemunhas || '',
           descricaoOcorrencia: ocorrencia.descricaoOcorrencia || '',
           reincidencia: (ocorrencia as any).reincidencia || false,
           atendimentoRealizado: (ocorrencia as any).atendimentoRealizado || '',
@@ -131,14 +141,21 @@ export const FormOcorrenciaViolencia: React.FC = () => {
 
     if (!formData.dataOcorrencia) novoErros.dataOcorrencia = 'Obrigatória';
     if (!formData.tipoViolencia) novoErros.tipoViolencia = 'Obrigatório';
-    if (!formData.tipoViolenciaSexual) novoErros.tipoViolenciaSexual = 'Obrigatório';
-    if (!formData.motivoViolencia) novoErros.motivoViolencia = 'Obrigatório';
-    if (!formData.meioAgressao) novoErros.meioAgressao = 'Obrigatório';
-    if (!formData.tipoAutorViolencia) novoErros.tipoAutorViolencia = 'Obrigatório';
+
+    if (formData.isAssedio) {
+      if (!formData.frequenciaAssedio) novoErros.frequenciaAssedio = 'Obrigatório';
+      if (!formData.tipoAutorViolencia) novoErros.tipoAutorViolencia = 'Obrigatório';
+    } else {
+      if (!formData.tipoViolenciaSexual) novoErros.tipoViolenciaSexual = 'Obrigatório';
+      if (!formData.motivoViolencia) novoErros.motivoViolencia = 'Obrigatório';
+      if (!formData.meioAgressao) novoErros.meioAgressao = 'Obrigatório';
+      if (!formData.tipoAutorViolencia) novoErros.tipoAutorViolencia = 'Obrigatório';
+      if (!formData.condutaViolencia) novoErros.condutaViolencia = 'Obrigatória';
+      if (!formData.pessoasEnvolvidas.trim()) novoErros.pessoasEnvolvidas = 'Obrigatório';
+    }
+
     if (!formData.atendimentoRealizado.trim()) novoErros.atendimentoRealizado = 'Obrigatório';
-    if (!formData.condutaViolencia) novoErros.condutaViolencia = 'Obrigatória';
     if (!formData.descricaoOcorrencia) novoErros.descricaoOcorrencia = 'Obrigatória';
-    if (!formData.pessoasEnvolvidas.trim()) novoErros.pessoasEnvolvidas = 'Obrigatório';
 
     setErrors(novoErros);
     return Object.keys(novoErros).length === 0;
@@ -148,14 +165,32 @@ export const FormOcorrenciaViolencia: React.FC = () => {
     const { name, value, type } = e.target;
     const finalValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: finalValue,
-    });
+    }));
 
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
+  };
+
+  const toggleAssedio = () => {
+    setFormData((prev) => {
+      const novo = { ...prev, isAssedio: !prev.isAssedio };
+      if (!novo.isAssedio) {
+        novo.frequenciaAssedio = '';
+        novo.testemunhas = '';
+      } else {
+        novo.motivoViolencia = '';
+        novo.meioAgressao = '';
+        novo.condutaViolencia = '';
+        novo.pessoasEnvolvidas = '';
+        novo.emissaoCatNas = false;
+      }
+      return novo;
+    });
+    setErrors({});
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,9 +205,31 @@ export const FormOcorrenciaViolencia: React.FC = () => {
       setIsLoading(true);
 
       const dados: Partial<ITrabalhadorOcorrenciaViolencia> = {
-        ...formData,
         dataOcorrencia: formData.dataOcorrencia ? new Date(formData.dataOcorrencia) : undefined,
+        localOcorrencia: formData.localOcorrencia,
+        tipoViolencia: formData.tipoViolencia,
+        isAssedio: formData.isAssedio,
+        descricaoOcorrencia: formData.descricaoOcorrencia,
+        reincidencia: formData.reincidencia,
+        atendimentoRealizado: formData.atendimentoRealizado,
+        boletimOcorrencia: formData.boletimOcorrencia,
+        medidasTomadas: formData.medidasTomadas,
+        ativo: formData.ativo,
       };
+
+      if (formData.isAssedio) {
+        dados.frequenciaAssedio = formData.frequenciaAssedio;
+        dados.testemunhas = formData.testemunhas;
+        dados.tipoAutorViolencia = formData.tipoAutorViolencia;
+      } else {
+        dados.tipoViolenciaSexual = formData.tipoViolenciaSexual;
+        dados.motivoViolencia = formData.motivoViolencia;
+        dados.meioAgressao = formData.meioAgressao;
+        dados.tipoAutorViolencia = formData.tipoAutorViolencia;
+        dados.condutaViolencia = formData.condutaViolencia;
+        dados.pessoasEnvolvidas = formData.pessoasEnvolvidas;
+        dados.emissaoCatNas = formData.emissaoCatNas;
+      }
 
       if (isEdicao) {
         await submoduloTrabalhadorService.atualizarOcorrenciaViolencia(id!, ocorrenciaId!, dados);
@@ -225,16 +282,51 @@ export const FormOcorrenciaViolencia: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Seletor de Tipo: Violência vs Assédio */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => formData.isAssedio && toggleAssedio()}
+                  className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-bold text-sm transition-all active:scale-95 ${
+                    !formData.isAssedio
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-100'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                  }`}
+                >
+                  <ShieldAlert size={22} />
+                  Violência
+                </button>
+                <button
+                  type="button"
+                  onClick={() => !formData.isAssedio && toggleAssedio()}
+                  className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-bold text-sm transition-all active:scale-95 ${
+                    formData.isAssedio
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-100'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                  }`}
+                >
+                  <UserX size={22} />
+                  Assédio Moral/Sexual
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Dados da Ocorrência */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
                 <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
-                  <ShieldAlert size={20} className="text-red-600" />
-                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da Ocorrência</h2>
+                  {formData.isAssedio ? <UserX size={20} className="text-red-600" /> : <ShieldAlert size={20} className="text-red-600" />}
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">
+                    {formData.isAssedio ? 'Dados do Assédio' : 'Dados da Ocorrência'}
+                  </h2>
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Campos compartilhados */}
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Data da Ocorrência <span className="text-red-500">*</span></label>
                     <input
@@ -273,94 +365,147 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     </select>
                     {errors.tipoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolencia}</p>}
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual <span className="text-red-500">*</span></label>
-                    <select
-                      required
-                      name="tipoViolenciaSexual"
-                      value={formData.tipoViolenciaSexual}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-bold text-red-600"
-                    >
-                      <option value="">Selecione...</option>
-                      {tiposViolencia.map((t) => (
-                        <option key={t.nome} value={t.nome}>{t.nome}</option>
-                      ))}
-                    </select>
-                    {errors.tipoViolenciaSexual && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolenciaSexual}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas <span className="text-red-500">*</span></label>
-                    <input
-                      name="pessoasEnvolvidas"
-                      required
-                      value={formData.pessoasEnvolvidas}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                      placeholder="Ex: 1"
-                    />
-                    {errors.pessoasEnvolvidas && <p className="mt-1 text-xs text-red-500 font-bold">{errors.pessoasEnvolvidas}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência <span className="text-red-500">*</span></label>
-                    <select
-                      required
-                      name="motivoViolencia"
-                      value={formData.motivoViolencia}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
-                    >
-                      <option value="">Selecione...</option>
-                      {motivosViolencia.map((m) => (
-                        <option key={m.nome} value={m.nome}>{m.nome}</option>
-                      ))}
-                    </select>
-                    {errors.motivoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.motivoViolencia}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Meio de Agressão <span className="text-red-500">*</span></label>
-                    <select
-                      required
-                      name="meioAgressao"
-                      value={formData.meioAgressao}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
-                    >
-                      <option value="">Selecione...</option>
-                      {meiosAgressao.map((m) => (
-                        <option key={m.nome} value={m.nome}>{m.nome}</option>
-                      ))}
-                    </select>
-                    {errors.meioAgressao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.meioAgressao}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Autor <span className="text-red-500">*</span></label>
-                    <select
-                      required
-                      name="tipoAutorViolencia"
-                      value={formData.tipoAutorViolencia}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
-                    >
-                      <option value="">Selecione...</option>
-                      {tiposAutor.map((t) => (
-                        <option key={t.nome} value={t.nome}>{t.nome}</option>
-                      ))}
-                    </select>
-                    {errors.tipoAutorViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAutorViolencia}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Conduta de Violência <span className="text-red-500">*</span></label>
-                    <input
-                      required
-                      name="condutaViolencia"
-                      value={formData.condutaViolencia}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
-                      placeholder="Descreva a conduta"
-                    />
-                    {errors.condutaViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.condutaViolencia}</p>}
-                  </div>
+
+                  {/* Campos específicos para Assédio Moral/Sexual */}
+                  {formData.isAssedio ? (
+                    <>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Autor do Assédio <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="tipoAutorViolencia"
+                          value={formData.tipoAutorViolencia}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                        >
+                          <option value="">Selecione...</option>
+                          {tiposAutor.map((t) => (
+                            <option key={t.nome} value={t.nome}>{t.nome}</option>
+                          ))}
+                        </select>
+                        {errors.tipoAutorViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAutorViolencia}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Frequência do Assédio <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="frequenciaAssedio"
+                          value={formData.frequenciaAssedio}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                        >
+                          <option value="">Selecione...</option>
+                          {frequenciasAssedio.map((f) => (
+                            <option key={f.nome} value={f.nome}>{f.nome}</option>
+                          ))}
+                        </select>
+                        {errors.frequenciaAssedio && <p className="mt-1 text-xs text-red-500 font-bold">{errors.frequenciaAssedio}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Testemunhas</label>
+                        <input
+                          name="testemunhas"
+                          value={formData.testemunhas}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                          placeholder="Nomes das testemunhas"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Campos específicos para Violência */}
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Violência Sexual <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="tipoViolenciaSexual"
+                          value={formData.tipoViolenciaSexual}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm font-bold text-red-600"
+                        >
+                          <option value="">Selecione...</option>
+                          {tiposViolencia.map((t) => (
+                            <option key={t.nome} value={t.nome}>{t.nome}</option>
+                          ))}
+                        </select>
+                        {errors.tipoViolenciaSexual && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoViolenciaSexual}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Qtde. Pessoas Envolvidas <span className="text-red-500">*</span></label>
+                        <input
+                          name="pessoasEnvolvidas"
+                          required
+                          value={formData.pessoasEnvolvidas}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                          placeholder="Ex: 1"
+                        />
+                        {errors.pessoasEnvolvidas && <p className="mt-1 text-xs text-red-500 font-bold">{errors.pessoasEnvolvidas}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Motivo da Violência <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="motivoViolencia"
+                          value={formData.motivoViolencia}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                        >
+                          <option value="">Selecione...</option>
+                          {motivosViolencia.map((m) => (
+                            <option key={m.nome} value={m.nome}>{m.nome}</option>
+                          ))}
+                        </select>
+                        {errors.motivoViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.motivoViolencia}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Meio de Agressão <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="meioAgressao"
+                          value={formData.meioAgressao}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                        >
+                          <option value="">Selecione...</option>
+                          {meiosAgressao.map((m) => (
+                            <option key={m.nome} value={m.nome}>{m.nome}</option>
+                          ))}
+                        </select>
+                        {errors.meioAgressao && <p className="mt-1 text-xs text-red-500 font-bold">{errors.meioAgressao}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Tipo de Autor <span className="text-red-500">*</span></label>
+                        <select
+                          required
+                          name="tipoAutorViolencia"
+                          value={formData.tipoAutorViolencia}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
+                        >
+                          <option value="">Selecione...</option>
+                          {tiposAutor.map((t) => (
+                            <option key={t.nome} value={t.nome}>{t.nome}</option>
+                          ))}
+                        </select>
+                        {errors.tipoAutorViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.tipoAutorViolencia}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Conduta de Violência <span className="text-red-500">*</span></label>
+                        <input
+                          required
+                          name="condutaViolencia"
+                          value={formData.condutaViolencia}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
+                          placeholder="Descreva a conduta"
+                        />
+                        {errors.condutaViolencia && <p className="mt-1 text-xs text-red-500 font-bold">{errors.condutaViolencia}</p>}
+                      </div>
+                    </>
+                  )}
+
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-slate-600 mb-2">Descrição do Atendimento Realizado <span className="text-red-500">*</span></label>
                     <input
@@ -443,19 +588,21 @@ export const FormOcorrenciaViolencia: React.FC = () => {
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
-                    <input
-                      type="checkbox"
-                      name="emissaoCatNas"
-                      checked={formData.emissaoCatNas}
-                      onChange={handleChange}
-                      className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500 transition-all"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Emitida CAT/NAS?</span>
-                      <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Documentação oficial</span>
-                    </div>
-                  </label>
+                  {!formData.isAssedio && (
+                    <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
+                      <input
+                        type="checkbox"
+                        name="emissaoCatNas"
+                        checked={formData.emissaoCatNas}
+                        onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500 transition-all"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Emitida CAT/NAS?</span>
+                        <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Documentação oficial</span>
+                      </div>
+                    </label>
+                  )}
 
                   <label className="flex items-center gap-3 cursor-pointer group pt-4 border-t border-slate-50">
                     <input
