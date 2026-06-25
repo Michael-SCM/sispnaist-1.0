@@ -114,8 +114,8 @@ export const FormRiscoOcupacional: React.FC = () => {
 
   const carregarEmpresas = async () => {
     try {
-      const data = await empresaService.listarAtivas();
-      setEmpresas(data);
+      const r = await empresaService.listarAtivas();
+      setEmpresas(r.data?.empresas || r.empresas || []);
     } catch {
       toast.error('Erro ao carregar empresas');
     }
@@ -123,8 +123,8 @@ export const FormRiscoOcupacional: React.FC = () => {
 
   const carregarUnidades = async () => {
     try {
-      const data = await unidadeService.listarAtivas();
-      setUnidades(data);
+      const r = await unidadeService.listarAtivas();
+      setUnidades(r.data?.unidades || r.unidades || []);
     } catch {
       toast.error('Erro ao carregar unidades');
     }
