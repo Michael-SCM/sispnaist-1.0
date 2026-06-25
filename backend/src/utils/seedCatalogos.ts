@@ -457,13 +457,6 @@ const CATALOGO_DADOS: Array<{
     { nome: 'TOC - Transtorno Obsessivo-Compulsivo', sigla: 'TOC', ordem: 9 },
     { nome: 'Transtorno do Processamento Sensorial', ordem: 10 },
   ]},
-  // Frequência de Assédio
-  { entidade: 'frequenciaAssedio', itens: [
-    { nome: 'Única vez', ordem: 1 },
-    { nome: 'Ocasional', ordem: 2 },
-    { nome: 'Frequente', ordem: 3 },
-    { nome: 'Constante', ordem: 4 },
-  ]},
   // Tipo de Violência Sexual
   { entidade: 'tipoViolenciaSexual', itens: [
     { nome: 'Assédio Sexual', ordem: 1 },
