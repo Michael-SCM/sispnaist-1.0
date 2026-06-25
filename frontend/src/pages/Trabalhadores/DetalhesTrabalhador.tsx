@@ -275,7 +275,6 @@ export const DetalhesTrabalhador: React.FC = () => {
                   { label: 'Vínculos Empregatícios', icon: ClipboardList, path: 'vinculos', color: 'text-blue-400' },
                   { label: 'Ocorrências de Violência', icon: ShieldAlert, path: 'ocorrencias-violencia', color: 'text-red-400' },
                   { label: 'Readaptações', icon: RefreshCcw, path: 'readaptacoes', color: 'text-purple-400' },
-                  { label: 'Processos de Trabalho', icon: Briefcase, path: 'processos-trabalho', color: 'text-cyan-400' },
                   { label: 'Informações Históricas', icon: Stethoscope, path: 'informacoes', color: 'text-teal-400' },
                   { label: 'Histórico Laboral / PPP', icon: FileText, path: 'historico-ppp', color: 'text-blue-400' },
                   { label: 'Riscos Ocupacionais', icon: Shield, path: 'riscos-ocupacionais', color: 'text-amber-400' }

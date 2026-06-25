@@ -14,8 +14,7 @@ import {
   ChevronRight,
   ClipboardList,
   Activity,
-  Eye,
-  X
+  Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,8 +24,6 @@ export const ListaAfastamentos: React.FC = () => {
   const [afastamentos, setAfastamentos] = useState<ITrabalhadorAfastamento[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [afastamentoSelecionado, setAfastamentoSelecionado] = useState<ITrabalhadorAfastamento | null>(null);
-
   useEffect(() => {
     if (id) {
       carregarDados();
@@ -123,7 +120,7 @@ export const ListaAfastamentos: React.FC = () => {
                     <tr 
                       key={afastamento._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => setAfastamentoSelecionado(afastamento)}
+                      onClick={() => navigate(`/trabalhadores/${id}/afastamentos/${afastamento._id}`)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -163,7 +160,7 @@ export const ListaAfastamentos: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setAfastamentoSelecionado(afastamento);
+                              navigate(`/trabalhadores/${id}/afastamentos/${afastamento._id}`);
                             }}
                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                             title="Visualizar Detalhes"
@@ -197,147 +194,6 @@ export const ListaAfastamentos: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal de Detalhes */}
-      {afastamentoSelecionado && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
-              onClick={() => setAfastamentoSelecionado(null)}
-            ></div>
-
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
-              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-                    <Stethoscope size={18} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900">Detalhes do Afastamento</h3>
-                </div>
-                <button 
-                  onClick={() => setAfastamentoSelecionado(null)}
-                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Início</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.dataInicio ? new Date(afastamentoSelecionado.dataInicio).toLocaleDateString('pt-BR') : '-'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Fim</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.dataFim ? new Date(afastamentoSelecionado.dataFim).toLocaleDateString('pt-BR') : 'Em aberto'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tipo de Afastamento</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {afastamentoSelecionado.tipoAfastamento}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Código CID</span>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-black uppercase w-fit block">
-                      {afastamentoSelecionado.cid || 'Não informado'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo do Afastamento</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {afastamentoSelecionado.motivoAfastamento || 'Nenhum motivo informado'}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Perícia</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.dataPericia ? new Date(afastamentoSelecionado.dataPericia).toLocaleDateString('pt-BR') : 'Não agendada'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data de Retorno</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.dataRetorno ? new Date(afastamentoSelecionado.dataRetorno).toLocaleDateString('pt-BR') : 'Não definida'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Desfecho</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.desfecho || 'Sem desfecho registrado'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tempo de Afastamento</span>
-                    <span className="font-semibold text-slate-700">
-                      {afastamentoSelecionado.tempoAfastamento || 'Não quantificado'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Laudo Médico</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {afastamentoSelecionado.laudoMedico || 'Nenhum laudo anexado'}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {afastamentoSelecionado.observacoes || 'Nenhuma observação cadastrada'}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 pt-2">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status do Afastamento:</span>
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                    afastamentoSelecionado.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {afastamentoSelecionado.ativo ? 'Ativo' : 'Encerrado'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-                <button 
-                  onClick={() => {
-                    setAfastamentoSelecionado(null);
-                    navigate(`/trabalhadores/${id}/afastamentos/${afastamentoSelecionado._id}/editar`);
-                  }}
-                  className="px-4 py-2 text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Editar Registro
-                </button>
-                <button 
-                  onClick={() => setAfastamentoSelecionado(null)}
-                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </MainLayout>
   );
 };

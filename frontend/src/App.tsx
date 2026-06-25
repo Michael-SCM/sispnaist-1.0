@@ -62,8 +62,6 @@ const ListaOcorrenciasViolencia = React.lazy(() => import('./pages/Trabalhadores
 const FormOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/FormOcorrenciaViolencia.js'));
 const ListaReadaptacoes = React.lazy(() => import('./pages/Trabalhadores/Readaptacoes/ListaReadaptacoes.js'));
 const FormReadaptacao = React.lazy(() => import('./pages/Trabalhadores/Readaptacoes/FormReadaptacao.js'));
-const ListaProcessosTrabalho = React.lazy(() => import('./pages/Trabalhadores/ProcessosTrabalho/ListaProcessosTrabalho.js'));
-const FormProcessoTrabalho = React.lazy(() => import('./pages/Trabalhadores/ProcessosTrabalho/FormProcessoTrabalho.js'));
 const ListaInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/ListaInformacoes.js'));
 const FormInformacoes = React.lazy(() => import('./pages/Trabalhadores/Informacoes/FormInformacoes.js'));
 const ListaHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/HistoricoPPP/ListaHistoricoPPP.js'));
@@ -72,6 +70,10 @@ const FormHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/Historic
 const ListaRiscosOcupacionais = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/ListaRiscosOcupacionais.js'));
 const FormRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/FormRiscoOcupacional.js'));
 const DetalhesRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/DetalhesRiscoOcupacional.js'));
+const DetalhesAfastamento = React.lazy(() => import('./pages/Trabalhadores/Afastamentos/DetalhesAfastamento.js'));
+const DetalhesDependente = React.lazy(() => import('./pages/Trabalhadores/Dependentes/DetalhesDependente.js'));
+const DetalhesOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/DetalhesOcorrenciaViolencia.js'));
+const DetalhesReadaptacao = React.lazy(() => import('./pages/Trabalhadores/Readaptacoes/DetalhesReadaptacao.js'));
 
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
 const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
@@ -341,11 +343,19 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-<Route
+        <Route
           path="/trabalhadores/:id/afastamentos/:afastamentoId/editar"
           element={
             <ProtectedRoute>
               <FormAfastamento />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/afastamentos/:afastamentoId"
+          element={
+            <ProtectedRoute>
+              <DetalhesAfastamento />
             </ProtectedRoute>
           }
         />
@@ -370,6 +380,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <FormDependente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/dependentes/:dependenteId"
+          element={
+            <ProtectedRoute>
+              <DetalhesDependente />
             </ProtectedRoute>
           }
         />
@@ -430,6 +448,14 @@ const App: React.FC = () => {
           }
         />
         <Route
+          path="/trabalhadores/:id/ocorrencias-violencia/:ocorrenciaId"
+          element={
+            <ProtectedRoute>
+              <DetalhesOcorrenciaViolencia />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/trabalhadores/:id/readaptacoes"
           element={
             <ProtectedRoute>
@@ -454,26 +480,10 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/trabalhadores/:id/processos-trabalho"
+          path="/trabalhadores/:id/readaptacoes/:readaptacaoId"
           element={
             <ProtectedRoute>
-              <ListaProcessosTrabalho />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/trabalhadores/:id/processos-trabalho/novo"
-          element={
-            <ProtectedRoute>
-              <FormProcessoTrabalho />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/trabalhadores/:id/processos-trabalho/:processoId/editar"
-          element={
-            <ProtectedRoute>
-              <FormProcessoTrabalho />
+              <DetalhesReadaptacao />
             </ProtectedRoute>
           }
         />

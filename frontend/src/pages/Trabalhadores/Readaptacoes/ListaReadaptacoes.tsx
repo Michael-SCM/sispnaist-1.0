@@ -14,8 +14,7 @@ import {
   ChevronRight,
   Activity,
   FileText,
-  Eye,
-  X
+  Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -25,8 +24,6 @@ export const ListaReadaptacoes: React.FC = () => {
   const [readaptacoes, setReadaptacoes] = useState<ITrabalhadorReadaptacao[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [readaptacaoSelecionada, setReadaptacaoSelecionada] = useState<ITrabalhadorReadaptacao | null>(null);
-
   useEffect(() => {
     if (id) {
       carregarDados();
@@ -124,7 +121,7 @@ export const ListaReadaptacoes: React.FC = () => {
                     <tr
                       key={readaptacao._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => setReadaptacaoSelecionada(readaptacao)}
+                      onClick={() => navigate(`/trabalhadores/${id}/readaptacoes/${readaptacao._id}`)}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -168,7 +165,7 @@ export const ListaReadaptacoes: React.FC = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setReadaptacaoSelecionada(readaptacao);
+                              navigate(`/trabalhadores/${id}/readaptacoes/${readaptacao._id}`);
                             }}
                             className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                             title="Visualizar Detalhes"
@@ -202,117 +199,6 @@ export const ListaReadaptacoes: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Modal de Detalhes */}
-      {readaptacaoSelecionada && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div 
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
-              onClick={() => setReadaptacaoSelecionada(null)}
-            ></div>
-
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div className="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100 animate-in fade-in zoom-in duration-200">
-              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
-                    <RefreshCcw size={18} />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-900">Detalhes da Readaptação</h3>
-                </div>
-                <button 
-                  onClick={() => setReadaptacaoSelecionada(null)}
-                  className="p-1.5 hover:bg-slate-200/60 rounded-xl text-slate-400 hover:text-slate-600 transition-all active:scale-95"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="px-6 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Data da Readaptação</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {readaptacaoSelecionada.dataReadaptacao ? new Date(readaptacaoSelecionada.dataReadaptacao).toLocaleDateString('pt-BR') : '-'}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Código CID</span>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-xs font-black uppercase w-fit block border border-slate-200/50 mt-0.5">
-                      {readaptacaoSelecionada.cid || 'Não informado'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Motivo</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {readaptacaoSelecionada.motivo || 'Não informado'}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Atividade Anterior</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {readaptacaoSelecionada.atividadeAnterior || 'Não informada'}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Atividade Atual Recomendada</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {readaptacaoSelecionada.atividadeAtual || 'Não informada'}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Previsão de Retorno</span>
-                    <span className="font-semibold text-slate-700 block">
-                      {readaptacaoSelecionada.dataRetorno ? new Date(readaptacaoSelecionada.dataRetorno).toLocaleDateString('pt-BR') : 'Não definida'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 pt-4">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Status:</span>
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      readaptacaoSelecionada.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                    }`}>
-                      {readaptacaoSelecionada.ativo ? 'Ativo' : 'Encerrada'}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Observações</span>
-                  <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">
-                    {readaptacaoSelecionada.observacoes || 'Nenhuma observação cadastrada'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end gap-2">
-                <button 
-                  onClick={() => {
-                    setReadaptacaoSelecionada(null);
-                    navigate(`/trabalhadores/${id}/readaptacoes/${readaptacaoSelecionada._id}/editar`);
-                  }}
-                  className="px-4 py-2 text-sm bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Editar Registro
-                </button>
-                <button 
-                  onClick={() => setReadaptacaoSelecionada(null)}
-                  className="px-4 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all active:scale-95"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </MainLayout>
   );
 };
