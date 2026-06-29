@@ -30,6 +30,7 @@ import enderecosRoutes from './routes/enderecos.js';
 import municipiosRoutes from './routes/municipios.js';
 import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
+import publicReportsRoutes from './routes/publicReports.js';
 import csrfRoutes from './routes/csrf.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -277,6 +278,7 @@ app.use('/api/municipios', municipiosRoutes);
 app.use('/api/enderecos', enderecosRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/material-biologico', materialBiologicoRoutes);
+app.use('/api/public/reports', publicReportsRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

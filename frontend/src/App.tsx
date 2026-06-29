@@ -81,6 +81,7 @@ const DetalhesReadaptacao = React.lazy(() => import('./pages/Trabalhadores/Reada
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
 const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
 const Monitoramento = React.lazy(() => import('./pages/Monitoramento.js'));
+const RelatorioConformidade = React.lazy(() => import('./pages/Publico/RelatorioConformidade.js'));
 
 const ListaEmpresas = React.lazy(() => import('./pages/Admin/Empresas/ListaEmpresas.js'));
 const FormEmpresa = React.lazy(() => import('./pages/Admin/Empresas/FormEmpresa.js'));
@@ -121,6 +122,7 @@ const App: React.FC = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/transparencia" element={<RelatorioConformidade />} />
           <Route
             path="/dashboard"
             element={

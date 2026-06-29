@@ -8,6 +8,11 @@ export const Footer: React.FC = React.memo(() => {
         <p className="text-sm mt-2">
           Sistema de Gerenciamento de Segurança do Trabalhador
         </p>
+        <div className="flex justify-center gap-4 mt-3 text-sm">
+          <a href="/termos" className="hover:text-white transition-colors">Termos de Uso</a>
+          <a href="/privacidade" className="hover:text-white transition-colors">Privacidade</a>
+          <a href="/transparencia" className="hover:text-white transition-colors">Transparência</a>
+        </div>
       </div>
     </footer>
   );

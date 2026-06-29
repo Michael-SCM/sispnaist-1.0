@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import authService from '../services/AuthService.js';
 import { PdfService } from '../services/PdfService.js';
+import { logAction } from '../utils/auditLogger.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import config from '../config/config.js';
 
@@ -55,6 +56,14 @@ const clearAuthCookies = (res: Response) => {
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, verificationLink } = await authService.register(req.body);
+
+  req.body.usuarioId = user._id;
+  await logAction(req, 'CREATE', 'User', user._id!.toString(), {
+    nome: user.nome,
+    email: user.email,
+    cpf: user.cpf,
+    perfil: user.perfil,
+  });
 
   const response: any = {
     status: 'success',
@@ -262,6 +271,12 @@ export const deleteAccount = asyncHandler(async (req: IAuthRequest, res: Respons
   }
 
   await authService.deleteAccount(req.user.id);
+
+  await logAction(req, 'DELETE', 'User', req.user.id, {
+    motivo: req.body.motivo,
+    dataSolicitacao: new Date().toISOString(),
+  });
+
   clearAuthCookies(res);
 
   res.status(200).json({
