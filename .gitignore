@@ -1,4 +1,5 @@
 backend/.env
+backend/dist/
 frontend/.env
 frontend/.env.local
 frontend/dist/

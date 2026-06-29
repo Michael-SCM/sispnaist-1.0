@@ -4,6 +4,20 @@ import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
 
 const MIN_CELL = 3;
+const CACHE_TTL = 5 * 60 * 1000;
+
+const cache = new Map<string, { data: unknown; expiry: number }>();
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (entry && entry.expiry > Date.now()) return entry.data as T;
+  cache.delete(key);
+  return null;
+}
+
+function setCache<T>(key: string, data: T): void {
+  cache.set(key, { data, expiry: Date.now() + CACHE_TTL });
+}
 
 function suppressSmallValues(data: { nome: string; valor: number }[]): { nome: string; valor: number }[] {
   return data.map((item) => ({
@@ -14,6 +28,10 @@ function suppressSmallValues(data: { nome: string; valor: number }[]): { nome: s
 
 export class PublicReportService {
   async obterRelatorioConformidade() {
+    const cacheKey = 'relatorioConformidade';
+    const cached = getCached<unknown>(cacheKey);
+    if (cached) return cached;
+
     const seisMesesAtras = new Date();
     seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
 
@@ -65,24 +83,33 @@ export class PublicReportService {
         },
         { $sort: { '_id.ano': 1, '_id.mes': 1 } },
       ]),
-      (async () => {
-        const acidentes = await Acidente.find()
-          .populate({
-            path: 'trabalhadorId',
-            select: 'empresa',
-            populate: { path: 'empresa', select: 'razaoSocial' },
-          })
-          .lean();
-
-        const mapa: Record<string, { nome: string; valor: number }> = {};
-        for (const ac of acidentes as any[]) {
-          const nome = ac.trabalhadorId?.empresa?.razaoSocial || 'Sem empresa';
-          if (!mapa[nome]) mapa[nome] = { nome, valor: 0 };
-          mapa[nome].valor++;
-        }
-
-        return Object.values(mapa).sort((a, b) => b.valor - a.valor);
-      })(),
+      Acidente.aggregate([
+        {
+          $lookup: {
+            from: 'trabalhadors',
+            localField: 'trabalhadorId',
+            foreignField: '_id',
+            as: 'trab',
+          },
+        },
+        { $unwind: { path: '$trab', preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: 'empresas',
+            localField: 'trab.empresa',
+            foreignField: '_id',
+            as: 'emp',
+          },
+        },
+        { $unwind: { path: '$emp', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: { $ifNull: ['$emp.razaoSocial', 'Sem empresa'] },
+            valor: { $sum: 1 },
+          },
+        },
+        { $sort: { valor: -1 } },
+      ]),
       Doenca.aggregate([
         { $group: { _id: '$nomeDoenca', valor: { $sum: 1 } } },
         { $sort: { valor: -1 } },
@@ -115,9 +142,7 @@ export class PublicReportService {
       ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
       : 0;
 
-    const acidentesPorEmpresaFormatado = acidentesPorEmpresa as { nome: string; valor: number }[];
-
-    return {
+    const relatorio = {
       kpis: {
         totalTrabalhadores,
         totalAcidentes,
@@ -138,7 +163,10 @@ export class PublicReportService {
           acidentesPorStatus.map((item: any) => ({ nome: item._id || 'Não informado', valor: item.valor }))
         ),
         ultimosMeses: acidentesMeses,
-        porEmpresa: acidentesPorEmpresaFormatado,
+        porEmpresa: (acidentesPorEmpresa as any[]).map((item: any) => ({
+          nome: item._id,
+          valor: item.valor,
+        })),
       },
       doencas: {
         total: totalDoencas,
@@ -152,6 +180,9 @@ export class PublicReportService {
       },
       dataReferencia: new Date().toISOString(),
     };
+
+    setCache(cacheKey, relatorio);
+    return relatorio;
   }
 }
 

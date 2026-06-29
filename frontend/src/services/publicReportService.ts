@@ -32,11 +32,18 @@ export interface IRelatorioConformidade {
   dataReferencia: string;
 }
 
+let cached: { data: IRelatorioConformidade; expiry: number } | null = null;
+const CACHE_TTL = 5 * 60 * 1000;
+
 export const publicReportService = {
   obterRelatorio: async (): Promise<IRelatorioConformidade> => {
+    if (cached && cached.expiry > Date.now()) {
+      return cached.data;
+    }
     const response = await axios.get<{ status: string; data: IRelatorioConformidade }>(
       `${API_BASE_URL}/public/reports/conformidade`
     );
+    cached = { data: response.data.data, expiry: Date.now() + CACHE_TTL };
     return response.data.data;
   },
 };

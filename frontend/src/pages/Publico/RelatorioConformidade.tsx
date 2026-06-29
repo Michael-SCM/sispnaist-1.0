@@ -198,9 +198,56 @@ export const RelatorioConformidade: React.FC = () => {
             <h1 className="text-xl font-bold text-gray-800">SISPNAIST</h1>
           </div>
         </header>
-        <main className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
+            <div className="h-8 w-64 bg-white/20 rounded animate-pulse mb-2" />
+            <div className="h-4 w-96 bg-white/20 rounded animate-pulse" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+                <div className="h-3 w-24 bg-gray-200 rounded mb-3" />
+                <div className="h-8 w-16 bg-gray-200 rounded mb-2" />
+                <div className="h-3 w-32 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+                <div className="h-4 w-40 bg-gray-200 rounded mb-6" />
+                <div className="space-y-3">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j} className="flex justify-between">
+                      <div className="h-3 w-20 bg-gray-200 rounded" />
+                      <div className="h-3 w-8 bg-gray-200 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+            <div className="h-4 w-48 bg-gray-200 rounded mb-4" />
+            <div className="h-48 bg-gray-100 rounded" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+                <div className="h-4 w-40 bg-gray-200 rounded mb-6" />
+                <div className="space-y-4">
+                  {[...Array(5)].map((_, j) => (
+                    <div key={j}>
+                      <div className="flex justify-between mb-1">
+                        <div className="h-3 w-24 bg-gray-200 rounded" />
+                        <div className="h-3 w-8 bg-gray-200 rounded" />
+                      </div>
+                      <div className="h-3 bg-gray-100 rounded-full" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </main>
       </div>
