@@ -86,7 +86,7 @@ export class PublicReportService {
       Acidente.aggregate([
         {
           $lookup: {
-            from: 'trabalhadors',
+            from: 'trabalhadores',
             localField: 'trabalhadorId',
             foreignField: '_id',
             as: 'trab',
