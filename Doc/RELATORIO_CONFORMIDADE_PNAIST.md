@@ -25,13 +25,13 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **47 de 61 requisitos** identificados (~77%), possui **0 requisitos parcialmente implementados** e **14 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **48 de 61 requisitos** identificados (~79%), possui **0 requisitos parcialmente implementados** e **13 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 47 | 77% |
+| ✅ Implementado | 48 | 79% |
 | ⚠️ Parcial | 0 | 0% |
-| ❌ Não implementado | 14 | 23% |
+| ❌ Não implementado | 13 | 21% |
 
 **Principais Pontos Fortes:**
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
@@ -201,7 +201,7 @@ Cada requisito foi classificado como:
 |---|-----------|--------|-------------------|
 | 67 | LGPD | ✅ | JWT (access + refresh tokens, tokenVersion, rotação), CSRF (double-submit cookie), rate-limit (global + específico), Helmet (CSP, HSTS, XSS), sanitização de senhas (bcrypt, histórico de senhas, sanitização em logs). Mas sem: termo de consentimento explícito, política de retenção, exportação de dados pelo titular |
 | 68 | Controle de acesso (RBAC) | ✅ | Perfis admin, gestor, user com middlewares de autorização |
-| 69 | **Anonimato/anonimização** | ❌ | Sem mecanismo de anonimização de dados para relatórios públicos |
+| 69 | **Anonimato/anonimização** | ✅ | Relatório público de transparência em `/api/public/reports` com dados agregados, supressão de células pequenas (<3) e sem PII; página `/transparencia` com gráficos anonimizados |
 
 #### Subdimensão: Acesso e Usabilidade
 
@@ -219,7 +219,7 @@ Cada requisito foi classificado como:
 | 74 | Definição de responsáveis | ✅ | RBAC com perfis distintos |
 | 75 | **Treinamento/capacitação** | ❌ | Sem módulo de onboarding, tutoriais ou certificação |
 | 76 | Monitoramento e avaliação | ✅ | Dashboard com KPIs, analytics, monitoramento clínico |
-| 77 | Divulgação de dados (dashboards) | ⚠️ | Dashboard interno existe, mas sem dashboards públicos para transparência |
+| 77 | Divulgação de dados (dashboards) | ✅ | Dashboard interno (KPIs, gráficos) + página pública `/transparencia` com dados anonimizados e gráficos Recharts |
 | 78 | **Power BI / BI externo** | ❌ | Sem endpoints otimizados para ferramentas de BI |
 
 #### Subdimensão: Realidades Locais
@@ -242,17 +242,17 @@ Cada requisito foi classificado como:
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 7 | 1 | 13 | 33% |
-| **Total** | **82** | **65** | **1** | **16** | **79%** |
+| Aspectos Transversais | 21 | 8 | 1 | 12 | 38% |
+| **Total** | **82** | **66** | **1** | **15** | **80%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
 ### Por Status
 
 ```
-✅ Implementado:    65 requisitos (79%)
+✅ Implementado:    66 requisitos (80%)
 ⚠️ Parcial:          1 requisitos (1%)
-❌ Não implementado: 16 requisitos (20%)
+❌ Não implementado: 15 requisitos (18%)
 ```
 
 ---
@@ -277,7 +277,7 @@ Cada requisito foi classificado como:
 | 7 | Formulário dedicado para assédio moral/sexual | Frontend | Criar componentes de formulário específicos para registrar assédio moral e sexual no ambiente de trabalho | 6h |
 | 8 | Implementar acessibilidade (WCAG 2.1) | Frontend | Auditoria + correções: ARIA labels, foco visível, contraste de cores, navegação por teclado, suporte a leitores de tela | 16h |
 | 9 | Criar sistema de indicadores customizáveis | Backend + Frontend | Interface admin para criar/editar indicadores (nome, fórmula, meta, periodicidade, unidade federativa) | 20h |
-| 10 | Dashboard público de transparência | Backend + Frontend | Endpoint público com dados agregados e anonimizados + página pública com gráficos e indicadores | 12h |
+| 10 | Dashboard público de transparência | Backend + Frontend | ✅ **Concluído.** Endpoint público `/api/public/reports` com dados agregados e anonimizados + página `/transparencia` com gráficos Recharts | 12h |
 | 11 | Criar trilha de consentimento LGPD | Backend | Auditoria dedicada para acessos a dados sensíveis; registro de consentimento do titular | 6h |
 | 12 | Implementar PPP (Perfil Profissiográfico Previdenciário) | Backend + Frontend | Modelo para histórico de exposições ocupacionais ao longo da carreira; geração de relatório PPP | 12h |
 | 13 | Endpoints otimizados para BI | Backend | Views agregadas, endpoints com dados em formato tabular para Power BI, Tableau, etc. | 6h |
@@ -309,7 +309,7 @@ Fase 2 - Curto Prazo (2-4 semanas):
 Fase 3 - Médio Prazo (1-2 meses):
 ├── #5 parametrização UF (20h)
 ├── #9 indicadores customizáveis (20h)
-├── #10 dashboard público (12h)
+├── #10 dashboard público ✅ (12h)
 ├── #12 PPP (12h)
 
 Fase 4 - Longo Prazo (2-4 meses):
@@ -333,7 +333,7 @@ Fase 4 - Longo Prazo (2-4 meses):
 
 3. **Segurança:** Implementação completa com JWT (access + refresh tokens, tokenVersion, rotação), CSRF (double-submit cookie), rate-limit (global, escrita, auth, change-password), Helmet (CSP, HSTS, XSS), sanitização de senhas (bcrypt, histórico de 5 senhas anteriores, limite de 128 caracteres, sanitização em logs de erro), refresh tokens em httpOnly cookie (mitigação XSS), e validação Joi com senha forte.
 
-4. **Dashboard analítico:** KPIs, gráficos (barras, pizza, série temporal), monitoramento de cobertura vacinal e absenteísmo, alertas críticos - funcionalidades que atendem à necessidade de "divulgação de dados" mencionada no documento.
+4. **Dashboard analítico:** KPIs, gráficos (barras, pizza, série temporal), monitoramento de cobertura vacinal e absenteísmo, alertas críticos - funcionalidades que atendem à necessidade de "divulgação de dados" mencionada no documento. Adicionalmente, o dashboard público `/transparencia` com dados agregados e anonimizados atende ao requisito de transparência (#69 e #77).
 
 ### Gaps Críticos
 

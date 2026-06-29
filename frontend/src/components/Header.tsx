@@ -31,7 +31,7 @@ export const Header: React.FC = React.memo(() => {
   };
 
   return (
-    <header className="bg-blue-600 text-white shadow-lg w-full overflow-x-hidden">
+    <header className="bg-blue-600 text-white shadow-lg w-full">
       <div className="px-4 py-4 w-full max-w-screen-xl mx-auto">
         <div className="flex justify-between items-center w-full">
           <Link to="/" className="text-2xl font-bold hover:text-blue-100 transition">
