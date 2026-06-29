@@ -1,6 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IUser } from '../types/index.js';
 
+export interface IPasswordHistoryEntry {
+  hash: string;
+  dataAlteracao: Date;
+}
+
 export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade' | 'senha'>, Document {
   empresa?: mongoose.Types.ObjectId;
   unidade?: mongoose.Types.ObjectId;
@@ -8,6 +13,7 @@ export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade'
   refreshToken?: string;
   refreshTokenExpires?: Date;
   tokenVersion?: number;
+  passwordHistory?: IPasswordHistoryEntry[];
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -36,7 +42,8 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       required: [true, 'Senha é obrigatória'],
       select: false,
-      minlength: 6,
+      minlength: 8,
+      maxlength: 20,
     },
     matricula: {
       type: String,
@@ -100,6 +107,14 @@ const UserSchema = new Schema<IUserDocument>(
     tokenVersion: {
       type: Number,
       default: 1,
+    },
+    passwordHistory: {
+      type: [{
+        hash: { type: String, required: true },
+        dataAlteracao: { type: Date, default: Date.now },
+      }],
+      select: false,
+      default: [],
     },
     // LGPD
     consentimentoLGPD: {

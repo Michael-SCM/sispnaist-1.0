@@ -22,6 +22,7 @@ export interface IUser {
   verificationTokenExpires?: Date;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
+  passwordHistory?: { hash: string; dataAlteracao: Date }[];
   // LGPD
   consentimentoLGPD?: boolean;
   dataAceiteLGPD?: Date;

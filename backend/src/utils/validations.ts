@@ -23,10 +23,12 @@ export const registerSchema = Joi.object({
     }),
   senha: Joi.string()
     .min(8)
+    .max(20)
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
       'string.min': 'Senha deve ter pelo menos 8 caracteres',
+      'string.max': 'Senha não pode ter mais de 20 caracteres',
       'string.pattern.base': 'A senha deve conter letra maiúscula, minúscula, número e caractere especial',
     }),
   telefone: Joi.string().optional(),
@@ -85,10 +87,12 @@ export const resetPasswordSchema = Joi.object({
   }),
   novaSenha: Joi.string()
     .min(8)
+    .max(128)
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
       'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
+      'string.max': 'A nova senha não pode ter mais de 20 caracteres',
       'string.pattern.base': 'A nova senha deve conter letra maiúscula, minúscula, número e caractere especial',
       'any.required': 'A nova senha é obrigatória',
     }),
@@ -326,10 +330,12 @@ export const changePasswordSchema = Joi.object({
   }),
   novaSenha: Joi.string()
     .min(8)
+    .max(128)
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
     .required()
     .messages({
       'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
+      'string.max': 'A nova senha não pode ter mais de 20 caracteres',
       'string.pattern.base': 'A nova senha deve conter letra maiúscula, minúscula, número e caractere especial',
       'any.required': 'Nova senha é obrigatória',
     }),

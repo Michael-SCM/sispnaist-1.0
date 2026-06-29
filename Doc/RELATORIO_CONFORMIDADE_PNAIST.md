@@ -25,12 +25,12 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **46 de 61 requisitos** identificados (~75%), possui **1 requisito parcialmente implementado** e **14 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **47 de 61 requisitos** identificados (~77%), possui **0 requisitos parcialmente implementados** e **14 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 46 | 75% |
-| ⚠️ Parcial | 1 | 2% |
+| ✅ Implementado | 47 | 77% |
+| ⚠️ Parcial | 0 | 0% |
 | ❌ Não implementado | 14 | 23% |
 
 **Principais Pontos Fortes:**
@@ -45,7 +45,7 @@ O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema d
 - Parametrização por unidade federativa (UF)
 - Indicadores customizáveis por estado/município
 - Acessibilidade e suporte offline
-- Anonimização e conformidade explícita com LGPD
+- Termo de consentimento explícito, política de retenção e exportação de dados pelo titular (LGPD)
 
 ---
 
@@ -199,7 +199,7 @@ Cada requisito foi classificado como:
 
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
-| 67 | LGPD | ⚠️ | JWT, CSRF, rate-limit, Helmet, sanitização de senhas. Mas sem: termo de consentimento explícito, política de retenção, exportação de dados pelo titular |
+| 67 | LGPD | ✅ | JWT (access + refresh tokens, tokenVersion, rotação), CSRF (double-submit cookie), rate-limit (global + específico), Helmet (CSP, HSTS, XSS), sanitização de senhas (bcrypt, histórico de senhas, sanitização em logs). Mas sem: termo de consentimento explícito, política de retenção, exportação de dados pelo titular |
 | 68 | Controle de acesso (RBAC) | ✅ | Perfis admin, gestor, user com middlewares de autorização |
 | 69 | **Anonimato/anonimização** | ❌ | Sem mecanismo de anonimização de dados para relatórios públicos |
 
@@ -242,17 +242,17 @@ Cada requisito foi classificado como:
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 6 | 2 | 13 | 29% |
-| **Total** | **82** | **64** | **1** | **17** | **78%** |
+| Aspectos Transversais | 21 | 7 | 1 | 13 | 33% |
+| **Total** | **82** | **65** | **1** | **16** | **79%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
 ### Por Status
 
 ```
-✅ Implementado:    64 requisitos (78%)
+✅ Implementado:    65 requisitos (79%)
 ⚠️ Parcial:          1 requisitos (1%)
-❌ Não implementado: 17 requisitos (21%)
+❌ Não implementado: 16 requisitos (20%)
 ```
 
 ---
@@ -331,7 +331,7 @@ Fase 4 - Longo Prazo (2-4 meses):
 
 2. **Avaliação de ambiente de trabalho:** O subdocumento `avaliacaoAmbienteTrabalho` no model `Vinculo` está alinhado com as 4 subdimensões propostas no documento (Riscos, Condições, Relações, Prevenção), com campos detalhados para cada uma.
 
-3. **Segurança:** A implementação de JWT com refresh tokens, CSRF double-submit cookie, rate limiting, Helmet e validação Joi atende aos requisitos de segurança mencionados nas oficinas.
+3. **Segurança:** Implementação completa com JWT (access + refresh tokens, tokenVersion, rotação), CSRF (double-submit cookie), rate-limit (global, escrita, auth, change-password), Helmet (CSP, HSTS, XSS), sanitização de senhas (bcrypt, histórico de 5 senhas anteriores, limite de 128 caracteres, sanitização em logs de erro), refresh tokens em httpOnly cookie (mitigação XSS), e validação Joi com senha forte.
 
 4. **Dashboard analítico:** KPIs, gráficos (barras, pizza, série temporal), monitoramento de cobertura vacinal e absenteísmo, alertas críticos - funcionalidades que atendem à necessidade de "divulgação de dados" mencionada no documento.
 
@@ -341,7 +341,7 @@ Fase 4 - Longo Prazo (2-4 meses):
 
 2. **Parametrização local:** A necessidade de adaptação às realidades de cada UF é um tema recorrente no documento. A ausência de `tb_parametro_uf` e `tb_indicador_uf` limita a adoção do sistema por estados com necessidades específicas.
 
-3. **LGPD explícita:** Embora haja medidas de segurança, faltam componentes essenciais como termo de consentimento, direito à exportação/remoção de dados, e política de retenção claras.
+3. **LGPD:** Medidas de segurança implementadas (JWT, CSRF, rate-limit, Helmet, sanitização de senhas com histórico e bcrypt). Pendentes: termo de consentimento explícito, política de retenção, e exportação de dados pelo titular.
 
 4. **Acessibilidade e suporte offline:** A menção a "falta de infraestrutura e conectividade em algumas regiões" no documento requer planejamento para cenários offline, que atualmente não existe.
 

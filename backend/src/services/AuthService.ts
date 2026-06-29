@@ -208,13 +208,28 @@ export class AuthService {
         throw new AppError('Token inválido', 400);
       }
 
-      const user = await User.findById(decoded.id);
+      const user = await User.findById(decoded.id).select('+senha +passwordHistory');
       if (!user) {
         throw new AppError('Usuário não encontrado', 404);
       }
 
+      if (user.senha) {
+        const sameAsCurrent = await bcrypt.compare(novaSenha, user.senha);
+        if (sameAsCurrent) {
+          throw new AppError('A nova senha deve ser diferente da senha atual.', 400);
+        }
+      }
+
+      await this.checkReuse(user, novaSenha);
+
+      const currentHash = user.senha;
+      if (currentHash) {
+        await this.pushPasswordHistory(user, currentHash);
+      }
+
       // Atualizar senha
       user.senha = novaSenha;
+      user.tokenVersion = (user.tokenVersion || 1) + 1;
       await user.save();
 
     } catch (error: any) {
@@ -253,8 +268,30 @@ export class AuthService {
     });
   }
 
+  private async checkReuse(user: IUserDocument, newPassword: string): Promise<void> {
+    if (user.passwordHistory && user.passwordHistory.length > 0) {
+      const maxHistory = 5;
+      const recent = user.passwordHistory.slice(-maxHistory);
+      for (const entry of recent) {
+        const match = await bcrypt.compare(newPassword, entry.hash);
+        if (match) {
+          throw new AppError('A nova senha não pode ser igual a uma das últimas 5 senhas utilizadas.', 400);
+        }
+      }
+    }
+  }
+
+  private async pushPasswordHistory(user: IUserDocument, passwordHash: string): Promise<void> {
+    const history = user.passwordHistory || [];
+    history.push({ hash: passwordHash, dataAlteracao: new Date() });
+    if (history.length > 10) {
+      history.splice(0, history.length - 10);
+    }
+    user.passwordHistory = history;
+  }
+
   async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
-    const user = await User.findById(userId).select('+senha');
+    const user = await User.findById(userId).select('+senha +passwordHistory');
     if (!user) {
       throw new AppError('Usuário não encontrado', 404);
     }
@@ -262,6 +299,17 @@ export class AuthService {
     const isPasswordValid = await (user as IUserDocument).comparePassword(currentPassword);
     if (!isPasswordValid) {
       throw new AppError('Senha atual incorreta', 401);
+    }
+
+    if (currentPassword === newPassword) {
+      throw new AppError('A nova senha deve ser diferente da senha atual.', 400);
+    }
+
+    await this.checkReuse(user, newPassword);
+
+    const currentHash = user.senha;
+    if (currentHash) {
+      await this.pushPasswordHistory(user, currentHash);
     }
 
     user.senha = newPassword;

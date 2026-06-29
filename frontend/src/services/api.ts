@@ -91,17 +91,13 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-        refreshToken: localStorage.getItem('sispnaist_refreshToken'),
-      }, { withCredentials: true });
+      const { data } = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {}, {
+        withCredentials: true,
+      });
 
       const newToken = data.data.accessToken;
-      const newRefreshToken = data.data.refreshToken;
 
       useAuthStore.getState().setAccessToken(newToken);
-      if (newRefreshToken) {
-        localStorage.setItem('sispnaist_refreshToken', newRefreshToken);
-      }
 
       processQueue(null, newToken);
 

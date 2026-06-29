@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { sanitizeForLogging } from '../utils/sanitize.js';
 
 export class AppError extends Error {
   constructor(
@@ -12,9 +13,10 @@ export class AppError extends Error {
 
 const isProduction = () => process.env.NODE_ENV === 'production';
 
-function genericResponse(res: Response, statusCode: number, genericMsg: string, detail: string, stack?: string) {
+function genericResponse(res: Response, statusCode: number, genericMsg: string, detail: string, stack?: string, req?: Request) {
+  const safeDetail = isProduction() ? detail : `${detail} | body: ${JSON.stringify(sanitizeForLogging(req?.body || {}))}`;
   if (!isProduction()) {
-    console.error(`[${statusCode}] ${detail}`, stack ? '\n' + stack : '');
+    console.error(`[${statusCode}] ${safeDetail}`, stack ? '\n' + stack : '');
   } else {
     console.error(`[${statusCode}] ${detail}`);
   }
@@ -30,7 +32,7 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
   if (err instanceof AppError) {
     const isServerError = err.statusCode >= 500;
     if (isServerError && isProduction()) {
-      genericResponse(res, err.statusCode, 'Erro interno do servidor', err.message, err.stack);
+      genericResponse(res, err.statusCode, 'Erro interno do servidor', err.message, err.stack, req);
       return;
     }
     res.status(err.statusCode).json({
@@ -49,6 +51,8 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
       res, 400,
       'Erro de validação dos dados enviados',
       `ValidationError: ${fieldErrors}`,
+      undefined,
+      req,
     );
     return;
   }
@@ -60,6 +64,8 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
       res, 400,
       'Parâmetro inválido na requisição',
       `CastError: invalid value "${castErr.value}" for field "${castErr.path}" (${castErr.kind})`,
+      undefined,
+      req,
     );
     return;
   }
@@ -72,6 +78,8 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
       res, 409,
       'Já existe um registro com este valor',
       `DuplicateKey: ${field} = "${value}"`,
+      undefined,
+      req,
     );
     return;
   }
@@ -82,6 +90,7 @@ export const errorHandler = (err: Error | AppError, req: Request, res: Response,
     'Erro interno do servidor',
     `Unexpected: ${err instanceof Error ? err.message : 'Unknown error'}`,
     err instanceof Error ? err.stack : undefined,
+    req,
   );
 };
 
@@ -90,6 +99,8 @@ export const notFoundHandler = (req: Request, res: Response): void => {
     res, 404,
     'Rota não encontrada',
     `Route not found: ${req.method} ${req.originalUrl}`,
+    undefined,
+    req,
   );
 };
 

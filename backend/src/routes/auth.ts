@@ -23,6 +23,14 @@ const refreshLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const changePasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { status: 'error', message: 'Muitas tentativas de alteração de senha. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 router.post(
   '/register',
   authLimiter,
@@ -69,6 +77,7 @@ router.post(
 
 router.post(
   '/change-password',
+  changePasswordLimiter,
   authMiddleware,
   validateRequest(changePasswordSchema),
   authController.changePassword

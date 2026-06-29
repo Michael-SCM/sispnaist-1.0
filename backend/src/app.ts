@@ -57,12 +57,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      imgSrc: ["'self'", "data:"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
       fontSrc: ["'self'"],
       frameSrc: ["'self'", "https://www.youtube.com", "https://*.youtube.com"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://sispnaist-1-0.onrender.com", "https://sispnaist-1-0.vercel.app"],
       mediaSrc: ["'self'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
@@ -73,6 +73,8 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   xXssProtection: true,
 }));
+
+
 
 // Parser de requisições
 app.use(express.json({ limit: '10mb', strict: false }));
