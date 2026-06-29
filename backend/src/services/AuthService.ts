@@ -392,16 +392,24 @@ export class AuthService {
     const user = await User.findById(userId);
     if (!user) throw new AppError('Usuário não encontrado', 404);
 
-    user.dataSolicitacaoExclusao = new Date();
-    user.anonimizado = true;
-    user.dataAnonimizacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    user.nome = 'Usuário Removido';
-    user.cpf = `000.000.000-${String(userId).slice(-2).padStart(2, '0')}`;
-    user.email = `removido-${userId}@sispnaist.local`;
-    user.telefone = undefined;
-    user.endereco = undefined;
-    user.ativo = false;
-    await user.save();
+    const anonimizadoEmail = `removido-${userId}@sispnaist.local`;
+    const anonimizadoCpf = `000.000.000-${String(userId).slice(-2).padStart(2, '0')}`;
+
+    await User.findByIdAndUpdate(userId, {
+      $set: {
+        nome: 'Usuário Removido',
+        cpf: anonimizadoCpf,
+        email: anonimizadoEmail,
+        dataSolicitacaoExclusao: new Date(),
+        anonimizado: true,
+        dataAnonimizacao: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        ativo: false,
+      },
+      $unset: {
+        telefone: '',
+        endereco: '',
+      },
+    });
   }
 }
 
