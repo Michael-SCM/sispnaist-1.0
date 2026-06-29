@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 import { authService } from '../services/authService.js';
@@ -7,6 +7,18 @@ export const Header: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [registrosOpen, setRegistrosOpen] = useState(false);
+  const registrosRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (registrosRef.current && !registrosRef.current.contains(e.target as Node)) {
+        setRegistrosOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     authService.logout();
@@ -30,21 +42,61 @@ export const Header: React.FC = React.memo(() => {
           <nav className="hidden lg:flex items-center gap-6 justify-end">
             {user ? (
               <>
-                <Link to="/dashboard" className="hover:text-blue-100 transition text-sm">
-                  Dashboard
-                </Link>
-                <Link to="/acidentes" className="hover:text-blue-100 transition text-sm">
-                  Acidentes
-                </Link>
-                <Link to="/trabalhadores" className="hover:text-blue-100 transition text-sm">
-                  Trabalhadores
-                </Link>
-                <Link to="/doencas" className="hover:text-blue-100 transition text-sm">
-                  Doenças
-                </Link>
-                <Link to="/vacinacoes" className="hover:text-blue-100 transition text-sm">
-                  Vacinações
-                </Link>
+                {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+                  <Link to="/dashboard" className="hover:text-blue-100 transition text-sm">
+                    Dashboard
+                  </Link>
+                )}
+
+                <div className="relative" ref={registrosRef}>
+                  <button
+                    onClick={() => setRegistrosOpen(!registrosOpen)}
+                    className="flex items-center gap-1 hover:text-blue-100 transition text-sm"
+                  >
+                    Registros
+                    <svg
+                      className={`w-3 h-3 transition-transform ${registrosOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {registrosOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                      <Link
+                        to="/trabalhadores"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setRegistrosOpen(false)}
+                      >
+                        Trabalhadores
+                      </Link>
+                      <Link
+                        to="/acidentes"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setRegistrosOpen(false)}
+                      >
+                        Acidentes
+                      </Link>
+                      <Link
+                        to="/doencas"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setRegistrosOpen(false)}
+                      >
+                        Doenças
+                      </Link>
+                      <Link
+                        to="/vacinacoes"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setRegistrosOpen(false)}
+                      >
+                        Vacinações
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
                 <Link to="/video-aulas" className="hover:text-blue-100 transition text-sm">
                   Treinamentos
                 </Link>
@@ -149,55 +201,52 @@ export const Header: React.FC = React.memo(() => {
             >
               Transparência
             </Link>
-            <Link
-              to="/dashboard"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/acidentes"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Acidentes
-            </Link>
-            <Link
-              to="/trabalhadores"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Trabalhadores
-            </Link>
-            <Link
-              to="/doencas"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Doenças
-            </Link>
-            <Link
-              to="/vacinacoes"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Vacinações
-            </Link>
+            {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+              <Link
+                to="/dashboard"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+            )}
+            <div className="pt-2 border-t border-blue-500">
+              <p className="text-xs text-blue-300 uppercase tracking-wider px-1 pb-1 font-semibold">Registros</p>
+              <Link
+                to="/trabalhadores"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Trabalhadores
+              </Link>
+              <Link
+                to="/acidentes"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Acidentes
+              </Link>
+              <Link
+                to="/doencas"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Doenças
+              </Link>
+              <Link
+                to="/vacinacoes"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Vacinações
+              </Link>
+            </div>
             <Link
               to="/video-aulas"
               className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
             >
               Treinamentos
-            </Link>
-
-            <Link
-              to="/transparencia"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Transparência
             </Link>
             <Link
               to="/minha-conta"

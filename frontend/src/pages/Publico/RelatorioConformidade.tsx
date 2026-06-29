@@ -12,6 +12,15 @@ import {
 } from 'lucide-react';
 import { publicReportService, IRelatorioConformidade } from '../../services/publicReportService';
 import { KPICard } from '../../components/KPICard';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 const CORES_GRAFICO = ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899'];
 
@@ -117,47 +126,46 @@ const LineChartSimple: React.FC<{
   dados: { mes: string; quantidade: number }[];
   titulo: string;
 }> = ({ dados, titulo }) => {
-  const todosZero = !dados || dados.length === 0 || dados.every((d) => d.quantidade === 0);
+  const temDados = dados && dados.length > 0 && dados.some((d) => d.quantidade > 0);
 
-  if (todosZero) {
+  if (!temDados) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-200">
         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
-        <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg">
           <p className="text-gray-400 text-sm">Nenhum acidente registrado no período</p>
         </div>
       </div>
     );
   }
 
-  const maxValor = Math.max(...dados.map((d) => d.quantidade));
-
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
-      <div className="flex gap-2 h-40">
-        {dados.map((item, i) => {
-          const barHeightPct = (item.quantidade / maxValor) * 100;
-          return (
-            <div key={i} className="flex-1 flex flex-col min-h-0">
-              <div className="flex-1 flex flex-col justify-end min-h-0">
-                <div
-                  className="w-full rounded-t transition-all duration-500"
-                  style={{
-                    height: `${Math.max(barHeightPct, 4)}%`,
-                    backgroundColor: '#3b82f6',
-                    minHeight: item.quantidade > 0 ? '4px' : '0px',
-                  }}
-                />
-              </div>
-              <div className="flex flex-col items-center pt-1">
-                <span className="text-[10px] font-semibold text-gray-600">{item.quantidade}</span>
-                <span className="text-[10px] text-gray-500 whitespace-nowrap">{item.mes}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={dados}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey="mes" tick={{ fill: '#6b7280', fontSize: 12 }} tickLine={false} />
+          <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} tickLine={false} allowDecimals={false} />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="quantidade"
+            stroke="#3b82f6"
+            strokeWidth={3}
+            dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+            name="Acidentes"
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };
