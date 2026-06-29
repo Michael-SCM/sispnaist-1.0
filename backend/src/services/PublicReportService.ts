@@ -65,34 +65,24 @@ export class PublicReportService {
         },
         { $sort: { '_id.ano': 1, '_id.mes': 1 } },
       ]),
-      Acidente.aggregate([
-        {
-          $lookup: {
-            from: 'trabalhadores',
-            localField: 'trabalhadorId',
-            foreignField: '_id',
-            as: 'trabalhador',
-          },
-        },
-        { $unwind: { path: '$trabalhador', preserveNullAndEmptyArrays: true } },
-        {
-          $lookup: {
-            from: 'empresas',
-            localField: 'trabalhador.empresa',
-            foreignField: '_id',
-            as: 'empresa',
-          },
-        },
-        { $unwind: { path: '$empresa', preserveNullAndEmptyArrays: true } },
-        {
-          $group: {
-            _id: '$empresa._id',
-            nome: { $first: '$empresa.razaoSocial' },
-            total: { $sum: 1 },
-          },
-        },
-        { $sort: { total: -1 } },
-      ]),
+      (async () => {
+        const acidentes = await Acidente.find()
+          .populate({
+            path: 'trabalhadorId',
+            select: 'empresa',
+            populate: { path: 'empresa', select: 'razaoSocial' },
+          })
+          .lean();
+
+        const mapa: Record<string, { nome: string; total: number }> = {};
+        for (const ac of acidentes as any[]) {
+          const nome = ac.trabalhadorId?.empresa?.razaoSocial || 'Sem empresa';
+          if (!mapa[nome]) mapa[nome] = { nome, total: 0 };
+          mapa[nome].total++;
+        }
+
+        return Object.values(mapa).sort((a, b) => b.total - a.total);
+      })(),
       Doenca.aggregate([
         { $group: { _id: '$nomeDoenca', valor: { $sum: 1 } } },
         { $sort: { valor: -1 } },
@@ -125,12 +115,7 @@ export class PublicReportService {
       ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
       : 0;
 
-    const acidentesPorEmpresaFormatado = acidentesPorEmpresa
-      .filter((item: any) => item._id !== null)
-      .map((item: any) => ({
-        nome: item.nome || 'Sem empresa',
-        total: item.total,
-      }));
+    const acidentesPorEmpresaFormatado = acidentesPorEmpresa as { nome: string; total: number }[];
 
     return {
       kpis: {
@@ -153,10 +138,7 @@ export class PublicReportService {
           acidentesPorStatus.map((item: any) => ({ nome: item._id || 'Não informado', valor: item.valor }))
         ),
         ultimosMeses: acidentesMeses,
-        porEmpresa: acidentesPorEmpresaFormatado.map((item: any) => ({
-          nome: item.nome,
-          total: item.total,
-        })),
+        porEmpresa: acidentesPorEmpresaFormatado,
       },
       doencas: {
         total: totalDoencas,

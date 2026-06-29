@@ -20,17 +20,9 @@ const BarChartSimple: React.FC<{
   titulo: string;
   cor?: string;
 }> = ({ dados, titulo, cor = '#3b82f6' }) => {
-  if (!dados || dados.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-gray-500 text-sm">Sem dados disponíveis</p>
-      </div>
-    );
-  }
+  const todosZero = !dados || dados.length === 0 || dados.every((d) => d.valor === 0);
 
-  const maxValor = Math.max(...dados.map((d) => d.valor), 1);
-
-  if (maxValor === 0) {
+  if (todosZero) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-200">
         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
@@ -40,6 +32,8 @@ const BarChartSimple: React.FC<{
       </div>
     );
   }
+
+  const maxValor = Math.max(...dados.map((d) => d.valor));
 
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
@@ -123,17 +117,9 @@ const LineChartSimple: React.FC<{
   dados: { mes: string; quantidade: number }[];
   titulo: string;
 }> = ({ dados, titulo }) => {
-  if (!dados || dados.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-48 bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-gray-500 text-sm">Sem dados disponíveis</p>
-      </div>
-    );
-  }
+  const todosZero = !dados || dados.length === 0 || dados.every((d) => d.quantidade === 0);
 
-  const maxValor = Math.max(...dados.map((d) => d.quantidade), 1);
-
-  if (maxValor === 0) {
+  if (todosZero) {
     return (
       <div className="bg-white p-5 rounded-xl border border-gray-200">
         <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
@@ -143,6 +129,8 @@ const LineChartSimple: React.FC<{
       </div>
     );
   }
+
+  const maxValor = Math.max(...dados.map((d) => d.quantidade));
 
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
