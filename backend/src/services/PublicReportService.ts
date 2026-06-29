@@ -2,7 +2,6 @@ import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
-import Empresa from '../models/Empresa.js';
 
 const MIN_CELL = 3;
 
@@ -35,7 +34,6 @@ export class PublicReportService {
       acidentesPorTipo,
       acidentesPorStatus,
       acidentesUltimosMeses,
-      empresas,
       acidentesPorEmpresa,
       doencasPorTipo,
     ] = await Promise.all([
@@ -67,7 +65,6 @@ export class PublicReportService {
         },
         { $sort: { '_id.ano': 1, '_id.mes': 1 } },
       ]),
-      Empresa.find({ ativa: true }).select('razaoSocial _id').lean(),
       Acidente.aggregate([
         {
           $lookup: {
@@ -128,10 +125,12 @@ export class PublicReportService {
       ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
       : 0;
 
-    const acidentesPorEmpresaFormatado = acidentesPorEmpresa.map((item: any) => ({
-      nome: item.nome || 'Sem empresa',
-      total: item.total,
-    }));
+    const acidentesPorEmpresaFormatado = acidentesPorEmpresa
+      .filter((item: any) => item._id !== null)
+      .map((item: any) => ({
+        nome: item.nome || 'Sem empresa',
+        total: item.total,
+      }));
 
     return {
       kpis: {
@@ -153,13 +152,10 @@ export class PublicReportService {
         porStatus: suppressSmallValues(
           acidentesPorStatus.map((item: any) => ({ nome: item._id || 'Não informado', valor: item.valor }))
         ),
-        ultimosMeses: acidentesMeses.map((m) => ({
-          ...m,
-          quantidade: m.quantidade < MIN_CELL && m.quantidade > 0 ? -1 : m.quantidade,
-        })),
+        ultimosMeses: acidentesMeses,
         porEmpresa: acidentesPorEmpresaFormatado.map((item: any) => ({
           nome: item.nome,
-          total: item.total < MIN_CELL && item.total > 0 ? -1 : item.total,
+          total: item.total,
         })),
       },
       doencas: {

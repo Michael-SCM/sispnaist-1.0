@@ -48,6 +48,9 @@ export const Header: React.FC = React.memo(() => {
                 <Link to="/video-aulas" className="hover:text-blue-100 transition text-sm">
                   Treinamentos
                 </Link>
+                <Link to="/transparencia" className="hover:text-blue-100 transition text-sm">
+                  Transparência
+                </Link>
 
                 <Link
                   to="/minha-conta"
@@ -90,6 +93,9 @@ export const Header: React.FC = React.memo(() => {
               </>
             ) : (
               <>
+                <Link to="/transparencia" className="hover:text-blue-100 transition text-sm">
+                  Transparência
+                </Link>
                 <Link to="/login" className="hover:text-blue-100 transition">
                   Login
                 </Link>
@@ -137,6 +143,13 @@ export const Header: React.FC = React.memo(() => {
           <nav className="lg:hidden mt-4 pt-4 border-t border-blue-500 space-y-2 w-full max-w-full overflow-x-hidden">
 
             <Link
+              to="/transparencia"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Transparência
+            </Link>
+            <Link
               to="/dashboard"
               className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
@@ -179,6 +192,13 @@ export const Header: React.FC = React.memo(() => {
               Treinamentos
             </Link>
 
+            <Link
+              to="/transparencia"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Transparência
+            </Link>
             <Link
               to="/minha-conta"
               className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"

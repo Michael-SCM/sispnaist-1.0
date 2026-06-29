@@ -30,6 +30,17 @@ const BarChartSimple: React.FC<{
 
   const maxValor = Math.max(...dados.map((d) => d.valor), 1);
 
+  if (maxValor === 0) {
+    return (
+      <div className="bg-white p-5 rounded-xl border border-gray-200">
+        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
+        <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+          <p className="text-gray-400 text-sm">Nenhum registro encontrado</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
@@ -40,13 +51,13 @@ const BarChartSimple: React.FC<{
             <div key={i}>
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span className="truncate max-w-[70%]">{item.nome}</span>
-                <span className="font-semibold">{item.valor < 0 ? '<3' : item.valor}</span>
+                <span className="font-semibold">{item.valor}</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-3">
                 <div
                   className="h-3 rounded-full transition-all duration-500"
                   style={{
-                    width: `${item.valor < 0 ? 0 : Math.max(widthPercent, 2)}%`,
+                    width: `${Math.max(widthPercent, 2)}%`,
                     backgroundColor: cor,
                   }}
                 />
@@ -73,12 +84,23 @@ const PieChartSimple: React.FC<{
 
   const total = dados.reduce((acc, item) => acc + (item.valor > 0 ? item.valor : 0), 0);
 
+  if (total === 0) {
+    return (
+      <div className="bg-white p-5 rounded-xl border border-gray-200">
+        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
+        <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+          <p className="text-gray-400 text-sm">Nenhum registro encontrado</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
       <div className="flex flex-col gap-2">
         {dados.map((item, i) => {
-          const percent = total > 0 ? ((Math.max(item.valor, 0) / total) * 100).toFixed(1) : 0;
+          const percent = total > 0 ? ((item.valor / total) * 100).toFixed(1) : 0;
           return (
             <div key={i} className="flex items-center gap-2 text-sm">
               <span
@@ -87,7 +109,7 @@ const PieChartSimple: React.FC<{
               />
               <span className="text-gray-700 flex-1 truncate">{item.nome}</span>
               <span className="font-semibold text-gray-900">
-                {item.valor < 0 ? '<3' : item.valor} ({percent}%)
+                {item.valor} ({percent}%)
               </span>
             </div>
           );
@@ -111,23 +133,31 @@ const LineChartSimple: React.FC<{
 
   const maxValor = Math.max(...dados.map((d) => d.quantidade), 1);
 
+  if (maxValor === 0) {
+    return (
+      <div className="bg-white p-5 rounded-xl border border-gray-200">
+        <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
+        <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg">
+          <p className="text-gray-400 text-sm">Nenhum acidente registrado no período</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
       <div className="flex items-end gap-2 h-32">
         {dados.map((item, i) => {
-          const heightPercent = (Math.max(item.quantidade, 0) / maxValor) * 100;
+          const heightPercent = (item.quantidade / maxValor) * 100;
           return (
             <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-[10px] font-semibold text-gray-600">
-                {item.quantidade < 0 ? '<3' : item.quantidade}
-              </span>
+              <span className="text-[10px] font-semibold text-gray-600">{item.quantidade}</span>
               <div
                 className="w-full rounded-t transition-all duration-500"
                 style={{
-                  height: `${item.quantidade < 0 ? 0 : Math.max(heightPercent, 2)}%`,
+                  height: `${Math.max(heightPercent, 2)}%`,
                   backgroundColor: '#3b82f6',
-                  minHeight: item.quantidade < 0 ? 0 : undefined,
                 }}
               />
               <span className="text-[10px] text-gray-500 whitespace-nowrap">{item.mes}</span>
