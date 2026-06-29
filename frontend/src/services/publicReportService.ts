@@ -19,7 +19,7 @@ export interface IRelatorioConformidade {
     porTipo: { nome: string; valor: number }[];
     porStatus: { nome: string; valor: number }[];
     ultimosMeses: { mes: string; quantidade: number }[];
-    porEmpresa: { nome: string; total: number }[];
+    porEmpresa: { nome: string; valor: number }[];
   };
   doencas: {
     total: number;

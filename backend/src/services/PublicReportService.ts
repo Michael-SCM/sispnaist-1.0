@@ -74,14 +74,14 @@ export class PublicReportService {
           })
           .lean();
 
-        const mapa: Record<string, { nome: string; total: number }> = {};
+        const mapa: Record<string, { nome: string; valor: number }> = {};
         for (const ac of acidentes as any[]) {
           const nome = ac.trabalhadorId?.empresa?.razaoSocial || 'Sem empresa';
-          if (!mapa[nome]) mapa[nome] = { nome, total: 0 };
-          mapa[nome].total++;
+          if (!mapa[nome]) mapa[nome] = { nome, valor: 0 };
+          mapa[nome].valor++;
         }
 
-        return Object.values(mapa).sort((a, b) => b.total - a.total);
+        return Object.values(mapa).sort((a, b) => b.valor - a.valor);
       })(),
       Doenca.aggregate([
         { $group: { _id: '$nomeDoenca', valor: { $sum: 1 } } },
@@ -115,7 +115,7 @@ export class PublicReportService {
       ? Math.round((trabalhadoresComVacina.length / totalTrabalhadores) * 100)
       : 0;
 
-    const acidentesPorEmpresaFormatado = acidentesPorEmpresa as { nome: string; total: number }[];
+    const acidentesPorEmpresaFormatado = acidentesPorEmpresa as { nome: string; valor: number }[];
 
     return {
       kpis: {

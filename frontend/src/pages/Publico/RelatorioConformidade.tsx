@@ -135,20 +135,25 @@ const LineChartSimple: React.FC<{
   return (
     <div className="bg-white p-5 rounded-xl border border-gray-200">
       <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">{titulo}</h3>
-      <div className="flex items-end gap-2 h-32">
+      <div className="flex gap-2 h-40">
         {dados.map((item, i) => {
-          const heightPercent = (item.quantidade / maxValor) * 100;
+          const barHeightPct = (item.quantidade / maxValor) * 100;
           return (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-[10px] font-semibold text-gray-600">{item.quantidade}</span>
-              <div
-                className="w-full rounded-t transition-all duration-500"
-                style={{
-                  height: `${Math.max(heightPercent, 2)}%`,
-                  backgroundColor: '#3b82f6',
-                }}
-              />
-              <span className="text-[10px] text-gray-500 whitespace-nowrap">{item.mes}</span>
+            <div key={i} className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 flex flex-col justify-end min-h-0">
+                <div
+                  className="w-full rounded-t transition-all duration-500"
+                  style={{
+                    height: `${Math.max(barHeightPct, 4)}%`,
+                    backgroundColor: '#3b82f6',
+                    minHeight: item.quantidade > 0 ? '4px' : '0px',
+                  }}
+                />
+              </div>
+              <div className="flex flex-col items-center pt-1">
+                <span className="text-[10px] font-semibold text-gray-600">{item.quantidade}</span>
+                <span className="text-[10px] text-gray-500 whitespace-nowrap">{item.mes}</span>
+              </div>
             </div>
           );
         })}
