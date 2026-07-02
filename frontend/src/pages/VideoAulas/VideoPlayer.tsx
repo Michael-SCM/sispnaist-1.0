@@ -151,13 +151,16 @@ export const VideoPlayer: React.FC = () => {
 
   const getEmbedUrl = (url: string) => {
     if (!url) return '';
+    let videoId = '';
     if (url.includes('youtube.com/watch?v=')) {
-      return url.replace('youtube.com/watch?v=', 'youtube.com/embed/');
+      videoId = url.split('v=')[1]?.split('&')[0] || '';
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+    } else if (url.includes('youtube.com/embed/')) {
+      videoId = url.split('embed/')[1]?.split('?')[0] || '';
     }
-    if (url.includes('youtu.be/')) {
-      return url.replace('youtu.be/', 'youtube.com/embed/');
-    }
-    return url;
+    if (!videoId) return url;
+    return `https://www.youtube.com/embed/${videoId}?rel=0&controls=1&modestbranding=1&iv_load_policy=3&fs=1&playsinline=1&showinfo=0&cc_load_policy=0&loop=0&enablejsapi=0&autoplay=0`;
   };
 
   if (isLoading) {
