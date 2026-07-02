@@ -284,12 +284,37 @@ export class AnalyticsService {
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
       this.obterUltimosAcidentes(5),
-      TrabalhadorVinculo.aggregate([
+      Trabalhador.aggregate([
         { $match: { empresa: { $exists: true, $ne: null } } },
+        {
+          $project: {
+            trabalhadorId: '$_id',
+            empresa: '$empresa',
+          },
+        },
+        {
+          $unionWith: {
+            coll: 'trabalhador_vinculos',
+            pipeline: [
+              { $match: { empresa: { $exists: true, $ne: null } } },
+              {
+                $project: {
+                  trabalhadorId: '$trabalhadorId',
+                  empresa: '$empresa',
+                },
+              },
+            ],
+          },
+        },
+        {
+          $group: {
+            _id: { trabalhadorId: '$trabalhadorId', empresa: '$empresa' },
+          },
+        },
         {
           $lookup: {
             from: 'empresas',
-            localField: 'empresa',
+            localField: '_id.empresa',
             foreignField: '_id',
             as: 'empresaData',
           },
@@ -298,33 +323,55 @@ export class AnalyticsService {
         {
           $group: {
             _id: '$empresaData.razaoSocial',
-            trabalhadores: { $addToSet: '$trabalhadorId' },
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            total: { $size: '$trabalhadores' },
+            total: { $sum: 1 },
           },
         },
         { $sort: { total: -1 } },
       ]),
-      TrabalhadorVinculo.aggregate([
+      Trabalhador.aggregate([
         { $match: { empresa: { $exists: true, $ne: null } } },
         {
-          $lookup: {
-            from: 'trabalhadores',
-            localField: 'trabalhadorId',
-            foreignField: '_id',
-            as: 'trabalhadorData',
+          $project: {
+            trabalhadorId: '$_id',
+            nome: 1,
+            empresa: '$empresa',
           },
         },
-        { $unwind: { path: '$trabalhadorData', preserveNullAndEmptyArrays: false } },
+        {
+          $unionWith: {
+            coll: 'trabalhador_vinculos',
+            pipeline: [
+              { $match: { empresa: { $exists: true, $ne: null } } },
+              {
+                $lookup: {
+                  from: 'trabalhadores',
+                  localField: 'trabalhadorId',
+                  foreignField: '_id',
+                  as: 'trabalhadorData',
+                },
+              },
+              { $unwind: '$trabalhadorData' },
+              {
+                $project: {
+                  trabalhadorId: '$trabalhadorId',
+                  nome: '$trabalhadorData.nome',
+                  empresa: '$empresa',
+                },
+              },
+            ],
+          },
+        },
         {
           $group: {
-            _id: { $toLower: '$trabalhadorData.nome' },
-            nomeOriginal: { $first: '$trabalhadorData.nome' },
-            empresas: { $addToSet: '$empresa' },
+            _id: { trabalhadorId: '$trabalhadorId', empresa: '$empresa' },
+            nome: { $first: '$nome' },
+          },
+        },
+        {
+          $group: {
+            _id: { $toLower: '$nome' },
+            nomeOriginal: { $first: '$nome' },
+            empresas: { $addToSet: '$_id.empresa' },
           },
         },
         {
