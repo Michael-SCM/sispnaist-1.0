@@ -25,13 +25,13 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **49 de 62 requisitos** identificados (~81%), possui **0 requisitos parcialmente implementados** e **13 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **50 de 62 requisitos** identificados (~81%), possui **0 requisitos parcialmente implementados** e **12 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 67 | 81% |
+| ✅ Implementado | 68 | 83% |
 | ⚠️ Parcial | 0 | 0% |
-| ❌ Não implementado | 15 | 18% |
+| ❌ Não implementado | 14 | 17% |
 
 **Principais Pontos Fortes:**
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
@@ -218,7 +218,7 @@ Cada requisito foi classificado como:
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
 | 74 | Definição de responsáveis | ✅ | RBAC com perfis distintos |
-| 75 | **Treinamento/capacitação** | ❌ | Sem módulo de onboarding, tutoriais ou certificação |
+| 75 | **Treinamento/capacitação** | ✅ | Onboarding tour, videoaulas com quiz/certificado, progresso por usuário, favoritos, página Meus Certificados |
 | 76 | Monitoramento e avaliação | ✅ | Dashboard com KPIs, analytics, monitoramento clínico |
 | 77 | Divulgação de dados (dashboards) | ✅ | Dashboard interno (KPIs, gráficos) + página pública `/transparencia` com dados anonimizados e gráficos Recharts |
 | 78 | **Power BI / BI externo** | ❌ | Sem endpoints otimizados para ferramentas de BI |
@@ -243,7 +243,7 @@ Cada requisito foi classificado como:
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 9 | 0 | 12 | 43% |
+| Aspectos Transversais | 21 | 10 | 0 | 11 | 48% |
 | **Total** | **82** | **67** | **0** | **15** | **82%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
@@ -251,9 +251,9 @@ Cada requisito foi classificado como:
 ### Por Status
 
 ```
-✅ Implementado:    67 requisitos (82%)
+✅ Implementado:    68 requisitos (83%)
 ⚠️ Parcial:          0 requisitos (0%)
-❌ Não implementado: 15 requisitos (18%)
+❌ Não implementado: 14 requisitos (17%)
 ```
 
 ---

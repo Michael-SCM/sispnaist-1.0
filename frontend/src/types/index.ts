@@ -550,3 +550,79 @@ export interface IVideoAula {
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
+
+export interface IQuestao {
+  pergunta: string;
+  opcoes: string[];
+  opcaoCorreta: number;
+  ordem: number;
+}
+
+export interface IQuiz {
+  _id?: string;
+  titulo: string;
+  descricao?: string;
+  videoAulaId?: string;
+  questoes: IQuestao[];
+  pontuacaoMinima: number;
+  tempoLimite?: number;
+  tentativasPermitidas: number;
+  ativo?: boolean;
+  ordem?: number;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ITentativaQuiz {
+  tentativa: number;
+  pontuacao: number;
+  respostas: number[];
+  dataRealizacao: string;
+}
+
+export interface IProgressoTreinamento {
+  _id?: string;
+  usuarioId: string;
+  videoAulaId: string;
+  assistido: boolean;
+  dataUltimaVisualizacao?: string;
+  quizRealizado: boolean;
+  quizAprovado: boolean;
+  tentativasQuiz: ITentativaQuiz[];
+  melhormaPontuacao?: number;
+  certificadoEmitido: boolean;
+  dataConclusao?: string;
+  favorito: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface ICertificado {
+  _id?: string;
+  usuarioId: string;
+  videoAulaId: string;
+  nomeUsuario: string;
+  cpfUsuario: string;
+  tituloTreinamento: string;
+  descricaoTreinamento?: string;
+  categoriaTreinamento?: string;
+  cargaHoraria?: string;
+  pontuacaoQuiz: number;
+  codigoCertificado: string;
+  dataConclusao: string;
+  dataEmissao: string;
+  emitidoPor?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
+export interface IResultadoQuiz {
+  pontuacao: number;
+  aprovado: boolean;
+  totalQuestoes: number;
+  acertos: number;
+  tentativa: number;
+  tentativasRestantes: number;
+  pontuacaoMinima: number;
+}

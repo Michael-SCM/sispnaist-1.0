@@ -150,6 +150,13 @@ export const Header: React.FC = React.memo(() => {
                 >
                   Transparência
                 </Link>
+                <Link
+                  to="/meus-certificados"
+                  className="hover:text-amber-200 transition text-sm"
+                  aria-current={isActive('/meus-certificados') ? 'page' : undefined}
+                >
+                  Certificados
+                </Link>
 
                 <Link
                   to="/minha-conta"
@@ -249,6 +256,14 @@ export const Header: React.FC = React.memo(() => {
               aria-current={isActive('/transparencia') ? 'page' : undefined}
             >
               Transparência
+            </Link>
+            <Link
+              to="/meus-certificados"
+              className="block w-full max-w-full py-2 hover:text-amber-200 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-current={isActive('/meus-certificados') ? 'page' : undefined}
+            >
+              Certificados
             </Link>
             {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
               <Link

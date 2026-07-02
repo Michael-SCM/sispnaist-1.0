@@ -50,6 +50,7 @@ const DetalhesVacinacao = React.lazy(() => import('./pages/Vacinacoes/DetalhesVa
 const ListaVideoAulas = React.lazy(() => import('./pages/VideoAulas/ListaVideoAulas.js'));
 const FormVideoAula = React.lazy(() => import('./pages/VideoAulas/FormVideoAula.js'));
 const VideoPlayer = React.lazy(() => import('./pages/VideoAulas/VideoPlayer.js'));
+const MeusCertificados = React.lazy(() => import('./pages/MeusCertificados.js'));
 
 const ListaTrabalhadores = React.lazy(() => import('./pages/Trabalhadores/ListaTrabalhadores.js'));
 const NovoTrabalhador = React.lazy(() => import('./pages/Trabalhadores/NovoTrabalhador.js'));
@@ -321,6 +322,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <VideoPlayer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/meus-certificados"
+          element={
+            <ProtectedRoute>
+              <MeusCertificados />
             </ProtectedRoute>
           }
         />

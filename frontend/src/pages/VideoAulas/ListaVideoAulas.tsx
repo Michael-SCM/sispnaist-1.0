@@ -4,8 +4,10 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useVideoAulaStore } from '../../store/videoAulaStore.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
+import { treinamentoService } from '../../services/treinamentoService.js';
 import { useAuthStore } from '../../store/authStore.js';
-import { IVideoAula } from '../../types/index.js';
+import { IVideoAula, IProgressoTreinamento } from '../../types/index.js';
+import { OnboardingTour } from '../../components/OnboardingTour.js';
 import { 
   Play, 
   Plus, 
@@ -15,7 +17,12 @@ import {
   Video,
   Clock,
   Eye,
-  Tag
+  Tag,
+  CheckCircle2,
+  Award,
+  GraduationCap,
+  BookOpen,
+  Heart
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -39,6 +46,9 @@ export const ListaVideoAulas: React.FC = () => {
 
   const [localSearch, setLocalSearch] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [progressos, setProgressos] = useState<Map<string, IProgressoTreinamento>>(new Map());
+  const [progressoCarregado, setProgressoCarregado] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const carregarVideoAulas = async (pageNumber: number = 1) => {
     try {
@@ -48,7 +58,6 @@ export const ListaVideoAulas: React.FC = () => {
       
       const resp: any = await videoAulaService.listar(pageNumber, 12, filtros);
 
-      // Pode vir como { data: [...], total, ... } ou como array puro ([...])
       const videos = Array.isArray(resp) ? resp : (resp?.data ?? []);
       setVideoAulas(videos);
 
@@ -68,9 +77,26 @@ export const ListaVideoAulas: React.FC = () => {
     }
   };
 
+  const carregarProgressos = async () => {
+    try {
+      const data = await treinamentoService.listarProgresso();
+      const map = new Map<string, IProgressoTreinamento>();
+      data.forEach((p) => map.set(p.videoAulaId, p));
+      setProgressos(map);
+    } catch {
+      // silently fail - progress is optional
+    } finally {
+      setProgressoCarregado(true);
+    }
+  };
+
   useEffect(() => {
     carregarVideoAulas(1);
   }, [categoria, location.key]);
+
+  useEffect(() => {
+    carregarProgressos();
+  }, []);
 
   const handleDeletar = async (e: React.MouseEvent, video: IVideoAula) => {
     e.stopPropagation();
@@ -93,9 +119,13 @@ export const ListaVideoAulas: React.FC = () => {
     video.descricao?.toLowerCase().includes(localSearch.toLowerCase())
   );
 
+  const progressoCount = Array.from(progressos.values()).filter(p => p.assistido).length;
+  const certificadoCount = Array.from(progressos.values()).filter(p => p.certificadoEmitido).length;
+
   return (
     <MainLayout>
-      <DocumentTitle title="Vídeo Aulas" />
+      <DocumentTitle title="Capacitação & Treinamento" />
+      <OnboardingTour onClose={() => setShowOnboarding(false)} />
       <div className="p-6 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-blue-900 to-indigo-800 p-8 rounded-3xl shadow-xl text-white">
@@ -120,6 +150,30 @@ export const ListaVideoAulas: React.FC = () => {
             </div>
           )}
         </div>
+
+        {/* Progress Summary */}
+        {progressoCarregado && (progressoCount > 0 || certificadoCount > 0) && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-blue-50 rounded-xl">
+                <BookOpen size={22} className="text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-slate-800">{progressoCount}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Vídeos Assistidos</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4">
+              <div className="p-3 bg-violet-50 rounded-xl">
+                <Award size={22} className="text-violet-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-black text-slate-800">{certificadoCount}</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Certificados</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search & Filters */}
         <div className="flex flex-col md:flex-row gap-4 items-center">
@@ -162,7 +216,7 @@ export const ListaVideoAulas: React.FC = () => {
           </div>
         ) : filteredVideos.length === 0 ? (
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-16 text-center">
-            <Video className="mx-auto h-16 w-16 text-slate-200 mb-4" />
+            <GraduationCap className="mx-auto h-16 w-16 text-slate-200 mb-4" />
             <h3 className="text-xl font-bold text-slate-700 mb-2">Nenhum vídeo encontrado</h3>
             <p className="text-slate-500 max-w-md mx-auto">
               Não encontramos nenhuma vídeo aula correspondente aos seus filtros. Tente buscar por outros termos.
@@ -170,87 +224,113 @@ export const ListaVideoAulas: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredVideos.map((video) => (
-              <div 
-                key={video._id}
-                onClick={() => navigate(`/video-aulas/${video._id}`)}
-                className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 group cursor-pointer flex flex-col"
-              >
-                {/* Thumbnail Area */}
-                <div className="relative aspect-video bg-slate-900 overflow-hidden">
-                  {video.thumbnail ? (
-                    <img 
-                      src={video.thumbnail} 
-                      alt={video.titulo} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                      <Video size={48} className="text-slate-700" />
+            {filteredVideos.map((video) => {
+              const prog = video._id ? progressos.get(video._id) : undefined;
+              return (
+                <div 
+                  key={video._id}
+                  onClick={() => navigate(`/video-aulas/${video._id}`)}
+                  className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 group cursor-pointer flex flex-col relative"
+                >
+                  {/* Progress badges on thumbnail */}
+                  {prog && (prog.assistido || prog.quizAprovado || prog.favorito) && (
+                    <div className="absolute top-3 left-3 z-10 flex gap-1.5">
+                      {prog.quizAprovado && (
+                        <div className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-1">
+                          <Award size={12} />
+                          {prog.melhormaPontuacao}%
+                        </div>
+                      )}
+                      {prog.assistido && !prog.quizAprovado && (
+                        <div className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-1">
+                          <CheckCircle2 size={12} />
+                          Visto
+                        </div>
+                      )}
+                      {prog.favorito && (
+                        <div className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                          <Heart size={12} fill="white" />
+                        </div>
+                      )}
                     </div>
                   )}
-                  
-                  {/* Play Overlay */}
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-all duration-300">
-                      <Play size={28} className="text-white ml-1" fill="white" />
-                    </div>
-                  </div>
 
-                  {/* Duration Badge */}
-                  {video.duracao && (
-                    <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-md rounded-lg text-white text-xs font-bold tracking-wider">
-                      {video.duracao}
+                  {/* Thumbnail Area */}
+                  <div className="relative aspect-video bg-slate-900 overflow-hidden">
+                    {video.thumbnail ? (
+                      <img 
+                        src={video.thumbnail} 
+                        alt={video.titulo} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                        <Video size={48} className="text-slate-700" />
+                      </div>
+                    )}
+                    
+                    {/* Play Overlay */}
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-all duration-300">
+                        <Play size={28} className="text-white ml-1" fill="white" />
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Content Area */}
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <h3 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                      {video.titulo}
-                    </h3>
-                    {isAdmin && (
-                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/video-aulas/${video._id}/editar`);
-                          }}
-                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                          <Edit size={16} />
-                        </button>
-                        <button
-                          onClick={(e) => handleDeletar(e, video)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                    {/* Duration Badge */}
+                    {video.duracao && (
+                      <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-md rounded-lg text-white text-xs font-bold tracking-wider">
+                        {video.duracao}
                       </div>
                     )}
                   </div>
 
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-4 flex-1">
-                    {video.descricao || 'Sem descrição'}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      <Eye size={14} className="text-blue-400" />
-                      <span>{video.visualizacoes || 0} views</span>
+                  {/* Content Area */}
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="font-bold text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                        {video.titulo}
+                      </h3>
+                      {isAdmin && (
+                        <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/video-aulas/${video._id}/editar`);
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={(e) => handleDeletar(e, video)}
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {video.categoria && (
+
+                    <p className="text-sm text-slate-500 line-clamp-2 mb-4 flex-1">
+                      {video.descricao || 'Sem descrição'}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <Tag size={14} className="text-emerald-400" />
-                        <span>{video.categoria}</span>
+                        <Eye size={14} className="text-blue-400" />
+                        <span>{video.visualizacoes || 0} views</span>
                       </div>
-                    )}
+                      {video.categoria && (
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                          <Tag size={14} className="text-emerald-400" />
+                          <span>{video.categoria}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
