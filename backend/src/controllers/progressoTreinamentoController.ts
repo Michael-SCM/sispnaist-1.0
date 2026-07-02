@@ -9,6 +9,7 @@ import { IAuthRequest } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import pdfService from '../services/PdfService.js';
 
 function gerarCodigoCertificado(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -291,4 +292,20 @@ export const listarCertificadosAdmin = asyncHandler(async (req: IAuthRequest, re
     limit,
     totalPages: getPaginationResult(total, page, limit).pages
   });
+});
+
+export const exportarCertificadoPDF = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  const usuarioId = (req.user as any).id;
+  const { id } = req.params;
+
+  const certificado = await Certificado.findById(id);
+  if (!certificado) {
+    throw new AppError('Certificado não encontrado', 404);
+  }
+
+  if (certificado.usuarioId.toString() !== usuarioId && req.user?.perfil !== 'admin') {
+    throw new AppError('Você não tem permissão para acessar este certificado', 403);
+  }
+
+  await pdfService.gerarPdfCertificado(res, id);
 });

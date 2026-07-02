@@ -137,18 +137,18 @@ export const Header: React.FC = React.memo(() => {
                 </div>
 
                 <Link
-                  to="/video-aulas"
-                  className="hover:text-blue-100 transition text-sm"
-                  aria-current={isActive('/video-aulas') ? 'page' : undefined}
-                >
-                  Treinamentos
-                </Link>
-                <Link
                   to="/transparencia"
                   className="hover:text-blue-100 transition text-sm"
                   aria-current={isActive('/transparencia') ? 'page' : undefined}
                 >
                   Transparência
+                </Link>
+                <Link
+                  to="/video-aulas"
+                  className="hover:text-blue-100 transition text-sm"
+                  aria-current={isActive('/video-aulas') ? 'page' : undefined}
+                >
+                  Treinamentos
                 </Link>
                 <Link
                   to="/meus-certificados"
@@ -250,6 +250,14 @@ export const Header: React.FC = React.memo(() => {
             aria-label="Navegação mobile"
           >
             <Link
+              to="/video-aulas"
+              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-current={isActive('/video-aulas') ? 'page' : undefined}
+            >
+              Treinamentos
+            </Link>
+            <Link
               to="/transparencia"
               className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
@@ -310,14 +318,7 @@ export const Header: React.FC = React.memo(() => {
                 Vacinações
               </Link>
             </div>
-            <Link
-              to="/video-aulas"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-current={isActive('/video-aulas') ? 'page' : undefined}
-            >
-              Treinamentos
-            </Link>
+
             <Link
               to="/minha-conta"
               className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"

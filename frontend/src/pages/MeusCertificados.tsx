@@ -4,13 +4,14 @@ import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import { treinamentoService } from '../services/treinamentoService.js';
 import { ICertificado } from '../types/index.js';
 import { CertificadoCard } from '../components/CertificadoCard.js';
-import { Award, ExternalLink, X, FileText, Download, Hash, User, Calendar, Target } from 'lucide-react';
+import { Award, ExternalLink, X, FileText, Download, Hash, User, Calendar, Target, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const MeusCertificados: React.FC = () => {
   const [certificados, setCertificados] = useState<ICertificado[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [certificadoSelecionado, setCertificadoSelecionado] = useState<ICertificado | null>(null);
+  const [baixandoPDF, setBaixandoPDF] = useState(false);
 
   useEffect(() => {
     carregarCertificados();
@@ -35,6 +36,19 @@ export const MeusCertificados: React.FC = () => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!certificadoSelecionado?._id) return;
+    try {
+      setBaixandoPDF(true);
+      await treinamentoService.downloadCertificadoPdf(certificadoSelecionado._id);
+      toast.success('Certificado baixado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao baixar certificado');
+    } finally {
+      setBaixandoPDF(false);
+    }
   };
 
   return (
@@ -91,52 +105,52 @@ export const MeusCertificados: React.FC = () => {
         {/* Certificate Detail Modal */}
         {certificadoSelecionado && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-4 pt-8 md:pt-12 overflow-y-auto"
             onClick={() => setCertificadoSelecionado(null)}
             role="dialog"
             aria-modal="true"
             aria-label="Detalhes do certificado"
           >
             <div
-              className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300"
+              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-300"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Certificate Visual */}
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-8 md:p-12 border-8 border-amber-200 m-4 rounded-2xl">
-                <div className="text-center space-y-4">
-                  <Award size={56} className="mx-auto text-amber-500" />
-                  <h2 className="text-3xl font-black text-slate-800">Certificado</h2>
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 md:p-10 border-4 border-amber-200 m-3 md:m-5 rounded-2xl">
+                <div className="text-center space-y-3 md:space-y-4">
+                  <Award size={48} className="mx-auto text-amber-500" />
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-800">Certificado</h2>
                   <p className="text-slate-500 font-medium">de Capacitação e Treinamento</p>
 
-                  <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full" />
+                  <div className="w-20 h-0.5 bg-amber-400 mx-auto rounded-full" />
 
-                  <p className="text-lg font-bold text-slate-700">Conferimos a</p>
-                  <p className="text-2xl font-black text-slate-900">{certificadoSelecionado.nomeUsuario}</p>
+                  <p className="text-base md:text-lg font-bold text-slate-700">Conferimos a</p>
+                  <p className="text-xl md:text-2xl font-black text-slate-900 break-words">{certificadoSelecionado.nomeUsuario}</p>
                   <p className="text-slate-500">CPF: {certificadoSelecionado.cpfUsuario}</p>
 
-                  <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full" />
+                  <div className="w-20 h-0.5 bg-amber-400 mx-auto rounded-full" />
 
                   <p className="text-slate-600">por ter concluído o treinamento</p>
-                  <p className="text-xl font-black text-amber-700">{certificadoSelecionado.tituloTreinamento}</p>
+                  <p className="text-lg md:text-xl font-black text-amber-700 break-words">{certificadoSelecionado.tituloTreinamento}</p>
 
                   {certificadoSelecionado.descricaoTreinamento && (
-                    <p className="text-sm text-slate-500 italic">"{certificadoSelecionado.descricaoTreinamento}"</p>
+                    <p className="text-sm text-slate-500 italic break-words">"{certificadoSelecionado.descricaoTreinamento}"</p>
                   )}
 
-                  <div className="flex items-center justify-center gap-6 text-sm text-slate-500 pt-4">
+                  <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm text-slate-500 pt-4">
                     <div className="flex items-center gap-1.5">
-                      <Target size={14} className="text-amber-500" />
+                      <Target size={14} className="text-amber-500 shrink-0" />
                       <span>Pontuação: {certificadoSelecionado.pontuacaoQuiz}%</span>
                     </div>
                     {certificadoSelecionado.cargaHoraria && (
                       <div className="flex items-center gap-1.5">
-                        <Calendar size={14} className="text-amber-500" />
+                        <Calendar size={14} className="text-amber-500 shrink-0" />
                         <span>Duração: {certificadoSelecionado.cargaHoraria}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="w-24 h-1 bg-amber-400 mx-auto rounded-full" />
+                  <div className="w-20 h-0.5 bg-amber-400 mx-auto rounded-full" />
 
                   <p className="text-xs text-slate-400">
                     Emitido em {new Date(certificadoSelecionado.dataEmissao).toLocaleDateString('pt-BR')}
@@ -144,27 +158,37 @@ export const MeusCertificados: React.FC = () => {
 
                   <div className="flex items-center justify-center gap-2 text-xs font-mono text-slate-400 pt-2">
                     <Hash size={12} />
-                    <span>Código: {certificadoSelecionado.codigoCertificado}</span>
+                    <span className="break-all">Código: {certificadoSelecionado.codigoCertificado}</span>
                   </div>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-between">
+              <div className="p-4 md:p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between gap-3">
                 <button
                   onClick={() => setCertificadoSelecionado(null)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-slate-500 font-bold hover:bg-slate-200/50 rounded-xl transition-all"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 text-slate-500 font-bold hover:bg-slate-200/50 rounded-xl transition-all"
                 >
                   <X size={18} />
                   Fechar
                 </button>
-                <button
-                  onClick={handlePrint}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:shadow-lg transition-all"
-                >
-                  <Download size={18} />
-                  Imprimir / Baixar
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={baixandoPDF}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-all"
+                  >
+                    {baixandoPDF ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                    {baixandoPDF ? 'Baixando...' : 'Baixar PDF'}
+                  </button>
+                  <button
+                    onClick={handlePrint}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+                  >
+                    <FileText size={18} />
+                    Imprimir
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -9,7 +9,8 @@ import {
   emitirCertificado,
   listarCertificados,
   obterCertificado,
-  listarCertificadosAdmin
+  listarCertificadosAdmin,
+  exportarCertificadoPDF
 } from '../controllers/progressoTreinamentoController.js';
 import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth.js';
 import { validateObjectId } from '../middleware/validation';
@@ -26,6 +27,7 @@ router.post('/progresso/:videoAulaId/certificado', authMiddleware, validateObjec
 
 router.get('/certificados', authMiddleware, listarCertificados);
 router.get('/certificados/:id', authMiddleware, validateObjectId('id'), obterCertificado);
+router.get('/certificados/:id/pdf', authMiddleware, validateObjectId('id'), exportarCertificadoPDF);
 router.get('/admin/certificados', authMiddleware, adminOuGestorMiddleware, listarCertificadosAdmin);
 
 export default router;

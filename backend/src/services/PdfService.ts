@@ -6,6 +6,7 @@ import Unidade from '../models/Unidade.js';
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
+import Certificado from '../models/Certificado.js';
 import mongoose from 'mongoose';
 
 interface TrabalhadorData {
@@ -2026,6 +2027,242 @@ export class PdfService {
     }
 
     return y;
+  }
+
+  /**
+   * Gera PDF de um certificado individual
+   */
+  async gerarPdfCertificado(
+    res: Response,
+    certificadoId: string
+  ): Promise<void> {
+    const certificado = await Certificado.findById(certificadoId).lean();
+    if (!certificado) {
+      throw new Error('Certificado não encontrado');
+    }
+
+    const dataEmissao = certificado.dataEmissao
+      ? new Date(certificado.dataEmissao).toLocaleDateString('pt-BR')
+      : new Date().toLocaleDateString('pt-BR');
+
+    const filename = `certificado_${certificado.codigoCertificado}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const doc = new PDFDocument({
+      size: 'A4',
+      layout: 'landscape',
+      margin: 0,
+      bufferPages: true,
+    });
+
+    doc.pipe(res);
+
+    const pageWidth = doc.page.width;
+    const pageHeight = doc.page.height;
+
+    // Borda decorativa externa
+    doc.rect(20, 20, pageWidth - 40, pageHeight - 40)
+      .lineWidth(2)
+      .stroke('#d97706');
+
+    // Borda decorativa interna
+    doc.rect(28, 28, pageWidth - 56, pageHeight - 56)
+      .lineWidth(0.5)
+      .stroke('#f59e0b');
+
+    // Faixa superior decorativa
+    doc.rect(20, 20, pageWidth - 40, 80)
+      .fillColor('#1e40af')
+      .fill();
+
+    doc.fontSize(28)
+      .fillColor('#ffffff')
+      .font('Helvetica-Bold')
+      .text('SISPNAIST', 0, 38, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    doc.fontSize(12)
+      .fillColor('#bfdbfe')
+      .font('Helvetica')
+      .text('Sistema de Gerenciamento de Saúde e Segurança do Trabalho', 0, 72, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    // Título do certificado
+    const tituloY = 140;
+    doc.fontSize(36)
+      .fillColor('#1e40af')
+      .font('Helvetica-Bold')
+      .text('CERTIFICADO', 0, tituloY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    doc.fontSize(16)
+      .fillColor('#6b7280')
+      .font('Helvetica')
+      .text('de Capacitação e Treinamento', 0, tituloY + 45, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    // Linha decorativa
+    const linhaY = tituloY + 80;
+    doc.moveTo(pageWidth / 2 - 100, linhaY)
+      .lineTo(pageWidth / 2 + 100, linhaY)
+      .lineWidth(1.5)
+      .stroke('#d97706');
+
+    // Corpo do certificado
+    const corpoY = linhaY + 40;
+
+    doc.fontSize(14)
+      .fillColor('#374151')
+      .font('Helvetica')
+      .text('Conferimos a', 0, corpoY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    const nomeY = corpoY + 30;
+    doc.fontSize(28)
+      .fillColor('#1e40af')
+      .font('Helvetica-Bold')
+      .text(certificado.nomeUsuario, 0, nomeY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    const cpfY = nomeY + 40;
+    doc.fontSize(12)
+      .fillColor('#6b7280')
+      .font('Helvetica')
+      .text(`CPF: ${certificado.cpfUsuario}`, 0, cpfY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    // Segunda linha decorativa
+    const linha2Y = cpfY + 35;
+    doc.moveTo(pageWidth / 2 - 100, linha2Y)
+      .lineTo(pageWidth / 2 + 100, linha2Y)
+      .lineWidth(1.5)
+      .stroke('#d97706');
+
+    const descY = linha2Y + 35;
+    doc.fontSize(14)
+      .fillColor('#374151')
+      .font('Helvetica')
+      .text('por ter concluído o treinamento', 0, descY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    const treinamentoY = descY + 30;
+    doc.fontSize(20)
+      .fillColor('#d97706')
+      .font('Helvetica-Bold')
+      .text(certificado.tituloTreinamento, 0, treinamentoY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    let nextY = treinamentoY + 35;
+
+    if (certificado.descricaoTreinamento) {
+      doc.fontSize(11)
+        .fillColor('#6b7280')
+        .font('Helvetica-Oblique')
+        .text(`"${certificado.descricaoTreinamento}"`, 0, nextY, {
+          align: 'center',
+          width: pageWidth,
+        });
+      nextY += 25;
+    }
+
+    // Informações adicionais
+    nextY += 15;
+    const infoStartX = pageWidth / 2 - 180;
+    const infoWidth = 360;
+
+    doc.roundedRect(infoStartX, nextY, infoWidth, 50, 8)
+      .fillColor('#fef3c7')
+      .fill();
+
+    doc.fontSize(12)
+      .fillColor('#92400e')
+      .font('Helvetica');
+
+    let infoText = `Pontuação: ${certificado.pontuacaoQuiz}%`;
+    if (certificado.cargaHoraria) {
+      infoText += `    |    Duração: ${certificado.cargaHoraria}`;
+    }
+
+    doc.text(infoText, infoStartX, nextY + 16, {
+      align: 'center',
+      width: infoWidth,
+    });
+
+    nextY += 70;
+
+    // Data e código
+    const dataY = nextY;
+    doc.fontSize(12)
+      .fillColor('#6b7280')
+      .font('Helvetica')
+      .text(`Emitido em ${dataEmissao}`, 0, dataY, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    doc.fontSize(10)
+      .fillColor('#9ca3af')
+      .font('Helvetica')
+      .text(`Código: ${certificado.codigoCertificado}`, 0, dataY + 22, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    // Linha de assinatura
+    const assinaturaY = pageHeight - 120;
+    const assinaturaX = pageWidth / 2 - 100;
+
+    doc.moveTo(assinaturaX, assinaturaY)
+      .lineTo(assinaturaX + 200, assinaturaY)
+      .lineWidth(1)
+      .stroke('#374151');
+
+    doc.fontSize(11)
+      .fillColor('#374151')
+      .font('Helvetica')
+      .text(certificado.emitidoPor || 'SISPNAIST', assinaturaX, assinaturaY + 8, {
+        align: 'center',
+        width: 200,
+      });
+
+    doc.fontSize(9)
+      .fillColor('#9ca3af')
+      .font('Helvetica')
+      .text('Responsável pela emissão', assinaturaX, assinaturaY + 26, {
+        align: 'center',
+        width: 200,
+      });
+
+    // Rodapé
+    doc.fontSize(8)
+      .fillColor('#9ca3af')
+      .font('Helvetica')
+      .text('Documento emitido eletronicamente pelo SISPNAIST. Verifique a autenticidade pelo código do certificado.', 0, pageHeight - 55, {
+        align: 'center',
+        width: pageWidth,
+      });
+
+    doc.end();
   }
 }
 
