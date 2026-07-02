@@ -218,7 +218,7 @@ const {
             />
             <BarChartComponent
               dados={graficos.trabalhadoresPorEmpresa}
-              titulo="Trabalhadores por Empresa"
+              titulo="Trabalhadores ativos por Empresa"
             />
           </div>
         </Suspense>
@@ -227,8 +227,10 @@ const {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <BarChartComponent
               dados={graficos.trabalhadoresMultiplosVinculos}
-              titulo="Trabalhadores com mais de 1 Vínculo"
+              titulo="Trabalhadores ativos com mais de 1 Vínculo"
               cor="#8b5cf6"
+              dataKey="percentual"
+              unidade="% dos trabalhadores"
             />
           </div>
         </Suspense>

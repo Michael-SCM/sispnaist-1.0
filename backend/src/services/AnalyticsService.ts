@@ -285,7 +285,7 @@ export class AnalyticsService {
       this.obterProximasVacinacoes(30),
       this.obterUltimosAcidentes(5),
       Trabalhador.aggregate([
-        { $match: { empresa: { $exists: true, $ne: null } } },
+        { $match: { empresa: { $exists: true, $ne: null }, 'vinculo.situacao': 'Ativo' } },
         {
           $project: {
             trabalhadorId: '$_id',
@@ -296,7 +296,7 @@ export class AnalyticsService {
           $unionWith: {
             coll: 'trabalhador_vinculos',
             pipeline: [
-              { $match: { empresa: { $exists: true, $ne: null } } },
+              { $match: { empresa: { $exists: true, $ne: null }, ativo: true } },
               {
                 $project: {
                   trabalhadorId: '$trabalhadorId',
@@ -329,7 +329,7 @@ export class AnalyticsService {
         { $sort: { total: -1 } },
       ]),
       Trabalhador.aggregate([
-        { $match: { empresa: { $exists: true, $ne: null } } },
+        { $match: { empresa: { $exists: true, $ne: null }, 'vinculo.situacao': 'Ativo' } },
         {
           $project: {
             trabalhadorId: '$_id',
@@ -340,7 +340,7 @@ export class AnalyticsService {
           $unionWith: {
             coll: 'trabalhador_vinculos',
             pipeline: [
-              { $match: { empresa: { $exists: true, $ne: null } } },
+              { $match: { empresa: { $exists: true, $ne: null }, ativo: true } },
               {
                 $project: {
                   trabalhadorId: '$trabalhadorId',
@@ -369,7 +369,7 @@ export class AnalyticsService {
         },
         { $sort: { _id: 1 } },
       ]),
-      Trabalhador.countDocuments(),
+      Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' }),
     ]);
 
     const trabalhadoresMultiplosVinculos = distribuicaoVinculosRaw

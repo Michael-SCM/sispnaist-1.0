@@ -16,6 +16,8 @@ interface IBarChartProps {
   titulo?: string;
   altura?: number;
   cor?: string;
+  dataKey?: string;
+  unidade?: string;
 }
 
 export const BarChartComponent: React.FC<IBarChartProps> = ({
@@ -23,6 +25,8 @@ export const BarChartComponent: React.FC<IBarChartProps> = ({
   titulo = 'Trabalhadores por Empresa',
   altura = 300,
   cor = '#3b82f6',
+  dataKey = 'total',
+  unidade = 'Trabalhadores',
 }) => {
   if (!dados || dados.length === 0) {
     return (
@@ -53,7 +57,9 @@ export const BarChartComponent: React.FC<IBarChartProps> = ({
             <YAxis
               tick={{ fill: '#6b7280', fontSize: 12 }}
               tickLine={false}
-              allowDecimals={false}
+              allowDecimals={dataKey !== 'total'}
+              domain={dataKey !== 'total' ? [0, 100] : undefined}
+              tickFormatter={dataKey !== 'total' ? (v: number) => `${v}%` : undefined}
             />
             <Tooltip
               contentStyle={{
@@ -64,21 +70,24 @@ export const BarChartComponent: React.FC<IBarChartProps> = ({
               }}
               formatter={(value: number, name: string, props: any) => {
                 const payload = props?.payload;
+                if (payload?.percentual && dataKey === 'percentual') {
+                  return [`${payload.percentual}% (${payload.total} trabalhadores)`, unidade];
+                }
                 if (payload?.percentual) {
                   return [`${value} trabalhadores (${payload.percentual}%)`, 'Total'];
                 }
-                return [`${value} trabalhadores`, 'Total'];
+                return [`${value} ${unidade.toLowerCase()}`, 'Total'];
               }}
             />
             <Legend
               verticalAlign="top"
               height={36}
               formatter={() => (
-                <span className="text-gray-700 text-sm">Trabalhadores</span>
+                <span className="text-gray-700 text-sm">{unidade}</span>
               )}
             />
             <Bar
-              dataKey="total"
+              dataKey={dataKey}
               fill={cor}
               radius={[8, 8, 0, 0]}
               maxBarSize={60}
