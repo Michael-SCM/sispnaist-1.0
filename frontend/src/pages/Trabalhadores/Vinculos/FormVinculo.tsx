@@ -97,7 +97,7 @@ const INITIAL_FORM: FormData = {
   salario: '',
   insalubridadePericulosidade: '',
   observacoes: '',
-  ativo: false,
+  ativo: true,
   terceirizado: false,
   residente: false,
   anosResidencia: '',
