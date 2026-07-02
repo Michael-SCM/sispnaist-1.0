@@ -231,6 +231,12 @@ export const VideoPlayer: React.FC = () => {
             onStateChange: (e: any) => {
               const state = e.data;
               setIsPlaying(state === 1);
+              if (state === 1 || state === 3) {
+                try {
+                  const q = e.target.getAvailableQualityLevels();
+                  if (q?.length) setAvailableQualities(q);
+                } catch {}
+              }
               if (state === 1) {
                 setYtDuration(e.target.getDuration());
                 startProgressTracking(e.target);
@@ -565,22 +571,15 @@ export const VideoPlayer: React.FC = () => {
                       className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900/95 backdrop-blur rounded-xl shadow-2xl border border-white/10 py-2 z-50"
                     >
                       <p className="px-4 py-1.5 text-xs text-white/50 uppercase tracking-wider font-bold">Qualidade</p>
-                      {availableQualities.length > 0 && (
-                        <>
-                          {availableQualities.map(q => (
-                            <button
-                              key={q}
-                              onClick={() => changeQuality(q)}
-                              className="w-full text-left px-4 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
-                            >
-                              {q === 'hd2160' ? '4K' : q === 'hd1440' ? '2K' : q === 'hd1080' ? '1080p' : q === 'hd720' ? '720p' : q === 'large' ? '480p' : q === 'medium' ? '360p' : q === 'small' ? '240p' : q === 'tiny' ? '144p' : q}
-                            </button>
-                          ))}
-                        </>
-                      )}
-                      {availableQualities.length === 0 && (
-                        <div className="px-4 py-1.5 text-sm text-white/50">Não disponível</div>
-                      )}
+                      {(availableQualities.length > 0 ? availableQualities : ['hd1080', 'hd720', 'large', 'medium', 'small', 'tiny']).map(q => (
+                        <button
+                          key={q}
+                          onClick={() => changeQuality(q)}
+                          className="w-full text-left px-4 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                        >
+                          {q === 'hd2160' ? '4K' : q === 'hd1440' ? '2K' : q === 'hd1080' ? '1080p' : q === 'hd720' ? '720p' : q === 'large' ? '480p' : q === 'medium' ? '360p' : q === 'small' ? '240p' : q === 'tiny' ? '144p' : q}
+                        </button>
+                      ))}
                       <div className="border-t border-white/10 my-2" />
                       <p className="px-4 py-1.5 text-xs text-white/50 uppercase tracking-wider font-bold">Velocidade</p>
                       {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => (
