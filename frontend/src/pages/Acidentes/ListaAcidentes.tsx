@@ -308,6 +308,9 @@ export const ListaAcidentes: React.FC = () => {
                       key={acidente._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/acidentes/${acidente._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/acidentes/${acidente._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">

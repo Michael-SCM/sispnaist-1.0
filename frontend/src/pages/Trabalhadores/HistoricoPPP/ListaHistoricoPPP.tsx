@@ -121,6 +121,9 @@ export const ListaHistoricoPPP: React.FC = () => {
                       key={registro._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/trabalhadores/${id}/historico-ppp/${registro._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/trabalhadores/${id}/historico-ppp/${registro._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">

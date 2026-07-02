@@ -126,6 +126,9 @@ export const ListaVinculos: React.FC = () => {
                       key={v._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/trabalhadores/${id}/vinculos/${v._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/trabalhadores/${id}/vinculos/${v._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <div className="flex flex-col gap-1">

@@ -254,6 +254,9 @@ export const ListaMaterialBiologico: React.FC = () => {
                       key={ficha._id} 
                       className="hover:bg-emerald-50/30 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/acidentes/material-biologico/${ficha._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/acidentes/material-biologico/${ficha._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">

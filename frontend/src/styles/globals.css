@@ -33,6 +33,13 @@ textarea:focus:not(:focus-visible),
   box-shadow: none;
 }
 
+/* Focus ring branco para links/botoes no header (fundo azul escuro) */
+header a:focus-visible,
+header button:focus-visible {
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #2563eb;
+  border-radius: 4px;
+}
+
 /* Ensure disabled form controls have sufficient contrast */
 input:disabled,
 textarea:disabled,

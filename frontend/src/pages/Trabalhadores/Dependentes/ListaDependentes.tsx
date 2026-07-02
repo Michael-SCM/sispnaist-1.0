@@ -125,6 +125,9 @@ export const ListaDependentes: React.FC = () => {
                       key={dep._id} 
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/trabalhadores/${id}/dependentes/${dep._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/trabalhadores/${id}/dependentes/${dep._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">

@@ -124,6 +124,9 @@ export const ListaRiscosOcupacionais: React.FC = () => {
                       key={risco._id}
                       className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/trabalhadores/${id}/riscos-ocupacionais/${risco._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/trabalhadores/${id}/riscos-ocupacionais/${risco._id}`); } }}
                     >
                       <td className="px-8 py-6">
                         <span className="font-bold text-slate-700">{risco.categoria}</span>
