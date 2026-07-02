@@ -381,7 +381,7 @@ export class AnalyticsService {
         nome: `${item._id} vínculos`,
         total: item.totalTrabalhadores,
         percentual: totalTrabalhadores > 0
-          ? Math.round((item.totalTrabalhadores / totalTrabalhadores) * 100)
+          ? Number(((item.totalTrabalhadores / totalTrabalhadores) * 100).toFixed(2))
           : 0,
       }));
 
