@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { ITrabalhadorDependente } from '../../../types/index.js';
 import {
@@ -47,6 +48,7 @@ export const DetalhesDependente: React.FC = () => {
   if (isLoading || !dependente) {
     return (
       <MainLayout>
+        <DocumentTitle title="Detalhes do Dependente" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-rose-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando...</p>
@@ -59,6 +61,7 @@ export const DetalhesDependente: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Detalhes do Dependente" />
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

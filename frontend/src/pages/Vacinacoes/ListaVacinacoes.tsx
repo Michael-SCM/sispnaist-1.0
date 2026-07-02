@@ -20,6 +20,7 @@ import {
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 import { exportVacinacoes } from '../../services/exportService.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 
 export const ListaVacinacoes: React.FC = () => {
@@ -93,6 +94,7 @@ export const ListaVacinacoes: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Vacinações" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

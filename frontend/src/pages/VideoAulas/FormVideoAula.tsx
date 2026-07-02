@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { IVideoAula } from '../../types/index.js';
 import { TextInput, Select, TextArea } from '../../components/FormFields';
@@ -100,6 +101,7 @@ export const FormVideoAula: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title={isEditing ? 'Editar Vídeo Aula' : 'Nova Vídeo Aula'} />
       <div className="p-6 max-w-5xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">

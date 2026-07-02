@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '../services/authService.js';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ export const ResetPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <DocumentTitle title="Redefinir Senha" />
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-blue-600 mb-2">Nova Senha</h2>

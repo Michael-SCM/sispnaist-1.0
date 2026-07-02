@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { IVideoAula } from '../../types/index.js';
 import { ArrowLeft, Eye, Clock, Tag } from 'lucide-react';
@@ -55,6 +56,7 @@ export const VideoPlayer: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
+        <DocumentTitle title="Carregando..." />
         <div className="p-6 max-w-5xl mx-auto flex justify-center items-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -65,6 +67,7 @@ export const VideoPlayer: React.FC = () => {
   if (!video) {
     return (
       <MainLayout>
+        <DocumentTitle title="Vídeo não encontrado" />
         <div className="p-6 max-w-5xl mx-auto text-center text-slate-600">
           Vídeo não disponível.
         </div>
@@ -78,6 +81,7 @@ export const VideoPlayer: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title={video?.titulo ? `Vídeo: ${video.titulo}` : 'Vídeo Aula'} />
       <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
         
         {/* Navigation */}

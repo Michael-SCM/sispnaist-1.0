@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import empresaService from '../../../services/empresaService.js';
@@ -444,6 +445,7 @@ export const FormVinculo: React.FC = () => {
   if (isCarregando) {
     return (
       <MainLayout>
+        <DocumentTitle title="Formulário de Vínculo" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-blue-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando dados...</p>
@@ -461,6 +463,7 @@ export const FormVinculo: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Formulário de Vínculo" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <button

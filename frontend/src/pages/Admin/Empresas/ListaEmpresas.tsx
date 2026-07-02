@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import empresaService from '../../../services/empresaService.js';
 import { Plus, Edit, Trash2, Building2, Search, Mail, Fingerprint } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 import { IEmpresa } from '../../../types/index.js';
 
@@ -114,6 +115,7 @@ const ListaEmpresas: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Empresas" />
       <div className="p-6 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">

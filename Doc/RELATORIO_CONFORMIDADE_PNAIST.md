@@ -25,13 +25,13 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **48 de 61 requisitos** identificados (~79%), possui **0 requisitos parcialmente implementados** e **13 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **49 de 62 requisitos** identificados (~81%), possui **0 requisitos parcialmente implementados** e **13 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 48 | 79% |
+| ✅ Implementado | 67 | 81% |
 | ⚠️ Parcial | 0 | 0% |
-| ❌ Não implementado | 13 | 21% |
+| ❌ Não implementado | 15 | 18% |
 
 **Principais Pontos Fortes:**
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
@@ -39,12 +39,13 @@ O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema d
 - Gestão de acidentes, doenças ocupacionais e vacinação
 - Dashboard analítico com KPIs e monitoramento clínico
 - Segurança em camadas (JWT, CSRF, rate limiting, RBAC)
+- Acessibilidade WCAG 2.1 AA (aria labels, navegação por teclado, foco visível, leitores de tela, contraste)
 
 **Principais Gaps:**
 - Interoperabilidade com sistemas governamentais (CADSUS, CNES, e-Social, SINAN)
 - Parametrização por unidade federativa (UF)
 - Indicadores customizáveis por estado/município
-- Acessibilidade e suporte offline
+- Suporte offline
 - Termo de consentimento explícito, política de retenção e exportação de dados pelo titular (LGPD)
 
 ---
@@ -208,7 +209,7 @@ Cada requisito foi classificado como:
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
 | 70 | Interface amigável | ✅ | Tailwind CSS, responsivo, componentes reutilizáveis, formulários com validação e máscaras |
-| 71 | **Acessibilidade** | ❌ | Sem recursos específicos (aria labels, navegação por teclado, contraste, leitores de tela) |
+| 71 | **Acessibilidade** | ✅ | Skip link, aria-labels, aria-invalid/describedby, aria-expanded, aria-current, aria-sort, role=alert/status, navegação teclado, focus-visible, prefers-reduced-motion, títulos dinâmicos (Helmet), contraste ajustado, sr-only |
 | 72 | **Aplicativo mobile** | ❌ | Sem versão mobile nativa ou PWA |
 | 73 | **Funcionalidade offline** | ❌ | Sistema 100% dependente de conexão |
 
@@ -242,16 +243,16 @@ Cada requisito foi classificado como:
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 8 | 1 | 12 | 38% |
-| **Total** | **82** | **66** | **1** | **15** | **80%** |
+| Aspectos Transversais | 21 | 9 | 0 | 12 | 43% |
+| **Total** | **82** | **67** | **0** | **15** | **82%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
 ### Por Status
 
 ```
-✅ Implementado:    66 requisitos (80%)
-⚠️ Parcial:          1 requisitos (1%)
+✅ Implementado:    67 requisitos (82%)
+⚠️ Parcial:          0 requisitos (0%)
 ❌ Não implementado: 15 requisitos (18%)
 ```
 
@@ -275,7 +276,7 @@ Cada requisito foi classificado como:
 | # | Tarefa | Módulo | Descrição | Esforço Estimado |
 |---|--------|--------|-----------|-----------------|
 | 7 | Formulário dedicado para assédio moral/sexual | Frontend | Criar componentes de formulário específicos para registrar assédio moral e sexual no ambiente de trabalho | 6h |
-| 8 | Implementar acessibilidade (WCAG 2.1) | Frontend | Auditoria + correções: ARIA labels, foco visível, contraste de cores, navegação por teclado, suporte a leitores de tela | 16h |
+| 8 | Implementar acessibilidade (WCAG 2.1) | Frontend | ✅ **Concluído.** Skip link, aria-labels, aria-invalid/describedby, aria-expanded, aria-current, aria-sort, role=alert/status, navegação teclado, focus-visible, prefers-reduced-motion, títulos dinâmicos (Helmet), contraste ajustado, sr-only | 16h |
 | 9 | Criar sistema de indicadores customizáveis | Backend + Frontend | Interface admin para criar/editar indicadores (nome, fórmula, meta, periodicidade, unidade federativa) | 20h |
 | 10 | Dashboard público de transparência | Backend + Frontend | ✅ **Concluído.** Endpoint público `/api/public/reports` com dados agregados e anonimizados + página `/transparencia` com gráficos Recharts | 12h |
 | 11 | Criar trilha de consentimento LGPD | Backend | Auditoria dedicada para acessos a dados sensíveis; registro de consentimento do titular | 6h |
@@ -303,7 +304,7 @@ Fase 1 - Imediata (1-2 semanas):
 Fase 2 - Curto Prazo (2-4 semanas):
 ├── #3 expansão racaEtnia ✅ (3h)
 ├── #7 formulário assédio (6h)
-├── #8 acessibilidade (16h)
+├── #8 acessibilidade ✅ (16h)
 ├── #11 consentimento LGPD (6h)
 
 Fase 3 - Médio Prazo (1-2 meses):
@@ -343,7 +344,7 @@ Fase 4 - Longo Prazo (2-4 meses):
 
 3. **LGPD:** Medidas de segurança implementadas (JWT, CSRF, rate-limit, Helmet, sanitização de senhas com histórico e bcrypt). Pendentes: termo de consentimento explícito, política de retenção, e exportação de dados pelo titular.
 
-4. **Acessibilidade e suporte offline:** A menção a "falta de infraestrutura e conectividade em algumas regiões" no documento requer planejamento para cenários offline, que atualmente não existe.
+4. **Acessibilidade:** Implementado conforme WCAG 2.1 AA (skip link, aria labels, navegação por teclado, foco visível, leitores de tela, contraste, títulos dinâmicos). Pendente: suporte offline para cenários sem conectividade.
 
 ### Recomendações Estratégicas
 

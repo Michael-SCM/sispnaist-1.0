@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 const ListaAtos: React.FC = () => {
@@ -68,6 +69,7 @@ const ListaAtos: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Atos Municipais" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

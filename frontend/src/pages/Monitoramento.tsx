@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import {
   Activity,
   AlertTriangle,
@@ -42,6 +43,7 @@ const Monitoramento: React.FC = () => {
   if (loading) {
     return (
       <MainLayout>
+        <DocumentTitle title="Monitoramento Clínico" />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
@@ -51,6 +53,7 @@ const Monitoramento: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Monitoramento Clínico" />
       <div className="p-6 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

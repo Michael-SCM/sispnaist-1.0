@@ -20,6 +20,7 @@ import {
 import toast from 'react-hot-toast';
 import { exportAcidentes } from '../../services/exportService.js';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
@@ -106,6 +107,7 @@ export const ListaAcidentes: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Acidentes" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -38,7 +38,11 @@ export const KPICard: React.FC<IKPICardProps> = React.memo(({
   valorTendencia,
 }) => {
   return (
-    <div className={`card border ${corMap[cor]} hover:shadow-lg transition-shadow`}>
+    <div
+      className={`card border ${corMap[cor]} hover:shadow-lg transition-shadow`}
+      role="region"
+      aria-label={`${titulo}: ${valor}`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">{titulo}</h3>
@@ -62,7 +66,7 @@ export const KPICard: React.FC<IKPICardProps> = React.memo(({
             </div>
           )}
         </div>
-        <div className={`p-3 rounded-lg ${corIconeMap[cor]}`}>
+        <div className={`p-3 rounded-lg ${corIconeMap[cor]}`} aria-hidden="true">
           <span className="text-2xl">{icone}</span>
         </div>
       </div>

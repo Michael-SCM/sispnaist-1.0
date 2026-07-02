@@ -5,6 +5,7 @@ import { useEmpresaStore } from '../../../store/empresaStore.js';
 import { useUnidadeStore } from '../../../store/unidadeStore.js';
 import { ArrowLeft, Save, User, Shield, Building2, MapPin, Mail, Key } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 const empresaIdToString = (v: any): string => {
@@ -146,6 +147,7 @@ const EditarUsuario: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Editar Usuário" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

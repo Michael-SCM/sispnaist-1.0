@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorDependente, ITrabalhador } from '../../../types/index.js';
@@ -171,6 +172,7 @@ export const FormDependente: React.FC = () => {
   if (isCarregando) {
     return (
       <MainLayout>
+        <DocumentTitle title="Formulário de Dependente" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-rose-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando dados...</p>
@@ -181,6 +183,7 @@ export const FormDependente: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Formulário de Dependente" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

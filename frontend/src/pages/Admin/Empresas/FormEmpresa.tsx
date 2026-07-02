@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEmpresaStore } from '../../../store/empresaStore.js';
 import { ArrowLeft, Save, Building2, MapPin, Mail, Phone, Info } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 const FormEmpresa: React.FC = () => {
@@ -94,6 +95,7 @@ const FormEmpresa: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title={id ? 'Editar Empresa' : 'Nova Empresa'} />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

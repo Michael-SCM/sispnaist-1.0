@@ -4,6 +4,7 @@ import unidadeService from '../../../services/unidadeService.js';
 import empresaService from '../../../services/empresaService.js';
 import { Plus, Edit, Trash2, Home, MapPin, Building2, Search } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 import { IUnidade, IEmpresa } from '../../../types/index.js';
 
@@ -125,6 +126,7 @@ const ListaUnidades: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Unidades" />
       <div className="p-6 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">

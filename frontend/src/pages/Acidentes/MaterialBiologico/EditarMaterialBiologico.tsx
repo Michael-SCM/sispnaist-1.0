@@ -16,6 +16,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 
 export const EditarMaterialBiologico: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -120,6 +121,7 @@ export const EditarMaterialBiologico: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Editar Material Biológico" />
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(`/acidentes/material-biologico/${id}`)} className="p-3 hover:bg-emerald-50 rounded-2xl transition-all text-emerald-600 active:scale-90">

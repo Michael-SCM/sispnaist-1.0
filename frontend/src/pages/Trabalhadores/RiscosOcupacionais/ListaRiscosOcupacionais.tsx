@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorRiscoOcupacional, ITrabalhador } from '../../../types/index.js';
@@ -63,6 +64,7 @@ export const ListaRiscosOcupacionais: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Riscos Ocupacionais" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">

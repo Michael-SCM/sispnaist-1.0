@@ -5,6 +5,7 @@ import { useAnalyticsStore } from '../store/analyticsStore.js';
 import { MainLayout } from '../layouts/MainLayout.js';
 import { KPICard } from '../components/KPICard.js';
 import { AlertaOrientacaoMobile } from '../components/AlertaOrientacaoMobile.js';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import { format } from 'date-fns';
 
 const AcidentesPorMes = lazy(() => import('../components/charts/AcidentesPorMes.js').then(m => ({ default: m.AcidentesPorMes })));
@@ -494,6 +495,7 @@ const {
   // Fallback - Dashboard básico (antes de carregar)
   return (
     <MainLayout>
+      <DocumentTitle title="Dashboard" />
       <AlertaOrientacaoMobile />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="card bg-blue-50 border-blue-100">

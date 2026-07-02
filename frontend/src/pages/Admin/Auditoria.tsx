@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import api from '../../services/api.js';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
@@ -101,6 +102,7 @@ export const Auditoria: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Auditoria" />
       <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

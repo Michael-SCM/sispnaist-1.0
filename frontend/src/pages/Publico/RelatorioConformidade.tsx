@@ -10,6 +10,7 @@ import {
   BarChart3,
   Download,
 } from 'lucide-react';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { publicReportService, IRelatorioConformidade } from '../../services/publicReportService';
 import { KPICard } from '../../components/KPICard';
 import {
@@ -191,7 +192,8 @@ export const RelatorioConformidade: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        <DocumentTitle title="Relatório de Conformidade" />
         <header className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
             <Shield className="text-blue-600" size={28} />
@@ -199,6 +201,8 @@ export const RelatorioConformidade: React.FC = () => {
           </div>
         </header>
         <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+          {/* Skeleton KPIs */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
             <div className="h-8 w-64 bg-white/20 rounded animate-pulse mb-2" />
             <div className="h-4 w-96 bg-white/20 rounded animate-pulse" />
@@ -256,14 +260,15 @@ export const RelatorioConformidade: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        <DocumentTitle title="Relatório de Conformidade" />
         <header className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
             <Shield className="text-blue-600" size={28} />
             <h1 className="text-xl font-bold text-gray-800">SISPNAIST</h1>
           </div>
         </header>
-        <main className="max-w-7xl mx-auto px-6 py-12">
+        <main className="max-w-7xl mx-auto px-6 py-8">
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
             <AlertTriangle className="text-red-500 mx-auto mb-3" size={40} />
             <p className="text-red-700 font-medium">{error}</p>
@@ -277,6 +282,7 @@ export const RelatorioConformidade: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <DocumentTitle title="Relatório de Conformidade" />
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

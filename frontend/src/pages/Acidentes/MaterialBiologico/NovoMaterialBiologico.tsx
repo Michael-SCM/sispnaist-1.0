@@ -18,6 +18,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 
 export const NovoMaterialBiologico: React.FC = () => {
   const navigate = useNavigate();
@@ -122,6 +123,7 @@ export const NovoMaterialBiologico: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Novo Material Biológico" />
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

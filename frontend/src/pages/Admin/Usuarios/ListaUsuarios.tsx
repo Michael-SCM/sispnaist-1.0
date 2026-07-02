@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import userService from '../../../services/userService.js';
 import { User, Mail, Edit, Trash2, Search, Building2, Fingerprint } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../../utils/cpfMask.js';
 
@@ -162,6 +163,7 @@ const ListaUsuarios: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Usuários" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

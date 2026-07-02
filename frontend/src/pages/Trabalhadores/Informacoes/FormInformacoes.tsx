@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { informacaoService, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
 import { uploadService } from '../../../services/uploadService.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
@@ -343,6 +344,7 @@ export const FormInformacoes: React.FC = () => {
   if (isCarregando) {
     return (
       <MainLayout>
+        <DocumentTitle title="Formulário de Informações" />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
         </div>
@@ -352,6 +354,7 @@ export const FormInformacoes: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Formulário de Informações" />
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

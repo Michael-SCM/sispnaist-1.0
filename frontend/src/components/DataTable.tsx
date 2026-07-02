@@ -22,6 +22,7 @@ interface DataTableProps<T> {
     onClick: (row: T) => void;
     variant?: 'primary' | 'danger' | 'secondary';
   }>;
+  ariaLabel?: string;
 }
 
 const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
@@ -36,45 +37,52 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
       sortBy,
       sortOrder = 'asc',
       actions,
+      ariaLabel = 'Tabela de registros',
     },
     ref
   ) => {
     if (isLoading) {
       return (
-        <div ref={ref} className="w-full p-8 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          <p className="text-gray-500 mt-2">Carregando...</p>
+        <div ref={ref} className="w-full p-8 text-center" role="status" aria-label="Carregando dados">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" aria-hidden="true"></div>
+          <p className="text-gray-500 mt-2" aria-live="polite">Carregando...</p>
         </div>
       );
     }
 
     if (!data || data.length === 0) {
       return (
-        <div ref={ref} className="w-full p-8 text-center text-gray-500">
+        <div ref={ref} className="w-full p-8 text-center text-gray-500" role="status" aria-live="polite">
           <p className="text-lg">{emptyMessage}</p>
         </div>
       );
     }
 
+    const sortDirection = sortBy && sortOrder === 'asc' ? 'ascending' : 'descending';
+
     return (
       <div ref={ref} className="w-full overflow-x-auto">
-        <table className="w-full text-sm text-gray-700">
+        <table className="w-full text-sm text-gray-700" role="table" aria-label={ariaLabel}>
+          <caption className="sr-only">{ariaLabel}</caption>
           <thead className="bg-gray-100 border-b-2 border-gray-200">
             <tr>
               {columns.map((column) => (
                 <th
                   key={String(column.key)}
+                  scope="col"
                   className="px-4 py-3 text-left font-semibold text-gray-800"
                   style={{ width: column.width }}
+                  aria-sort={column.sortable && sortBy === column.key ? (sortOrder === 'asc' ? 'ascending' : 'descending') : undefined}
                 >
                   {column.sortable && onSort ? (
                     <button
                       onClick={() => onSort(String(column.key))}
                       className="flex items-center gap-1 hover:text-blue-600"
+                      aria-label={`Ordenar por ${column.header}${sortBy === column.key ? ` (ordem ${sortOrder === 'asc' ? 'crescente' : 'decrescente'})` : ''}`}
                     >
                       {column.header}
                       {sortBy === column.key && (
-                        <span>{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                        <span aria-hidden="true">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </button>
                   ) : (
@@ -83,7 +91,7 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
                 </th>
               ))}
               {actions && actions.length > 0 && (
-                <th className="px-4 py-3 text-center font-semibold text-gray-800">
+                <th scope="col" className="px-4 py-3 text-center font-semibold text-gray-800">
                   Ações
                 </th>
               )}
@@ -93,10 +101,12 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
             {data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={`border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer ${
-                  onRowClick ? 'hover:bg-blue-50' : ''
-                }`}
+                className={`border-b border-gray-200 hover:bg-gray-50 transition cursor-pointer ${onRowClick ? 'hover:bg-blue-50' : ''}`}
                 onClick={() => onRowClick?.(row)}
+                tabIndex={onRowClick ? 0 : undefined}
+                role={onRowClick ? 'button' : undefined}
+                onKeyDown={onRowClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onRowClick(row); } } : undefined}
+                aria-label={onRowClick ? 'Ver detalhes' : undefined}
               >
                 {columns.map((column) => (
                   <td
@@ -126,6 +136,7 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
                               ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                               : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                           }`}
+                          aria-label={`${action.label} ${(row as any).nome || (row as any).name || ''}`}
                         >
                           {action.label}
                         </button>
@@ -167,25 +178,28 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
   );
 
   return (
-    <div className="flex items-center gap-2 mt-4">
+    <nav className="flex items-center gap-2 mt-4" aria-label="Navegação de páginas">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
         className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Página anterior"
       >
         Anterior
       </button>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1" role="list" aria-label="Números de página">
         {visiblePages[0] > 1 && (
           <>
             <button
               onClick={() => onPageChange(1)}
               className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100"
+              aria-label="Página 1"
+              aria-current={currentPage === 1 ? 'page' : undefined}
             >
               1
             </button>
-            {visiblePages[0] > 2 && <span className="px-2 py-2">...</span>}
+            {visiblePages[0] > 2 && <span className="px-2 py-2" aria-hidden="true">...</span>}
           </>
         )}
 
@@ -198,6 +212,8 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
                 ? 'bg-blue-600 text-white border border-blue-600'
                 : 'border border-gray-300 hover:bg-gray-100'
             }`}
+            aria-label={`Página ${page}`}
+            aria-current={currentPage === page ? 'page' : undefined}
           >
             {page}
           </button>
@@ -206,11 +222,12 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
         {visiblePages[visiblePages.length - 1] < totalPages && (
           <>
             {visiblePages[visiblePages.length - 1] < totalPages - 1 && (
-              <span className="px-2 py-2">...</span>
+              <span className="px-2 py-2" aria-hidden="true">...</span>
             )}
             <button
               onClick={() => onPageChange(totalPages)}
               className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100"
+              aria-label={`Página ${totalPages}`}
             >
               {totalPages}
             </button>
@@ -222,13 +239,14 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages || isLoading}
         className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Próxima página"
       >
         Próxima
       </button>
 
-      <span className="text-sm text-gray-600 ml-4">
+      <span className="text-sm text-gray-600 ml-4" aria-live="polite" aria-atomic="true">
         Página {currentPage} de {totalPages}
       </span>
-    </div>
+    </nav>
   );
 });

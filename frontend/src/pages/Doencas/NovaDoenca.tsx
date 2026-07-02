@@ -20,6 +20,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 interface FormData {
   trabalhadorId: string;
@@ -111,6 +112,7 @@ export const NovaDoenca: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Nova Doença" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

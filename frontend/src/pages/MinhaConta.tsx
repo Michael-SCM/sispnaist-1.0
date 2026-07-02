@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore.js';
 import { authService } from '../services/authService.js';
 import { Loader2, Download, Trash2, CheckCircle, AlertTriangle, User } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 export const MinhaConta: React.FC = () => {
   const { user, clearAuth } = useAuthStore();
@@ -42,6 +43,7 @@ export const MinhaConta: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Minha Conta" />
       <div className="p-6 max-w-3xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-blue-50 rounded-2xl text-blue-600">

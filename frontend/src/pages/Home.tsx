@@ -1,9 +1,11 @@
 import React from 'react';
 import { MainLayout } from '../layouts/MainLayout.js';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 export const Home: React.FC = () => {
   return (
     <MainLayout>
+      <DocumentTitle title="Início" />
       <div className="text-center py-12">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">SISPNAIST</h1>
         <p className="text-xl text-gray-600 mb-8">

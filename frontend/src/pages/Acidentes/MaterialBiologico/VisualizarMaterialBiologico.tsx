@@ -8,6 +8,7 @@ import {
   AlertTriangle, Stethoscope, User, Clock, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 
 export const VisualizarMaterialBiologico: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,6 +75,7 @@ export const VisualizarMaterialBiologico: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
+        <DocumentTitle title="Material Biológico" />
         <div className="p-6 max-w-4xl mx-auto">
           <div className="animate-pulse space-y-6">
             <div className="h-12 bg-slate-100 rounded-2xl w-1/3" />
@@ -89,6 +91,7 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Material Biológico" />
       <div className="p-6 max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

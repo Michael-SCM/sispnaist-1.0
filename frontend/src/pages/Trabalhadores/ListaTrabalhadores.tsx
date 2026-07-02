@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
@@ -91,6 +92,7 @@ export const ListaTrabalhadores: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Trabalhadores" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

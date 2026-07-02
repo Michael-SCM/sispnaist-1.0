@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
@@ -63,6 +64,7 @@ export const DetalhesTrabalhador: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
+        <DocumentTitle title="Detalhes do Trabalhador" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-blue-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando detalhes do trabalhador...</p>
@@ -75,6 +77,7 @@ export const DetalhesTrabalhador: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Detalhes do Trabalhador" />
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -4,6 +4,7 @@ import { useUnidadeStore } from '../../../store/unidadeStore.js';
 import { useEmpresaStore } from '../../../store/empresaStore.js';
 import { ArrowLeft, Save, Home, MapPin, Building2, Info } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 const FormUnidade: React.FC = () => {
@@ -98,6 +99,7 @@ const FormUnidade: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title={id ? 'Editar Unidade' : 'Nova Unidade'} />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

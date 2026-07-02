@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api.js';
 import { Settings, ChevronRight, Database, Search, ArrowRight } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 interface Catalogo {
@@ -35,6 +36,7 @@ const ListaCatalogos: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Catálogos" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

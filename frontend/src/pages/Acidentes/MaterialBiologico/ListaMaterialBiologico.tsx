@@ -19,6 +19,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 
 export const ListaMaterialBiologico: React.FC = () => {
   const navigate = useNavigate();
@@ -128,6 +129,7 @@ export const ListaMaterialBiologico: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Material Biológico" />
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -1,6 +1,22 @@
 import React from 'react';
 import { formatCPF, formatCNPJ, formatTelefone, formatCEP } from '../utils/masks.js';
 
+function errorId(name: string) { return `${name}-error`; }
+
+function errorMessage(error: string | undefined, name: string) {
+  if (!error) return null;
+  return <p id={errorId(name)} className="text-red-500 text-xs mt-1" role="alert">{error}</p>;
+}
+
+function helpText(help: string | undefined) {
+  if (!help) return null;
+  return <p className="text-gray-500 text-xs mt-1">{help}</p>;
+}
+
+function inputClasses(error?: string) {
+  return `w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'}`;
+}
+
 // TextInput
 interface TextInputProps {
   label: string;
@@ -15,18 +31,7 @@ interface TextInputProps {
   help?: string;
 }
 
-export const TextInput: React.FC<TextInputProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  type = 'text',
-  error,
-  required,
-  disabled,
-  help,
-}) => (
+export const TextInput: React.FC<TextInputProps> = ({ label, name, value, onChange, placeholder, type = 'text', error, required, disabled, help }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
@@ -40,12 +45,13 @@ export const TextInput: React.FC<TextInputProps> = ({
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled}
-      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : undefined}
+      aria-required={required}
+      className={inputClasses(error)}
     />
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {errorMessage(error, name)}
+    {helpText(help)}
   </div>
 );
 
@@ -63,18 +69,7 @@ interface TextAreaProps {
   help?: string;
 }
 
-export const TextArea: React.FC<TextAreaProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-  disabled,
-  rows = 4,
-  help,
-}) => (
+export const TextArea: React.FC<TextAreaProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, rows = 4, help }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
@@ -88,12 +83,13 @@ export const TextArea: React.FC<TextAreaProps> = ({
       placeholder={placeholder}
       disabled={disabled}
       rows={rows}
-      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : undefined}
+      aria-required={required}
+      className={inputClasses(error)}
     />
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {errorMessage(error, name)}
+    {helpText(help)}
   </div>
 );
 
@@ -116,18 +112,7 @@ interface SelectProps {
   help?: string;
 }
 
-export const Select: React.FC<SelectProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  options,
-  placeholder,
-  error,
-  required,
-  disabled,
-  help,
-}) => (
+export const Select: React.FC<SelectProps> = ({ label, name, value, onChange, options, placeholder, error, required, disabled, help }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
@@ -139,9 +124,10 @@ export const Select: React.FC<SelectProps> = ({
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : undefined}
+      aria-required={required}
+      className={inputClasses(error)}
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map((option) => (
@@ -150,8 +136,8 @@ export const Select: React.FC<SelectProps> = ({
         </option>
       ))}
     </select>
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {errorMessage(error, name)}
+    {helpText(help)}
   </div>
 );
 
@@ -169,18 +155,7 @@ interface DatePickerProps {
   help?: string;
 }
 
-export const DatePicker: React.FC<DatePickerProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  error,
-  required,
-  disabled,
-  max,
-  min,
-  help,
-}) => (
+export const DatePicker: React.FC<DatePickerProps> = ({ label, name, value, onChange, error, required, disabled, max, min, help }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
@@ -195,12 +170,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       disabled={disabled}
       max={max}
       min={min}
-      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : undefined}
+      aria-required={required}
+      className={inputClasses(error)}
     />
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {errorMessage(error, name)}
+    {helpText(help)}
   </div>
 );
 
@@ -216,16 +192,7 @@ interface TimePickerProps {
   help?: string;
 }
 
-export const TimePicker: React.FC<TimePickerProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  error,
-  required,
-  disabled,
-  help,
-}) => (
+export const TimePicker: React.FC<TimePickerProps> = ({ label, name, value, onChange, error, required, disabled, help }) => (
   <div className="form-group">
     <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
       {label}
@@ -238,12 +205,13 @@ export const TimePicker: React.FC<TimePickerProps> = ({
       value={value}
       onChange={onChange}
       disabled={disabled}
-      className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : undefined}
+      aria-required={required}
+      className={inputClasses(error)}
     />
-    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+    {errorMessage(error, name)}
+    {helpText(help)}
   </div>
 );
 
@@ -254,17 +222,11 @@ interface CheckboxProps {
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
+  error?: string;
   help?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({
-  label,
-  name,
-  checked,
-  onChange,
-  disabled,
-  help,
-}) => (
+export const Checkbox: React.FC<CheckboxProps> = ({ label, name, checked, onChange, disabled, error, help }) => (
   <div className="form-group flex items-start">
     <input
       id={name}
@@ -273,11 +235,14 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       checked={checked}
       onChange={onChange}
       disabled={disabled}
+      aria-invalid={!!error}
+      aria-describedby={error ? errorId(name) : help ? errorId(name) : undefined}
       className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
     />
     <label htmlFor={name} className="ml-3 text-sm">
       <span className="font-medium text-gray-700">{label}</span>
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {helpText(help)}
+      {errorMessage(error, name)}
     </label>
   </div>
 );
@@ -295,17 +260,7 @@ interface MultiSelectProps {
   help?: string;
 }
 
-export const MultiSelect: React.FC<MultiSelectProps> = ({
-  label,
-  name,
-  values,
-  onAdd,
-  onRemove,
-  placeholder,
-  error,
-  required,
-  help,
-}) => {
+export const MultiSelect: React.FC<MultiSelectProps> = ({ label, name, values, onAdd, onRemove, placeholder, error, required, help }) => {
   const [inputValue, setInputValue] = React.useState('');
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -324,9 +279,11 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      <div className={`border rounded-md p-2 min-h-[38px] focus-within:ring-2 focus-within:ring-blue-500 ${
-        error ? 'border-red-500' : 'border-gray-300'
-      }`}>
+      <div className={`border rounded-md p-2 min-h-[38px] focus-within:ring-2 focus-within:ring-blue-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+        role="listbox"
+        aria-label={label}
+        aria-invalid={!!error}
+      >
         <div className="flex flex-wrap gap-2 mb-2">
           {values.map((value) => (
             <span
@@ -338,8 +295,9 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                 type="button"
                 onClick={() => onRemove(value)}
                 className="font-bold hover:text-blue-600"
+                aria-label={`Remover ${value}`}
               >
-                ×
+                <span aria-hidden="true">×</span>
               </button>
             </span>
           ))}
@@ -351,11 +309,12 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder || 'Digite e pressione Enter'}
+          aria-label={`Adicionar item a ${label}`}
           className="w-full bg-transparent outline-none text-sm"
         />
       </div>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {errorMessage(error, name)}
+      {helpText(help)}
     </div>
   );
 };
@@ -373,23 +332,10 @@ interface CPFInputProps {
   help?: string;
 }
 
-export const CPFInput: React.FC<CPFInputProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-  disabled,
-  help,
-}) => {
+export const CPFInput: React.FC<CPFInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
-    const syntheticEvent = {
-      ...e,
-      target: { ...e.target, name, value: formatted },
-    };
+    const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
     onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
   };
 
@@ -408,12 +354,13 @@ export const CPFInput: React.FC<CPFInputProps> = ({
         placeholder="123.456.789-00"
         disabled={disabled}
         maxLength={14}
-        className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId(name) : undefined}
+        aria-required={required}
+        className={inputClasses(error)}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {errorMessage(error, name)}
+      {helpText(help)}
     </div>
   );
 };
@@ -431,23 +378,10 @@ interface CNPJInputProps {
   help?: string;
 }
 
-export const CNPJInput: React.FC<CNPJInputProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-  disabled,
-  help,
-}) => {
+export const CNPJInput: React.FC<CNPJInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCNPJ(e.target.value);
-    const syntheticEvent = {
-      ...e,
-      target: { ...e.target, name, value: formatted },
-    };
+    const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
     onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
   };
 
@@ -466,12 +400,13 @@ export const CNPJInput: React.FC<CNPJInputProps> = ({
         placeholder="12.345.678/0001-90"
         disabled={disabled}
         maxLength={18}
-        className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId(name) : undefined}
+        aria-required={required}
+        className={inputClasses(error)}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {errorMessage(error, name)}
+      {helpText(help)}
     </div>
   );
 };
@@ -489,23 +424,10 @@ interface TelefoneInputProps {
   help?: string;
 }
 
-export const TelefoneInput: React.FC<TelefoneInputProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-  disabled,
-  help,
-}) => {
+export const TelefoneInput: React.FC<TelefoneInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatTelefone(e.target.value);
-    const syntheticEvent = {
-      ...e,
-      target: { ...e.target, name, value: formatted },
-    };
+    const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
     onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
   };
 
@@ -524,12 +446,13 @@ export const TelefoneInput: React.FC<TelefoneInputProps> = ({
         placeholder="(11) 99999-9999"
         disabled={disabled}
         maxLength={15}
-        className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        aria-invalid={!!error}
+        aria-describedby={error ? errorId(name) : undefined}
+        aria-required={required}
+        className={inputClasses(error)}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {errorMessage(error, name)}
+      {helpText(help)}
     </div>
   );
 };
@@ -548,26 +471,12 @@ interface CEPInputProps {
   help?: string;
 }
 
-export const CEPInput: React.FC<CEPInputProps> = ({
-  label,
-  name,
-  value,
-  onChange,
-  onCEPFound,
-  placeholder,
-  error,
-  required,
-  disabled,
-  help,
-}) => {
+export const CEPInput: React.FC<CEPInputProps> = ({ label, name, value, onChange, onCEPFound, placeholder, error, required, disabled, help }) => {
   const [loading, setLoading] = React.useState(false);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCEP(e.target.value);
-    const syntheticEvent = {
-      ...e,
-      target: { ...e.target, name, value: formatted },
-    };
+    const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
     onChange(syntheticEvent as React.ChangeEvent<HTMLInputElement>);
 
     const numbers = formatted.replace(/\D/g, '');
@@ -603,18 +512,20 @@ export const CEPInput: React.FC<CEPInputProps> = ({
           placeholder="12345-678"
           disabled={disabled}
           maxLength={9}
-          className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            error ? 'border-red-500' : 'border-gray-300'
-          } ${loading ? 'pr-10' : ''}`}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId(name) : undefined}
+          aria-required={required}
+          aria-label={loading ? `${label}, buscando endereço...` : label}
+          className={`${inputClasses(error)} ${loading ? 'pr-10' : ''}`}
         />
         {loading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2" role="status" aria-label="Buscando CEP">
+            <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full" aria-hidden="true" />
           </div>
         )}
       </div>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {errorMessage(error, name)}
+      {helpText(help)}
     </div>
   );
 };
@@ -626,26 +537,16 @@ interface SearchInputProps {
   placeholder?: string;
   debounce?: number;
   help?: string;
+  label?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({
-  value,
-  onChange,
-  placeholder = 'Buscar...',
-  debounce = 500,
-  help,
-}) => {
+export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = 'Buscar...', debounce = 500, help, label }) => {
   const [localValue, setLocalValue] = React.useState(value);
 
-  React.useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
+  React.useEffect(() => { setLocalValue(value); }, [value]);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      onChange(localValue);
-    }, debounce);
-
+    const timer = setTimeout(() => onChange(localValue), debounce);
     return () => clearTimeout(timer);
   }, [localValue, debounce, onChange]);
 
@@ -657,26 +558,16 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           value={localValue}
           onChange={(e) => setLocalValue(e.target.value)}
           placeholder={placeholder}
+          aria-label={label || placeholder}
           className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
       </div>
-      {help && <p className="text-gray-500 text-xs mt-1">{help}</p>}
+      {helpText(help)}
     </div>
   );
 };

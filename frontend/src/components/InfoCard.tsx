@@ -8,8 +8,8 @@ interface InfoCardProps {
 }
 
 export const InfoCard: React.FC<InfoCardProps> = React.memo(({ label, value, icon: Icon, color }) => (
-  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
-    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
+    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50" role="region" aria-label={`${label}: ${value ?? '-'}`}>
+    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`} aria-hidden="true">
       <Icon size={18} />
     </div>
     <div>

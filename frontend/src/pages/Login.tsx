@@ -7,6 +7,7 @@ import { authService } from '../services/authService.js';
 import { useAuthStore } from '../store/authStore.js';
 import { required, email as emailRule, validateField, validate } from '../utils/validators.js';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 interface LoginFormData {
   email: string;
@@ -88,6 +89,7 @@ export const Login: React.FC = () => {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
+      <DocumentTitle title="Login" />
       <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">SISPNAIST</h1>
 

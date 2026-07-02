@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../services/api.js';
 import { ArrowLeft, Plus, Edit2, Trash2, Database, Save, X, Search } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 interface ItemCatalogo {
@@ -83,6 +84,7 @@ const ItensCatalogo: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Itens do Catálogo" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

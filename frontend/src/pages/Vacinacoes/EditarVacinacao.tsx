@@ -17,6 +17,7 @@ import {
   Fingerprint
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 interface FormData {
   trabalhadorId: string;
@@ -114,6 +115,7 @@ export const EditarVacinacao: React.FC = () => {
   if (isCarregando) {
     return (
       <MainLayout>
+        <DocumentTitle title="Editar Vacinação" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-emerald-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando dados...</p>
@@ -126,6 +128,7 @@ export const EditarVacinacao: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Editar Vacinação" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

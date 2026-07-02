@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService.js';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 export const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export const ForgotPassword: React.FC = () => {
   if (isSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <DocumentTitle title="Recuperar Senha" />
         <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md text-center space-y-6">
           <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,6 +62,7 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <DocumentTitle title="Recuperar Senha" />
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-blue-600 mb-2">Esqueceu a senha?</h2>

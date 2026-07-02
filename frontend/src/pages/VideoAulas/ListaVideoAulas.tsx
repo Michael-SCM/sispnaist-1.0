@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useVideoAulaStore } from '../../store/videoAulaStore.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { useAuthStore } from '../../store/authStore.js';
@@ -94,6 +95,7 @@ export const ListaVideoAulas: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Vídeo Aulas" />
       <div className="p-6 space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-blue-900 to-indigo-800 p-8 rounded-3xl shadow-xl text-white">

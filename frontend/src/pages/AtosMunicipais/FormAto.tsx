@@ -13,6 +13,7 @@ import {
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
 import enderecoService, { Bairro, Logradouro } from '../../services/enderecoService';
 import { MainLayout } from '../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
 
 const FormAto: React.FC = () => {
@@ -85,6 +86,7 @@ const FormAto: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title={isEditing ? 'Editar Ato Municipal' : 'Novo Ato Municipal'} />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

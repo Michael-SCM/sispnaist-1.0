@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '../services/authService.js';
 import toast from 'react-hot-toast';
+import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 
 export const VerifyEmail: React.FC = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ export const VerifyEmail: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-100 via-blue-50 to-emerald-50 p-4">
+      <DocumentTitle title="Verificar Email" />
       <div className="bg-white/80 backdrop-blur-lg border border-white/40 rounded-3xl shadow-2xl p-8 w-full max-w-md text-center transform transition-all duration-500 scale-100 hover:shadow-indigo-100/50">
         <h2 className="text-3xl font-extrabold text-blue-600 mb-6 tracking-wide">SISPNAIST</h2>
 

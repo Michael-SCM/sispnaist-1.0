@@ -25,6 +25,7 @@ import {
 import toast from 'react-hot-toast';
 import { materialBiologicoService } from '../../services/materialBiologicoService.js';
 import { IMaterialBiologico } from '../../types/index.js';
+import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const DetalhesAcidente: React.FC = () => {
   const navigate = useNavigate();
@@ -82,6 +83,7 @@ export const DetalhesAcidente: React.FC = () => {
   if (isLoading) {
     return (
       <MainLayout>
+        <DocumentTitle title="Detalhes do Acidente" />
         <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
           <Loader2 size={48} className="text-amber-600 animate-spin" />
           <p className="text-slate-500 font-medium">Carregando detalhes...</p>
@@ -99,6 +101,7 @@ export const DetalhesAcidente: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Detalhes do Acidente" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

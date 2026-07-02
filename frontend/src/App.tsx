@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { useAuthStore } from './store/authStore.js';
 import { ProtectedRoute } from './components/ProtectedRoute.js';
 
@@ -8,8 +9,9 @@ import './styles/globals.css';
 
 function LoadingFallback() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+    <div className="flex items-center justify-center min-h-screen" role="status" aria-label="Carregando">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" aria-hidden="true" />
+      <span className="sr-only">Carregando...</span>
     </div>
   );
 }
@@ -110,8 +112,21 @@ const App: React.FC = () => {
   }
 
   return (
+    <HelmetProvider>
     <Router>
-      <Toaster position="top-right" />
+      <Helmet
+        defaultTitle="SISPNAIST - Sistema de Gerenciamento de Segurança do Trabalhador"
+        titleTemplate="%s | SISPNAIST"
+      />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          ariaProps: {
+            role: 'status',
+            'aria-live': 'polite',
+          },
+        }}
+      />
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -727,6 +742,7 @@ const App: React.FC = () => {
       </Routes>
       </Suspense>
     </Router>
+    </HelmetProvider>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
+import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorOcorrenciaViolencia, ITrabalhador } from '../../../types/index.js';
@@ -61,6 +62,7 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
 
   return (
     <MainLayout>
+      <DocumentTitle title="Ocorrências de Violência" />
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
