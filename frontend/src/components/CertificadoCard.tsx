@@ -15,7 +15,7 @@ export const CertificadoCard: React.FC<CertificadoCardProps> = React.memo(({ cer
   return (
     <div
       onClick={() => onVisualizar(certificado)}
-      className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:shadow-amber-900/5 transition-all duration-300 group cursor-pointer"
+      className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl hover:shadow-amber-900/5 transition-all duration-300 group cursor-pointer relative"
     >
       {/* Certificate Header */}
       <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6 relative overflow-hidden">

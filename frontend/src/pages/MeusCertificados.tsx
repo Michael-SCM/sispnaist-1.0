@@ -105,20 +105,20 @@ export const MeusCertificados: React.FC = () => {
         {/* Certificate Detail Modal */}
         {certificadoSelecionado && (
           <div
-            className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-4 pt-8 md:pt-12 overflow-y-auto"
+            className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm p-4 pt-8 md:pt-12 overflow-y-auto print:bg-white print:backdrop-blur-none print:!p-0 print:!m-0 print:!items-center print:!overflow-visible"
             onClick={() => setCertificadoSelecionado(null)}
             role="dialog"
             aria-modal="true"
             aria-label="Detalhes do certificado"
           >
             <div
-              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-300"
+              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-300 print:shadow-none print:rounded-none print:max-w-full print:my-0 print:border-0"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Certificate Visual */}
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 md:p-10 border-4 border-amber-200 m-3 md:m-5 rounded-2xl">
-                <div className="text-center space-y-3 md:space-y-4">
-                  <Award size={48} className="mx-auto text-amber-500" />
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 md:p-10 border-4 border-amber-200 m-3 md:m-5 rounded-2xl print:border-2 print:m-0 print:rounded-none print:p-8 print:min-h-[90vh] print:flex print:items-center">
+                <div className="text-center space-y-3 md:space-y-4 print:space-y-5 w-full">
+                  <Award size={48} className="mx-auto text-amber-500 print:hidden" />
                   <h2 className="text-2xl md:text-3xl font-black text-slate-800">Certificado</h2>
                   <p className="text-slate-500 font-medium">de Capacitação e Treinamento</p>
 
@@ -164,7 +164,7 @@ export const MeusCertificados: React.FC = () => {
               </div>
 
               {/* Actions */}
-              <div className="p-4 md:p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between gap-3">
+              <div className="p-4 md:p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row justify-between gap-3 print:hidden">
                 <button
                   onClick={() => setCertificadoSelecionado(null)}
                   className="flex items-center justify-center gap-2 px-4 py-2.5 text-slate-500 font-bold hover:bg-slate-200/50 rounded-xl transition-all"

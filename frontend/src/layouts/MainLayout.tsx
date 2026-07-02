@@ -10,12 +10,16 @@ interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
-      <SkipLink />
-      <Header />
+      <div className="print:hidden">
+        <SkipLink />
+        <Header />
+      </div>
       <main id="main-content" className="flex-1 w-full px-4 py-8" tabIndex={-1}>
         {children}
       </main>
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </div>
   );
 };

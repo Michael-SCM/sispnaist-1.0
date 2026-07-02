@@ -2059,208 +2059,103 @@ export class PdfService {
 
     doc.pipe(res);
 
-    const pageWidth = doc.page.width;
-    const pageHeight = doc.page.height;
+    const PW = doc.page.width;   // 841.89
+    const PH = doc.page.height;  // 595.28
+    const CX = PW / 2;           // centro X
+    const TW = PW - 100;         // largura do texto (741)
+    const LW = 200;              // largura linha decorativa
 
-    // Borda decorativa externa
-    doc.rect(20, 20, pageWidth - 40, pageHeight - 40)
-      .lineWidth(2)
-      .stroke('#d97706');
+    // Bordas decorativas
+    doc.rect(20, 20, PW - 40, PH - 40).lineWidth(2).stroke('#d97706');
+    doc.rect(28, 28, PW - 56, PH - 56).lineWidth(0.5).stroke('#f59e0b');
 
-    // Borda decorativa interna
-    doc.rect(28, 28, pageWidth - 56, pageHeight - 56)
-      .lineWidth(0.5)
-      .stroke('#f59e0b');
+    // Faixa superior
+    doc.rect(20, 20, PW - 40, 55).fillColor('#1e40af').fill();
 
-    // Faixa superior decorativa
-    doc.rect(20, 20, pageWidth - 40, 80)
-      .fillColor('#1e40af')
-      .fill();
+    doc.fontSize(20).fillColor('#ffffff').font('Helvetica-Bold')
+      .text('SISPNAIST', 0, 35, { align: 'center', width: PW });
 
-    doc.fontSize(28)
-      .fillColor('#ffffff')
-      .font('Helvetica-Bold')
-      .text('SISPNAIST', 0, 38, {
-        align: 'center',
-        width: pageWidth,
-      });
+    doc.fontSize(10).fillColor('#bfdbfe').font('Helvetica')
+      .text('Sistema de Gerenciamento de Saúde e Segurança do Trabalho', 0, 60, { align: 'center', width: PW });
 
-    doc.fontSize(12)
-      .fillColor('#bfdbfe')
-      .font('Helvetica')
-      .text('Sistema de Gerenciamento de Saúde e Segurança do Trabalho', 0, 72, {
-        align: 'center',
-        width: pageWidth,
-      });
+    // === TÍTULO ===
+    doc.fontSize(24).fillColor('#1e40af').font('Helvetica-Bold')
+      .text('CERTIFICADO', 50, 100, { align: 'center', width: TW });
 
-    // Título do certificado
-    const tituloY = 140;
-    doc.fontSize(36)
-      .fillColor('#1e40af')
-      .font('Helvetica-Bold')
-      .text('CERTIFICADO', 0, tituloY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    doc.fontSize(12).fillColor('#6b7280').font('Helvetica')
+      .text('de Capacitação e Treinamento', 50, 130, { align: 'center', width: TW });
 
-    doc.fontSize(16)
-      .fillColor('#6b7280')
-      .font('Helvetica')
-      .text('de Capacitação e Treinamento', 0, tituloY + 45, {
-        align: 'center',
-        width: pageWidth,
-      });
+    doc.moveTo(CX - 80, 155).lineTo(CX + 80, 155).lineWidth(1.5).stroke('#d97706');
 
-    // Linha decorativa
-    const linhaY = tituloY + 80;
-    doc.moveTo(pageWidth / 2 - 100, linhaY)
-      .lineTo(pageWidth / 2 + 100, linhaY)
-      .lineWidth(1.5)
-      .stroke('#d97706');
+    // === CORPO ===
+    let y = 175;
 
-    // Corpo do certificado
-    const corpoY = linhaY + 40;
+    doc.fontSize(11).fillColor('#374151').font('Helvetica')
+      .text('Conferimos a', 50, y, { align: 'center', width: TW });
 
-    doc.fontSize(14)
-      .fillColor('#374151')
-      .font('Helvetica')
-      .text('Conferimos a', 0, corpoY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    y = 195;
+    doc.fontSize(22).fillColor('#1e40af').font('Helvetica-Bold')
+      .text(certificado.nomeUsuario, 50, y, { align: 'center', width: TW });
 
-    const nomeY = corpoY + 30;
-    doc.fontSize(28)
-      .fillColor('#1e40af')
-      .font('Helvetica-Bold')
-      .text(certificado.nomeUsuario, 0, nomeY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    y = doc.y + 10;
+    doc.fontSize(10).fillColor('#6b7280').font('Helvetica')
+      .text(`CPF: ${certificado.cpfUsuario}`, 50, y, { align: 'center', width: TW });
 
-    const cpfY = nomeY + 40;
-    doc.fontSize(12)
-      .fillColor('#6b7280')
-      .font('Helvetica')
-      .text(`CPF: ${certificado.cpfUsuario}`, 0, cpfY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    y = Math.max(doc.y + 12, 245);
+    doc.moveTo(CX - 80, y).lineTo(CX + 80, y).lineWidth(1.5).stroke('#d97706');
 
-    // Segunda linha decorativa
-    const linha2Y = cpfY + 35;
-    doc.moveTo(pageWidth / 2 - 100, linha2Y)
-      .lineTo(pageWidth / 2 + 100, linha2Y)
-      .lineWidth(1.5)
-      .stroke('#d97706');
+    y += 22;
+    doc.fontSize(11).fillColor('#374151').font('Helvetica')
+      .text('por ter concluído o treinamento', 50, y, { align: 'center', width: TW });
 
-    const descY = linha2Y + 35;
-    doc.fontSize(14)
-      .fillColor('#374151')
-      .font('Helvetica')
-      .text('por ter concluído o treinamento', 0, descY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    y = doc.y + 8;
+    doc.fontSize(16).fillColor('#d97706').font('Helvetica-Bold')
+      .text(certificado.tituloTreinamento, 50, y, { align: 'center', width: TW });
 
-    const treinamentoY = descY + 30;
-    doc.fontSize(20)
-      .fillColor('#d97706')
-      .font('Helvetica-Bold')
-      .text(certificado.tituloTreinamento, 0, treinamentoY, {
-        align: 'center',
-        width: pageWidth,
-      });
-
-    let nextY = treinamentoY + 35;
+    y = doc.y + 8;
 
     if (certificado.descricaoTreinamento) {
-      doc.fontSize(11)
-        .fillColor('#6b7280')
-        .font('Helvetica-Oblique')
-        .text(`"${certificado.descricaoTreinamento}"`, 0, nextY, {
-          align: 'center',
-          width: pageWidth,
-        });
-      nextY += 25;
+      doc.fontSize(10).fillColor('#6b7280').font('Helvetica-Oblique')
+        .text(`"${certificado.descricaoTreinamento}"`, 50, y, { align: 'center', width: TW });
+      y = doc.y + 10;
     }
 
-    // Informações adicionais
-    nextY += 15;
-    const infoStartX = pageWidth / 2 - 180;
-    const infoWidth = 360;
-
-    doc.roundedRect(infoStartX, nextY, infoWidth, 50, 8)
-      .fillColor('#fef3c7')
-      .fill();
-
-    doc.fontSize(12)
-      .fillColor('#92400e')
-      .font('Helvetica');
+    // Info box
+    y = Math.max(y, 330);
+    const iw = 340;
+    const ix = CX - iw / 2;
+    doc.roundedRect(ix, y, iw, 30, 6).fillColor('#fef3c7').fill();
 
     let infoText = `Pontuação: ${certificado.pontuacaoQuiz}%`;
-    if (certificado.cargaHoraria) {
-      infoText += `    |    Duração: ${certificado.cargaHoraria}`;
-    }
+    if (certificado.cargaHoraria) infoText += `    |    Duração: ${certificado.cargaHoraria}`;
+    doc.fontSize(11).fillColor('#92400e').font('Helvetica')
+      .text(infoText, ix, y + 8, { align: 'center', width: iw });
 
-    doc.text(infoText, infoStartX, nextY + 16, {
-      align: 'center',
-      width: infoWidth,
-    });
-
-    nextY += 70;
+    y += 48;
 
     // Data e código
-    const dataY = nextY;
-    doc.fontSize(12)
-      .fillColor('#6b7280')
-      .font('Helvetica')
-      .text(`Emitido em ${dataEmissao}`, 0, dataY, {
-        align: 'center',
-        width: pageWidth,
-      });
+    y = Math.max(y, 385);
+    doc.fontSize(11).fillColor('#6b7280').font('Helvetica')
+      .text(`Emitido em ${dataEmissao}`, 50, y, { align: 'center', width: TW });
 
-    doc.fontSize(10)
-      .fillColor('#9ca3af')
-      .font('Helvetica')
-      .text(`Código: ${certificado.codigoCertificado}`, 0, dataY + 22, {
-        align: 'center',
-        width: pageWidth,
-      });
+    doc.fontSize(9).fillColor('#9ca3af').font('Helvetica')
+      .text(`Código: ${certificado.codigoCertificado}`, 50, y + 18, { align: 'center', width: TW });
 
-    // Linha de assinatura
-    const assinaturaY = pageHeight - 120;
-    const assinaturaX = pageWidth / 2 - 100;
-
-    doc.moveTo(assinaturaX, assinaturaY)
-      .lineTo(assinaturaX + 200, assinaturaY)
-      .lineWidth(1)
-      .stroke('#374151');
-
-    doc.fontSize(11)
-      .fillColor('#374151')
-      .font('Helvetica')
-      .text(certificado.emitidoPor || 'SISPNAIST', assinaturaX, assinaturaY + 8, {
-        align: 'center',
-        width: 200,
-      });
-
-    doc.fontSize(9)
-      .fillColor('#9ca3af')
-      .font('Helvetica')
-      .text('Responsável pela emissão', assinaturaX, assinaturaY + 26, {
-        align: 'center',
-        width: 200,
-      });
+    // Assinatura
+    y = Math.max(y + 48, 420);
+    const ax = CX - 100;
+    doc.moveTo(ax, y).lineTo(ax + 200, y).lineWidth(1).stroke('#374151');
+    doc.fontSize(10).fillColor('#374151').font('Helvetica')
+      .text(certificado.emitidoPor || 'SISPNAIST', ax, y + 8, { align: 'center', width: 200 });
+    doc.fontSize(8).fillColor('#9ca3af').font('Helvetica')
+      .text('Responsável pela emissão', ax, y + 24, { align: 'center', width: 200 });
 
     // Rodapé
-    doc.fontSize(8)
-      .fillColor('#9ca3af')
-      .font('Helvetica')
-      .text('Documento emitido eletronicamente pelo SISPNAIST. Verifique a autenticidade pelo código do certificado.', 0, pageHeight - 55, {
-        align: 'center',
-        width: pageWidth,
-      });
+    doc.fontSize(7.5).fillColor('#9ca3af').font('Helvetica')
+      .text(
+        'Documento emitido eletronicamente pelo SISPNAIST. Verifique a autenticidade pelo código do certificado.',
+        50, PH - 58, { align: 'center', width: TW }
+      );
 
     doc.end();
   }
