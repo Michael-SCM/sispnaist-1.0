@@ -9,7 +9,9 @@ export const Header: React.FC = React.memo(() => {
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [registrosOpen, setRegistrosOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
   const registrosRef = useRef<HTMLDivElement>(null);
+  const configRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -17,6 +19,9 @@ export const Header: React.FC = React.memo(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (registrosRef.current && !registrosRef.current.contains(e.target as Node)) {
         setRegistrosOpen(false);
+      }
+      if (configRef.current && !configRef.current.contains(e.target as Node)) {
+        setConfigOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -32,10 +37,13 @@ export const Header: React.FC = React.memo(() => {
       if (e.key === 'Escape' && registrosOpen) {
         setRegistrosOpen(false);
       }
+      if (e.key === 'Escape' && configOpen) {
+        setConfigOpen(false);
+      }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [mobileMenuOpen, registrosOpen]);
+  }, [mobileMenuOpen, registrosOpen, configOpen]);
 
   const handleLogout = () => {
     authService.logout();
@@ -189,20 +197,48 @@ export const Header: React.FC = React.memo(() => {
                     >
                       Usuários
                     </Link>
-                    <Link
-                      to="/admin/parametros-uf"
-                      className="hover:text-amber-200 transition text-sm font-semibold"
-                      aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
-                    >
-                      Parâmetros por UF
-                    </Link>
-                    <Link
-                      to="/admin/regras-validacao"
-                      className="hover:text-amber-200 transition text-sm font-semibold"
-                      aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
-                    >
-                      Regras de Validação
-                    </Link>
+                    <div className="relative" ref={configRef}>
+                      <button
+                        onClick={() => setConfigOpen(!configOpen)}
+                        className="flex items-center gap-1 hover:text-amber-200 transition text-sm font-semibold"
+                        aria-expanded={configOpen}
+                        aria-haspopup="menu"
+                      >
+                        Configurações
+                        <svg
+                          className={`w-3 h-3 transition-transform ${configOpen ? 'rotate-180' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {configOpen && (
+                        <div
+                          className="absolute top-full left-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                          role="menu"
+                        >
+                          <Link
+                            to="/admin/parametros-uf"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                            onClick={() => setConfigOpen(false)}
+                            role="menuitem"
+                          >
+                            Parâmetros por UF
+                          </Link>
+                          <Link
+                            to="/admin/regras-validacao"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                            onClick={() => setConfigOpen(false)}
+                            role="menuitem"
+                          >
+                            Regras de Validação
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </>
                 )}
                 <div className="flex items-center gap-4">
@@ -369,6 +405,9 @@ export const Header: React.FC = React.memo(() => {
                   >
                     Usuários
                   </Link>
+                </div>
+                <div className="pt-2">
+                  <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Configurações</p>
                   <Link
                     to="/admin/parametros-uf"
                     className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
