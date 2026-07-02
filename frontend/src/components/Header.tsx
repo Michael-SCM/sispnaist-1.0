@@ -189,6 +189,20 @@ export const Header: React.FC = React.memo(() => {
                     >
                       Usuários
                     </Link>
+                    <Link
+                      to="/admin/parametros-uf"
+                      className="hover:text-amber-200 transition text-sm font-semibold"
+                      aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
+                    >
+                      Parâmetros por UF
+                    </Link>
+                    <Link
+                      to="/admin/regras-validacao"
+                      className="hover:text-amber-200 transition text-sm font-semibold"
+                      aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
+                    >
+                      Regras de Validação
+                    </Link>
                   </>
                 )}
                 <div className="flex items-center gap-4">
@@ -354,6 +368,22 @@ export const Header: React.FC = React.memo(() => {
                     aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
                   >
                     Usuários
+                  </Link>
+                  <Link
+                    to="/admin/parametros-uf"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
+                  >
+                    Parâmetros por UF
+                  </Link>
+                  <Link
+                    to="/admin/regras-validacao"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
+                  >
+                    Regras de Validação
                   </Link>
                 </div>
               </>

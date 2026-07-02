@@ -227,10 +227,10 @@ Cada requisito foi classificado como:
 
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
-| 79 | **Parametrização por UF** | ❌ | Sem tabelas `tb_parametro_uf`, `tb_indicador_uf` |
+| 79 | **Parametrização por UF** | ✅ | Modelo `ParametroPorUF`, controller/routes `/api/parametros-uf`, admin page `/admin/parametros-uf` |
 | 80 | **Indicadores customizáveis** | ❌ | Indicadores são fixos, sem interface para criar/editar |
 | 81 | **Adaptação a grupos específicos** | ✅ | Catálogo `etnia` criado com quilombola, ribeirinho, caiçara, cigano, extrativista, etc. |
-| 82 | **Regras de validação por localidade** | ❌ | Sem validações configuráveis por estado/município |
+| 82 | **Regras de validação por localidade** | ✅ | Modelo `RegraValidacao`, controller/routes `/api/regras-validacao`, middleware `validateByLocality`, seed com 10 regras, admin page `/admin/regras-validacao` |
 
 ---
 

@@ -97,6 +97,10 @@ const EditarUsuario = React.lazy(() => import('./pages/Admin/Usuarios/EditarUsua
 const ListaCatalogos = React.lazy(() => import('./pages/Admin/Catalogos/ListaCatalogos.js'));
 const ItensCatalogo = React.lazy(() => import('./pages/Admin/Catalogos/ItensCatalogo.js'));
 const Auditoria = React.lazy(() => import('./pages/Admin/Auditoria.js'));
+const ListaParametrosUF = React.lazy(() => import('./pages/Admin/ParametrosUF/ListaParametrosUF.js'));
+const FormParametroUF = React.lazy(() => import('./pages/Admin/ParametrosUF/FormParametroUF.js'));
+const ListaRegrasValidacao = React.lazy(() => import('./pages/Admin/RegrasValidacao/ListaRegrasValidacao.js'));
+const FormRegraValidacao = React.lazy(() => import('./pages/Admin/RegrasValidacao/FormRegraValidacao.js'));
 
 const App: React.FC = () => {
   const [appReady, setAppReady] = React.useState(false);
@@ -761,6 +765,58 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <Auditoria />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin - Parâmetros por UF */}
+        <Route
+          path="/admin/parametros-uf"
+          element={
+            <ProtectedRoute adminOnly>
+              <ListaParametrosUF />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/parametros-uf/novo"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormParametroUF />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/parametros-uf/editar/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormParametroUF />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin - Regras de Validação */}
+        <Route
+          path="/admin/regras-validacao"
+          element={
+            <ProtectedRoute adminOnly>
+              <ListaRegrasValidacao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/regras-validacao/nova"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormRegraValidacao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/regras-validacao/editar/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormRegraValidacao />
             </ProtectedRoute>
           }
         />

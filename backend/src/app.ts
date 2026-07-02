@@ -34,9 +34,12 @@ import exportRoutes from './routes/export.js';
 import materialBiologicoRoutes from './routes/materialBiologico.js';
 import publicReportsRoutes from './routes/publicReports.js';
 import csrfRoutes from './routes/csrf.js';
+import parametrosUfRoutes from './routes/parametrosUf.js';
+import regrasValidacaoRoutes from './routes/regrasValidacao.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
+import { seedRegrasValidacao } from './utils/seedRegrasValidacao.js';
 
 const app = express();
 
@@ -117,6 +120,7 @@ connectDB().then(() => {
   // Executa o seed apenas se o banco estiver vazio
   if (process.env.NODE_ENV !== 'test') {
     seedCatalogos();
+    seedRegrasValidacao();
   }
 });
 
@@ -282,6 +286,8 @@ app.use('/api/municipios', municipiosRoutes);
 app.use('/api/enderecos', enderecosRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/material-biologico', materialBiologicoRoutes);
+app.use('/api/parametros-uf', parametrosUfRoutes);
+app.use('/api/regras-validacao', regrasValidacaoRoutes);
 app.use('/api/public/reports', publicReportsRoutes);
 
 // 404 handler
