@@ -2,6 +2,7 @@ import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
+import TrabalhadorVinculo from '../models/TrabalhadorVinculo.js';
 import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 
@@ -278,12 +279,12 @@ export class AnalyticsService {
    * Obtém dados completos para dashboard admin
    */
   async obterDadosDashboardAdmin(): Promise<any> {
-    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa] = await Promise.all([
+    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, trabalhadoresMultiplosVinculos] = await Promise.all([
       this.obterKPIs(),
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
       this.obterUltimosAcidentes(5),
-      Trabalhador.aggregate([
+      TrabalhadorVinculo.aggregate([
         { $match: { empresa: { $exists: true, $ne: null } } },
         {
           $lookup: {
@@ -297,9 +298,43 @@ export class AnalyticsService {
         {
           $group: {
             _id: '$empresaData.razaoSocial',
-            total: { $sum: 1 },
+            trabalhadores: { $addToSet: '$trabalhadorId' },
           },
         },
+        {
+          $project: {
+            _id: 1,
+            total: { $size: '$trabalhadores' },
+          },
+        },
+        { $sort: { total: -1 } },
+      ]),
+      TrabalhadorVinculo.aggregate([
+        { $match: { empresa: { $exists: true, $ne: null } } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: 'trabalhadorId',
+            foreignField: '_id',
+            as: 'trabalhadorData',
+          },
+        },
+        { $unwind: { path: '$trabalhadorData', preserveNullAndEmptyArrays: false } },
+        {
+          $group: {
+            _id: { $toLower: '$trabalhadorData.nome' },
+            nomeOriginal: { $first: '$trabalhadorData.nome' },
+            empresas: { $addToSet: '$empresa' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            nome: '$nomeOriginal',
+            total: { $size: '$empresas' },
+          },
+        },
+        { $match: { total: { $gt: 1 } } },
         { $sort: { total: -1 } },
       ])
     ]);
@@ -316,6 +351,7 @@ export class AnalyticsService {
         acidentesPorStatus: dadosAcidentes.porStatus,
         acidentesUltimosMeses: dadosAcidentes.ultimosMeses,
         trabalhadoresPorEmpresa: empresasFormatadas,
+        trabalhadoresMultiplosVinculos,
       },
       tabelas: {
         proximasVacinacoes,

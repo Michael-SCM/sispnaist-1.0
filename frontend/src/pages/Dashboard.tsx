@@ -223,6 +223,16 @@ const {
           </div>
         </Suspense>
 
+        <Suspense fallback={<ChartFallback />}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <BarChartComponent
+              dados={graficos.trabalhadoresMultiplosVinculos}
+              titulo="Trabalhadores com mais de 1 Vínculo"
+              cor="#8b5cf6"
+            />
+          </div>
+        </Suspense>
+
         {/* Tabelas de Resumo */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Últimos Acidentes */}

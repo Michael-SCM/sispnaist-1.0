@@ -52,6 +52,7 @@ export interface IAnalyticsDashboardAdmin {
     acidentesPorStatus: IGraficoDados[];
     acidentesUltimosMeses: IMensalDados[];
     trabalhadoresPorEmpresa: IEmpresaDados[];
+    trabalhadoresMultiplosVinculos: IEmpresaDados[];
   };
   tabelas: {
     proximasVacinacoes: IVacinacaoProxima[];
