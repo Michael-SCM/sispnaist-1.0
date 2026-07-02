@@ -285,7 +285,12 @@ export class AnalyticsService {
       this.obterProximasVacinacoes(30),
       this.obterUltimosAcidentes(5),
       Trabalhador.aggregate([
-        { $match: { empresa: { $exists: true, $ne: null }, 'vinculo.situacao': 'Ativo' } },
+        {
+          $match: {
+            empresa: { $exists: true, $ne: null },
+            'vinculo.situacao': 'Ativo',
+          },
+        },
         {
           $project: {
             trabalhadorId: '$_id',
@@ -296,7 +301,7 @@ export class AnalyticsService {
           $unionWith: {
             coll: 'trabalhador_vinculos',
             pipeline: [
-              { $match: { empresa: { $exists: true, $ne: null }, ativo: true } },
+              { $match: { empresa: { $exists: true, $ne: null } } },
               {
                 $project: {
                   trabalhadorId: '$trabalhadorId',
@@ -329,22 +334,25 @@ export class AnalyticsService {
         { $sort: { total: -1 } },
       ]),
       Trabalhador.aggregate([
-        { $match: { empresa: { $exists: true, $ne: null }, 'vinculo.situacao': 'Ativo' } },
+        {
+          $match: {
+            empresa: { $exists: true, $ne: null },
+            'vinculo.situacao': 'Ativo',
+          },
+        },
         {
           $project: {
             trabalhadorId: '$_id',
-            empresa: '$empresa',
           },
         },
         {
           $unionWith: {
             coll: 'trabalhador_vinculos',
             pipeline: [
-              { $match: { empresa: { $exists: true, $ne: null }, ativo: true } },
+              { $match: { empresa: { $exists: true, $ne: null } } },
               {
                 $project: {
                   trabalhadorId: '$trabalhadorId',
-                  empresa: '$empresa',
                 },
               },
             ],
@@ -352,12 +360,7 @@ export class AnalyticsService {
         },
         {
           $group: {
-            _id: { trabalhadorId: '$trabalhadorId', empresa: '$empresa' },
-          },
-        },
-        {
-          $group: {
-            _id: '$_id.trabalhadorId',
+            _id: '$trabalhadorId',
             totalVinculos: { $sum: 1 },
           },
         },
