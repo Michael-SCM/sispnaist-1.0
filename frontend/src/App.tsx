@@ -86,8 +86,10 @@ const Monitoramento = React.lazy(() => import('./pages/Monitoramento.js'));
 const RelatorioConformidade = React.lazy(() => import('./pages/Publico/RelatorioConformidade.js'));
 
 const ListaEmpresas = React.lazy(() => import('./pages/Admin/Empresas/ListaEmpresas.js'));
+const DetalhesEmpresa = React.lazy(() => import('./pages/Admin/Empresas/DetalhesEmpresa.js'));
 const FormEmpresa = React.lazy(() => import('./pages/Admin/Empresas/FormEmpresa.js'));
 const ListaUnidades = React.lazy(() => import('./pages/Admin/Unidades/ListaUnidades.js'));
+const DetalhesUnidade = React.lazy(() => import('./pages/Admin/Unidades/DetalhesUnidade.js'));
 const FormUnidade = React.lazy(() => import('./pages/Admin/Unidades/FormUnidade.js'));
 const ListaUsuarios = React.lazy(() => import('./pages/Admin/Usuarios/ListaUsuarios.js'));
 const EditarUsuario = React.lazy(() => import('./pages/Admin/Usuarios/EditarUsuario.js'));
@@ -659,6 +661,14 @@ const App: React.FC = () => {
           }
         />
         <Route
+          path="/admin/empresas/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <DetalhesEmpresa />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/empresas/editar/:id"
           element={
             <ProtectedRoute adminOnly>
@@ -681,6 +691,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <FormUnidade />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/unidades/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <DetalhesUnidade />
             </ProtectedRoute>
           }
         />

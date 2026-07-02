@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import unidadeService from '../../../services/unidadeService.js';
 import empresaService from '../../../services/empresaService.js';
-import { Plus, Edit, Trash2, Home, MapPin, Building2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Home, MapPin, Building2, Search, Eye } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
@@ -181,7 +181,14 @@ const ListaUnidades: React.FC = () => {
                   </tr>
                 ) : (
                   unidades.map((unidade) => (
-                    <tr key={unidade._id} className="hover:bg-slate-50/80 transition-colors group">
+                    <tr
+                      key={unidade._id}
+                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                      onClick={() => navigate(`/admin/unidades/${unidade._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/admin/unidades/${unidade._id}`); } }}
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
                           <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><Home size={20} /></div>
@@ -207,10 +214,12 @@ const ListaUnidades: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => navigate(`/admin/unidades/editar/${unidade._id}`)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><Edit size={20} /></button>
-                          <button onClick={() => handleDelete(unidade._id, unidade.nome)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/unidades/${unidade._id}`); }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Visualizar Detalhes"><Eye size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/unidades/editar/${unidade._id}`); }}
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="Editar"><Edit size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(unidade._id, unidade.nome); }}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Excluir"><Trash2 size={20} /></button>
                         </div>
                       </td>
                     </tr>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import empresaService from '../../../services/empresaService.js';
-import { Plus, Edit, Trash2, Building2, Search, Mail, Fingerprint } from 'lucide-react';
+import { Plus, Edit, Trash2, Building2, Search, Mail, Fingerprint, Eye } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
@@ -176,7 +176,14 @@ const ListaEmpresas: React.FC = () => {
                   </tr>
                 ) : (
                   empresas.map((empresa) => (
-                    <tr key={empresa._id} className="hover:bg-slate-50/80 transition-colors group">
+                    <tr
+                      key={empresa._id}
+                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                      onClick={() => navigate(`/admin/empresas/${empresa._id}`)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/admin/empresas/${empresa._id}`); } }}
+                    >
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
                           <div className="p-2 bg-blue-50 text-blue-600 rounded-xl"><Building2 size={20} /></div>
@@ -197,10 +204,12 @@ const ListaEmpresas: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => navigate(`/admin/empresas/editar/${empresa._id}`)}
-                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Edit size={20} /></button>
-                          <button onClick={() => handleDelete(empresa._id, empresa.razaoSocial)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"><Trash2 size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/empresas/${empresa._id}`); }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Visualizar Detalhes"><Eye size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/empresas/editar/${empresa._id}`); }}
+                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Editar"><Edit size={20} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(empresa._id, empresa.razaoSocial); }}
+                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Excluir"><Trash2 size={20} /></button>
                         </div>
                       </td>
                     </tr>
