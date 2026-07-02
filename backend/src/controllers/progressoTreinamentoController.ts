@@ -76,13 +76,62 @@ export const alternarFavorito = asyncHandler(async (req: IAuthRequest, res: Resp
   return res.status(200).json(progresso);
 });
 
+export const iniciarQuiz = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  const usuarioId = (req.user as any).id;
+  const { videoAulaId } = req.params;
+
+  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
+  if (!progresso || !progresso.assistido) {
+    throw new AppError('Assista ao vídeo antes de iniciar o quiz', 400);
+  }
+
+  if (progresso.quizAprovado) {
+    throw new AppError('Você já foi aprovado neste quiz', 400);
+  }
+
+  const quiz = await Quiz.findOne({ videoAulaId, ativo: true });
+  if (!quiz) {
+    throw new AppError('Nenhum quiz encontrado para esta video aula', 404);
+  }
+
+  if (quiz.questoes.length < 10) {
+    throw new AppError('O quiz precisa ter pelo menos 10 perguntas cadastradas', 400);
+  }
+
+  if (progresso.tentativasQuiz.length >= quiz.tentativasPermitidas) {
+    throw new AppError(`Número máximo de tentativas (${quiz.tentativasPermitidas}) atingido`, 400);
+  }
+
+  const indices = Array.from({ length: quiz.questoes.length }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  const questoesSelecionadas = indices.slice(0, 10).sort((a, b) => a - b);
+
+  progresso.sessaoAtiva = {
+    questoesSelecionadas,
+    dataInicio: new Date()
+  };
+  await progresso.save();
+
+  const questoes = questoesSelecionadas.map(i => ({
+    pergunta: quiz.questoes[i].pergunta,
+    opcoes: quiz.questoes[i].opcoes,
+    index: i
+  }));
+
+  return res.status(200).json({ questoes, totalQuestoes: 10 });
+});
+
 export const submeterQuiz = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
   const { respostas } = req.body;
 
-  if (!Array.isArray(respostas)) {
-    throw new AppError('Respostas deve ser um array', 400);
+  if (!Array.isArray(respostas) || respostas.length !== 10) {
+    throw new AppError('Respostas deve ser um array com 10 posições', 400);
   }
 
   const quiz = await Quiz.findOne({ videoAulaId, ativo: true });
@@ -90,41 +139,48 @@ export const submeterQuiz = asyncHandler(async (req: IAuthRequest, res: Response
     throw new AppError('Nenhum quiz ativo encontrado para esta video aula', 404);
   }
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
-  if (!progresso) {
-    progresso = await ProgressoTreinamento.create({ usuarioId, videoAulaId }) as any;
+  const progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
+  if (!progresso || !progresso.sessaoAtiva) {
+    throw new AppError('Nenhuma sessão de quiz ativa. Clique em "Fazer Prova" para iniciar.', 400);
   }
 
-  if (progresso.tentativasQuiz.length >= quiz.tentativasPermitidas) {
-    throw new AppError(`Número máximo de tentativas (${quiz.tentativasPermitidas}) atingido`, 400);
-  }
+  const questoesSelecionadas = progresso.sessaoAtiva.questoesSelecionadas;
 
   let acertos = 0;
-  quiz.questoes.forEach((q, index) => {
-    if (respostas[index] === q.opcaoCorreta) {
-      acertos++;
-    }
+  const detalhes = questoesSelecionadas.map((qIndex, i) => {
+    const questao = quiz.questoes[qIndex];
+    const correta = respostas[i] === questao.opcaoCorreta;
+    if (correta) acertos++;
+    return {
+      pergunta: questao.pergunta,
+      opcoes: questao.opcoes,
+      respostaUsuario: respostas[i],
+      respostaCorreta: questao.opcaoCorreta,
+      correta
+    };
   });
 
-  const pontuacao = Math.round((acertos / quiz.questoes.length) * 100);
+  const pontuacao = Math.round((acertos / 10) * 100);
+  const aprovado = pontuacao >= quiz.pontuacaoMinima;
 
   const tentativa = {
     tentativa: progresso.tentativasQuiz.length + 1,
     pontuacao,
     respostas,
+    questoesSelecionadas,
     dataRealizacao: new Date()
   };
 
   progresso.tentativasQuiz.push(tentativa);
   progresso.quizRealizado = true;
-  progresso.quizAprovado = pontuacao >= quiz.pontuacaoMinima;
+  progresso.quizAprovado = aprovado;
+  progresso.sessaoAtiva = undefined;
 
   if (progresso.melhormaPontuacao === undefined || pontuacao > progresso.melhormaPontuacao) {
     progresso.melhormaPontuacao = pontuacao;
   }
 
-  if (progresso.quizAprovado) {
-    progresso.assistido = true;
+  if (aprovado) {
     progresso.dataConclusao = new Date();
   }
 
@@ -134,17 +190,18 @@ export const submeterQuiz = asyncHandler(async (req: IAuthRequest, res: Response
     acao: 'submeter_quiz',
     videoAulaId,
     pontuacao,
-    aprovado: progresso.quizAprovado
+    aprovado
   });
 
   return res.status(200).json({
     pontuacao,
-    aprovado: progresso.quizAprovado,
-    totalQuestoes: quiz.questoes.length,
+    aprovado,
+    totalQuestoes: 10,
     acertos,
     tentativa: tentativa.tentativa,
     tentativasRestantes: quiz.tentativasPermitidas - progresso.tentativasQuiz.length,
-    pontuacaoMinima: quiz.pontuacaoMinima
+    pontuacaoMinima: quiz.pontuacaoMinima,
+    detalhes
   });
 });
 

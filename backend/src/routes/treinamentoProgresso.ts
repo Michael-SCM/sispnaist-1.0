@@ -4,6 +4,7 @@ import {
   listarProgresso,
   marcarAssistido,
   alternarFavorito,
+  iniciarQuiz,
   submeterQuiz,
   emitirCertificado,
   listarCertificados,
@@ -19,6 +20,7 @@ router.get('/progresso', authMiddleware, listarProgresso);
 router.get('/progresso/:videoAulaId', authMiddleware, validateObjectId('videoAulaId'), obterProgresso);
 router.post('/progresso/:videoAulaId/assistir', authMiddleware, validateObjectId('videoAulaId'), marcarAssistido);
 router.post('/progresso/:videoAulaId/favorito', authMiddleware, validateObjectId('videoAulaId'), alternarFavorito);
+router.post('/progresso/:videoAulaId/iniciar-quiz', authMiddleware, validateObjectId('videoAulaId'), iniciarQuiz);
 router.post('/progresso/:videoAulaId/quiz', authMiddleware, validateObjectId('videoAulaId'), submeterQuiz);
 router.post('/progresso/:videoAulaId/certificado', authMiddleware, validateObjectId('videoAulaId'), emitirCertificado);
 

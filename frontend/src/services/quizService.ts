@@ -43,5 +43,17 @@ export const quizService = {
 
   deletar: async (id: string): Promise<void> => {
     await api.delete(`/quizzes/${id}`);
+  },
+
+  salvar: async (videoAulaId: string | undefined, data: Partial<IQuiz>): Promise<IQuiz> => {
+    if (videoAulaId) {
+      const existente = await api.get<IQuiz>(`/quizzes/video/${videoAulaId}`).catch(() => null);
+      if (existente && existente.data) {
+        const response = await api.put<{ data: IQuiz }>(`/quizzes/${existente.data._id}`, data);
+        return response.data.data;
+      }
+    }
+    const response = await api.post<{ data: IQuiz }>('/quizzes', data);
+    return response.data.data;
   }
 };

@@ -1,5 +1,5 @@
 import api from './api';
-import { IProgressoTreinamento, ICertificado, IResultadoQuiz } from '../types';
+import { IProgressoTreinamento, ICertificado, IResultadoQuiz, IInicioQuizResponse } from '../types';
 
 export const treinamentoService = {
   obterProgresso: async (videoAulaId: string): Promise<IProgressoTreinamento> => {
@@ -19,6 +19,11 @@ export const treinamentoService = {
 
   alternarFavorito: async (videoAulaId: string): Promise<IProgressoTreinamento> => {
     const response = await api.post<IProgressoTreinamento>(`/treinamento/progresso/${videoAulaId}/favorito`);
+    return response.data;
+  },
+
+  iniciarQuiz: async (videoAulaId: string): Promise<IInicioQuizResponse> => {
+    const response = await api.post<IInicioQuizResponse>(`/treinamento/progresso/${videoAulaId}/iniciar-quiz`);
     return response.data;
   },
 

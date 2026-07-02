@@ -577,6 +577,7 @@ export interface ITentativaQuiz {
   tentativa: number;
   pontuacao: number;
   respostas: number[];
+  questoesSelecionadas?: number[];
   dataRealizacao: string;
 }
 
@@ -593,6 +594,10 @@ export interface IProgressoTreinamento {
   certificadoEmitido: boolean;
   dataConclusao?: string;
   favorito: boolean;
+  sessaoAtiva?: {
+    questoesSelecionadas: number[];
+    dataInicio: string;
+  };
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
@@ -617,6 +622,14 @@ export interface ICertificado {
   dataAtualizacao?: string;
 }
 
+export interface IDetalheQuestao {
+  pergunta: string;
+  opcoes: string[];
+  respostaUsuario: number;
+  respostaCorreta: number;
+  correta: boolean;
+}
+
 export interface IResultadoQuiz {
   pontuacao: number;
   aprovado: boolean;
@@ -625,4 +638,16 @@ export interface IResultadoQuiz {
   tentativa: number;
   tentativasRestantes: number;
   pontuacaoMinima: number;
+  detalhes: IDetalheQuestao[];
+}
+
+export interface IQuestaoSessao {
+  pergunta: string;
+  opcoes: string[];
+  index: number;
+}
+
+export interface IInicioQuizResponse {
+  questoes: IQuestaoSessao[];
+  totalQuestoes: number;
 }

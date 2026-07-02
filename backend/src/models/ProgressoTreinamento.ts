@@ -4,7 +4,13 @@ export interface ITentativaQuiz {
   tentativa: number;
   pontuacao: number;
   respostas: number[];
+  questoesSelecionadas?: number[];
   dataRealizacao: Date;
+}
+
+export interface ISessaoAtiva {
+  questoesSelecionadas: number[];
+  dataInicio: Date;
 }
 
 export interface IProgressoTreinamento extends Document {
@@ -19,6 +25,7 @@ export interface IProgressoTreinamento extends Document {
   certificadoEmitido: boolean;
   dataConclusao?: Date;
   favorito: boolean;
+  sessaoAtiva?: ISessaoAtiva;
   dataCriacao: Date;
   dataAtualizacao: Date;
 }
@@ -28,6 +35,7 @@ const TentativaQuizSchema = new Schema<ITentativaQuiz>(
     tentativa: { type: Number, required: true },
     pontuacao: { type: Number, required: true, min: 0, max: 100 },
     respostas: [{ type: Number }],
+    questoesSelecionadas: [{ type: Number }],
     dataRealizacao: { type: Date, default: Date.now }
   },
   { _id: false }
@@ -45,7 +53,14 @@ const ProgressoTreinamentoSchema = new Schema<IProgressoTreinamento>(
     melhormaPontuacao: { type: Number, min: 0, max: 100 },
     certificadoEmitido: { type: Boolean, default: false },
     dataConclusao: { type: Date },
-    favorito: { type: Boolean, default: false }
+    favorito: { type: Boolean, default: false },
+    sessaoAtiva: {
+      type: {
+        questoesSelecionadas: [{ type: Number }],
+        dataInicio: { type: Date, default: Date.now }
+      },
+      required: false
+    }
   },
   {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },

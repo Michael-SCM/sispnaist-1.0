@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { quizService } from '../../services/quizService.js';
 import { treinamentoService } from '../../services/treinamentoService.js';
-import { IVideoAula, IQuiz, IProgressoTreinamento, IResultadoQuiz } from '../../types/index.js';
+import { IVideoAula, IProgressoTreinamento, IResultadoQuiz, IQuestaoSessao } from '../../types/index.js';
 import { QuizModal } from '../../components/QuizModal.js';
-import { ArrowLeft, Eye, Clock, Tag, ClipboardCheck, Award, BookOpen, Heart, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Eye, Clock, Tag, ClipboardCheck, Award, BookOpen, Heart, CheckCircle2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const VideoPlayer: React.FC = () => {
@@ -15,13 +15,19 @@ export const VideoPlayer: React.FC = () => {
   const navigate = useNavigate();
   const [video, setVideo] = useState<IVideoAula | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [quiz, setQuiz] = useState<IQuiz | null>(null);
-  const [quizCarregado, setQuizCarregado] = useState(false);
   const [progresso, setProgresso] = useState<IProgressoTreinamento | null>(null);
   const [progressoCarregado, setProgressoCarregado] = useState(false);
+  const [temQuiz, setTemQuiz] = useState(false);
+  const [quizCarregado, setQuizCarregado] = useState(false);
+
   const [showQuiz, setShowQuiz] = useState(false);
+  const [quizQuestoes, setQuizQuestoes] = useState<IQuestaoSessao[]>([]);
+  const [iniciandoQuiz, setIniciandoQuiz] = useState(false);
+
   const [emitindoCertificado, setEmitindoCertificado] = useState(false);
   const [certificadoEmitido, setCertificadoEmitido] = useState(false);
+
+  const [marcandoAssistido, setMarcandoAssistido] = useState(false);
 
   useEffect(() => {
     carregarVideo();
@@ -57,9 +63,9 @@ export const VideoPlayer: React.FC = () => {
   const carregarQuiz = async () => {
     try {
       const data = await quizService.obterPorVideo(id!);
-      setQuiz(data);
+      setTemQuiz(!!data && data.questoes.length >= 10);
     } catch {
-      setQuiz(null);
+      setTemQuiz(false);
     } finally {
       setQuizCarregado(true);
     }
@@ -77,14 +83,34 @@ export const VideoPlayer: React.FC = () => {
     }
   };
 
+  const iniciarQuiz = useCallback(async () => {
+    if (!id) return;
+    try {
+      setIniciandoQuiz(true);
+      const data = await treinamentoService.iniciarQuiz(id);
+      setQuizQuestoes(data.questoes);
+      setShowQuiz(true);
+    } catch (error: any) {
+      toast.error(error?.message || 'Erro ao iniciar quiz');
+    } finally {
+      setIniciandoQuiz(false);
+    }
+  }, [id]);
+
   const handleMarcarAssistido = async () => {
     if (!id) return;
     try {
+      setMarcandoAssistido(true);
       const data = await treinamentoService.marcarAssistido(id);
       setProgresso(data);
-      toast.success('Progresso registrado!');
+
+      if (temQuiz && !data.quizAprovado) {
+        setTimeout(() => iniciarQuiz(), 600);
+      }
     } catch {
       toast.error('Erro ao registrar progresso');
+    } finally {
+      setMarcandoAssistido(false);
     }
   };
 
@@ -102,6 +128,9 @@ export const VideoPlayer: React.FC = () => {
   const handleQuizSubmit = async (respostas: number[]): Promise<IResultadoQuiz> => {
     const resultado = await treinamentoService.submeterQuiz(id!, respostas);
     await carregarProgresso();
+    if (resultado.aprovado) {
+      setCertificadoEmitido(false);
+    }
     return resultado;
   };
 
@@ -136,7 +165,7 @@ export const VideoPlayer: React.FC = () => {
       <MainLayout>
         <DocumentTitle title="Carregando..." />
         <div className="p-6 max-w-5xl mx-auto flex justify-center items-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
         </div>
       </MainLayout>
     );
@@ -160,7 +189,6 @@ export const VideoPlayer: React.FC = () => {
       <DocumentTitle title={video?.titulo ? `Vídeo: ${video.titulo}` : 'Vídeo Aula'} />
       <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-6 animate-in fade-in duration-500">
         
-        {/* Navigation */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/video-aulas')}
@@ -187,8 +215,6 @@ export const VideoPlayer: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          
-          {/* Video Player Container */}
           <div className="relative aspect-video bg-black w-full">
             {embedUrl ? (
               <iframe
@@ -201,14 +227,10 @@ export const VideoPlayer: React.FC = () => {
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-white/80 text-center p-6">
                 URL do vídeo inválida ou vazia.
-                <div className="mt-2 text-xs text-white/60 break-all">
-                  url: {video?.url}
-                </div>
               </div>
             )}
           </div>
 
-          {/* Video Information */}
           <div className="p-8">
             <div className="flex flex-col gap-4">
               
@@ -235,7 +257,6 @@ export const VideoPlayer: React.FC = () => {
                   </div>
                 )}
 
-                {/* Progress Badge */}
                 {progressoCarregado && progresso && (
                   <>
                     {progresso.assistido && (
@@ -278,44 +299,50 @@ export const VideoPlayer: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Mark as watched */}
           <button
             onClick={handleMarcarAssistido}
-            disabled={progresso?.assistido}
+            disabled={progresso?.assistido || marcandoAssistido}
             className={`flex items-center justify-center gap-3 p-5 rounded-2xl font-bold transition-all ${
               progresso?.assistido
                 ? 'bg-emerald-50 text-emerald-600 border-2 border-emerald-200 cursor-default'
                 : 'bg-white border-2 border-slate-200 text-slate-700 hover:border-blue-300 hover:shadow-md active:scale-[0.98]'
             }`}
           >
-            <BookOpen size={24} />
+            {marcandoAssistido ? (
+              <Loader2 size={24} className="animate-spin" />
+            ) : (
+              <BookOpen size={24} />
+            )}
             {progresso?.assistido ? 'Assistido ✓' : 'Marcar como Assistido'}
           </button>
 
-          {/* Take Quiz */}
-          {quizCarregado && quiz && (
+          {/* Quiz Button - opens directly using iniciarQuiz */}
+          {quizCarregado && temQuiz && (
             <button
-              onClick={() => setShowQuiz(true)}
-              disabled={!progresso?.assistido}
+              onClick={iniciarQuiz}
+              disabled={!progresso?.assistido || progresso?.quizAprovado || iniciandoQuiz}
               className={`flex items-center justify-center gap-3 p-5 rounded-2xl font-bold transition-all ${
                 progresso?.quizAprovado
                   ? 'bg-emerald-50 text-emerald-600 border-2 border-emerald-200 cursor-default'
                   : progresso?.assistido
-                  ? 'bg-white border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:shadow-md active:scale-[0.98]'
+                  ? 'bg-white border-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:shadow-md active:scale-[0.98]'
                   : 'bg-slate-50 border-2 border-slate-200 text-slate-400 cursor-not-allowed'
               }`}
               title={!progresso?.assistido ? 'Assista ao vídeo primeiro' : ''}
             >
-              <ClipboardCheck size={24} />
+              {iniciandoQuiz ? (
+                <Loader2 size={24} className="animate-spin" />
+              ) : (
+                <ClipboardCheck size={24} />
+              )}
               {progresso?.quizAprovado
-                ? `Quiz Aprovado (${progresso.melhormaPontuacao}%)`
+                ? `Aprovado (${progresso.melhormaPontuacao}%)`
                 : progresso?.quizRealizado
-                ? 'Tentar Quiz Novamente'
-                : 'Fazer Quiz'}
+                ? 'Fazer Prova Novamente'
+                : 'Fazer Prova'}
             </button>
           )}
 
-          {/* Certificate */}
           <button
             onClick={handleEmitirCertificado}
             disabled={!progresso?.quizAprovado || certificadoEmitido || emitindoCertificado}
@@ -326,9 +353,13 @@ export const VideoPlayer: React.FC = () => {
                 ? 'bg-white border-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:shadow-md active:scale-[0.98]'
                 : 'bg-slate-50 border-2 border-slate-200 text-slate-400 cursor-not-allowed'
             }`}
-            title={!progresso?.quizAprovado ? 'Seja aprovado no quiz primeiro' : ''}
+            title={!progresso?.quizAprovado ? 'Seja aprovado na prova primeiro' : ''}
           >
-            <Award size={24} />
+            {emitindoCertificado ? (
+              <Loader2 size={24} className="animate-spin" />
+            ) : (
+              <Award size={24} />
+            )}
             {emitindoCertificado
               ? 'Emitindo...'
               : certificadoEmitido
@@ -337,12 +368,25 @@ export const VideoPlayer: React.FC = () => {
           </button>
         </div>
 
-        {/* Quiz Modal */}
-        {showQuiz && quiz && (
+        {/* Info when no quiz */}
+        {quizCarregado && !temQuiz && progresso?.assistido && (
+          <div className="bg-slate-50 rounded-2xl p-5 text-center border border-slate-200">
+            <p className="text-slate-500 font-medium text-sm">
+              Este vídeo não possui prova de conhecimento. Assista e marque como assistido para registro de progresso.
+            </p>
+          </div>
+        )}
+
+        {/* Quiz Modal - uses the updated component */}
+        {showQuiz && quizQuestoes.length > 0 && (
           <QuizModal
-            quiz={quiz}
+            questoes={quizQuestoes}
+            totalQuestoes={quizQuestoes.length}
             onSubmit={handleQuizSubmit}
-            onClose={() => setShowQuiz(false)}
+            onClose={() => {
+              setShowQuiz(false);
+              carregarProgresso();
+            }}
           />
         )}
       </div>
