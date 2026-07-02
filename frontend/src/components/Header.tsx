@@ -9,9 +9,13 @@ export const Header: React.FC = React.memo(() => {
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [registrosOpen, setRegistrosOpen] = useState(false);
+  const [orgOpen, setOrgOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const registrosRef = useRef<HTMLDivElement>(null);
+  const orgRef = useRef<HTMLDivElement>(null);
   const configRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -20,8 +24,14 @@ export const Header: React.FC = React.memo(() => {
       if (registrosRef.current && !registrosRef.current.contains(e.target as Node)) {
         setRegistrosOpen(false);
       }
+      if (orgRef.current && !orgRef.current.contains(e.target as Node)) {
+        setOrgOpen(false);
+      }
       if (configRef.current && !configRef.current.contains(e.target as Node)) {
         setConfigOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -37,13 +47,19 @@ export const Header: React.FC = React.memo(() => {
       if (e.key === 'Escape' && registrosOpen) {
         setRegistrosOpen(false);
       }
+      if (e.key === 'Escape' && orgOpen) {
+        setOrgOpen(false);
+      }
       if (e.key === 'Escape' && configOpen) {
         setConfigOpen(false);
+      }
+      if (e.key === 'Escape' && userMenuOpen) {
+        setUserMenuOpen(false);
       }
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [mobileMenuOpen, registrosOpen, configOpen]);
+  }, [mobileMenuOpen, registrosOpen, orgOpen, configOpen, userMenuOpen]);
 
   const handleLogout = () => {
     authService.logout();
@@ -166,37 +182,57 @@ export const Header: React.FC = React.memo(() => {
                   Certificados
                 </Link>
 
-                <Link
-                  to="/minha-conta"
-                  className="hover:text-blue-100 transition text-sm border-l border-blue-400 pl-4"
-                  aria-current={isActive('/minha-conta') ? 'page' : undefined}
-                >
-                  Minha Conta
-                </Link>
-
                 {user?.perfil === 'admin' && (
                   <>
-                    <Link
-                      to="/admin/empresas"
-                      className="hover:text-amber-200 transition text-sm font-semibold border-l border-blue-400 pl-4"
-                      aria-current={isActive('/admin/empresas') ? 'page' : undefined}
+                  <div className="relative" ref={orgRef}>
+                    <button
+                      onClick={() => setOrgOpen(!orgOpen)}
+                      className="flex items-center gap-1 hover:text-amber-200 transition text-sm font-semibold border-l border-blue-400 pl-4"
+                      aria-expanded={orgOpen}
+                      aria-haspopup="menu"
                     >
-                      Empresas
-                    </Link>
-                    <Link
-                      to="/admin/unidades"
-                      className="hover:text-amber-200 transition text-sm font-semibold"
-                      aria-current={isActive('/admin/unidades') ? 'page' : undefined}
-                    >
-                      Unidades
-                    </Link>
-                    <Link
-                      to="/admin/usuarios"
-                      className="hover:text-amber-200 transition text-sm font-semibold"
-                      aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
-                    >
-                      Usuários
-                    </Link>
+                      Organizações
+                      <svg
+                        className={`w-3 h-3 transition-transform ${orgOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {orgOpen && (
+                      <div
+                        className="absolute top-full left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                        role="menu"
+                      >
+                        <Link
+                          to="/admin/empresas"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setOrgOpen(false)}
+                          role="menuitem"
+                        >
+                          Empresas
+                        </Link>
+                        <Link
+                          to="/admin/unidades"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setOrgOpen(false)}
+                          role="menuitem"
+                        >
+                          Unidades
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                  <Link
+                    to="/admin/usuarios"
+                    className="hover:text-amber-200 transition text-sm font-semibold"
+                    aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
+                  >
+                    Usuários
+                  </Link>
                     <div className="relative" ref={configRef}>
                       <button
                         onClick={() => setConfigOpen(!configOpen)}
@@ -241,15 +277,48 @@ export const Header: React.FC = React.memo(() => {
                     </div>
                   </>
                 )}
-                <div className="flex items-center gap-4">
-                  <span className="text-sm" aria-label={`Usuário: ${user?.nome ?? ''}`}>{user?.nome ?? ''}</span>
+                <div className="relative flex items-center" ref={userMenuRef}>
                   <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition"
-                    aria-label="Sair do sistema"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 hover:text-blue-100 transition text-sm border-l border-blue-400 pl-4"
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="menu"
+                    aria-label={`Usuário: ${user?.nome ?? ''}`}
                   >
-                    Sair
+                    <span className="hidden sm:inline max-w-[120px] truncate">{user?.nome ?? ''}</span>
+                    <svg
+                      className={`w-3 h-3 flex-none transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </button>
+                  {userMenuOpen && (
+                    <div
+                      className="absolute top-full right-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                      role="menu"
+                    >
+                      <Link
+                        to="/minha-conta"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setUserMenuOpen(false)}
+                        role="menuitem"
+                      >
+                        Minha Conta
+                      </Link>
+                      <div className="border-t border-gray-100 my-1" />
+                      <button
+                        onClick={() => { setUserMenuOpen(false); handleLogout(); }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        role="menuitem"
+                      >
+                        Sair
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -380,32 +449,35 @@ export const Header: React.FC = React.memo(() => {
 
             {user?.perfil === 'admin' && (
               <>
-                <div className="pt-2 border-t border-blue-500">
-                  <Link
-                    to="/admin/empresas"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/empresas') ? 'page' : undefined}
-                  >
-                    Empresas
-                  </Link>
-                  <Link
-                    to="/admin/unidades"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/unidades') ? 'page' : undefined}
-                  >
-                    Unidades
-                  </Link>
-                  <Link
-                    to="/admin/usuarios"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
-                  >
-                    Usuários
-                  </Link>
-                </div>
+                  <div className="pt-2 border-t border-blue-500">
+                    <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Organizações</p>
+                    <Link
+                      to="/admin/empresas"
+                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                      onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive('/admin/empresas') ? 'page' : undefined}
+                    >
+                      Empresas
+                    </Link>
+                    <Link
+                      to="/admin/unidades"
+                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                      onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive('/admin/unidades') ? 'page' : undefined}
+                    >
+                      Unidades
+                    </Link>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      to="/admin/usuarios"
+                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                      onClick={() => setMobileMenuOpen(false)}
+                      aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
+                    >
+                      Usuários
+                    </Link>
+                  </div>
                 <div className="pt-2">
                   <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Configurações</p>
                   <Link
