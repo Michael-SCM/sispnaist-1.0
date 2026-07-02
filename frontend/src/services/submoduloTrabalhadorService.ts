@@ -145,15 +145,11 @@ export const submoduloTrabalhadorService = {
   },
 
   listarVinculos: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorVinculo[]> => {
-    const key = `vinculos-${trabalhadorId}-${ativo}`;
-    const cached = getCached<ITrabalhadorVinculo[]>(key);
-    if (cached) return cached;
     const params = new URLSearchParams();
     if (ativo !== undefined) params.append('ativo', ativo.toString());
     const response = await api.get<ITrabalhadorVinculo[]>(
       `/trabalhadores/${trabalhadorId}/vinculos?${params.toString()}`
     );
-    setCache(key, response.data);
     return response.data;
   },
 
