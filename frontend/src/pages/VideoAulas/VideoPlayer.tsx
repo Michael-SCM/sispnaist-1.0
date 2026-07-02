@@ -42,6 +42,8 @@ export const VideoPlayer: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [availableQualities, setAvailableQualities] = useState<string[]>([]);
+  const [currentQuality, setCurrentQuality] = useState<string>('');
+  const pendingQualityRef = useRef<string | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const progressTimerRef = useRef<ReturnType<typeof setInterval>>();
   const ytPlayerRef = useRef<any>(null);
@@ -221,6 +223,8 @@ export const VideoPlayer: React.FC = () => {
               try {
                 const q = e.target.getAvailableQualityLevels();
                 if (q?.length) setAvailableQualities(q);
+                const cur = e.target.getPlaybackQuality();
+                if (cur) setCurrentQuality(cur);
               } catch {}
               const iframe = e.target.getIframe();
               if (iframe) {
@@ -235,7 +239,13 @@ export const VideoPlayer: React.FC = () => {
                 try {
                   const q = e.target.getAvailableQualityLevels();
                   if (q?.length) setAvailableQualities(q);
+                  const cur = e.target.getPlaybackQuality();
+                  if (cur) setCurrentQuality(cur);
                 } catch {}
+                if (pendingQualityRef.current) {
+                  e.target.setPlaybackQuality(pendingQualityRef.current);
+                  pendingQualityRef.current = null;
+                }
               }
               if (state === 1) {
                 setYtDuration(e.target.getDuration());
@@ -373,7 +383,14 @@ export const VideoPlayer: React.FC = () => {
 
   const changeQuality = (q: string) => {
     if (!ytPlayer) return;
-    ytPlayer.setPlaybackQuality(q);
+    const state = ytPlayer.getPlayerState();
+    if (state === 1 || state === 3) {
+      ytPlayer.setPlaybackQuality(q);
+      setCurrentQuality(q);
+    } else {
+      pendingQualityRef.current = q;
+      setCurrentQuality(q);
+    }
     setShowSettings(false);
     toast.success(`Qualidade: ${q.toUpperCase()}`);
   };
@@ -575,7 +592,11 @@ export const VideoPlayer: React.FC = () => {
                         <button
                           key={q}
                           onClick={() => changeQuality(q)}
-                          className="w-full text-left px-4 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                          className={`w-full text-left px-4 py-1.5 text-sm transition-colors ${
+                            currentQuality === q
+                              ? 'text-white font-bold bg-white/15'
+                              : 'text-white/80 hover:bg-white/10'
+                          }`}
                         >
                           {q === 'hd2160' ? '4K' : q === 'hd1440' ? '2K' : q === 'hd1080' ? '1080p' : q === 'hd720' ? '720p' : q === 'large' ? '480p' : q === 'medium' ? '360p' : q === 'small' ? '240p' : q === 'tiny' ? '144p' : q}
                         </button>
