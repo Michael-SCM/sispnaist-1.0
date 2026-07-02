@@ -2069,14 +2069,7 @@ export class PdfService {
     doc.rect(20, 20, PW - 40, PH - 40).lineWidth(2).stroke('#d97706');
     doc.rect(28, 28, PW - 56, PH - 56).lineWidth(0.5).stroke('#f59e0b');
 
-    // Faixa superior
-    doc.rect(20, 20, PW - 40, 55).fillColor('#1e40af').fill();
-
-    doc.fontSize(20).fillColor('#ffffff').font('Helvetica-Bold')
-      .text('SISPNAIST', 0, 35, { align: 'center', width: PW });
-
-    doc.fontSize(10).fillColor('#bfdbfe').font('Helvetica')
-      .text('Sistema de Gerenciamento de Saúde e Segurança do Trabalho', 0, 60, { align: 'center', width: PW });
+    // Faixa superior (apenas borda decorativa mantém)
 
     // === TÍTULO ===
     doc.fontSize(24).fillColor('#1e40af').font('Helvetica-Bold')
@@ -2140,15 +2133,6 @@ export class PdfService {
 
     doc.fontSize(9).fillColor('#9ca3af').font('Helvetica')
       .text(`Código: ${certificado.codigoCertificado}`, 50, y + 18, { align: 'center', width: TW });
-
-    // Assinatura
-    y = Math.max(y + 48, 420);
-    const ax = CX - 100;
-    doc.moveTo(ax, y).lineTo(ax + 200, y).lineWidth(1).stroke('#374151');
-    doc.fontSize(10).fillColor('#374151').font('Helvetica')
-      .text(certificado.emitidoPor || 'SISPNAIST', ax, y + 8, { align: 'center', width: 200 });
-    doc.fontSize(8).fillColor('#9ca3af').font('Helvetica')
-      .text('Responsável pela emissão', ax, y + 24, { align: 'center', width: 200 });
 
     // Rodapé
     doc.fontSize(7.5).fillColor('#9ca3af').font('Helvetica')

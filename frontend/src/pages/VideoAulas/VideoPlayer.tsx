@@ -181,62 +181,78 @@ export const VideoPlayer: React.FC = () => {
 
   // Inicializa o player do YouTube via IFrame API com controles customizados
   useEffect(() => {
-    if (!video?.url) return;
+    if (!video?.url) {
+      setYtReady(false);
+      return;
+    }
 
     const videoId = extractVideoId(video.url);
     if (!videoId) return;
 
+    let destroyInit = false;
+
     const initPlayer = () => {
-      if (!playerContainerRef.current) return;
-      const newPlayer = new (window as any).YT.Player(playerContainerRef.current, {
-        height: '100%',
-        width: '100%',
-        videoId,
-        playerVars: {
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          iv_load_policy: 3,
-          fs: 0,
-          playsinline: 1,
-          cc_load_policy: 0,
-          enablejsapi: 1,
-          autoplay: 0,
-        },
-        events: {
-          onReady: (e: any) => {
-            ytPlayerRef.current = e.target;
-            setYtPlayer(e.target);
-            setYtDuration(e.target.getDuration());
-            setYtVolume(e.target.getVolume());
-            setYtReady(true);
+      if (destroyInit || !playerContainerRef.current) return;
+      try {
+        const newPlayer = new (window as any).YT.Player(playerContainerRef.current, {
+          height: '100%',
+          width: '100%',
+          videoId,
+          playerVars: {
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            iv_load_policy: 3,
+            fs: 0,
+            playsinline: 1,
+            cc_load_policy: 0,
+            enablejsapi: 1,
+            autoplay: 0,
           },
-          onStateChange: (e: any) => {
-            const state = e.data;
-            setIsPlaying(state === 1);
-            if (state === 1) {
+          events: {
+            onReady: (e: any) => {
+              ytPlayerRef.current = e.target;
+              setYtPlayer(e.target);
               setYtDuration(e.target.getDuration());
-              startProgressTracking(e.target);
-              startHideTimer();
-            } else {
-              stopProgressTracking();
-              if (state === 2) stopHideTimer();
-            }
-            if (state === 0) setControlsVisible(true);
+              setYtVolume(e.target.getVolume());
+              setYtReady(true);
+            },
+            onStateChange: (e: any) => {
+              const state = e.data;
+              setIsPlaying(state === 1);
+              if (state === 1) {
+                setYtDuration(e.target.getDuration());
+                startProgressTracking(e.target);
+                startHideTimer();
+              } else {
+                stopProgressTracking();
+                if (state === 2) stopHideTimer();
+              }
+              if (state === 0) setControlsVisible(true);
+            },
           },
-        },
-      });
+        });
+      } catch (err) {
+        console.error('Erro ao criar player YouTube:', err);
+      }
     };
 
     if ((window as any).YT?.Player) {
       initPlayer();
     } else {
       (window as any).onYouTubeIframeAPIReady = initPlayer;
+      // Carrega o script da API do YouTube
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.onerror = () => console.error('Falha ao carregar YouTube IFrame API');
+      const firstScript = document.getElementsByTagName('script')[0];
+      firstScript?.parentNode?.insertBefore(tag, firstScript);
     }
 
     return () => {
+      destroyInit = true;
       if (ytPlayerRef.current) {
-        ytPlayerRef.current.destroy();
+        try { ytPlayerRef.current.destroy(); } catch {}
         ytPlayerRef.current = null;
       }
     };
