@@ -40,10 +40,13 @@ export const VideoPlayer: React.FC = () => {
   const [ytMuted, setYtMuted] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [availableQualities, setAvailableQualities] = useState<string[]>([]);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const progressTimerRef = useRef<ReturnType<typeof setInterval>>();
   const ytPlayerRef = useRef<any>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const playerWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     carregarVideo();
@@ -215,6 +218,14 @@ export const VideoPlayer: React.FC = () => {
               setYtPlayer(e.target);
               setYtDuration(e.target.getDuration());
               setYtVolume(e.target.getVolume());
+              try {
+                const q = e.target.getAvailableQualityLevels();
+                if (q?.length) setAvailableQualities(q);
+              } catch {}
+              const iframe = e.target.getIframe();
+              if (iframe) {
+                iframe.setAttribute('allowFullscreen', 'true');
+              }
               setYtReady(true);
             },
             onStateChange: (e: any) => {
@@ -333,14 +344,22 @@ export const VideoPlayer: React.FC = () => {
   };
 
   const toggleFullscreen = () => {
-    const el = playerContainerRef.current?.parentElement;
+    const el = playerWrapperRef.current;
     if (!el) return;
     if (document.fullscreenElement) {
-      document.exitFullscreen();
+      document.exitFullscreen().catch(() => {});
     } else {
-      el.requestFullscreen();
+      el.requestFullscreen().catch(() => {});
     }
   };
+
+  useEffect(() => {
+    const handler = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
 
   const handleSettingsClick = () => {
     setShowSettings(!showSettings);
@@ -435,6 +454,7 @@ export const VideoPlayer: React.FC = () => {
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
           <div
+            ref={playerWrapperRef}
             className="relative aspect-video bg-black w-full group"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => { if (isPlaying) startHideTimer(); }}
@@ -545,15 +565,22 @@ export const VideoPlayer: React.FC = () => {
                       className="absolute bottom-full right-0 mb-2 w-48 bg-slate-900/95 backdrop-blur rounded-xl shadow-2xl border border-white/10 py-2 z-50"
                     >
                       <p className="px-4 py-1.5 text-xs text-white/50 uppercase tracking-wider font-bold">Qualidade</p>
-                      {['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small'].map(q => (
-                        <button
-                          key={q}
-                          onClick={() => changeQuality(q)}
-                          className="w-full text-left px-4 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
-                        >
-                          {q === 'hd2160' ? '4K' : q === 'hd1440' ? '2K' : q === 'hd1080' ? '1080p' : q === 'hd720' ? '720p' : q === 'large' ? '480p' : q === 'medium' ? '360p' : '240p'}
-                        </button>
-                      ))}
+                      {availableQualities.length > 0 && (
+                        <>
+                          {availableQualities.map(q => (
+                            <button
+                              key={q}
+                              onClick={() => changeQuality(q)}
+                              className="w-full text-left px-4 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                            >
+                              {q === 'hd2160' ? '4K' : q === 'hd1440' ? '2K' : q === 'hd1080' ? '1080p' : q === 'hd720' ? '720p' : q === 'large' ? '480p' : q === 'medium' ? '360p' : q === 'small' ? '240p' : q === 'tiny' ? '144p' : q}
+                            </button>
+                          ))}
+                        </>
+                      )}
+                      {availableQualities.length === 0 && (
+                        <div className="px-4 py-1.5 text-sm text-white/50">Não disponível</div>
+                      )}
                       <div className="border-t border-white/10 my-2" />
                       <p className="px-4 py-1.5 text-xs text-white/50 uppercase tracking-wider font-bold">Velocidade</p>
                       {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => (
@@ -575,7 +602,7 @@ export const VideoPlayer: React.FC = () => {
                   className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
                   aria-label="Tela cheia"
                 >
-                  {document.fullscreenElement ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                  {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
                 </button>
               </div>
             </div>
