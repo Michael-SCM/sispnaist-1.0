@@ -62,7 +62,13 @@ export const BarChartComponent: React.FC<IBarChartProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
               }}
-              formatter={(value: number) => [`${value} trabalhadores`, 'Total']}
+              formatter={(value: number, name: string, props: any) => {
+                const payload = props?.payload;
+                if (payload?.percentual) {
+                  return [`${value} trabalhadores (${payload.percentual}%)`, 'Total'];
+                }
+                return [`${value} trabalhadores`, 'Total'];
+              }}
             />
             <Legend
               verticalAlign="top"

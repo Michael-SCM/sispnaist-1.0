@@ -25,6 +25,7 @@ export interface IMensalDados {
 export interface IEmpresaDados {
   nome: string;
   total: number;
+  percentual?: number;
 }
 
 export interface IAnalyticsDadosAcidentes {

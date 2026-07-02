@@ -279,7 +279,7 @@ export class AnalyticsService {
    * Obtém dados completos para dashboard admin
    */
   async obterDadosDashboardAdmin(): Promise<any> {
-    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, trabalhadoresMultiplosVinculos] = await Promise.all([
+    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores] = await Promise.all([
       this.obterKPIs(),
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
@@ -333,7 +333,6 @@ export class AnalyticsService {
         {
           $project: {
             trabalhadorId: '$_id',
-            nome: 1,
             empresa: '$empresa',
           },
         },
@@ -343,18 +342,8 @@ export class AnalyticsService {
             pipeline: [
               { $match: { empresa: { $exists: true, $ne: null } } },
               {
-                $lookup: {
-                  from: 'trabalhadores',
-                  localField: 'trabalhadorId',
-                  foreignField: '_id',
-                  as: 'trabalhadorData',
-                },
-              },
-              { $unwind: '$trabalhadorData' },
-              {
                 $project: {
                   trabalhadorId: '$trabalhadorId',
-                  nome: '$trabalhadorData.nome',
                   empresa: '$empresa',
                 },
               },
@@ -364,27 +353,34 @@ export class AnalyticsService {
         {
           $group: {
             _id: { trabalhadorId: '$trabalhadorId', empresa: '$empresa' },
-            nome: { $first: '$nome' },
           },
         },
         {
           $group: {
-            _id: { $toLower: '$nome' },
-            nomeOriginal: { $first: '$nome' },
-            empresas: { $addToSet: '$_id.empresa' },
+            _id: '$_id.trabalhadorId',
+            totalVinculos: { $sum: 1 },
           },
         },
         {
-          $project: {
-            _id: 0,
-            nome: '$nomeOriginal',
-            total: { $size: '$empresas' },
+          $group: {
+            _id: '$totalVinculos',
+            totalTrabalhadores: { $sum: 1 },
           },
         },
-        { $match: { total: { $gt: 1 } } },
-        { $sort: { total: -1 } },
-      ])
+        { $sort: { _id: 1 } },
+      ]),
+      Trabalhador.countDocuments(),
     ]);
+
+    const trabalhadoresMultiplosVinculos = distribuicaoVinculosRaw
+      .filter((item: any) => item._id > 1)
+      .map((item: any) => ({
+        nome: `${item._id} vínculos`,
+        total: item.totalTrabalhadores,
+        percentual: totalTrabalhadores > 0
+          ? Math.round((item.totalTrabalhadores / totalTrabalhadores) * 100)
+          : 0,
+      }));
 
     const empresasFormatadas = trabalhadoresPorEmpresa.map((item: any) => ({
       nome: item._id || 'Sem empresa',
