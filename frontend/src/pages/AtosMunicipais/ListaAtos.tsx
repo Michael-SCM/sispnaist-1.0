@@ -28,6 +28,15 @@ const ListaAtos: React.FC = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!atoSelecionado) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAtoSelecionado(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [atoSelecionado]);
+
   const carregarAtos = async () => {
     setLoading(true);
     try {

@@ -11,16 +11,26 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-/* Focus visible - keyboard only focus indicator */
-*:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+/* Focus indicator for all interactive elements */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+[tabindex]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #2563eb;
   border-radius: 4px;
 }
 
-/* Remove focus ring for mouse users */
-*:focus:not(:focus-visible) {
-  outline: none;
+/* Remove focus ring on click for mouse users (browsers that support :focus-visible) */
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+[tabindex]:focus:not(:focus-visible) {
+  box-shadow: none;
 }
 
 /* Ensure disabled form controls have sufficient contrast */

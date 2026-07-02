@@ -34,6 +34,15 @@ export const AlertaOrientacaoMobile: React.FC = () => {
     verificarPreferencia();
   }, []);
 
+  useEffect(() => {
+    if (!aberto) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleFechar();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [aberto]);
+
   const handleFechar = async () => {
     if (naoMostrar) {
       try {
@@ -48,7 +57,7 @@ export const AlertaOrientacaoMobile: React.FC = () => {
   if (carregando || !aberto) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Aviso de orientação">
       <div className="bg-white rounded-2xl shadow-2xl mx-4 p-8 w-full max-w-sm text-center">
         <div className="text-5xl mb-4">📱</div>
         <h2 className="text-xl font-bold text-gray-800 mb-3">
