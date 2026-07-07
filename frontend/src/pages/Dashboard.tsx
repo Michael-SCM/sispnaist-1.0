@@ -252,13 +252,9 @@ const {
           </div>
 
           <Suspense fallback={<ChartFallback />}>
-            <div className="mx-auto w-full max-w-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <BarChartComponent dados={graficos.trabalhadoresPorEmpresa} titulo="Trabalhadores ativos por Empresa" />
-            </div>
-          </Suspense>
-          <Suspense fallback={<ChartFallback />}>
-            <div className="mx-auto w-full max-w-3xl mt-6">
-              <BarChartComponent dados={graficos.trabalhadoresMultiplosVinculos} titulo="Trabalhadores com mais de 1 Vínculo" cor="#8b5cf6" dataKey="percentual" unidade="% dos trabalhadores" />
+              <BarChartComponent dados={graficos.trabalhadoresMultiplosVinculos} titulo="Trabalhadores com mais de 1 Vínculo" cor="#8b5cf6" dataKey="percentual" unidade="% dos trabalhadores" altura={350} />
             </div>
           </Suspense>
         </div>
