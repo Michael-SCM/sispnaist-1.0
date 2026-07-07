@@ -11,27 +11,27 @@ const formulaSchema = Joi.object({
   metric: Joi.when('type', {
     is: 'simple',
     then: Joi.string().required(),
-    otherwise: Joi.string().optional()
+    otherwise: Joi.string().optional().allow('')
   }),
   numerator: Joi.when('type', {
     is: Joi.valid('percentage', 'ratio'),
     then: Joi.string().required(),
-    otherwise: Joi.string().optional()
+    otherwise: Joi.string().optional().allow('')
   }),
   denominator: Joi.when('type', {
     is: Joi.valid('percentage', 'ratio'),
     then: Joi.string().required(),
-    otherwise: Joi.string().optional()
+    otherwise: Joi.string().optional().allow('')
   }),
   metric1: Joi.when('type', {
     is: 'difference',
     then: Joi.string().required(),
-    otherwise: Joi.string().optional()
+    otherwise: Joi.string().optional().allow('')
   }),
   metric2: Joi.when('type', {
     is: 'difference',
     then: Joi.string().required(),
-    otherwise: Joi.string().optional()
+    otherwise: Joi.string().optional().allow('')
   })
 });
 
