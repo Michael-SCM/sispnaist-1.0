@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 import { useAnalyticsStore } from '../store/analyticsStore.js';
@@ -7,6 +7,8 @@ import { KPICard } from '../components/KPICard.js';
 import { AlertaOrientacaoMobile } from '../components/AlertaOrientacaoMobile.js';
 import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import { format } from 'date-fns';
+import { indicadorService } from '../services/indicadorService.js';
+import type { IIndicador } from '../types/indicadores.js';
 
 const AcidentesPorMes = lazy(() => import('../components/charts/AcidentesPorMes.js').then(m => ({ default: m.AcidentesPorMes })));
 const PieChartComponent = lazy(() => import('../components/charts/PieChartComponent.js').then(m => ({ default: m.PieChartComponent })));
@@ -32,10 +34,17 @@ const {
     carregarDashboardTrabalhador,
   } = useAnalyticsStore();
 
+  const [customIndicadores, setCustomIndicadores] = useState<IIndicador[]>([]);
+  const [loadingIndicadores, setLoadingIndicadores] = useState(false);
+
   useEffect(() => {
-    // Carregar dados baseado no perfil do usuário
     if (userPerfil === 'admin' || userPerfil === 'gestor') {
       carregarDashboardAdmin();
+      setLoadingIndicadores(true);
+      indicadorService.calcularTodos()
+        .then(res => setCustomIndicadores(res.data))
+        .catch(() => {})
+        .finally(() => setLoadingIndicadores(false));
     } else {
       carregarDashboardTrabalhador();
     }
@@ -194,6 +203,37 @@ const {
             cor="blue"
           />
         </div>
+
+        {/* Indicadores Customizáveis */}
+        {customIndicadores.length > 0 && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Indicadores Customizáveis</h2>
+              <Link to="/admin/indicadores" className="text-sm text-purple-600 font-bold hover:underline">
+                Gerenciar Indicadores
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {customIndicadores.filter(ind => ind.ativo).slice(0, 8).map(ind => (
+                <KPICard
+                  key={ind._id}
+                  titulo={ind.nome}
+                  valor={ind.tipo === 'percentual' ? `${ind.valorCalculado ?? 0}%` : (ind.valorCalculado ?? 0)}
+                  icone={ind.icone || '📊'}
+                  cor={(ind.cor as any) || 'blue'}
+                  descricao={ind.meta != null ? `Meta: ${ind.meta}` : undefined}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        {loadingIndicadores && (
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-24 bg-slate-50 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        )}
 
         {/* Gráficos */}
         <Suspense fallback={<ChartFallback />}>

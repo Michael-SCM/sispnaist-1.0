@@ -265,6 +265,14 @@ export const Header: React.FC = React.memo(() => {
                             Parâmetros por UF
                           </Link>
                           <Link
+                            to="/admin/indicadores"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                            onClick={() => setConfigOpen(false)}
+                            role="menuitem"
+                          >
+                            Indicadores
+                          </Link>
+                          <Link
                             to="/admin/regras-validacao"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
                             onClick={() => setConfigOpen(false)}
@@ -487,6 +495,14 @@ export const Header: React.FC = React.memo(() => {
                     aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
                   >
                     Parâmetros por UF
+                  </Link>
+                  <Link
+                    to="/admin/indicadores"
+                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive('/admin/indicadores') ? 'page' : undefined}
+                  >
+                    Indicadores
                   </Link>
                   <Link
                     to="/admin/regras-validacao"

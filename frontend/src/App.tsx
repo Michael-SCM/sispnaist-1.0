@@ -101,6 +101,8 @@ const ListaParametrosUF = React.lazy(() => import('./pages/Admin/ParametrosUF/Li
 const FormParametroUF = React.lazy(() => import('./pages/Admin/ParametrosUF/FormParametroUF.js'));
 const ListaRegrasValidacao = React.lazy(() => import('./pages/Admin/RegrasValidacao/ListaRegrasValidacao.js'));
 const FormRegraValidacao = React.lazy(() => import('./pages/Admin/RegrasValidacao/FormRegraValidacao.js'));
+const ListaIndicadores = React.lazy(() => import('./pages/Admin/Indicadores/ListaIndicadores.js'));
+const FormIndicador = React.lazy(() => import('./pages/Admin/Indicadores/FormIndicador.js'));
 
 const App: React.FC = () => {
   const [appReady, setAppReady] = React.useState(false);
@@ -817,6 +819,32 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <FormRegraValidacao />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin - Indicadores Customizáveis */}
+        <Route
+          path="/admin/indicadores"
+          element={
+            <ProtectedRoute adminOnly>
+              <ListaIndicadores />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/indicadores/novo"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormIndicador />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/indicadores/editar/:id"
+          element={
+            <ProtectedRoute adminOnly>
+              <FormIndicador />
             </ProtectedRoute>
           }
         />

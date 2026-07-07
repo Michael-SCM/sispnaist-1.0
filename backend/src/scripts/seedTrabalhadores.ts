@@ -17,6 +17,12 @@ import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 import Questionario from '../models/Questionario.js';
 import Catalogo from '../models/Catalogo.js';
+import Acidente from '../models/Acidente.js';
+import Doenca from '../models/Doenca.js';
+import Vacinacao from '../models/Vacinacao.js';
+import MaterialBiologico from '../models/MaterialBiologico.js';
+import TrabalhadorRiscoOcupacional from '../models/TrabalhadorRiscoOcupacional.js';
+import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP.js';
 
 // Seeded PRNG (Mulberry32) para distribuição mais natural
 function mulberry32(seed: number) {
@@ -202,13 +208,64 @@ const setoresOptions = [
 
 const dominioEmails = ['sispnaist.com', 'saude.gov.br', 'prefeitura.sp.gov.br', 'gov.br', 'saude.mg.gov.br'];
 
+const doencasOcupacionais = [
+  { codigoDoenca: 'B30.9', nomeDoenca: 'Alergia a pó ocupacional' },
+  { codigoDoenca: 'M25.5', nomeDoenca: 'Dor articular relacionada ao trabalho' },
+  { codigoDoenca: 'J30.9', nomeDoenca: 'Rinite alérgica ocupacional' },
+  { codigoDoenca: 'L23.9', nomeDoenca: 'Dermatite de contato profissional' },
+  { codigoDoenca: 'G56.1', nomeDoenca: 'Síndrome do Túnel do Carpo' },
+  { codigoDoenca: 'M54.5', nomeDoenca: 'Lombalgia ocupacional' },
+  { codigoDoenca: 'H83.3', nomeDoenca: 'Perda auditiva induzida por ruído' },
+  { codigoDoenca: 'F43.2', nomeDoenca: 'Transtorno de adaptação ao trabalho' },
+  { codigoDoenca: 'J45.0', nomeDoenca: 'Asma ocupacional' },
+  { codigoDoenca: 'M70.2', nomeDoenca: 'Bursite do ombro relacionada ao trabalho' },
+  { codigoDoenca: 'I10', nomeDoenca: 'Hipertensão arterial relacionada ao trabalho' },
+];
+
+const vacinasDisponiveis = [
+  { vacina: 'Hepatite B', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'Hepatite A', doseUnica: false, intervaloDias: 180 },
+  { vacina: 'Tétano', doseUnica: false, intervaloDias: 365 },
+  { vacina: 'Difteria', doseUnica: false, intervaloDias: 365 },
+  { vacina: 'Influenza', doseUnica: true, intervaloDias: 365 },
+  { vacina: 'Sarampo', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'Caxumba', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'Rubéola', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'Varicela', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'COVID-19', doseUnica: false, intervaloDias: 90 },
+  { vacina: 'Febre Amarela', doseUnica: true, intervaloDias: 365 },
+  { vacina: 'Tríplice Viral', doseUnica: false, intervaloDias: 30 },
+  { vacina: 'Meningocócica', doseUnica: false, intervaloDias: 60 },
+  { vacina: 'Pneumocócica', doseUnica: false, intervaloDias: 365 },
+];
+
+const statusAcidente = ['Aberto', 'Em Análise', 'Fechado'];
+
+const unidadesSaude = [
+  'Hospital Central da Saúde', 'UPA - Unidade de Pronto Atendimento Zona Sul',
+  'Pronto Socorro Municipal', 'Hospital Geral do Servidor',
+  'Centro de Saúde do Trabalhador', 'Hospital Universitário',
+  'Unidade Básica de Saúde - Jardim América', 'Santa Casa de Misericórdia',
+  'Hospital Regional do Trabalhador', 'Clínica de Saúde Ocupacional',
+];
+
+const profissionaisSaude = [
+  'Dr. Ricardo Almeida - Médico do Trabalho', 'Dra. Fernanda Martins - Médica do Trabalho',
+  'Dr. Carlos Eduardo - Ortopedista', 'Dra. Patrícia Oliveira - Clínica Geral',
+  'Dr. Marcelo Santos - Infectologista', 'Enf. Ana Beatriz - Enfermeira do Trabalho',
+  'Enf. Juliana Costa - Enfermeira', 'Dr. Roberto Lima - Cardiologista',
+  'Dra. Camila Rocha - Dermatologista', 'Dr. Thiago Nunes - Otorrino',
+  'Dr. André Moura - Neurologista', 'Dra. Renata Xavier - Psiquiatra',
+  'Enf. Paulo Sérgio - Enfermeiro Vacinador', 'Téc. Maria Aparecida - Técnica de Enfermagem',
+];
+
 function generateCNPJ(index: number): string {
   const base = 10000000000000 + index;
   const s = String(base);
   return `${s.substring(0, 2)}.${s.substring(2, 5)}.${s.substring(5, 8)}/${s.substring(8, 12)}-${s.substring(12, 14)}`;
 }
 
-export async function seedTrabalhadores(targetCount: number = 2000) {
+export async function seedTrabalhadores(targetCount: number = 1500) {
   console.log(`🌱 Iniciando seed de ${targetCount} trabalhadores e seus submódulos...`);
 
   console.log('🏢 Removendo empresas e unidades antigas...');
@@ -390,6 +447,12 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
   await TrabalhadorProcessoTrabalho.deleteMany({});
   await TrabalhadorReadaptacao.deleteMany({});
   await TrabalhadorVinculo.deleteMany({});
+  await TrabalhadorRiscoOcupacional.deleteMany({});
+  await TrabalhadorHistoricoPPP.deleteMany({});
+  await Acidente.deleteMany({});
+  await Doenca.deleteMany({});
+  await Vacinacao.deleteMany({});
+  await MaterialBiologico.deleteMany({});
   console.log('🧹 Limpeza concluída.');
 
   console.log(`📝 Preparando ${targetCount} registros...`);
@@ -402,6 +465,12 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
   const processosToInsert: any[] = [];
   const readaptacoesToInsert: any[] = [];
   const vinculosToInsert: any[] = [];
+  const vacinacoesToInsert: any[] = [];
+  const doencasToInsert: any[] = [];
+  const acidentesToInsert: any[] = [];
+  const materiaisBiologicosToInsert: any[] = [];
+  const riscosOcupacionaisToInsert: any[] = [];
+  const historicoPPPToInsert: any[] = [];
 
   for (let i = 1; i <= targetCount; i++) {
     const rand = mulberry32(i * 2654435761 + 12345);
@@ -548,6 +617,7 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
       _id: workerId,
       cpf,
       nome,
+      nomeSocial: rand() > 0.9 ? `Nome Social ${firstName}` : '',
       nomeMae,
       matricula,
       cartaoSus,
@@ -560,6 +630,14 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
       sexo: sexoStr,
       genero: generoStr,
       raca: racaStr,
+      etnia: racaStr === 'Indígena' ? 'Tupi-Guarani' : (rand() > 0.9 ? pick(['Quilombola', 'Cigano', 'Não especificada'], rand) : ''),
+      nacionalidade: {
+        cidade: cidadeObj.cidade,
+        estado: cidadeObj.estado,
+        pais: 'Brasil'
+      },
+      insalubridadePericulosidade: rand() > 0.7 ? 'Insalubridade grau médio' : '',
+      neurodivergencias: rand() > 0.92 ? [pick(['TDAH', 'Dislexia', 'TEA', 'Discalculia'], rand)] : [],
       escolaridade: escolaridadeStr,
       estadoCivil: estadoCivilStr,
       tipoSanguineo: tipoSanguineoStr,
@@ -584,6 +662,8 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
       trabalho: {
         dataPosse: vinculoTipoStr === 'Efetivo' ? dataEntrada : null,
         empresaTerceirizada: vinculoTipoStr === 'Terceirizado' ? 'Terceiriza SST S/A' : '',
+        residente: rand() > 0.9,
+        anosResidencia: rand() > 0.9 ? `${1 + Math.floor(rand() * 20)} anos` : '',
         dataEntrada,
         setor: setorStr,
         cargo: funcaoStr,
@@ -639,6 +719,7 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
         ? new Date(birthYear - 2 + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28))
         : new Date(2010 + Math.floor(rand() * 15), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
 
+      const depHasDeficiencia = rand() < 0.07;
       dependentesToInsert.push({
         trabalhadorId: workerId,
         nome: `${depFirstName} ${middleName} ${lastName}`,
@@ -646,6 +727,9 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
         dataNascimento: depDataNasc,
         parentesco: depParentesco,
         dependentIR: d === 0 && rand() > 0.5,
+        temDeficiencia: depHasDeficiencia,
+        tipoDeficiencia: depHasDeficiencia ? pick(deficienciaTipos, rand) : '',
+        descricaoDeficiencia: depHasDeficiencia ? `Deficiência ${pick(deficienciaTipos, rand)} diagnosticada.` : '',
         ativo: true
       });
     }
@@ -659,6 +743,11 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
     const estadoVacinalOpts = getOptions('estadoVacinal', ['Em dia', 'Atrasado', 'Não vacinado']);
     const tipoDrogaOpts = getOptions('tipoDroga', ['Álcool', 'Tabaco', 'Nenhuma']);
 
+    const teveCovid = rand() > 0.6;
+    const hasLimitacao = rand() < 0.12;
+    const isGestante = isFeminino && rand() > 0.85;
+    const hasDoencaPreexistente = rand() < 0.15;
+    const hasHistoricoFamiliar = rand() < 0.2;
     informacoesToInsert.push({
       trabalhadorId: workerId.toString(),
       doencaBase: rand() > 0.25 ? 'Nenhuma' : pick(doencaBaseOpts.filter(d => d !== 'Nenhuma'), rand),
@@ -666,30 +755,67 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
       tipoDroga: rand() > 0.7 ? pick(tipoDrogaOpts.filter(d => d !== 'Nenhuma'), rand) : 'Nenhuma',
       tipoSanguineo: tipoSanguineoStr,
       medicamentos: rand() > 0.2 ? 'Nenhum' : 'Uso contínuo de anti-hipertensivo',
+      doadorSangue: rand() > 0.7,
+      doadorOrgaos: rand() > 0.8,
+      doencaPreexistente: hasDoencaPreexistente,
+      descricaoDoencaPreexistente: hasDoencaPreexistente ? 'Hipertensão arterial diagnosticada há mais de 5 anos.' : '',
+      historicoFamiliar: hasHistoricoFamiliar,
+      descricaoHistoricoFamiliar: hasHistoricoFamiliar ? 'Histórico de diabetes e hipertensão na família.' : '',
+      teveCovid,
+      ultimoContagio: teveCovid ? `${2021 + Math.floor(rand() * 4)}-0${1 + Math.floor(rand() * 9)}` : '',
+      teveSequela: teveCovid && rand() > 0.7,
+      descricaoSequela: teveCovid && rand() > 0.7 ? 'Fadiga persistente e perda parcial de olfato.' : '',
+      foiInternado: teveCovid && rand() > 0.8,
+      diasInternacao: teveCovid && rand() > 0.8 ? 5 + Math.floor(rand() * 15) : 0,
+      foiIntubado: teveCovid && rand() > 0.9,
       allergy: rand() > 0.85,
       descricaoAlergia: rand() > 0.85 ? 'Alergia a Dipirona' : '',
       acompanhamentoMedico: rand() > 0.5,
+      acompanhamentoMedicoMotivo: rand() > 0.5 ? 'Acompanhamento cardiológico semestral' : '',
       acompanhamentoReabilitacao: false,
       usoAlcool: rand() > 0.7,
       dosesAlcool: rand() > 0.7 ? Math.floor(rand() * 4) + 1 : 0,
       usoCigarro: rand() > 0.85,
       macosCigarro: rand() > 0.85 ? Math.floor(rand() * 3) + 1 : 0,
       usoOutraDroga: false,
+      outraDrogaDescricao: '',
       frequenciaUso: rand() > 0.7 ? 'Ocasional' : '',
+      gestante: isGestante,
+      dataUltimaMenstruacao: isGestante ? `2026-0${1 + Math.floor(rand() * 5)}-${10 + Math.floor(rand() * 18)}` : '',
+      semanasGestacao: isGestante ? 8 + Math.floor(rand() * 30) : 0,
+      dataPartoPrevista: isGestante ? `2026-${6 + Math.floor(rand() * 6)}-${1 + Math.floor(rand() * 28)}` : '',
+      preNatal: isGestante && rand() > 0.1,
+      lactante: isFeminino && rand() > 0.85 && !isGestante,
+      complicacoesGestacao: isGestante && rand() > 0.85 ? 'Diabetes gestacional controlada.' : '',
+      limitacao: hasLimitacao,
+      tipoLimitacao: hasLimitacao ? pick(deficienciaTipos, rand) : '',
+      descricaoLimitacao: hasLimitacao ? 'Limitação parcial para atividades que exigem esforço físico intenso.' : '',
+      causaLimitacao: hasLimitacao ? pick(['Acidente de trabalho', 'Doença ocupacional', 'Congênita'], rand) : '',
+      parteCorpoAtingida: hasLimitacao ? pick(['Membros superiores', 'Coluna lombar', 'Membros inferiores'], rand) : '',
+      necessitaAdaptacao: hasLimitacao && rand() > 0.5,
+      descricaoAdaptacao: hasLimitacao && rand() > 0.5 ? 'Necessita de cadeira ergonômica e pousa-teclado ajustável.' : '',
+      readaptacaoProfissional: rand() < 0.08,
+      descricaoReadaptacao: rand() < 0.08 ? 'Readaptado para função administrativa por limitação física.' : '',
+      exames: [],
+      observacoes: rand() > 0.7 ? 'Trabalhador sem queixas no momento.' : 'Acompanhamento de rotina.',
       ativo: true
     });
 
     // ---- Submódulo 4: OCORRÊNCIA DE VIOLÊNCIA (~15% dos casos) ----
     if (rand() > 0.85) {
+      const isAssedioCase = rand() > 0.5;
       ocorrenciasToInsert.push({
         trabalhadorId: workerId,
         dataOcorrencia: new Date(entradaYear + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)),
         localOcorrencia: `${setorStr} - Sala ${Math.floor(rand() * 50) + 1}`,
         tipoViolencia: pick(violenciaTipos, rand),
         tipoViolenciaSexual: pick(violenciaSexuais, rand),
+        isAssedio: isAssedioCase,
         motivoViolencia: pick(violenciaMotivos, rand),
         meioAgressao: pick(violenciaMeios, rand),
         tipoAutorViolencia: pick(violenciaAutores, rand),
+        frequenciaAssedio: isAssedioCase ? pick(['Diário', 'Semanal', 'Quinzenal', 'Mensal'], rand) : '',
+        testemunhas: isAssedioCase && rand() > 0.4 ? pick(['Colegas de setor', 'Chefia imediata', 'Pacientes presentes'], rand) : '',
         descricaoOcorrencia: rand() > 0.5
           ? 'Registro de conflito verbal ocorrido durante o expediente do trabalhador no atendimento de rotina.'
           : 'Trabalhador relatou episódio de assédio moral praticado por superior hierárquico durante reunião de equipe.',
@@ -749,35 +875,295 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
       });
     }
 
-    // ---- Submódulo 7: VÍNCULO EMPREGATÍCIO ----
-    const cargaHoraria = jornadaStr.startsWith('44') ? 44 : (jornadaStr.startsWith('40') ? 40 : (jornadaStr.startsWith('30') ? 30 : 20));
-    const salario = (() => {
-      if (funcaoStr === 'Médico(a)') return 12000 + Math.floor(rand() * 8000);
-      if (funcaoStr === 'Enfermeiro(a)') return 5000 + Math.floor(rand() * 3000);
-      if (funcaoStr === 'Técnico(a) de Enfermagem') return 2500 + Math.floor(rand() * 1500);
-      if (funcaoStr === 'Administrativo') return 2200 + Math.floor(rand() * 1800);
-      return 1800 + Math.floor(rand() * 1000);
-    })();
+    // ---- VACINAÇÕES (5 por trabalhador) ----
+    const vacinasEscolhidas: string[] = [];
+    for (let v = 0; v < 5; v++) {
+      let vacinaInfo = pick(vacinasDisponiveis, mulberry32(i * 100 + v * 13 + 777));
+      let tentativas = 0;
+      while (vacinasEscolhidas.includes(vacinaInfo.vacina) && tentativas < 10) {
+        vacinaInfo = pick(vacinasDisponiveis, mulberry32(i * 100 + v * 13 + 777 + tentativas));
+        tentativas++;
+      }
+      vacinasEscolhidas.push(vacinaInfo.vacina);
 
-    vinculosToInsert.push({
-      trabalhadorId: workerId,
-      tipoVinculo: vinculoTipoStr,
-      matricula,
-      funcao: funcaoStr,
-      jornadaTrabalho: jornadaStr,
-      turnoTrabalho: turnoStr,
-      dataInicio: dataEntrada,
-      dataFim: situacaoStr === 'Desligado' || situacaoStr === 'Aposentado' ? new Date(2024, Math.floor(rand() * 12), 1 + Math.floor(rand() * 28)) : null,
-      situacao: situacaoStr,
-      empresaTerceirizada: vinculoTipoStr === 'Terceirizado' ? 'Terceiriza SST S/A' : '',
-      setor: setorStr,
-      cargo: funcaoStr,
-      ocupacao: `CBO-${2000 + Math.floor(rand() * 999)}`,
-      cargaHoraria,
-      salario,
-      observacoes: 'Contrato cadastrado no sistema.',
-      ativo: true
-    });
+      const dataVac = new Date(2022 + Math.floor(rand() * 4), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
+      const dataProxDose = vacinaInfo.doseUnica
+        ? undefined
+        : new Date(dataVac.getTime() + vacinaInfo.intervaloDias * 24 * 60 * 60 * 1000);
+
+      vacinacoesToInsert.push({
+        trabalhadorId: workerId,
+        vacina: vacinaInfo.vacina,
+        dataVacinacao: dataVac,
+        proximoDose: dataProxDose,
+        unidadeSaude: pick(unidadesSaude, mulberry32(i * 100 + v * 37 + 555)),
+        profissional: pick(profissionaisSaude, mulberry32(i * 100 + v * 53 + 333)),
+        certificado: `CERT-${String(20250000 + i).padStart(8, '0')}-${String(v + 1)}`,
+      });
+    }
+
+    // ---- DOENÇAS (0 a 3 aleatórias) ----
+    const numDoencas = rand() < 0.1 ? 0 : (rand() < 0.4 ? 1 : (rand() < 0.7 ? 2 : 3));
+    const doencasUsadas: string[] = [];
+    for (let d = 0; d < numDoencas; d++) {
+      let doencaInfo = pick(doencasOcupacionais, mulberry32(i * 200 + d * 17 + 3333));
+      let tentativas = 0;
+      while (doencasUsadas.includes(doencaInfo.nomeDoenca) && tentativas < 10) {
+        doencaInfo = pick(doencasOcupacionais, mulberry32(i * 200 + d * 17 + 3333 + tentativas));
+        tentativas++;
+      }
+      doencasUsadas.push(doencaInfo.nomeDoenca);
+
+      const dataInicioDoenca = new Date(2021 + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
+      const isAtiva = rand() > 0.35;
+
+      doencasToInsert.push({
+        dataInicio: dataInicioDoenca,
+        dataFim: isAtiva ? undefined : new Date(dataInicioDoenca.getTime() + (30 + Math.floor(rand() * 180)) * 86400000),
+        trabalhadorId: workerId,
+        codigoDoenca: doencaInfo.codigoDoenca,
+        nomeDoenca: doencaInfo.nomeDoenca,
+        relatoClinico: `Paciente apresenta ${doencaInfo.nomeDoenca.toLowerCase()}. ${rand() > 0.5 ? 'Em acompanhamento regular com evolução satisfatória.' : 'Necessita de reavaliação periódica.'}`,
+        profissionalSaude: pick(profissionaisSaude, rand),
+        ativo: isAtiva,
+      });
+    }
+
+    // ---- ACIDENTES (0 a 5 aleatórios) ----
+    const numAcidentes = Math.floor(rand() * 6);
+    for (let a = 0; a < numAcidentes; a++) {
+      const acRand = mulberry32(i * 10000 + a * 997 + 3333);
+      const tiposTrauma = getOptions('tipoTrauma', ['Contusão', 'Fratura', 'Entorse', 'Laceração', 'Escoriação', 'Queimadura']);
+      const partesCorpo = getOptions('parteCorpo', ['Mãos/Dedos', 'Ombro', 'Coluna', 'Punho', 'Joelho', 'Braço', 'Pé', 'Cabeça']);
+      const causadores = getOptions('causadorTrauma', ['Queda de mesmo nível', 'Esforço repetitivo', 'Corte com objeto perfurocortante', 'Impacto contra objeto', 'Movimento brusco']);
+
+      const tipoTraumaValue = pick(tiposTrauma, acRand);
+      const parteCorpoValue = pick(partesCorpo, acRand);
+      const causadorValue = pick(causadores, acRand);
+      const statusValue = pick(statusAcidente, acRand);
+      const ehMaterialBiologico = acRand() < 0.18;
+
+      const dataAcidente = new Date(2020 + Math.floor(acRand() * 6), Math.floor(acRand() * 12), 1 + Math.floor(acRand() * 28));
+
+      const outrosAtingidos = acRand() > 0.92;
+      const acidente = await Acidente.create({
+        dataAcidente,
+        horario: `${Math.floor(acRand() * 24).toString().padStart(2, '0')}:${Math.floor(acRand() * 60).toString().padStart(2, '0')}`,
+        horarioAposInicioJornada: `${Math.floor(acRand() * 8).toString().padStart(2, '0')}:${Math.floor(acRand() * 60).toString().padStart(2, '0')}`,
+        trabalhadorId: workerId,
+        tipoAcidente: ehMaterialBiologico ? 'Acidente com Material Biológico' : pick(['Típico', 'Trajeto', 'Violência'], acRand),
+        tipoTrauma: tipoTraumaValue,
+        agenteCausador: causadorValue,
+        parteCorpo: parteCorpoValue,
+        descricao: `Acidente de trabalho: ${causadorValue} resultando em ${tipoTraumaValue} na região ${parteCorpoValue}.`,
+        descricaoTrauma: `${tipoTraumaValue} na região ${parteCorpoValue} com necessidade de avaliação médica.`,
+        local: `Setor ${setorStr}`,
+        lesoes: [tipoTraumaValue],
+        feriado: acRand() > 0.95,
+        comunicado: acRand() > 0.15,
+        dataComunicacao: acRand() > 0.15 ? new Date(dataAcidente.getTime() + Math.floor(acRand() * 5) * 86400000) : undefined,
+        dataNotificacao: new Date(dataAcidente.getTime() + Math.floor(acRand() * 3) * 86400000),
+        atendimentoMedico: acRand() > 0.08,
+        dataAtendimento: acRand() > 0.08 ? new Date(dataAcidente.getTime() + Math.floor(acRand() * 2) * 86400000) : undefined,
+        horaAtendimento: `${Math.floor(acRand() * 24).toString().padStart(2, '0')}:${Math.floor(acRand() * 60).toString().padStart(2, '0')}`,
+        unidadeAtendimento: pick(unidadesSaude, acRand),
+        internamento: acRand() > 0.75,
+        duracaoInternamento: acRand() > 0.75 ? Math.floor(acRand() * 15) + 1 : undefined,
+        catNas: acRand() > 0.25,
+        registroPolicial: acRand() > 0.9,
+        encaminhamentoJuntaMedica: acRand() > 0.85,
+        afastamento: acRand() > 0.7,
+        outrosTrabalhadoresAtingidos: outrosAtingidos,
+        quantidadeTrabalhadoresAtingidos: outrosAtingidos ? 1 + Math.floor(acRand() * 4) : 0,
+        status: statusValue,
+      });
+
+      if (ehMaterialBiologico) {
+        materiaisBiologicosToInsert.push({
+          acidenteId: acidente._id,
+          tipoExposicao: pick(['Percutânea', 'Mucosa', 'Pele não íntegra'], acRand),
+          materialOrganico: pick(['Sangue', 'Secreção', 'Líquido cefalorraquidiano'], acRand),
+          circunstanciaAcidente: pick(['Durante procedimento', 'Manuseio de resíduos', 'Acidente com agulha'], acRand),
+          agente: 'Biológico',
+          equipamentoProtecao: acRand() > 0.4 ? 'Utilizado corretamente' : 'Não utilizado',
+          sorologiaPaciente: acRand() > 0.2 ? 'Não reagente' : 'Reagente para Hepatite B',
+          sorologiaAcidentado: acRand() > 0.3 ? 'Não reagente' : 'Reagente para Hepatite B',
+          conduta: pick(['Profilaxia pós-exposição indicada', 'Apenas acompanhamento sorológico', 'Encaminhamento ao infectologista'], acRand),
+          evolucaoCaso: acRand() > 0.5 ? 'Paciente em acompanhamento, sem sinais de soroconversão.' : 'Caso encerrado após acompanhamento sorológico de 6 meses.',
+          usoEPI: acRand() > 0.4,
+          sorologiaFonte: acRand() > 0.3,
+          acompanhamentoPrEP: acRand() > 0.6,
+          descAcompanhamentoPrEP: acRand() > 0.6 ? 'Acompanhamento trimestral no serviço especializado.' : '',
+          descEncaminhamento: acRand() > 0.5 ? 'Encaminhado ao CTA para aconselhamento.' : '',
+          dataReavaliacao: new Date(dataAcidente.getTime() + 30 * 86400000),
+          efeitoColateralPermanente: acRand() > 0.95,
+          descEfeitoColateralPermanente: acRand() > 0.95 ? 'Relato de náuseas com o uso da profilaxia.' : '',
+        });
+      }
+    }
+
+    // ---- Submódulo 7: VÍNCULOS EMPREGATÍCIOS (0 a 5) ----
+    const numVinculos = rand() < 0.1 ? 0 : 1 + Math.floor(rand() * 5);
+    const empresasUsadas: string[] = [];
+    for (let v = 0; v < numVinculos; v++) {
+      const vRand = mulberry32(i * 500 + v * 31 + 1111);
+      const empIndexVinculo = (i + v) % empresas.length;
+      const empresaVinculo = empresas[empIndexVinculo];
+      const unidadesDaEmpresaVinculo = unidades.filter(u => u.empresaId.toString() === empresaVinculo._id.toString());
+      const unidadeVinculo = pick(unidadesDaEmpresaVinculo, vRand);
+
+      const empresaKey = empresaVinculo._id.toString();
+      if (empresasUsadas.includes(empresaKey)) continue;
+      empresasUsadas.push(empresaKey);
+
+      const vinculoAtivo = vRand() > 0.2;
+      const vinculoSituacao = vinculoAtivo ? 'Ativo' : 'Encerrado';
+      const vinculoTipo = pick(vinculoTipos, vRand);
+      const vinculoFuncao = pick(funcoes, vRand);
+      const vinculoSetor = pick(setoresOptions, vRand);
+      const vinculoCarga = vRand() < 0.5 ? 40 : (vRand() < 0.8 ? 44 : (vRand() < 0.93 ? 30 : 20));
+      const vinculoSalario = (() => {
+        if (vinculoFuncao === 'Médico(a)') return 10000 + Math.floor(vRand() * 10000);
+        if (vinculoFuncao === 'Enfermeiro(a)') return 4500 + Math.floor(vRand() * 3500);
+        if (vinculoFuncao === 'Técnico(a) de Enfermagem') return 2200 + Math.floor(vRand() * 1800);
+        if (vinculoFuncao === 'Administrativo') return 2000 + Math.floor(vRand() * 2000);
+        return 1500 + Math.floor(vRand() * 1200);
+      })();
+
+      const temAvaliacao = vRand() > 0.5;
+      vinculosToInsert.push({
+        trabalhadorId: workerId,
+        empresa: empresaVinculo._id,
+        unidade: unidadeVinculo._id,
+        tipoVinculo: vinculoTipo,
+        matricula: `VINC-${String(i).padStart(6, '0')}-${String(v + 1)}`,
+        funcao: vinculoFuncao,
+        jornadaTrabalho: `${vinculoCarga} horas semanais`,
+        turnoTrabalho: pick(turnos, vRand),
+        dataInicio: new Date(dataEntrada.getTime() - Math.floor(vRand() * 365) * 86400000),
+        dataPosse: new Date(dataEntrada.getTime() - Math.floor(vRand() * 365) * 86400000),
+        dataFim: vinculoAtivo ? null : new Date(2024, Math.floor(vRand() * 12), 1 + Math.floor(vRand() * 28)),
+        situacao: vinculoSituacao,
+        empresaTerceirizada: vinculoTipo === 'Terceirizado' ? 'Terceiriza SST S/A' : '',
+        residente: vRand() > 0.9,
+        anosResidencia: vRand() > 0.9 ? `${1 + Math.floor(vRand() * 20)} anos` : '',
+        setor: vinculoSetor,
+        cargo: vinculoFuncao,
+        ocupacao: `CBO-${3000 + Math.floor(vRand() * 999)}`,
+        cargaHoraria: vinculoCarga,
+        salario: vinculoSalario,
+        insalubridadePericulosidade: vRand() > 0.7 ? 'Insalubridade grau médio' : '',
+        observacoes: `Vínculo registrado via seed. ${vinculoAtivo ? 'Ativo' : 'Encerrado'}.`,
+        ativo: vinculoAtivo,
+        avaliacaoAmbienteTrabalho: temAvaliacao ? {
+          riscosOcupacionais: {
+            agentesFisicos: { presente: vRand() > 0.5, intensidade: vRand() > 0.5 ? 'medio' : 'baixo', observacao: 'Ruído ambiental dentro dos limites.' },
+            agentesQuimicos: { presente: vRand() > 0.7, intensidade: 'baixo', observacao: 'Produtos de limpeza padronizados.' },
+            agentesBiologicos: { presente: vRand() > 0.4, intensidade: vRand() > 0.5 ? 'medio' : 'alto', observacao: 'Exposição a material biológico.' },
+            riscosErgonomicos: { presente: vRand() > 0.5, intensidade: 'medio', observacao: 'Postura inadequada prolongada.' },
+            riscosAcidentes: { presente: vRand() > 0.6, intensidade: 'baixo', observacao: 'Riscos de queda controlados.' },
+          },
+          condicoesTrabalho: {
+            infraestrutura: { presente: true, situacao: vRand() > 0.3 ? 'adequado' : 'parcial' },
+            equipamentos: { presente: true, situacao: vRand() > 0.4 ? 'adequado' : 'parcial' },
+            organizacaoTrabalho: { presente: true, situacao: vRand() > 0.5 ? 'adequado' : 'parcial' },
+          },
+          relacoesTrabalho: {
+            violencia: { presente: vRand() > 0.85, frequencia: 'raramente' },
+            assedio: { presente: vRand() > 0.9, frequencia: 'nunca' },
+            climaOrganizacional: { presente: true, situacao: vRand() > 0.4 ? 'adequado' : 'parcial' },
+            satisfacaoTrabalho: { presente: true, situacao: vRand() > 0.4 ? 'adequado' : 'parcial' },
+          },
+          acoesPrevencao: {
+            pcmo: { presente: vRand() > 0.3, situacao: vRand() > 0.5 ? 'adequado' : 'parcial' },
+            ppraPgr: { presente: vRand() > 0.4, situacao: vRand() > 0.5 ? 'adequado' : 'parcial' },
+            programasVacinacao: { presente: vRand() > 0.3, situacao: vRand() > 0.6 ? 'adequado' : 'parcial' },
+            treinamentos: { presente: vRand() > 0.4, situacao: vRand() > 0.5 ? 'adequado' : 'parcial' },
+            inspecoes: { presente: vRand() > 0.5, situacao: vRand() > 0.6 ? 'adequado' : 'parcial' },
+          },
+        } : undefined,
+      });
+    }
+
+    // ---- Submódulo 8: RISCOS OCUPACIONAIS (0 a 3 por trabalhador, ~70% dos casos) ----
+    if (rand() > 0.3) {
+      const numRiscos = 1 + Math.floor(rand() * 3);
+      const categorias = ['Físico', 'Químico', 'Biológico', 'Ergonômico', 'Acidente'];
+      for (let r = 0; r < numRiscos; r++) {
+        const rRand = mulberry32(i * 300 + r * 37 + 5555);
+        const categoria = pick(categorias, rRand);
+        const riscosFisicos = ['Ruído', 'Vibração', 'Calor', 'Frio', 'Radiação ionizante', 'Radiação não ionizante', 'Umidade'];
+        const riscosQuimicos = ['Poeira mineral', 'Fumos metálicos', 'Névoas ácidas', 'Gases tóxicos', 'Vapores orgânicos'];
+        const riscosBiologicos = ['Vírus', 'Bactérias', 'Fungos', 'Parasitas', 'Material biológico'];
+        const riscosErgonomicos = ['Postura inadequada', 'Movimentos repetitivos', 'Esforço físico intenso', 'Jornada prolongada'];
+        const riscosAcidente = ['Máquinas sem proteção', 'Piso escorregadio', 'Altura', 'Eletricidade', 'Ferramentas cortantes'];
+        const mapRisco: Record<string, string[]> = {
+          'Físico': riscosFisicos,
+          'Químico': riscosQuimicos,
+          'Biológico': riscosBiologicos,
+          'Ergonômico': riscosErgonomicos,
+          'Acidente': riscosAcidente,
+        };
+        const tipoRisco = pick(mapRisco[categoria], rRand);
+        riscosOcupacionaisToInsert.push({
+          trabalhadorId: workerId,
+          empresaId: currentEmpresa._id,
+          unidadeId: currentUnidade._id,
+          categoria,
+          tipoRisco,
+          presente: rRand() > 0.15,
+          observacao: `Risco ${tipoRisco} identificado no setor ${setorStr}.`,
+          intensidade: rRand() > 0.5 ? 'medio' : (rRand() > 0.5 ? 'alto' : 'baixo'),
+          fonteGeradora: pick(['Processo produtivo', 'Equipamentos', 'Ambiente', 'Organização do trabalho'], rRand),
+          frequenciaExposicao: pick(['Eventual', 'Intermitente', 'Permanente'], rRand),
+          duracaoExposicao: pick(['< 2h/dia', '2-6h/dia', '> 6h/dia'], rRand),
+          epcUtilizado: rRand() > 0.3,
+          epcDescricao: rRand() > 0.3 ? pick(['Exaustor local', 'Cabine de segurança', 'Enclausuramento', 'Ventilação geral'], rRand) : '',
+          epiUtilizado: rRand() > 0.2,
+          epiDescricao: rRand() > 0.2 ? pick(['Luvas', 'Máscara N95', 'Protetor auricular', 'Óculos de proteção', 'Avental'], rRand) : '',
+          caEpis: rRand() > 0.2 ? [String(10000 + Math.floor(rRand() * 90000))] : [],
+          medidasControle: rRand() > 0.5 ? 'Medidas de controle implementadas conforme PPRA.' : '',
+          dataAvaliacao: new Date(2023 + Math.floor(rRand() * 3), Math.floor(rRand() * 12), 1 + Math.floor(rRand() * 28)),
+          avaliador: pick(['Eng. Segurança do Trabalho', 'Médico do Trabalho', 'Técnico em Segurança'], rRand),
+          ativo: true,
+        });
+      }
+    }
+
+    // ---- Submódulo 9: HISTÓRICO PPP (~30% dos casos, 1 registro por trabalhador) ----
+    if (rand() > 0.7) {
+      const pppRand = mulberry32(i * 400 + 7777);
+      const dataPPPInicio = new Date(entradaYear + Math.floor(pppRand() * 5), Math.floor(pppRand() * 12), 1 + Math.floor(pppRand() * 28));
+      const dataPPPFim = pppRand() > 0.6 ? new Date(dataPPPInicio.getTime() + (180 + Math.floor(pppRand() * 1000)) * 86400000) : undefined;
+      historicoPPPToInsert.push({
+        trabalhadorId: workerId,
+        dataInicio: dataPPPInicio,
+        dataFim: dataPPPFim,
+        empresa: currentEmpresa.nomeFantasia,
+        cargo: funcaoStr,
+        funcao: funcaoStr,
+        setor: setorStr,
+        descricaoAtividades: `Desenvolvimento de atividades na área ${setorStr}, atuando como ${funcaoStr}.`,
+        agentesQuimicos: pppRand() > 0.6 ? pick(['Poeira', 'Fumos', 'Gases', 'Vapores'], pppRand) : 'Não houve exposição a agentes químicos.',
+        agentesFisicos: pppRand() > 0.5 ? pick(['Ruído acima de 85dB', 'Calor excessivo', 'Vibração localizada', 'Radiação'], pppRand) : 'Não houve exposição a agentes físicos.',
+        agentesBiologicos: pppRand() > 0.4 ? pick(['Vírus', 'Bactérias', 'Fungos', 'Material biológico'], pppRand) : 'Não houve exposição a agentes biológicos.',
+        agentesErgonomicos: pppRand() > 0.5 ? pick(['Postura inadequada', 'Movimentos repetitivos', 'Levantamento de peso'], pppRand) : 'Não houve exposição a riscos ergonômicos.',
+        tecnicaMedicao: pppRand() > 0.5 ? pick(['Dosimetria', 'Decibelímetro', 'Bomba de amostragem', 'Termômetro de globo'], pppRand) : '',
+        resultadoMedicao: pppRand() > 0.5 ? `${70 + Math.floor(pppRand() * 40)} dB` : '',
+        limiteTolerancia: pppRand() > 0.5 ? '85 dB para 8h de exposição (NR-15)' : '',
+        epcEficaz: pppRand() > 0.6,
+        epiEficaz: pppRand() > 0.7,
+        ltcatNumero: `LTCAT-${202300 + Math.floor(pppRand() * 3)}-${String(i).padStart(4, '0')}`,
+        dataLtcat: new Date(2023 + Math.floor(pppRand() * 3), Math.floor(pppRand() * 12), 1 + Math.floor(pppRand() * 28)),
+        responsavelNome: pick(['Eng. Carlos Silva', 'Dra. Mariana Santos', 'Téc. João Pereira'], pppRand),
+        responsavelRegistro: `CREA-${100000 + Math.floor(pppRand() * 900000)}`,
+        dataExameMedico: new Date(dataPPPInicio.getTime() + 90 * 86400000),
+        resultadoExame: pppRand() > 0.85 ? 'Apto com restrições' : 'Apto',
+        anexos: [],
+        observacoes: 'PPP elaborado conforme legislação vigente.',
+        ativo: true,
+      });
+    }
   }
 
   console.log('⚡ Inserindo dados no MongoDB...');
@@ -804,13 +1190,31 @@ export async function seedTrabalhadores(targetCount: number = 2000) {
   if (readaptacoesToInsert.length > 0) await TrabalhadorReadaptacao.insertMany(readaptacoesToInsert);
 
   console.log('  ▸ Vínculos...');
-  await TrabalhadorVinculo.insertMany(vinculosToInsert);
+  if (vinculosToInsert.length > 0) await TrabalhadorVinculo.insertMany(vinculosToInsert);
+
+  console.log('  ▸ Vacinações...');
+  if (vacinacoesToInsert.length > 0) await Vacinacao.insertMany(vacinacoesToInsert);
+
+  console.log('  ▸ Doenças...');
+  if (doencasToInsert.length > 0) await Doenca.insertMany(doencasToInsert);
+
+  console.log('  ▸ Acidentes...');
+  console.log('     (criados individualmente com _id)');
+
+  console.log('  ▸ Material Biológico...');
+  if (materiaisBiologicosToInsert.length > 0) await MaterialBiologico.insertMany(materiaisBiologicosToInsert);
+
+  console.log('  ▸ Riscos Ocupacionais...');
+  if (riscosOcupacionaisToInsert.length > 0) await TrabalhadorRiscoOcupacional.insertMany(riscosOcupacionaisToInsert);
+
+  console.log('  ▸ Histórico PPP...');
+  if (historicoPPPToInsert.length > 0) await TrabalhadorHistoricoPPP.insertMany(historicoPPPToInsert);
 
   console.log(`✅ ${targetCount} trabalhadores e submódulos cadastrados com sucesso!`);
 }
 
 connectDB().then(() => {
-  seedTrabalhadores(2000).then(() => {
+  seedTrabalhadores(1500).then(() => {
     console.log('🚀 Seed de trabalhadores concluído.');
     mongoose.connection.close();
     process.exit(0);
