@@ -21,6 +21,8 @@ export interface IKPIData {
   totalAbsenteismo: number;
   totalTrabalhadoresComDeficiencia: number;
   percentualDeficiencia: number;
+  totalTrabalhadoresAfastadosAcidente: number;
+  percentualTrabalhadoresAfastadosAcidente: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -75,7 +77,8 @@ export class AnalyticsService {
       proximasVacinacoes,
       trabalhadoresComVacina,
       absenteismoAgg,
-      totalTrabalhadoresComDeficiencia
+      totalTrabalhadoresComDeficiencia,
+      trabalhadoresAfastadosAcidenteAgg
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -116,7 +119,22 @@ export class AnalyticsService {
       Trabalhador.countDocuments({
         'vinculo.situacao': 'Ativo',
         'deficiencia.tipo': { $exists: true, $nin: ['', null] }
-      })
+      }),
+      Acidente.aggregate([
+        { $match: { tipoAcidente: { $in: ['Típico', 'Trajeto'] }, afastamento: true } },
+        { $group: { _id: '$trabalhadorId' } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        { $match: { 'trab.vinculo.situacao': 'Ativo' } },
+        { $count: 'total' }
+      ])
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -137,6 +155,12 @@ export class AnalyticsService {
       ? Math.round((totalTrabalhadoresComDeficiencia / totalTrabalhadores) * 100)
       : 0;
 
+    // Trabalhadores afastados por acidente Típico ou Trajeto
+    const totalTrabalhadoresAfastadosAcidente = trabalhadoresAfastadosAcidenteAgg[0]?.total || 0;
+    const percentualTrabalhadoresAfastadosAcidente = totalTrabalhadores > 0
+      ? Math.round((totalTrabalhadoresAfastadosAcidente / totalTrabalhadores) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -151,7 +175,9 @@ export class AnalyticsService {
       coberturaVacinal,
       totalAbsenteismo,
       totalTrabalhadoresComDeficiencia,
-      percentualDeficiencia
+      percentualDeficiencia,
+      totalTrabalhadoresAfastadosAcidente,
+      percentualTrabalhadoresAfastadosAcidente
     };
   }
 

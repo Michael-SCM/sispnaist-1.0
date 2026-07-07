@@ -134,11 +134,12 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <KPICard titulo="Total Acidentes" valor={kpis.totalAcidentes} icone="🚑" cor="blue" />
             <KPICard titulo="Acidentes Abertos" valor={kpis.acidentesAbertos} icone="⚠️" cor="red" />
             <KPICard titulo="Acidentes em Análise" valor={kpis.acidentesEmAnalise} icone="🔍" cor="yellow" />
             <KPICard titulo="Taxa de Resolução" valor={`${kpis.taxaResolucao}%`} icone="✅" cor="green" />
+            <KPICard titulo="Afastados por Acidente" valor={`${kpis.percentualTrabalhadoresAfastadosAcidente}%`} icone="🩹" cor="orange" descricao={`${kpis.totalTrabalhadoresAfastadosAcidente} trabalhadores`} />
           </div>
 
           <Suspense fallback={<ChartFallback />}>

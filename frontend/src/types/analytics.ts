@@ -12,6 +12,8 @@ export interface IKPIData {
   proximasVacinacoes: number;
   totalTrabalhadoresComDeficiencia: number;
   percentualDeficiencia: number;
+  totalTrabalhadoresAfastadosAcidente: number;
+  percentualTrabalhadoresAfastadosAcidente: number;
 }
 
 export interface IGraficoDados {

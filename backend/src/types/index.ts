@@ -285,6 +285,8 @@ export interface IKPIData {
   doencasAtivas: number;
   totalVacinacoes: number;
   proximasVacinacoes: number;
+  totalTrabalhadoresAfastadosAcidente: number;
+  percentualTrabalhadoresAfastadosAcidente: number;
 }
 
 export interface IAnalyticsDadosAcidentes {
