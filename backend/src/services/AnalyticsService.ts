@@ -19,6 +19,8 @@ export interface IKPIData {
   proximasVacinacoes: number;
   coberturaVacinal: number;
   totalAbsenteismo: number;
+  totalTrabalhadoresComDeficiencia: number;
+  percentualDeficiencia: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -72,7 +74,8 @@ export class AnalyticsService {
       totalVacinacoes,
       proximasVacinacoes,
       trabalhadoresComVacina,
-      absenteismoAgg
+      absenteismoAgg,
+      totalTrabalhadoresComDeficiencia
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -109,7 +112,11 @@ export class AnalyticsService {
             total: { $sum: '$diasAfastamento' }
           }
         }
-      ])
+      ]),
+      Trabalhador.countDocuments({
+        'vinculo.situacao': 'Ativo',
+        'deficiencia.tipo': { $exists: true, $nin: ['', null] }
+      })
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -125,6 +132,11 @@ export class AnalyticsService {
     // Total absenteísmo (dias de afastamento) calculado a partir dos afastamentos reais
     const totalAbsenteismo = absenteismoAgg[0]?.total || 0;
 
+    // Percentual de trabalhadores com deficiência
+    const percentualDeficiencia = totalTrabalhadores > 0
+      ? Math.round((totalTrabalhadoresComDeficiencia / totalTrabalhadores) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -137,7 +149,9 @@ export class AnalyticsService {
       totalVacinacoes,
       proximasVacinacoes,
       coberturaVacinal,
-      totalAbsenteismo
+      totalAbsenteismo,
+      totalTrabalhadoresComDeficiencia,
+      percentualDeficiencia
     };
   }
 
@@ -279,7 +293,7 @@ export class AnalyticsService {
    * Obtém dados completos para dashboard admin
    */
   async obterDadosDashboardAdmin(): Promise<any> {
-    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores] = await Promise.all([
+    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg] = await Promise.all([
       this.obterKPIs(),
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
@@ -373,6 +387,21 @@ export class AnalyticsService {
         { $sort: { _id: 1 } },
       ]),
       Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' }),
+      Trabalhador.aggregate([
+        {
+          $match: {
+            'vinculo.situacao': 'Ativo',
+            'deficiencia.tipo': { $exists: true, $nin: ['', null] }
+          }
+        },
+        {
+          $group: {
+            _id: '$deficiencia.tipo',
+            valor: { $sum: 1 }
+          }
+        },
+        { $sort: { valor: -1 } }
+      ]),
     ]);
 
     const trabalhadoresMultiplosVinculos = distribuicaoVinculosRaw
@@ -390,6 +419,11 @@ export class AnalyticsService {
       total: item.total,
     }));
 
+    const deficienciaPorTipo = deficienciaPorTipoAgg.map((item: any) => ({
+      nome: item._id || 'Não informado',
+      valor: item.valor,
+    }));
+
     return {
       kpis,
       graficos: {
@@ -398,6 +432,7 @@ export class AnalyticsService {
         acidentesUltimosMeses: dadosAcidentes.ultimosMeses,
         trabalhadoresPorEmpresa: empresasFormatadas,
         trabalhadoresMultiplosVinculos,
+        deficienciaPorTipo,
       },
       tabelas: {
         proximasVacinacoes,

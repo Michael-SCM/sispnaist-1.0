@@ -9,12 +9,10 @@ export const Header: React.FC = React.memo(() => {
   const { user, clearAuth } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [registrosOpen, setRegistrosOpen] = useState(false);
-  const [orgOpen, setOrgOpen] = useState(false);
-  const [configOpen, setConfigOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const registrosRef = useRef<HTMLDivElement>(null);
-  const orgRef = useRef<HTMLDivElement>(null);
-  const configRef = useRef<HTMLDivElement>(null);
+  const adminRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
@@ -24,11 +22,8 @@ export const Header: React.FC = React.memo(() => {
       if (registrosRef.current && !registrosRef.current.contains(e.target as Node)) {
         setRegistrosOpen(false);
       }
-      if (orgRef.current && !orgRef.current.contains(e.target as Node)) {
-        setOrgOpen(false);
-      }
-      if (configRef.current && !configRef.current.contains(e.target as Node)) {
-        setConfigOpen(false);
+      if (adminRef.current && !adminRef.current.contains(e.target as Node)) {
+        setAdminOpen(false);
       }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
@@ -47,11 +42,8 @@ export const Header: React.FC = React.memo(() => {
       if (e.key === 'Escape' && registrosOpen) {
         setRegistrosOpen(false);
       }
-      if (e.key === 'Escape' && orgOpen) {
-        setOrgOpen(false);
-      }
-      if (e.key === 'Escape' && configOpen) {
-        setConfigOpen(false);
+      if (e.key === 'Escape' && adminOpen) {
+        setAdminOpen(false);
       }
       if (e.key === 'Escape' && userMenuOpen) {
         setUserMenuOpen(false);
@@ -59,7 +51,7 @@ export const Header: React.FC = React.memo(() => {
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [mobileMenuOpen, registrosOpen, orgOpen, configOpen, userMenuOpen]);
+  }, [mobileMenuOpen, registrosOpen, adminOpen, userMenuOpen]);
 
   const handleLogout = () => {
     authService.logout();
@@ -92,6 +84,16 @@ export const Header: React.FC = React.memo(() => {
                     aria-current={isActive('/dashboard') ? 'page' : undefined}
                   >
                     Dashboard
+                  </Link>
+                )}
+
+                {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+                  <Link
+                    to="/monitoramento"
+                    className="hover:text-blue-100 transition text-sm"
+                    aria-current={isActive('/monitoramento') ? 'page' : undefined}
+                  >
+                    Monitoramento
                   </Link>
                 )}
 
@@ -156,6 +158,15 @@ export const Header: React.FC = React.memo(() => {
                       >
                         Vacinações
                       </Link>
+                      <Link
+                        to="/atos-municipais"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                        onClick={() => setRegistrosOpen(false)}
+                        role="menuitem"
+                        aria-current={isActive('/atos-municipais') ? 'page' : undefined}
+                      >
+                        Atos Municipais
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -183,17 +194,16 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
 
                 {user?.perfil === 'admin' && (
-                  <>
-                  <div className="relative" ref={orgRef}>
+                  <div className="relative" ref={adminRef}>
                     <button
-                      onClick={() => setOrgOpen(!orgOpen)}
+                      onClick={() => setAdminOpen(!adminOpen)}
                       className="flex items-center gap-1 hover:text-amber-200 transition text-sm font-semibold border-l border-blue-400 pl-4"
-                      aria-expanded={orgOpen}
+                      aria-expanded={adminOpen}
                       aria-haspopup="menu"
                     >
-                      Organizações
+                      Administração
                       <svg
-                        className={`w-3 h-3 transition-transform ${orgOpen ? 'rotate-180' : ''}`}
+                        className={`w-3 h-3 transition-transform ${adminOpen ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -202,15 +212,15 @@ export const Header: React.FC = React.memo(() => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-                    {orgOpen && (
+                    {adminOpen && (
                       <div
-                        className="absolute top-full left-0 mt-2 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+                        className="absolute top-full left-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
                         role="menu"
                       >
                         <Link
                           to="/admin/empresas"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                          onClick={() => setOrgOpen(false)}
+                          onClick={() => setAdminOpen(false)}
                           role="menuitem"
                         >
                           Empresas
@@ -218,72 +228,55 @@ export const Header: React.FC = React.memo(() => {
                         <Link
                           to="/admin/unidades"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                          onClick={() => setOrgOpen(false)}
+                          onClick={() => setAdminOpen(false)}
                           role="menuitem"
                         >
                           Unidades
                         </Link>
+                        <Link
+                          to="/admin/usuarios"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Usuários
+                        </Link>
+                        <Link
+                          to="/admin/auditoria"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Auditoria
+                        </Link>
+                        <div className="border-t border-gray-100 my-1" />
+                        <Link
+                          to="/admin/parametros-uf"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Parâmetros por UF
+                        </Link>
+                        <Link
+                          to="/admin/indicadores"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Indicadores
+                        </Link>
+                        <Link
+                          to="/admin/regras-validacao"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Regras de Validação
+                        </Link>
                       </div>
                     )}
                   </div>
-                  <Link
-                    to="/admin/usuarios"
-                    className="hover:text-amber-200 transition text-sm font-semibold"
-                    aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
-                  >
-                    Usuários
-                  </Link>
-                    <div className="relative" ref={configRef}>
-                      <button
-                        onClick={() => setConfigOpen(!configOpen)}
-                        className="flex items-center gap-1 hover:text-amber-200 transition text-sm font-semibold"
-                        aria-expanded={configOpen}
-                        aria-haspopup="menu"
-                      >
-                        Configurações
-                        <svg
-                          className={`w-3 h-3 transition-transform ${configOpen ? 'rotate-180' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          aria-hidden="true"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      {configOpen && (
-                        <div
-                          className="absolute top-full left-0 mt-2 w-52 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
-                          role="menu"
-                        >
-                          <Link
-                            to="/admin/parametros-uf"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                            onClick={() => setConfigOpen(false)}
-                            role="menuitem"
-                          >
-                            Parâmetros por UF
-                          </Link>
-                          <Link
-                            to="/admin/indicadores"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                            onClick={() => setConfigOpen(false)}
-                            role="menuitem"
-                          >
-                            Indicadores
-                          </Link>
-                          <Link
-                            to="/admin/regras-validacao"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
-                            onClick={() => setConfigOpen(false)}
-                            role="menuitem"
-                          >
-                            Regras de Validação
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </>
                 )}
                 <div className="relative flex items-center" ref={userMenuRef}>
                   <button
@@ -410,6 +403,16 @@ export const Header: React.FC = React.memo(() => {
                 Dashboard
               </Link>
             )}
+            {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+              <Link
+                to="/monitoramento"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-current={isActive('/monitoramento') ? 'page' : undefined}
+              >
+                Monitoramento
+              </Link>
+            )}
             <div className="pt-2 border-t border-blue-500">
               <p className="text-xs text-blue-300 uppercase tracking-wider px-1 pb-1 font-semibold" id="mobile-registros-heading">Registros</p>
               <Link
@@ -444,6 +447,14 @@ export const Header: React.FC = React.memo(() => {
               >
                 Vacinações
               </Link>
+              <Link
+                to="/atos-municipais"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-current={isActive('/atos-municipais') ? 'page' : undefined}
+              >
+                Atos Municipais
+              </Link>
             </div>
 
             <Link
@@ -456,64 +467,65 @@ export const Header: React.FC = React.memo(() => {
             </Link>
 
             {user?.perfil === 'admin' && (
-              <>
-                  <div className="pt-2 border-t border-blue-500">
-                    <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Organizações</p>
-                    <Link
-                      to="/admin/empresas"
-                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive('/admin/empresas') ? 'page' : undefined}
-                    >
-                      Empresas
-                    </Link>
-                    <Link
-                      to="/admin/unidades"
-                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive('/admin/unidades') ? 'page' : undefined}
-                    >
-                      Unidades
-                    </Link>
-                  </div>
-                  <div className="pt-2">
-                    <Link
-                      to="/admin/usuarios"
-                      className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
-                    >
-                      Usuários
-                    </Link>
-                  </div>
-                <div className="pt-2">
-                  <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Configurações</p>
-                  <Link
-                    to="/admin/parametros-uf"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
-                  >
-                    Parâmetros por UF
-                  </Link>
-                  <Link
-                    to="/admin/indicadores"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/indicadores') ? 'page' : undefined}
-                  >
-                    Indicadores
-                  </Link>
-                  <Link
-                    to="/admin/regras-validacao"
-                    className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
-                  >
-                    Regras de Validação
-                  </Link>
-                </div>
-              </>
+              <div className="pt-2 border-t border-blue-500">
+                <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Administração</p>
+                <Link
+                  to="/admin/empresas"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/empresas') ? 'page' : undefined}
+                >
+                  Empresas
+                </Link>
+                <Link
+                  to="/admin/unidades"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/unidades') ? 'page' : undefined}
+                >
+                  Unidades
+                </Link>
+                <Link
+                  to="/admin/usuarios"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
+                >
+                  Usuários
+                </Link>
+                <Link
+                  to="/admin/auditoria"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/auditoria') ? 'page' : undefined}
+                >
+                  Auditoria
+                </Link>
+                <Link
+                  to="/admin/parametros-uf"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
+                >
+                  Parâmetros por UF
+                </Link>
+                <Link
+                  to="/admin/indicadores"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/indicadores') ? 'page' : undefined}
+                >
+                  Indicadores
+                </Link>
+                <Link
+                  to="/admin/regras-validacao"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
+                >
+                  Regras de Validação
+                </Link>
+              </div>
             )}
             <div className="pt-4 border-t border-blue-500">
               <div className="py-2 text-sm" aria-label={`Usuário: ${user?.nome ?? ''}`}>{user?.nome ?? ''}</div>

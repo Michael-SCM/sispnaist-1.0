@@ -178,7 +178,7 @@ const ListaIndicadores: React.FC = () => {
                 ) : (
                   indicadores.map(ind => (
                     <tr key={ind._id} className="hover:bg-slate-50/50 transition-all">
-                      <td className="px-6 py-4 text-center text-xl">{ind.icone || '📊'}</td>
+                      <td className="px-6 py-4 text-center"><span className="inline-flex items-center justify-center w-10 h-10 text-xl">{ind.icone || '📊'}</span></td>
                       <td className="px-6 py-4">
                         <span className="font-bold text-slate-800">{ind.nome}</span>
                         {ind.descricao && (

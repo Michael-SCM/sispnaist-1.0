@@ -10,6 +10,8 @@ export interface IKPIData {
   doencasAtivas: number;
   totalVacinacoes: number;
   proximasVacinacoes: number;
+  totalTrabalhadoresComDeficiencia: number;
+  percentualDeficiencia: number;
 }
 
 export interface IGraficoDados {
@@ -54,6 +56,7 @@ export interface IAnalyticsDashboardAdmin {
     acidentesUltimosMeses: IMensalDados[];
     trabalhadoresPorEmpresa: IEmpresaDados[];
     trabalhadoresMultiplosVinculos: IEmpresaDados[];
+    deficienciaPorTipo: IGraficoDados[];
   };
   tabelas: {
     proximasVacinacoes: IVacinacaoProxima[];

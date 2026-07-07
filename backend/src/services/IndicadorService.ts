@@ -24,6 +24,8 @@ const METRICAS_DISPONIVEIS: IMetricaDisponivel[] = [
   { chave: 'proximasVacinacoes', nome: 'Próximas Vacinações', descricao: 'Vacinações com próximo dose nos próximos 30 dias', categoria: 'vacinacao' },
   { chave: 'coberturaVacinal', nome: 'Cobertura Vacinal', descricao: 'Percentual de trabalhadores com ao menos 1 vacina', categoria: 'vacinacao' },
   { chave: 'totalAbsenteismo', nome: 'Total de Absenteísmo', descricao: 'Total de dias de afastamento', categoria: 'absenteismo' },
+  { chave: 'totalTrabalhadoresComDeficiencia', nome: 'Trabalhadores com Deficiência', descricao: 'Total de trabalhadores ativos com deficiência', categoria: 'geral' },
+  { chave: 'percentualDeficiencia', nome: '% de Trabalhadores com Deficiência', descricao: 'Percentual de trabalhadores ativos com deficiência', categoria: 'geral' },
 ];
 
 type MetricValues = Record<string, number>;
@@ -86,7 +88,8 @@ export class IndicadorService {
       totalVacinacoes,
       proximasVacinacoes,
       trabalhadoresComVacina,
-      absenteismoAgg
+      absenteismoAgg,
+      totalTrabalhadoresComDeficiencia
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -123,7 +126,11 @@ export class IndicadorService {
             total: { $sum: '$diasAfastamento' }
           }
         }
-      ])
+      ]),
+      Trabalhador.countDocuments({
+        'vinculo.situacao': 'Ativo',
+        'deficiencia.tipo': { $exists: true, $nin: ['', null] }
+      })
     ]);
 
     const taxaResolucao = totalAcidentes > 0
@@ -135,6 +142,10 @@ export class IndicadorService {
       : 0;
 
     const totalAbsenteismo = absenteismoAgg[0]?.total || 0;
+
+    const percentualDeficiencia = totalTrabalhadores > 0
+      ? Math.round((totalTrabalhadoresComDeficiencia / totalTrabalhadores) * 100)
+      : 0;
 
     return {
       totalAcidentes,
@@ -148,7 +159,9 @@ export class IndicadorService {
       totalVacinacoes,
       proximasVacinacoes,
       coberturaVacinal,
-      totalAbsenteismo
+      totalAbsenteismo,
+      totalTrabalhadoresComDeficiencia,
+      percentualDeficiencia
     };
   }
 

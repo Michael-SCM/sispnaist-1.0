@@ -25,7 +25,7 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **50 de 62 requisitos** identificados (~81%), possui **0 requisitos parcialmente implementados** e **12 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **51 de 62 requisitos** identificados (~82%), possui **0 requisitos parcialmente implementados** e **11 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
@@ -228,7 +228,7 @@ Cada requisito foi classificado como:
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
 | 79 | **Parametrização por UF** | ✅ | Modelo `ParametroPorUF`, controller/routes `/api/parametros-uf`, admin page `/admin/parametros-uf` |
-| 80 | **Indicadores customizáveis** | ❌ | Indicadores são fixos, sem interface para criar/editar |
+| 80 | **Indicadores customizáveis** | ✅ | Modelo `Indicador`, controller/routes `/api/indicadores`, admin page `/admin/indicadores` com builder visual de fórmulas, cálculo automático no dashboard |
 | 81 | **Adaptação a grupos específicos** | ✅ | Catálogo `etnia` criado com quilombola, ribeirinho, caiçara, cigano, extrativista, etc. |
 | 82 | **Regras de validação por localidade** | ✅ | Modelo `RegraValidacao`, controller/routes `/api/regras-validacao`, middleware `validateByLocality`, seed com 10 regras, admin page `/admin/regras-validacao` |
 
@@ -243,8 +243,8 @@ Cada requisito foi classificado como:
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
 | Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 10 | 0 | 11 | 48% |
-| **Total** | **82** | **67** | **0** | **15** | **82%** |
+| Aspectos Transversais | 21 | 11 | 0 | 10 | 52% |
+| **Total** | **82** | **68** | **0** | **14** | **83%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
@@ -277,7 +277,7 @@ Cada requisito foi classificado como:
 |---|--------|--------|-----------|-----------------|
 | 7 | Formulário dedicado para assédio moral/sexual | Frontend | Criar componentes de formulário específicos para registrar assédio moral e sexual no ambiente de trabalho | 6h |
 | 8 | Implementar acessibilidade (WCAG 2.1) | Frontend | ✅ **Concluído.** Skip link, aria-labels, aria-invalid/describedby, aria-expanded, aria-current, aria-sort, role=alert/status, navegação teclado, focus-visible, prefers-reduced-motion, títulos dinâmicos (Helmet), contraste ajustado, sr-only | 16h |
-| 9 | Criar sistema de indicadores customizáveis | Backend + Frontend | Interface admin para criar/editar indicadores (nome, fórmula, meta, periodicidade, unidade federativa) | 20h |
+| 9 | Criar sistema de indicadores customizáveis | Backend + Frontend | ✅ **Concluído.** Modelo `Indicador`, service com 12 métricas base e 4 tipos de fórmula (simple/percentage/ratio/difference), CRUD com validação Joi, cálculo automático, admin pages `/admin/indicadores` (Lista + Formulário com builder visual), integração no dashboard | 20h |
 | 10 | Dashboard público de transparência | Backend + Frontend | ✅ **Concluído.** Endpoint público `/api/public/reports` com dados agregados e anonimizados + página `/transparencia` com gráficos Recharts | 12h |
 | 11 | Criar trilha de consentimento LGPD | Backend | Auditoria dedicada para acessos a dados sensíveis; registro de consentimento do titular | 6h |
 | 12 | Implementar PPP (Perfil Profissiográfico Previdenciário) | Backend + Frontend | Modelo para histórico de exposições ocupacionais ao longo da carreira; geração de relatório PPP | 12h |
@@ -309,7 +309,7 @@ Fase 2 - Curto Prazo (2-4 semanas):
 
 Fase 3 - Médio Prazo (1-2 meses):
 ├── #5 parametrização UF (20h)
-├── #9 indicadores customizáveis (20h)
+├── #9 indicadores customizáveis ✅ (20h)
 ├── #10 dashboard público ✅ (12h)
 ├── #12 PPP (12h)
 
