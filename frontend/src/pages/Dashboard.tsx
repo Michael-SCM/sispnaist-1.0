@@ -196,11 +196,12 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <KPICard titulo="Doenças Ativas" valor={kpis.doencasAtivas} icone="🩺" cor="yellow" />
             <KPICard titulo="Total Vacinações" valor={kpis.totalVacinacoes} icone="💉" cor="green" />
             <KPICard titulo="Vacinações Próximas" valor={kpis.proximasVacinacoes} icone="⏰" cor="orange" descricao="Próximos 30 dias" />
             <KPICard titulo="Trab. c/ Deficiência" valor={`${kpis.percentualDeficiencia}%`} icone="♿" cor="purple" descricao={`${kpis.totalTrabalhadoresComDeficiencia} trabalhadores`} />
+            <KPICard titulo="Em Readaptação" valor={`${kpis.percentualReadaptacao}%`} icone="🔄" cor="green" descricao={`${kpis.totalTrabalhadoresReadaptacao} trabalhadores`} />
           </div>
 
           <Suspense fallback={<ChartFallback />}>

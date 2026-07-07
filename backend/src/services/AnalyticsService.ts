@@ -5,6 +5,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import TrabalhadorVinculo from '../models/TrabalhadorVinculo.js';
 import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
+import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
 
 export interface IKPIData {
   totalAcidentes: number;
@@ -23,6 +24,8 @@ export interface IKPIData {
   percentualDeficiencia: number;
   totalTrabalhadoresAfastadosAcidente: number;
   percentualTrabalhadoresAfastadosAcidente: number;
+  totalTrabalhadoresReadaptacao: number;
+  percentualReadaptacao: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -78,7 +81,8 @@ export class AnalyticsService {
       trabalhadoresComVacina,
       absenteismoAgg,
       totalTrabalhadoresComDeficiencia,
-      trabalhadoresAfastadosAcidenteAgg
+      trabalhadoresAfastadosAcidenteAgg,
+      trabalhadoresReadaptacao
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -134,7 +138,13 @@ export class AnalyticsService {
         { $unwind: '$trab' },
         { $match: { 'trab.vinculo.situacao': 'Ativo' } },
         { $count: 'total' }
-      ])
+      ]),
+      TrabalhadorInformacao.distinct('trabalhadorId', {
+        $or: [
+          { readaptacaoProfissional: true },
+          { acompanhamentoReabilitacao: true }
+        ]
+      })
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -161,6 +171,12 @@ export class AnalyticsService {
       ? Math.round((totalTrabalhadoresAfastadosAcidente / totalTrabalhadores) * 100)
       : 0;
 
+    // Trabalhadores em readaptação profissional ou reabilitação
+    const totalTrabalhadoresReadaptacao = trabalhadoresReadaptacao.length || 0;
+    const percentualReadaptacao = totalTrabalhadores > 0
+      ? Math.round((totalTrabalhadoresReadaptacao / totalTrabalhadores) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -177,7 +193,9 @@ export class AnalyticsService {
       totalTrabalhadoresComDeficiencia,
       percentualDeficiencia,
       totalTrabalhadoresAfastadosAcidente,
-      percentualTrabalhadoresAfastadosAcidente
+      percentualTrabalhadoresAfastadosAcidente,
+      totalTrabalhadoresReadaptacao,
+      percentualReadaptacao
     };
   }
 

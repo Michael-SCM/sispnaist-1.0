@@ -14,6 +14,8 @@ export interface IKPIData {
   percentualDeficiencia: number;
   totalTrabalhadoresAfastadosAcidente: number;
   percentualTrabalhadoresAfastadosAcidente: number;
+  totalTrabalhadoresReadaptacao: number;
+  percentualReadaptacao: number;
 }
 
 export interface IGraficoDados {
