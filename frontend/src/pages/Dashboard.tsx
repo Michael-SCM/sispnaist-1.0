@@ -83,6 +83,45 @@ const {
           </p>
         </div>
 
+        {/* ==================== INDICADORES CUSTOMIZÁVEIS ==================== */}
+        {customIndicadores.filter(ind => ind.ativo).length > 0 && (
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-purple-50 rounded-2xl">
+                <span className="text-2xl">📊</span>
+              </div>
+              <div className="flex-1 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Indicadores Customizáveis</h2>
+                  <p className="text-sm text-gray-500">Métricas definidas pela sua organização</p>
+                </div>
+                <Link to="/admin/indicadores" className="text-sm text-purple-600 font-bold hover:underline shrink-0">
+                  Gerenciar
+                </Link>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {customIndicadores.filter(ind => ind.ativo).slice(0, 8).map(ind => (
+                <KPICard
+                  key={ind._id}
+                  titulo={ind.nome}
+                  valor={ind.tipo === 'percentual' ? `${ind.valorCalculado ?? 0}%` : (ind.valorCalculado ?? 0)}
+                  icone={ind.icone || '📊'}
+                  cor={(ind.cor as any) || 'blue'}
+                  descricao={ind.meta != null ? `Meta: ${ind.meta}` : undefined}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {loadingIndicadores && (
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-24 bg-slate-50 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        )}
+
         {/* ==================== ÁREA: ACIDENTES ==================== */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-8">
           <div className="flex items-center gap-3 mb-6">
@@ -194,27 +233,6 @@ const {
             </div>
           </div>
 
-          {/* Indicadores Customizáveis */}
-          {customIndicadores.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">Indicadores Customizáveis</h3>
-                <Link to="/admin/indicadores" className="text-sm text-purple-600 font-bold hover:underline">Gerenciar</Link>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {customIndicadores.filter(ind => ind.ativo).slice(0, 8).map(ind => (
-                  <KPICard key={ind._id} titulo={ind.nome} valor={ind.tipo === 'percentual' ? `${ind.valorCalculado ?? 0}%` : (ind.valorCalculado ?? 0)} icone={ind.icone || '📊'} cor={(ind.cor as any) || 'blue'} descricao={ind.meta != null ? `Meta: ${ind.meta}` : undefined} />
-                ))}
-              </div>
-            </div>
-          )}
-          {loadingIndicadores && (
-            <div className="grid grid-cols-4 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-24 bg-slate-50 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* ==================== ÁREA: EMPRESAS ==================== */}
@@ -234,8 +252,12 @@ const {
           </div>
 
           <Suspense fallback={<ChartFallback />}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="mx-auto w-full max-w-3xl">
               <BarChartComponent dados={graficos.trabalhadoresPorEmpresa} titulo="Trabalhadores ativos por Empresa" />
+            </div>
+          </Suspense>
+          <Suspense fallback={<ChartFallback />}>
+            <div className="mx-auto w-full max-w-3xl mt-6">
               <BarChartComponent dados={graficos.trabalhadoresMultiplosVinculos} titulo="Trabalhadores com mais de 1 Vínculo" cor="#8b5cf6" dataKey="percentual" unidade="% dos trabalhadores" />
             </div>
           </Suspense>
