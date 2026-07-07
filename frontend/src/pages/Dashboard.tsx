@@ -138,7 +138,7 @@ const {
             <KPICard titulo="Total Acidentes" valor={kpis.totalAcidentes} icone="🚑" cor="blue" />
             <KPICard titulo="Acidentes Abertos" valor={kpis.acidentesAbertos} icone="⚠️" cor="red" />
             <KPICard titulo="Acidentes em Análise" valor={kpis.acidentesEmAnalise} icone="🔍" cor="yellow" />
-            <KPICard titulo="Taxa de Resolução" valor={`${kpis.taxaResolucao}%`} icone="✅" cor="green" />
+            <KPICard titulo="Taxa de Resolução" valor={`${kpis.taxaResolucao}%`} icone="✅" cor="green" descricao={`${kpis.acidentesFechados} resolvidos`} />
             <KPICard titulo="Afastados por Acidente" valor={`${kpis.percentualTrabalhadoresAfastadosAcidente}%`} icone="🩹" cor="orange" descricao={`${kpis.totalTrabalhadoresAfastadosAcidente} trabalhadores`} />
           </div>
 
@@ -150,8 +150,9 @@ const {
           </Suspense>
 
           <Suspense fallback={<ChartFallback />}>
-            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <PieChartComponent dados={graficos.acidentesPorStatus} titulo="Acidentes por Status" cores={['#ef4444', '#f59e0b', '#10b981']} />
+              <PieChartComponent dados={graficos.afastadosPorTipoAcidente} titulo="Afastados por Tipo de Acidente" />
             </div>
           </Suspense>
 

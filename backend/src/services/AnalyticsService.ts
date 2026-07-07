@@ -319,7 +319,7 @@ export class AnalyticsService {
    * Obtém dados completos para dashboard admin
    */
   async obterDadosDashboardAdmin(): Promise<any> {
-    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg] = await Promise.all([
+    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg, afastadosPorTipoAgg] = await Promise.all([
       this.obterKPIs(),
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
@@ -428,6 +428,11 @@ export class AnalyticsService {
         },
         { $sort: { valor: -1 } }
       ]),
+      Acidente.aggregate([
+        { $match: { afastamento: true } },
+        { $group: { _id: '$tipoAcidente', valor: { $sum: 1 } } },
+        { $sort: { valor: -1 } }
+      ]),
     ]);
 
     const trabalhadoresMultiplosVinculos = distribuicaoVinculosRaw
@@ -450,6 +455,11 @@ export class AnalyticsService {
       valor: item.valor,
     }));
 
+    const afastadosPorTipoAcidente = afastadosPorTipoAgg.map((item: any) => ({
+      nome: item._id || 'Não informado',
+      valor: item.valor,
+    }));
+
     return {
       kpis,
       graficos: {
@@ -459,6 +469,7 @@ export class AnalyticsService {
         trabalhadoresPorEmpresa: empresasFormatadas,
         trabalhadoresMultiplosVinculos,
         deficienciaPorTipo,
+        afastadosPorTipoAcidente,
       },
       tabelas: {
         proximasVacinacoes,

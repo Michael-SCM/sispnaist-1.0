@@ -302,6 +302,7 @@ export interface IAnalyticsDashboardAdmin {
     acidentesPorStatus: { nome: string; valor: number }[];
     acidentesUltimosMeses: { mes: string; quantidade: number }[];
     trabalhadoresPorEmpresa: { nome: string; total: number }[];
+    afastadosPorTipoAcidente: { nome: string; valor: number }[];
   };
   tabelas: {
     proximasVacinacoes: any[];
