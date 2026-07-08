@@ -274,6 +274,14 @@ export const Header: React.FC = React.memo(() => {
                         >
                           Regras de Validação
                         </Link>
+                        <Link
+                          to="/admin/habilitacao-pnaist"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700"
+                          onClick={() => setAdminOpen(false)}
+                          role="menuitem"
+                        >
+                          Habilitação PNAIST
+                        </Link>
                       </div>
                     )}
                   </div>
@@ -524,6 +532,14 @@ export const Header: React.FC = React.memo(() => {
                   aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
                 >
                   Regras de Validação
+                </Link>
+                <Link
+                  to="/admin/habilitacao-pnaist"
+                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/admin/habilitacao-pnaist') ? 'page' : undefined}
+                >
+                  Habilitação PNAIST
                 </Link>
               </div>
             )}
