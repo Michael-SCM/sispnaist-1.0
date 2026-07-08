@@ -40,10 +40,15 @@ const doencasOcupacionais = [
   { codigoDoenca: 'M54.5', nomeDoenca: 'Lombalgia ocupacional', relato: 'Dor lombar crônica decorrente de esforço físico excessivo e posturas inadequadas no ambiente de trabalho.' },
   { codigoDoenca: 'H83.3', nomeDoenca: 'Perda auditiva induzida por ruído', relato: 'Diminuição da acuidade auditiva devido à exposição prolongada a ruídos elevados no ambiente ocupacional.' },
   { codigoDoenca: 'F43.2', nomeDoenca: 'Transtorno de adaptação ao trabalho', relato: 'Sintomas de ansiedade e depressão relacionados a situações estressantes no ambiente profissional.' },
+  { codigoDoenca: 'F32.0', nomeDoenca: 'Episódio depressivo leve relacionado ao trabalho', relato: 'Quadro depressivo leve desencadeado por fatores estressores ocupacionais crônicos.' },
+  { codigoDoenca: 'F41.1', nomeDoenca: 'Transtorno de ansiedade generalizada relacionado ao trabalho', relato: 'Ansiedade generalizada com sintomas somáticos associados às pressões do ambiente laboral.' },
+  { codigoDoenca: 'F43.0', nomeDoenca: 'Reação aguda ao estresse ocupacional', relato: 'Reação aguda ao estresse desencadeada por evento traumático no ambiente de trabalho.' },
   { codigoDoenca: 'J45.0', nomeDoenca: 'Asma ocupacional', relato: 'Crise de broncoespasmo desencadeada por agentes sensibilizantes presentes no ambiente de trabalho.' },
   { codigoDoenca: 'M70.2', nomeDoenca: 'Bursite do ombro relacionada ao trabalho', relato: 'Inflamação da bursa subacromial devido a movimentos repetitivos de elevação dos membros superiores.' },
   { codigoDoenca: 'Z57.9', nomeDoenca: 'Exposição a fatores de risco ocupacional', relato: 'Trabalhador exposto a agentes nocivos à saúde durante o exercício de sua função laboral.' },
   { codigoDoenca: 'I10', nomeDoenca: 'Hipertensão arterial relacionada ao trabalho', relato: 'Elevação dos níveis pressóricos associada ao estresse ocupacional crônico.' },
+  { codigoDoenca: 'F48.9', nomeDoenca: 'Transtorno neurótico relacionado ao trabalho', relato: 'Sintomas neuróticos inespecíficos associados a condições adversas no ambiente profissional.' },
+  { codigoDoenca: 'Z73.0', nomeDoenca: 'Esgotamento profissional (Burnout)', relato: 'Síndrome de esgotamento profissional caracterizada por exaustão emocional, despersonalização e redução da realização pessoal no trabalho.' },
 ];
 
 const vacinasDisponiveis = [
@@ -68,6 +73,16 @@ const statusAcidente = ['Aberto', 'Em Análise', 'Fechado'];
 
 const MATERIAL_BIOLOGICO_PROB = 0.18;
 const PROB_ACIDENTE_COM_AFASTAMENTO = 0.40;
+const PROB_TRANSTORNO_MENTAL = 0.25;
+
+const transtornosMentaisCID = [
+  'F32.0', 'F32.1', 'F32.2', 'F32.3',
+  'F33.0', 'F33.1', 'F33.2',
+  'F41.0', 'F41.1', 'F41.2',
+  'F43.0', 'F43.1', 'F43.2',
+  'F48.9',
+  'F31.0', 'F31.1', 'F31.2',
+];
 
 const unidadesSaude = [
   'Hospital Central da Saúde', 'UPA - Unidade de Pronto Atendimento Zona Sul',
@@ -414,6 +429,34 @@ async function seedAcidentesDoencasVacinacoes() {
                 tipoAfastamento: pick(tiposAfastamento, () => Math.random()),
                 motivoAfastamento: pick(motivosAfastamento, () => Math.random()),
                 cid: `M${50 + Math.floor(Math.random() * 40)}.${Math.floor(Math.random() * 9)}`,
+                dataInicio,
+                dataFim: new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000),
+                dataRetorno,
+                dataPericia: new Date(dataInicio.getTime() + Math.max(1, Math.floor(dias / 2)) * 24 * 60 * 60 * 1000),
+                desfecho: pick(['Retorno ao trabalho', 'Encaminhamento para avaliação', 'Alta', 'Afastamento prorrogado'], () => Math.random()),
+                tempoAfastamento: `${dias} dias`,
+                ativo: true,
+              });
+              afastamentosCriados++;
+            } catch {
+              erros++;
+            }
+          }
+
+          // ---- Afastamento por Transtorno Mental (independente de acidente) ----
+          const ehTranstornoMental = doencaInfo.codigoDoenca.startsWith('F');
+          const deveCriarAfastamentoMental = ehTranstornoMental || seedRand() < PROB_TRANSTORNO_MENTAL;
+          if (deveCriarAfastamentoMental) {
+            try {
+              const dias = clampInt(15 + seedRand() * 90, 15, 105);
+              const dataInicio = new Date(2025, Math.floor(seedRand() * 12), 1 + Math.floor(seedRand() * 28));
+              const dataRetorno = new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000);
+
+              await TrabalhadorAfastamento.create({
+                trabalhadorId: trabalhador._id,
+                tipoAfastamento: 'Doença',
+                motivoAfastamento: seedRand() > 0.5 ? 'Doença profissional' : 'Tratamento psiquiátrico',
+                cid: ehTranstornoMental ? doencaInfo.codigoDoenca : pick(transtornosMentaisCID, () => Math.random()),
                 dataInicio,
                 dataFim: new Date(dataInicio.getTime() + dias * 24 * 60 * 60 * 1000),
                 dataRetorno,

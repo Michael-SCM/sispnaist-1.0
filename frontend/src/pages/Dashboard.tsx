@@ -202,6 +202,7 @@ const {
             <KPICard titulo="Vacinações Próximas" valor={kpis.proximasVacinacoes} icone="⏰" cor="orange" descricao="Próximos 30 dias" />
             <KPICard titulo="Trab. c/ Deficiência" valor={`${kpis.percentualDeficiencia}%`} icone="♿" cor="purple" descricao={`${kpis.totalTrabalhadoresComDeficiencia} trabalhadores`} />
             <KPICard titulo="Em Readaptação" valor={`${kpis.percentualReadaptacao}%`} icone="🔄" cor="green" descricao={`${kpis.totalTrabalhadoresReadaptacao} trabalhadores`} />
+            <KPICard titulo="Transtorno Mental (Afast.)" valor={`${kpis.percentualTrabalhadoresAfastadosTranstornoMental}%`} icone="🧠" cor="purple" descricao={`${kpis.totalTrabalhadoresAfastadosTranstornoMental} trabalhadores`} />
           </div>
 
           <Suspense fallback={<ChartFallback />}>

@@ -26,6 +26,8 @@ export interface IKPIData {
   percentualTrabalhadoresAfastadosAcidente: number;
   totalTrabalhadoresReadaptacao: number;
   percentualReadaptacao: number;
+  totalTrabalhadoresAfastadosTranstornoMental: number;
+  percentualTrabalhadoresAfastadosTranstornoMental: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -82,7 +84,8 @@ export class AnalyticsService {
       absenteismoAgg,
       totalTrabalhadoresComDeficiencia,
       trabalhadoresAfastadosAcidenteAgg,
-      trabalhadoresReadaptacao
+      trabalhadoresReadaptacao,
+      trabalhadoresAfastadosTranstornoMentalAgg
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -144,7 +147,27 @@ export class AnalyticsService {
           { readaptacaoProfissional: true },
           { acompanhamentoReabilitacao: true }
         ]
-      })
+      }),
+      TrabalhadorAfastamento.aggregate([
+        {
+          $match: {
+            cid: { $regex: /^F/, $options: 'i' },
+            ativo: true
+          }
+        },
+        { $group: { _id: '$trabalhadorId' } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        { $match: { 'trab.vinculo.situacao': 'Ativo' } },
+        { $count: 'total' }
+      ])
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -177,6 +200,12 @@ export class AnalyticsService {
       ? Math.round((totalTrabalhadoresReadaptacao / totalTrabalhadores) * 100)
       : 0;
 
+    // Trabalhadores afastados por transtorno mental (CID F)
+    const totalTrabalhadoresAfastadosTranstornoMental = trabalhadoresAfastadosTranstornoMentalAgg[0]?.total || 0;
+    const percentualTrabalhadoresAfastadosTranstornoMental = totalTrabalhadores > 0
+      ? Math.round((totalTrabalhadoresAfastadosTranstornoMental / totalTrabalhadores) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -195,7 +224,9 @@ export class AnalyticsService {
       totalTrabalhadoresAfastadosAcidente,
       percentualTrabalhadoresAfastadosAcidente,
       totalTrabalhadoresReadaptacao,
-      percentualReadaptacao
+      percentualReadaptacao,
+      totalTrabalhadoresAfastadosTranstornoMental,
+      percentualTrabalhadoresAfastadosTranstornoMental
     };
   }
 
