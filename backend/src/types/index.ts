@@ -254,6 +254,7 @@ export interface IUnidade {
   empresaId: string;
   endereco?: IEndereco;
   gestor?: string;
+  possuiPgr?: boolean;
   ativa?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
@@ -291,6 +292,9 @@ export interface IKPIData {
   percentualReadaptacao: number;
   totalTrabalhadoresAfastadosTranstornoMental: number;
   percentualTrabalhadoresAfastadosTranstornoMental: number;
+  totalUnidadesAtivas: number;
+  totalUnidadesComPgr: number;
+  percentualUnidadesComPgr: number;
 }
 
 export interface IAnalyticsDadosAcidentes {

@@ -17,6 +17,7 @@ const FormUnidade: React.FC = () => {
     nome: '',
     empresaId: '',
     tipo: 'Própria',
+    possuiPgr: false,
     ativa: true,
     endereco: {
       logradouro: '',
@@ -43,6 +44,7 @@ const FormUnidade: React.FC = () => {
         nome: unidadeAtual.nome || '',
         empresaId: typeof unidadeAtual.empresaId === 'object' && unidadeAtual.empresaId !== null ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
         tipo: unidadeAtual.tipo || 'Própria',
+        possuiPgr: unidadeAtual.possuiPgr ?? false,
         ativa: unidadeAtual.ativa ?? true,
         endereco: {
           logradouro: unidadeAtual.endereco?.logradouro || '',
@@ -253,6 +255,19 @@ const FormUnidade: React.FC = () => {
                       <option value="Própria">Própria</option>
                       <option value="Terceirizada">Terceirizada</option>
                     </select>
+                  </div>
+                  <div className="pt-2">
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={formData.possuiPgr}
+                        onChange={(e) => setFormData(prev => ({ ...prev, possuiPgr: e.target.checked }))}
+                        className="mt-0.5 w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                      />
+                      <span className="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors leading-snug">
+                        Possui Programa de Gerenciamento de Riscos?
+                      </span>
+                    </label>
                   </div>
                 </div>
               </div>

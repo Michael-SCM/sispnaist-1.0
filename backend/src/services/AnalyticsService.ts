@@ -28,6 +28,9 @@ export interface IKPIData {
   percentualReadaptacao: number;
   totalTrabalhadoresAfastadosTranstornoMental: number;
   percentualTrabalhadoresAfastadosTranstornoMental: number;
+  totalUnidadesAtivas: number;
+  totalUnidadesComPgr: number;
+  percentualUnidadesComPgr: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -85,7 +88,9 @@ export class AnalyticsService {
       totalTrabalhadoresComDeficiencia,
       trabalhadoresAfastadosAcidenteAgg,
       trabalhadoresReadaptacao,
-      trabalhadoresAfastadosTranstornoMentalAgg
+      trabalhadoresAfastadosTranstornoMentalAgg,
+      totalUnidadesAtivas,
+      totalUnidadesComPgr
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -167,7 +172,9 @@ export class AnalyticsService {
         { $unwind: '$trab' },
         { $match: { 'trab.vinculo.situacao': 'Ativo' } },
         { $count: 'total' }
-      ])
+      ]),
+      Unidade.countDocuments({ ativa: true }),
+      Unidade.countDocuments({ possuiPgr: true, ativa: true })
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -206,6 +213,10 @@ export class AnalyticsService {
       ? Math.round((totalTrabalhadoresAfastadosTranstornoMental / totalTrabalhadores) * 100)
       : 0;
 
+    const percentualUnidadesComPgr = totalUnidadesAtivas > 0
+      ? Math.round((totalUnidadesComPgr / totalUnidadesAtivas) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -226,7 +237,10 @@ export class AnalyticsService {
       totalTrabalhadoresReadaptacao,
       percentualReadaptacao,
       totalTrabalhadoresAfastadosTranstornoMental,
-      percentualTrabalhadoresAfastadosTranstornoMental
+      percentualTrabalhadoresAfastadosTranstornoMental,
+      totalUnidadesAtivas,
+      totalUnidadesComPgr,
+      percentualUnidadesComPgr
     };
   }
 

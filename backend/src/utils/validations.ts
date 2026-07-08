@@ -179,6 +179,7 @@ export const unidadeSchema = Joi.object({
     cep: Joi.string().trim().max(10).optional().allow('', null),
   }).optional(),
   gestor: Joi.string().trim().max(100).optional().allow('', null),
+  possuiPgr: Joi.boolean().optional(),
   ativa: Joi.boolean().optional(),
 });
 
@@ -195,6 +196,7 @@ export const unidadeUpdateSchema = Joi.object({
     cep: Joi.string().trim().max(10).optional().allow('', null),
   }).optional(),
   gestor: Joi.string().trim().max(100).optional().allow('', null),
+  possuiPgr: Joi.boolean().optional(),
   ativa: Joi.boolean().optional(),
 }).min(1);
 

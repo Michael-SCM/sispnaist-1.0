@@ -41,6 +41,10 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
       cep: String,
     },
     gestor: String,
+    possuiPgr: {
+      type: Boolean,
+      default: false,
+    },
     ativa: {
       type: Boolean,
       default: true,

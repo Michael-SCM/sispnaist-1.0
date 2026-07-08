@@ -18,6 +18,9 @@ export interface IKPIData {
   percentualReadaptacao: number;
   totalTrabalhadoresAfastadosTranstornoMental: number;
   percentualTrabalhadoresAfastadosTranstornoMental: number;
+  totalUnidadesAtivas: number;
+  totalUnidadesComPgr: number;
+  percentualUnidadesComPgr: number;
 }
 
 export interface IGraficoDados {

@@ -179,6 +179,19 @@ export const DetalhesUnidade: React.FC = () => {
                     {unidade.ativa ? 'Ativa' : 'Inativa'}
                   </span>
                 </div>
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  {unidade.possuiPgr ? (
+                    <div className="flex items-center gap-2 text-emerald-600">
+                      <CheckCircle2 size={20} />
+                      <span className="font-bold text-sm">Possui Programa de Gerenciamento de Riscos</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <XCircle size={20} />
+                      <span className="font-bold text-sm">Não possui PGR</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

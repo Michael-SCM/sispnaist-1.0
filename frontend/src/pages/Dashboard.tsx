@@ -203,6 +203,7 @@ const {
             <KPICard titulo="Trab. c/ Deficiência" valor={`${kpis.percentualDeficiencia}%`} icone="♿" cor="purple" descricao={`${kpis.totalTrabalhadoresComDeficiencia} trabalhadores`} />
             <KPICard titulo="Em Readaptação" valor={`${kpis.percentualReadaptacao}%`} icone="🔄" cor="green" descricao={`${kpis.totalTrabalhadoresReadaptacao} trabalhadores`} />
             <KPICard titulo="Transtorno Mental (Afast.)" valor={`${kpis.percentualTrabalhadoresAfastadosTranstornoMental}%`} icone="🧠" cor="purple" descricao={`${kpis.totalTrabalhadoresAfastadosTranstornoMental} trabalhadores`} />
+            <KPICard titulo="Unidades c/ PGR" valor={`${kpis.percentualUnidadesComPgr}%`} icone="🛡️" cor="blue" descricao={`${kpis.totalUnidadesComPgr} de ${kpis.totalUnidadesAtivas} unidades`} />
           </div>
 
           <Suspense fallback={<ChartFallback />}>

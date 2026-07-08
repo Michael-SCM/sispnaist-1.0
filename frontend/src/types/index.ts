@@ -408,6 +408,7 @@ export interface IUnidade {
   empresaId: string;
   endereco?: IEndereco;
   gestor?: string;
+  possuiPgr?: boolean;
   ativa?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
