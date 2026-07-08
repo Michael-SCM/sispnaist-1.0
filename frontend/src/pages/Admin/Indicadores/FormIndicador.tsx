@@ -423,7 +423,7 @@ const FormIndicador: React.FC = () => {
                   <div className="grid grid-cols-5 gap-2">
                     {ICONES.map(ic => (
                       <button key={ic.value} type="button" onClick={() => setFormData(prev => ({ ...prev, icone: ic.value }))}
-                        className={`p-2 text-xl rounded-xl border-2 transition-all ${
+                        className={`w-12 h-12 flex items-center justify-center p-0 text-xl rounded-xl border-2 transition-all ${
                           formData.icone === ic.value
                             ? 'border-purple-500 bg-purple-50'
                             : 'border-transparent hover:border-slate-200'
@@ -439,7 +439,7 @@ const FormIndicador: React.FC = () => {
                   <div className="grid grid-cols-3 gap-2">
                     {CORES.map(c => (
                       <button key={c} type="button" onClick={() => setFormData(prev => ({ ...prev, cor: c }))}
-                        className={`p-3 rounded-xl border-2 text-xs font-bold transition-all capitalize ${
+                        className={`h-12 flex items-center justify-center px-3 rounded-xl border-2 text-xs font-bold transition-all capitalize ${
                           formData.cor === c
                             ? 'border-purple-500 ring-2 ring-purple-200'
                             : 'border-transparent'
