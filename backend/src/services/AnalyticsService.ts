@@ -37,17 +37,17 @@ export interface IKPIData {
   totalUnidadesAtivas: number;
   totalUnidadesComPgr: number;
   percentualUnidadesComPgr: number;
-  totalUnidadesSus: number;
-  unidadesSusComPgr: number;
-  percentualUnidadesSusComPgr: number;
-  totalTrabalhadoresSus: number;
-  trabalhadoresSusDoencaOcupacional: number;
-  percentualTrabalhadoresSusDoencaOcupacional: number;
-  municipiosHabilitadosPnaist: number;
-  percentualMunicipiosHabilitadosPnaist: number;
-  totalAtosMunicipais: number;
-  atosMunicipaisClassificadosSst: number;
-  percentualAtosMunicipaisClassificadosSst: number;
+  totalMunicipiosHabilitados: number;
+  municipiosHabilitadosAnaliseSituacao: number;
+  municipiosHabilitadosPlanoPrograma: number;
+  percentualMunicipiosHabilitadosAnaliseSituacao: number;
+  percentualMunicipiosHabilitadosPlanoPrograma: number;
+  drtSusPeriodoAtual: number;
+  drtSusPeriodoAnterior: number;
+  percentualAumentoDrtSus: number;
+  acidentesSusPeriodoAtual: number;
+  acidentesSusPeriodoAnterior: number;
+  percentualAumentoAcidentesSus: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -108,13 +108,13 @@ export class AnalyticsService {
       trabalhadoresAfastadosTranstornoMentalAgg,
       totalUnidadesAtivas,
       totalUnidadesComPgr,
-      totalUnidadesSusAgg,
-      unidadesSusComPgrAgg,
-      totalTrabalhadoresSusAgg,
-      trabalhadoresSusDoencaOcupacionalAgg,
-      municipiosHabilitadosPnaist,
-      totalAtosMunicipais,
-      atosMunicipaisClassificadosSst
+      totalMunicipiosHabilitados,
+      municipiosHabilitadosAnaliseSituacaoAgg,
+      municipiosHabilitadosPlanoProgramaAgg,
+      drtSusPeriodoAtualAgg,
+      drtSusPeriodoAnteriorAgg,
+      acidentesSusPeriodoAtualAgg,
+      acidentesSusPeriodoAnteriorAgg
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -199,29 +199,59 @@ export class AnalyticsService {
       ]),
       Unidade.countDocuments({ ativa: true }),
       Unidade.countDocuments({ possuiPgr: true, ativa: true }),
-      Unidade.aggregate([
-        { $match: { esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] }, ativa: true } },
-        { $count: 'total' }
-      ]),
-      Unidade.aggregate([
-        { $match: { esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] }, possuiPgr: true, ativa: true } },
-        { $count: 'total' }
-      ]),
-      Trabalhador.aggregate([
+      HabilitacaoPnaist.countDocuments({ ativo: true }),
+      HabilitacaoPnaist.aggregate([
+        { $match: { ativo: true } },
         {
           $lookup: {
-            from: 'unidades',
-            localField: 'unidade',
-            foreignField: '_id',
-            as: 'unidade'
+            from: 'atos_municipais_inovacao',
+            let: { municipio: '$municipio', uf: '$uf' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$nm_cidade', '$$municipio'] },
+                      { $eq: ['$nm_estado', '$$uf'] },
+                      { $eq: ['$classificacaoSst', 'analise_situacao'] }
+                    ]
+                  }
+                }
+              }
+            ],
+            as: 'atos'
           }
         },
-        { $unwind: '$unidade' },
-        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] }, 'vinculo.situacao': 'Ativo' } },
+        { $match: { 'atos.0': { $exists: true } } },
+        { $count: 'total' }
+      ]),
+      HabilitacaoPnaist.aggregate([
+        { $match: { ativo: true } },
+        {
+          $lookup: {
+            from: 'atos_municipais_inovacao',
+            let: { municipio: '$municipio', uf: '$uf' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$nm_cidade', '$$municipio'] },
+                      { $eq: ['$nm_estado', '$$uf'] },
+                      { $eq: ['$classificacaoSst', 'plano_programa'] }
+                    ]
+                  }
+                }
+              }
+            ],
+            as: 'atos'
+          }
+        },
+        { $match: { 'atos.0': { $exists: true } } },
         { $count: 'total' }
       ]),
       Doenca.aggregate([
-        { $match: { relacaoTrabalho: { $in: ['ocupacional', 'acidente'] } } },
+        { $match: { relacaoTrabalho: { $in: ['ocupacional', 'acidente'] }, dataInicio: { $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } },
         { $group: { _id: '$trabalhadorId' } },
         {
           $lookup: {
@@ -244,9 +274,76 @@ export class AnalyticsService {
         { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
         { $count: 'total' }
       ]),
-      HabilitacaoPnaist.countDocuments({ ativo: true }),
-      AtoMunicipalInovacao.countDocuments(),
-      AtoMunicipalInovacao.countDocuments({ classificacaoSst: { $exists: true, $nin: ['', null] } })
+      Doenca.aggregate([
+        { $match: { relacaoTrabalho: { $in: ['ocupacional', 'acidente'] }, dataInicio: { $gte: new Date(Date.now() - 730 * 24 * 60 * 60 * 1000), $lt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } },
+        { $group: { _id: '$trabalhadorId' } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        {
+          $lookup: {
+            from: 'unidades',
+            localField: 'trab.unidade',
+            foreignField: '_id',
+            as: 'unidade'
+          }
+        },
+        { $unwind: '$unidade' },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $count: 'total' }
+      ]),
+      Acidente.aggregate([
+        { $match: { dataAcidente: { $gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: 'trabalhadorId',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        {
+          $lookup: {
+            from: 'unidades',
+            localField: 'trab.unidade',
+            foreignField: '_id',
+            as: 'unidade'
+          }
+        },
+        { $unwind: '$unidade' },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $count: 'total' }
+      ]),
+      Acidente.aggregate([
+        { $match: { dataAcidente: { $gte: new Date(Date.now() - 730 * 24 * 60 * 60 * 1000), $lt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000) } } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: 'trabalhadorId',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        {
+          $lookup: {
+            from: 'unidades',
+            localField: 'trab.unidade',
+            foreignField: '_id',
+            as: 'unidade'
+          }
+        },
+        { $unwind: '$unidade' },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $count: 'total' }
+      ])
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -289,26 +386,26 @@ export class AnalyticsService {
       ? Math.round((totalUnidadesComPgr / totalUnidadesAtivas) * 100)
       : 0;
 
-    const totalUnidadesSus = totalUnidadesSusAgg[0]?.total || 0;
-    const unidadesSusComPgr = unidadesSusComPgrAgg[0]?.total || 0;
-    const percentualUnidadesSusComPgr = totalUnidadesSus > 0
-      ? Math.round((unidadesSusComPgr / totalUnidadesSus) * 100)
+    const municipiosHabilitadosAnaliseSituacao = municipiosHabilitadosAnaliseSituacaoAgg[0]?.total || 0;
+    const municipiosHabilitadosPlanoPrograma = municipiosHabilitadosPlanoProgramaAgg[0]?.total || 0;
+    const percentualMunicipiosHabilitadosAnaliseSituacao = totalMunicipiosHabilitados > 0
+      ? Math.round((municipiosHabilitadosAnaliseSituacao / totalMunicipiosHabilitados) * 100)
+      : 0;
+    const percentualMunicipiosHabilitadosPlanoPrograma = totalMunicipiosHabilitados > 0
+      ? Math.round((municipiosHabilitadosPlanoPrograma / totalMunicipiosHabilitados) * 100)
       : 0;
 
-    const totalTrabalhadoresSus = totalTrabalhadoresSusAgg[0]?.total || 0;
-    const trabalhadoresSusDoencaOcupacional = trabalhadoresSusDoencaOcupacionalAgg[0]?.total || 0;
-    const percentualTrabalhadoresSusDoencaOcupacional = totalTrabalhadoresSus > 0
-      ? Math.round((trabalhadoresSusDoencaOcupacional / totalTrabalhadoresSus) * 100)
-      : 0;
+    const drtSusPeriodoAtual = drtSusPeriodoAtualAgg[0]?.total || 0;
+    const drtSusPeriodoAnterior = drtSusPeriodoAnteriorAgg[0]?.total || 0;
+    const percentualAumentoDrtSus = drtSusPeriodoAnterior > 0
+      ? Math.round(((drtSusPeriodoAtual - drtSusPeriodoAnterior) / drtSusPeriodoAnterior) * 100)
+      : drtSusPeriodoAtual > 0 ? 100 : 0;
 
-    const TOTAL_MUNICIPIOS_BRASIL = 5570;
-    const percentualMunicipiosHabilitadosPnaist = TOTAL_MUNICIPIOS_BRASIL > 0
-      ? Math.round((municipiosHabilitadosPnaist / TOTAL_MUNICIPIOS_BRASIL) * 100)
-      : 0;
-
-    const percentualAtosMunicipaisClassificadosSst = totalAtosMunicipais > 0
-      ? Math.round((atosMunicipaisClassificadosSst / totalAtosMunicipais) * 100)
-      : 0;
+    const acidentesSusPeriodoAtual = acidentesSusPeriodoAtualAgg[0]?.total || 0;
+    const acidentesSusPeriodoAnterior = acidentesSusPeriodoAnteriorAgg[0]?.total || 0;
+    const percentualAumentoAcidentesSus = acidentesSusPeriodoAnterior > 0
+      ? Math.round(((acidentesSusPeriodoAtual - acidentesSusPeriodoAnterior) / acidentesSusPeriodoAnterior) * 100)
+      : acidentesSusPeriodoAtual > 0 ? 100 : 0;
 
     return {
       totalAcidentes,
@@ -334,17 +431,17 @@ export class AnalyticsService {
       totalUnidadesAtivas,
       totalUnidadesComPgr,
       percentualUnidadesComPgr,
-      totalUnidadesSus,
-      unidadesSusComPgr,
-      percentualUnidadesSusComPgr,
-      totalTrabalhadoresSus,
-      trabalhadoresSusDoencaOcupacional,
-      percentualTrabalhadoresSusDoencaOcupacional,
-      municipiosHabilitadosPnaist,
-      percentualMunicipiosHabilitadosPnaist,
-      totalAtosMunicipais,
-      atosMunicipaisClassificadosSst,
-      percentualAtosMunicipaisClassificadosSst
+      totalMunicipiosHabilitados,
+      municipiosHabilitadosAnaliseSituacao,
+      municipiosHabilitadosPlanoPrograma,
+      percentualMunicipiosHabilitadosAnaliseSituacao,
+      percentualMunicipiosHabilitadosPlanoPrograma,
+      drtSusPeriodoAtual,
+      drtSusPeriodoAnterior,
+      percentualAumentoDrtSus,
+      acidentesSusPeriodoAtual,
+      acidentesSusPeriodoAnterior,
+      percentualAumentoAcidentesSus
     };
   }
 

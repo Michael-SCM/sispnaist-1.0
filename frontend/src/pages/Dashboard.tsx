@@ -278,32 +278,36 @@ const {
 
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <KPICard
-              titulo="Unidades SUS c/ PGR"
-              valor={`${kpis.percentualUnidadesSusComPgr}%`}
-              icone="🛡️"
-              cor="blue"
-              descricao={`${kpis.unidadesSusComPgr} de ${kpis.totalUnidadesSus} unidades SUS`}
-            />
-            <KPICard
-              titulo="Trab. SUS c/ Doença Ocup."
-              valor={`${kpis.percentualTrabalhadoresSusDoencaOcupacional}%`}
-              icone="🔬"
-              cor="green"
-              descricao={`${kpis.trabalhadoresSusDoencaOcupacional} de ${kpis.totalTrabalhadoresSus} trab. SUS`}
-            />
-            <KPICard
-              titulo="Municípios Habilitados"
-              valor={`${kpis.percentualMunicipiosHabilitadosPnaist}%`}
-              icone="🏙️"
+              titulo="Habilitados c/ Análise Situação"
+              valor={`${kpis.percentualMunicipiosHabilitadosAnaliseSituacao}%`}
+              icone="🔍"
               cor="purple"
-              descricao={`${kpis.municipiosHabilitadosPnaist} de 5570 municípios`}
+              descricao={`${kpis.municipiosHabilitadosAnaliseSituacao} de ${kpis.totalMunicipiosHabilitados} habilitados`}
             />
             <KPICard
-              titulo="Atos Municipais Classif."
-              valor={`${kpis.percentualAtosMunicipaisClassificadosSst}%`}
+              titulo="Habilitados c/ Planos/Programas"
+              valor={`${kpis.percentualMunicipiosHabilitadosPlanoPrograma}%`}
               icone="📋"
+              cor="blue"
+              descricao={`${kpis.municipiosHabilitadosPlanoPrograma} de ${kpis.totalMunicipiosHabilitados} habilitados`}
+            />
+            <KPICard
+              titulo="Aumento DRT - Trab. SUS"
+              valor={`${kpis.percentualAumentoDrtSus}%`}
+              icone="📈"
               cor="orange"
-              descricao={`${kpis.atosMunicipaisClassificadosSst} de ${kpis.totalAtosMunicipais} atos`}
+              descricao={`${kpis.drtSusPeriodoAtual} atuais vs ${kpis.drtSusPeriodoAnterior} anteriores`}
+              tendencia={kpis.percentualAumentoDrtSus > 0 ? 'up' : kpis.percentualAumentoDrtSus < 0 ? 'down' : 'neutral'}
+              valorTendencia={`${Math.abs(kpis.percentualAumentoDrtSus)}%`}
+            />
+            <KPICard
+              titulo="Aumento Acidentes - Trab. SUS"
+              valor={`${kpis.percentualAumentoAcidentesSus}%`}
+              icone="⚠️"
+              cor="red"
+              descricao={`${kpis.acidentesSusPeriodoAtual} atuais vs ${kpis.acidentesSusPeriodoAnterior} anteriores`}
+              tendencia={kpis.percentualAumentoAcidentesSus > 0 ? 'up' : kpis.percentualAumentoAcidentesSus < 0 ? 'down' : 'neutral'}
+              valorTendencia={`${Math.abs(kpis.percentualAumentoAcidentesSus)}%`}
             />
           </div>
         </div>

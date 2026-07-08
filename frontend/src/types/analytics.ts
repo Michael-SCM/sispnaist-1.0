@@ -21,17 +21,17 @@ export interface IKPIData {
   totalUnidadesAtivas: number;
   totalUnidadesComPgr: number;
   percentualUnidadesComPgr: number;
-  totalUnidadesSus: number;
-  unidadesSusComPgr: number;
-  percentualUnidadesSusComPgr: number;
-  totalTrabalhadoresSus: number;
-  trabalhadoresSusDoencaOcupacional: number;
-  percentualTrabalhadoresSusDoencaOcupacional: number;
-  municipiosHabilitadosPnaist: number;
-  percentualMunicipiosHabilitadosPnaist: number;
-  totalAtosMunicipais: number;
-  atosMunicipaisClassificadosSst: number;
-  percentualAtosMunicipaisClassificadosSst: number;
+  totalMunicipiosHabilitados: number;
+  municipiosHabilitadosAnaliseSituacao: number;
+  municipiosHabilitadosPlanoPrograma: number;
+  percentualMunicipiosHabilitadosAnaliseSituacao: number;
+  percentualMunicipiosHabilitadosPlanoPrograma: number;
+  drtSusPeriodoAtual: number;
+  drtSusPeriodoAnterior: number;
+  percentualAumentoDrtSus: number;
+  acidentesSusPeriodoAtual: number;
+  acidentesSusPeriodoAnterior: number;
+  percentualAumentoAcidentesSus: number;
 }
 
 export interface IGraficoDados {
