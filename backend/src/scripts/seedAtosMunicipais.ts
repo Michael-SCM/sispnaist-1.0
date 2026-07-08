@@ -30,25 +30,37 @@ export async function seedAtosMunicipais(targetCount = 120) {
   await AtoMunicipalInovacao.deleteMany({});
   console.log('🧹 Limpeza concluída.');
 
-  const cidades = [
-    'São Paulo',
-    'Campinas',
-    'Santos',
-    'Ribeirão Preto',
-    'Sorocaba',
-    'Guarulhos',
-    'São José dos Campos',
-    'Osasco',
-    'Santo André',
-    'São Bernardo do Campo',
-    'Jundiaí',
-    'Piracicaba',
-    'Taubaté',
-    'Mogi das Cruzes',
-    'Carapicuíba',
+  const cidadesEstados = [
+    { nm_cidade: 'São Paulo', nm_estado: 'SP' },
+    { nm_cidade: 'Rio de Janeiro', nm_estado: 'RJ' },
+    { nm_cidade: 'Belo Horizonte', nm_estado: 'MG' },
+    { nm_cidade: 'Salvador', nm_estado: 'BA' },
+    { nm_cidade: 'Curitiba', nm_estado: 'PR' },
+    { nm_cidade: 'Fortaleza', nm_estado: 'CE' },
+    { nm_cidade: 'Recife', nm_estado: 'PE' },
+    { nm_cidade: 'Porto Alegre', nm_estado: 'RS' },
+    { nm_cidade: 'Brasília', nm_estado: 'DF' },
+    { nm_cidade: 'Manaus', nm_estado: 'AM' },
+    { nm_cidade: 'Florianópolis', nm_estado: 'SC' },
+    { nm_cidade: 'Goiânia', nm_estado: 'GO' },
+    { nm_cidade: 'Belém', nm_estado: 'PA' },
+    { nm_cidade: 'São Luís', nm_estado: 'MA' },
+    { nm_cidade: 'Natal', nm_estado: 'RN' },
+    { nm_cidade: 'João Pessoa', nm_estado: 'PB' },
+    { nm_cidade: 'Aracaju', nm_estado: 'SE' },
+    { nm_cidade: 'Cuiabá', nm_estado: 'MT' },
+    { nm_cidade: 'Campo Grande', nm_estado: 'MS' },
+    { nm_cidade: 'Teresina', nm_estado: 'PI' },
+    { nm_cidade: 'Macapá', nm_estado: 'AP' },
+    { nm_cidade: 'Boa Vista', nm_estado: 'RR' },
+    { nm_cidade: 'Porto Velho', nm_estado: 'RO' },
+    { nm_cidade: 'Rio Branco', nm_estado: 'AC' },
+    { nm_cidade: 'Vitória', nm_estado: 'ES' },
+    { nm_cidade: 'Palmas', nm_estado: 'TO' },
+    { nm_cidade: 'Campinas', nm_estado: 'SP' },
+    { nm_cidade: 'Santos', nm_estado: 'SP' },
+    { nm_cidade: 'Ribeirão Preto', nm_estado: 'SP' },
   ];
-
-  const estados = ['SP', 'RJ', 'MG', 'RS', 'PR', 'SC', 'BA', 'PE'];
 
   const tipos = ['Lei', 'Decreto', 'Portaria', 'Resolução'];
   const subtipos = ['Municipal', 'Regulamentadora', 'Complementar', 'Normativa'];
@@ -70,8 +82,7 @@ export async function seedAtosMunicipais(targetCount = 120) {
   const docs = [];
 
   for (let i = 0; i < targetCount; i++) {
-    const nm_cidade = pick(cidades, i);
-    const nm_estado = pick(estados, i * 7 + 3);
+    const { nm_cidade, nm_estado } = pick(cidadesEstados, i);
     const nm_tipo = pick(tipos, i);
     const nm_subtipo = pick(subtipos, i * 2);
     const nm_categoria = pick(categorias, i * 3);
@@ -86,6 +97,9 @@ export async function seedAtosMunicipais(targetCount = 120) {
       pick(linksBase, i) +
       `${nm_estado.toLowerCase()}/${encodeURIComponent(nm_cidade.toLowerCase())}/${nr_ato.replace('/', '-')}`;
 
+    const sstRand = (i * 53 + 777) % 100;
+    const classificacaoSst = sstRand < 30 ? 'analise_situacao' : sstRand < 60 ? 'plano_programa' : sstRand < 80 ? 'outro' : undefined;
+
     docs.push({
       nr_ato,
       ano_ato,
@@ -98,6 +112,7 @@ export async function seedAtosMunicipais(targetCount = 120) {
       nm_classe_categoria,
       texto_legal,
       texto_ementa,
+      classificacaoSst,
       papeisModoGovernanca: [],
       ativo: true,
     });

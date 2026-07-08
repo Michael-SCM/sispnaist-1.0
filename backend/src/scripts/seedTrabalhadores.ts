@@ -23,6 +23,7 @@ import Vacinacao from '../models/Vacinacao.js';
 import MaterialBiologico from '../models/MaterialBiologico.js';
 import TrabalhadorRiscoOcupacional from '../models/TrabalhadorRiscoOcupacional.js';
 import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP.js';
+import HabilitacaoPnaist from '../models/HabilitacaoPnaist.js';
 
 // Seeded PRNG (Mulberry32) para distribuição mais natural
 function mulberry32(seed: number) {
@@ -370,9 +371,26 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
 
       const nomeUnidade = `${empresasDados[e].nomeFantasia} - ${pick(nomesUnidades, r)}${u > 0 ? ` ${u + 1}` : ''}`;
 
+      const esferaOptions: Array<{ value: string; weight: number }> = [
+        { value: 'municipal', weight: 0.35 },
+        { value: 'estadual', weight: 0.20 },
+        { value: 'federal', weight: 0.15 },
+        { value: 'privado', weight: 0.20 },
+        { value: 'terceiro_setor', weight: 0.10 },
+      ];
+      const esferaRand = r();
+      let cumSum = 0;
+      let esfera = 'privado';
+      for (const opt of esferaOptions) {
+        cumSum += opt.weight;
+        if (esferaRand < cumSum) { esfera = opt.value; break; }
+      }
+
       const unidade = await Unidade.create({
         nome: nomeUnidade,
         empresaId: empresa._id,
+        esferaAdministrativa: esfera,
+        possuiPgr: r() > 0.35,
         endereco: {
           logradouro,
           numero: String(100 + Math.floor(r() * 900)),
@@ -914,7 +932,18 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
       }
       doencasUsadas.push(doencaInfo.nomeDoenca);
 
-      const dataInicioDoenca = new Date(2021 + Math.floor(rand() * 5), Math.floor(rand() * 12), 1 + Math.floor(rand() * 28));
+      const relacaoOptions = ['comum', 'ocupacional', 'acidente'] as const;
+      const relacaoRand = rand();
+      const relacaoTrabalho = relacaoRand < 0.50 ? 'comum' : relacaoRand < 0.80 ? 'ocupacional' : 'acidente';
+
+      const now = Date.now();
+      const doencaPeriodoRand = rand();
+      const dataInicioDoenca = doencaPeriodoRand < 0.50
+        ? new Date(now - Math.floor(rand() * 365) * 86400000)
+        : doencaPeriodoRand < 0.80
+          ? new Date(now - (365 + Math.floor(rand() * 365)) * 86400000)
+          : new Date(now - (730 + Math.floor(rand() * 365)) * 86400000);
+
       const isAtiva = rand() > 0.35;
 
       doencasToInsert.push({
@@ -923,6 +952,7 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
         trabalhadorId: workerId,
         codigoDoenca: doencaInfo.codigoDoenca,
         nomeDoenca: doencaInfo.nomeDoenca,
+        relacaoTrabalho,
         relatoClinico: `Paciente apresenta ${doencaInfo.nomeDoenca.toLowerCase()}. ${rand() > 0.5 ? 'Em acompanhamento regular com evolução satisfatória.' : 'Necessita de reavaliação periódica.'}`,
         profissionalSaude: pick(profissionaisSaude, rand),
         ativo: isAtiva,
@@ -943,7 +973,13 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
       const statusValue = pick(statusAcidente, acRand);
       const ehMaterialBiologico = acRand() < 0.18;
 
-      const dataAcidente = new Date(2020 + Math.floor(acRand() * 6), Math.floor(acRand() * 12), 1 + Math.floor(acRand() * 28));
+      const now = Date.now();
+      const acPeriodoRand = acRand();
+      const dataAcidente = acPeriodoRand < 0.50
+        ? new Date(now - Math.floor(acRand() * 365) * 86400000)
+        : acPeriodoRand < 0.80
+          ? new Date(now - (365 + Math.floor(acRand() * 365)) * 86400000)
+          : new Date(now - (730 + Math.floor(acRand() * 365)) * 86400000);
 
       const outrosAtingidos = acRand() > 0.92;
       const acidente = await Acidente.create({
@@ -1209,6 +1245,54 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
 
   console.log('  ▸ Histórico PPP...');
   if (historicoPPPToInsert.length > 0) await TrabalhadorHistoricoPPP.insertMany(historicoPPPToInsert);
+
+  // ---- HABILITAÇÃO PNAIST ----
+  console.log('🏙️  Criando registros de Habilitação PNAIST...');
+  await HabilitacaoPnaist.deleteMany({});
+  const cidadesUnicas = new Map<string, { municipio: string; uf: string }>();
+  for (const u of unidades) {
+    const key = `${u.endereco.cidade}|${u.endereco.estado}`;
+    if (!cidadesUnicas.has(key) && u.endereco.cidade && u.endereco.estado) {
+      cidadesUnicas.set(key, { municipio: u.endereco.cidade, uf: u.endereco.estado });
+    }
+  }
+  // Add some extra cities/states for more coverage
+  const extras = [
+    { municipio: 'Florianópolis', uf: 'SC' },
+    { municipio: 'Goiânia', uf: 'GO' },
+    { municipio: 'Belém', uf: 'PA' },
+    { municipio: 'São Luís', uf: 'MA' },
+    { municipio: 'Natal', uf: 'RN' },
+    { municipio: 'João Pessoa', uf: 'PB' },
+    { municipio: 'Aracaju', uf: 'SE' },
+    { municipio: 'Cuiabá', uf: 'MT' },
+    { municipio: 'Campo Grande', uf: 'MS' },
+    { municipio: 'Teresina', uf: 'PI' },
+    { municipio: 'Macapá', uf: 'AP' },
+    { municipio: 'Boa Vista', uf: 'RR' },
+    { municipio: 'Porto Velho', uf: 'RO' },
+    { municipio: 'Rio Branco', uf: 'AC' },
+    { municipio: 'Vitória', uf: 'ES' },
+    { municipio: 'Palmas', uf: 'TO' },
+  ];
+  for (const ext of extras) {
+    const key = `${ext.municipio}|${ext.uf}`;
+    if (!cidadesUnicas.has(key)) cidadesUnicas.set(key, ext);
+  }
+  const habilitacaoDocs: any[] = [];
+  let habIdx = 0;
+  for (const [, cid] of cidadesUnicas) {
+    const hRand = mulberry32(habIdx * 991 + 4444);
+    habilitacaoDocs.push({
+      municipio: cid.municipio,
+      uf: cid.uf,
+      dataHabilitacao: new Date(2022 + Math.floor(hRand() * 4), Math.floor(hRand() * 12), 1 + Math.floor(hRand() * 28)),
+      ativo: hRand() > 0.25,
+    });
+    habIdx++;
+  }
+  await HabilitacaoPnaist.insertMany(habilitacaoDocs);
+  console.log(`   ✅ ${habilitacaoDocs.length} registros de habilitação criados.`);
 
   console.log(`✅ ${targetCount} trabalhadores e submódulos cadastrados com sucesso!`);
 }

@@ -261,8 +261,18 @@ async function seedAcidentesDoencasVacinacoes() {
         // 1. CRIAR 1 DOENÇA POR TRABALHADOR
         // ========================================
         const doencaInfo = pick(doencasOcupacionais, seedRand);
-        const dataInicioDoenca = getRandomDate(545, new Date(2026, 5, 1));
+        const now = Date.now();
+        const doencaPeriodo = seedRand();
+        const dataInicioDoenca = doencaPeriodo < 0.50
+          ? new Date(now - Math.floor(seedRand() * 365) * 86400000)
+          : doencaPeriodo < 0.80
+            ? new Date(now - (365 + Math.floor(seedRand() * 365)) * 86400000)
+            : new Date(now - (730 + Math.floor(seedRand() * 365)) * 86400000);
         const isAtiva = seedRand() > 0.35;
+
+        const relacaoOptions = ['comum', 'ocupacional', 'acidente'] as const;
+        const relacaoRand = seedRand();
+        const relacaoTrabalho = relacaoRand < 0.50 ? 'comum' : relacaoRand < 0.80 ? 'ocupacional' : 'acidente';
 
         await Doenca.create({
           dataInicio: dataInicioDoenca,
@@ -270,6 +280,7 @@ async function seedAcidentesDoencasVacinacoes() {
           trabalhadorId: trabalhador._id,
           codigoDoenca: doencaInfo.codigoDoenca,
           nomeDoenca: doencaInfo.nomeDoenca,
+          relacaoTrabalho,
           relatoClinico: doencaInfo.relato,
           profissionalSaude: pick(profissionaisSaude, seedRand),
           ativo: isAtiva,
@@ -327,7 +338,13 @@ async function seedAcidentesDoencasVacinacoes() {
           const statusValue = pick(statusAcidente, acRand);
           const comAfastamento = acRand() < PROB_ACIDENTE_COM_AFASTAMENTO;
 
-          const dataAcidente = getRandomDate(365, new Date(2026, 5, 1));
+          const now = Date.now();
+          const acPeriodo = acRand();
+          const dataAcidente = acPeriodo < 0.50
+            ? new Date(now - Math.floor(acRand() * 365) * 86400000)
+            : acPeriodo < 0.80
+              ? new Date(now - (365 + Math.floor(acRand() * 365)) * 86400000)
+              : new Date(now - (730 + Math.floor(acRand() * 365)) * 86400000);
 
           const descricao = gerarDescricao(causadorValue, tipoTraumaValue, parteCorpoValue);
           const descricaoTrauma = pick(descricoesTrauma, acRand)

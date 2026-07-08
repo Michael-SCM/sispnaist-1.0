@@ -352,7 +352,7 @@ export const changePasswordSchema = Joi.object({
 });
 
 export const refreshTokenSchema = Joi.object({
-  refreshToken: Joi.string().required().messages({
+  refreshToken: Joi.string().optional().messages({
     'any.required': 'Refresh token é obrigatório',
   }),
 });
