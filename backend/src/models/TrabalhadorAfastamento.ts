@@ -49,6 +49,7 @@ const TrabalhadorAfastamentoSchema = new Schema<ITrabalhadorAfastamentoDocument>
 
 TrabalhadorAfastamentoSchema.index({ trabalhadorId: 1, dataInicio: -1 });
 TrabalhadorAfastamentoSchema.index({ trabalhadorId: 1, ativo: 1 });
+TrabalhadorAfastamentoSchema.index({ dataInicio: 1 });
 
 export default mongoose.model<ITrabalhadorAfastamento>('TrabalhadorAfastamento', TrabalhadorAfastamentoSchema);
 
