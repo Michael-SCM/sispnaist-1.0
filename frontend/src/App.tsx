@@ -103,6 +103,7 @@ const ListaRegrasValidacao = React.lazy(() => import('./pages/Admin/RegrasValida
 const FormRegraValidacao = React.lazy(() => import('./pages/Admin/RegrasValidacao/FormRegraValidacao.js'));
 const ListaIndicadores = React.lazy(() => import('./pages/Admin/Indicadores/ListaIndicadores.js'));
 const FormIndicador = React.lazy(() => import('./pages/Admin/Indicadores/FormIndicador.js'));
+const HabilitacaoPnaist = React.lazy(() => import('./pages/Admin/HabilitacaoPnaist.js'));
 
 const App: React.FC = () => {
   const [appReady, setAppReady] = React.useState(false);
@@ -845,6 +846,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute adminOnly>
               <FormIndicador />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/habilitacao-pnaist"
+          element={
+            <ProtectedRoute adminOnly>
+              <HabilitacaoPnaist />
             </ProtectedRoute>
           }
         />

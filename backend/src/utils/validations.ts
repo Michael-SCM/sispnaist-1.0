@@ -179,6 +179,7 @@ export const unidadeSchema = Joi.object({
     cep: Joi.string().trim().max(10).optional().allow('', null),
   }).optional(),
   gestor: Joi.string().trim().max(100).optional().allow('', null),
+  esferaAdministrativa: Joi.string().valid('municipal', 'estadual', 'federal', 'privado', 'terceiro_setor').optional(),
   possuiPgr: Joi.boolean().optional(),
   ativa: Joi.boolean().optional(),
 });
@@ -196,6 +197,7 @@ export const unidadeUpdateSchema = Joi.object({
     cep: Joi.string().trim().max(10).optional().allow('', null),
   }).optional(),
   gestor: Joi.string().trim().max(100).optional().allow('', null),
+  esferaAdministrativa: Joi.string().valid('municipal', 'estadual', 'federal', 'privado', 'terceiro_setor').optional(),
   possuiPgr: Joi.boolean().optional(),
   ativa: Joi.boolean().optional(),
 }).min(1);
@@ -227,6 +229,7 @@ export const atoMunicipalSchema = Joi.object({
   texto_legal: Joi.string().trim().optional().allow('', null),
   texto_ementa: Joi.string().trim().optional().allow('', null),
   papeisModoGovernanca: Joi.array().items(Joi.string()).optional(),
+  classificacaoSst: Joi.string().valid('analise_situacao', 'plano_programa', 'outro').optional(),
   ativo: Joi.boolean().optional(),
 });
 
@@ -243,6 +246,7 @@ export const atoMunicipalUpdateSchema = Joi.object({
   texto_legal: Joi.string().trim().optional().allow('', null),
   texto_ementa: Joi.string().trim().optional().allow('', null),
   papeisModoGovernanca: Joi.array().items(Joi.string()).optional(),
+  classificacaoSst: Joi.string().valid('analise_situacao', 'plano_programa', 'outro').optional(),
   ativo: Joi.boolean().optional(),
 }).min(1);
 
@@ -545,6 +549,9 @@ export const criarDoencaSchema = Joi.object({
       'string.min': 'Nome da doença deve ter pelo menos 3 caracteres',
       'any.required': 'Nome da doença é obrigatório',
     }),
+  relacaoTrabalho: Joi.string()
+    .valid('comum', 'ocupacional', 'acidente')
+    .optional(),
   relatoClinico: Joi.string()
     .trim()
     .max(2000)
@@ -571,6 +578,9 @@ export const atualizarDoencaSchema = Joi.object({
     .trim()
     .min(3)
     .max(200)
+    .optional(),
+  relacaoTrabalho: Joi.string()
+    .valid('comum', 'ocupacional', 'acidente')
     .optional(),
   relatoClinico: Joi.string()
     .trim()

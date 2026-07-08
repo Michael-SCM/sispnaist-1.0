@@ -186,6 +186,7 @@ export interface IDoenca {
   trabalhadorId: string;
   codigoDoenca: string;
   nomeDoenca: string;
+  relacaoTrabalho?: string;
   relatoClinico?: string;
   profissionalSaude?: string;
   ativo?: boolean;
@@ -254,8 +255,19 @@ export interface IUnidade {
   empresaId: string;
   endereco?: IEndereco;
   gestor?: string;
+  esferaAdministrativa?: string;
   possuiPgr?: boolean;
   ativa?: boolean;
+  dataCriacao?: Date;
+  dataAtualizacao?: Date;
+}
+
+export interface IHabilitacaoPnaist {
+  _id?: string;
+  municipio: string;
+  uf: string;
+  dataHabilitacao?: Date;
+  ativo?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
 }

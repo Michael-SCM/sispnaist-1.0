@@ -175,6 +175,16 @@ export const DetalhesDoenca: React.FC = () => {
                     <p className="font-bold text-slate-700">{doenca.profissionalSaude}</p>
                   </div>
                 )}
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Relação com o Trabalho</p>
+                  <p className="font-bold text-slate-700">
+                    {{
+                      comum: 'Comum (sem relação)',
+                      ocupacional: 'Doença Ocupacional (DRT)',
+                      acidente: 'Acidente de Trabalho',
+                    }[doenca.relacaoTrabalho || 'comum']}
+                  </p>
+                </div>
                 {doenca.dataFim && (
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Encerramento</p>

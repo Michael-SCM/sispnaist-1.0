@@ -7,6 +7,8 @@ import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
 import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
+import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
+import HabilitacaoPnaist from '../models/HabilitacaoPnaist.js';
 
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
@@ -35,6 +37,17 @@ export interface IKPIData {
   totalUnidadesAtivas: number;
   totalUnidadesComPgr: number;
   percentualUnidadesComPgr: number;
+  totalUnidadesSus: number;
+  unidadesSusComPgr: number;
+  percentualUnidadesSusComPgr: number;
+  totalTrabalhadoresSus: number;
+  trabalhadoresSusDoencaOcupacional: number;
+  percentualTrabalhadoresSusDoencaOcupacional: number;
+  municipiosHabilitadosPnaist: number;
+  percentualMunicipiosHabilitadosPnaist: number;
+  totalAtosMunicipais: number;
+  atosMunicipaisClassificadosSst: number;
+  percentualAtosMunicipaisClassificadosSst: number;
 }
 
 export interface IMonitoramentoClinico {
@@ -94,7 +107,14 @@ export class AnalyticsService {
       trabalhadoresReadaptacao,
       trabalhadoresAfastadosTranstornoMentalAgg,
       totalUnidadesAtivas,
-      totalUnidadesComPgr
+      totalUnidadesComPgr,
+      totalUnidadesSusAgg,
+      unidadesSusComPgrAgg,
+      totalTrabalhadoresSusAgg,
+      trabalhadoresSusDoencaOcupacionalAgg,
+      municipiosHabilitadosPnaist,
+      totalAtosMunicipais,
+      atosMunicipaisClassificadosSst
     ] = await Promise.all([
       Acidente.countDocuments(),
       Acidente.countDocuments({ status: 'Aberto' }),
@@ -178,7 +198,55 @@ export class AnalyticsService {
         { $count: 'total' }
       ]),
       Unidade.countDocuments({ ativa: true }),
-      Unidade.countDocuments({ possuiPgr: true, ativa: true })
+      Unidade.countDocuments({ possuiPgr: true, ativa: true }),
+      Unidade.aggregate([
+        { $match: { esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] }, ativa: true } },
+        { $count: 'total' }
+      ]),
+      Unidade.aggregate([
+        { $match: { esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] }, possuiPgr: true, ativa: true } },
+        { $count: 'total' }
+      ]),
+      Trabalhador.aggregate([
+        {
+          $lookup: {
+            from: 'unidades',
+            localField: 'unidade',
+            foreignField: '_id',
+            as: 'unidade'
+          }
+        },
+        { $unwind: '$unidade' },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] }, 'vinculo.situacao': 'Ativo' } },
+        { $count: 'total' }
+      ]),
+      Doenca.aggregate([
+        { $match: { relacaoTrabalho: { $in: ['ocupacional', 'acidente'] } } },
+        { $group: { _id: '$trabalhadorId' } },
+        {
+          $lookup: {
+            from: 'trabalhadores',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'trab'
+          }
+        },
+        { $unwind: '$trab' },
+        {
+          $lookup: {
+            from: 'unidades',
+            localField: 'trab.unidade',
+            foreignField: '_id',
+            as: 'unidade'
+          }
+        },
+        { $unwind: '$unidade' },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $count: 'total' }
+      ]),
+      HabilitacaoPnaist.countDocuments({ ativo: true }),
+      AtoMunicipalInovacao.countDocuments(),
+      AtoMunicipalInovacao.countDocuments({ classificacaoSst: { $exists: true, $nin: ['', null] } })
     ]);
     
     // Taxa de resolução (acidentes fechados / total * 100)
@@ -221,6 +289,27 @@ export class AnalyticsService {
       ? Math.round((totalUnidadesComPgr / totalUnidadesAtivas) * 100)
       : 0;
 
+    const totalUnidadesSus = totalUnidadesSusAgg[0]?.total || 0;
+    const unidadesSusComPgr = unidadesSusComPgrAgg[0]?.total || 0;
+    const percentualUnidadesSusComPgr = totalUnidadesSus > 0
+      ? Math.round((unidadesSusComPgr / totalUnidadesSus) * 100)
+      : 0;
+
+    const totalTrabalhadoresSus = totalTrabalhadoresSusAgg[0]?.total || 0;
+    const trabalhadoresSusDoencaOcupacional = trabalhadoresSusDoencaOcupacionalAgg[0]?.total || 0;
+    const percentualTrabalhadoresSusDoencaOcupacional = totalTrabalhadoresSus > 0
+      ? Math.round((trabalhadoresSusDoencaOcupacional / totalTrabalhadoresSus) * 100)
+      : 0;
+
+    const TOTAL_MUNICIPIOS_BRASIL = 5570;
+    const percentualMunicipiosHabilitadosPnaist = TOTAL_MUNICIPIOS_BRASIL > 0
+      ? Math.round((municipiosHabilitadosPnaist / TOTAL_MUNICIPIOS_BRASIL) * 100)
+      : 0;
+
+    const percentualAtosMunicipaisClassificadosSst = totalAtosMunicipais > 0
+      ? Math.round((atosMunicipaisClassificadosSst / totalAtosMunicipais) * 100)
+      : 0;
+
     return {
       totalAcidentes,
       acidentesAbertos,
@@ -244,7 +333,18 @@ export class AnalyticsService {
       percentualTrabalhadoresAfastadosTranstornoMental,
       totalUnidadesAtivas,
       totalUnidadesComPgr,
-      percentualUnidadesComPgr
+      percentualUnidadesComPgr,
+      totalUnidadesSus,
+      unidadesSusComPgr,
+      percentualUnidadesSusComPgr,
+      totalTrabalhadoresSus,
+      trabalhadoresSusDoencaOcupacional,
+      percentualTrabalhadoresSusDoencaOcupacional,
+      municipiosHabilitadosPnaist,
+      percentualMunicipiosHabilitadosPnaist,
+      totalAtosMunicipais,
+      atosMunicipaisClassificadosSst,
+      percentualAtosMunicipaisClassificadosSst
     };
   }
 
@@ -804,6 +904,20 @@ export class AnalyticsService {
     cache.set(cacheKey, { data: result, timestamp: Date.now() });
 
     return result;
+  }
+
+  private async obterIdsTrabalhadoresSus(): Promise<string[]> {
+    const unidadesSus = await Unidade.find({
+      esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] },
+    }).select('_id').lean();
+
+    const unidadeIds = unidadesSus.map(u => u._id);
+
+    const trabalhadores = await Trabalhador.find({
+      unidade: { $in: unidadeIds },
+    }).select('_id').lean();
+
+    return trabalhadores.map(t => t._id.toString());
   }
 }
 

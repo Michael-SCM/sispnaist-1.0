@@ -264,6 +264,50 @@ const {
           </Suspense>
         </div>
 
+        {/* ==================== ÁREA: SST SUS ==================== */}
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-emerald-50 rounded-2xl">
+              <span className="text-2xl">🏥</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">SST SUS</h2>
+              <p className="text-sm text-gray-500">Indicadores de Saúde do Trabalhador do SUS</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <KPICard
+              titulo="Unidades SUS c/ PGR"
+              valor={`${kpis.percentualUnidadesSusComPgr}%`}
+              icone="🛡️"
+              cor="blue"
+              descricao={`${kpis.unidadesSusComPgr} de ${kpis.totalUnidadesSus} unidades SUS`}
+            />
+            <KPICard
+              titulo="Trab. SUS c/ Doença Ocup."
+              valor={`${kpis.percentualTrabalhadoresSusDoencaOcupacional}%`}
+              icone="🔬"
+              cor="green"
+              descricao={`${kpis.trabalhadoresSusDoencaOcupacional} de ${kpis.totalTrabalhadoresSus} trab. SUS`}
+            />
+            <KPICard
+              titulo="Municípios Habilitados"
+              valor={`${kpis.percentualMunicipiosHabilitadosPnaist}%`}
+              icone="🏙️"
+              cor="purple"
+              descricao={`${kpis.municipiosHabilitadosPnaist} de 5570 municípios`}
+            />
+            <KPICard
+              titulo="Atos Municipais Classif."
+              valor={`${kpis.percentualAtosMunicipaisClassificadosSst}%`}
+              icone="📋"
+              cor="orange"
+              descricao={`${kpis.atosMunicipaisClassificadosSst} de ${kpis.totalAtosMunicipais} atos`}
+            />
+          </div>
+        </div>
+
       </MainLayout>
     );
   }

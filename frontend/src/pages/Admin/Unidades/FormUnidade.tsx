@@ -17,6 +17,7 @@ const FormUnidade: React.FC = () => {
     nome: '',
     empresaId: '',
     tipo: 'Própria',
+    esferaAdministrativa: 'municipal',
     possuiPgr: false,
     ativa: true,
     endereco: {
@@ -44,6 +45,7 @@ const FormUnidade: React.FC = () => {
         nome: unidadeAtual.nome || '',
         empresaId: typeof unidadeAtual.empresaId === 'object' && unidadeAtual.empresaId !== null ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
         tipo: unidadeAtual.tipo || 'Própria',
+        esferaAdministrativa: unidadeAtual.esferaAdministrativa || 'municipal',
         possuiPgr: unidadeAtual.possuiPgr ?? false,
         ativa: unidadeAtual.ativa ?? true,
         endereco: {
@@ -254,6 +256,21 @@ const FormUnidade: React.FC = () => {
                     >
                       <option value="Própria">Própria</option>
                       <option value="Terceirizada">Terceirizada</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Esfera Administrativa</label>
+                    <select
+                      name="esferaAdministrativa"
+                      value={formData.esferaAdministrativa}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    >
+                      <option value="municipal">Municipal (SUS)</option>
+                      <option value="estadual">Estadual (SUS)</option>
+                      <option value="federal">Federal (SUS)</option>
+                      <option value="privado">Privado</option>
+                      <option value="terceiro_setor">Terceiro Setor</option>
                     </select>
                   </div>
                   <div className="pt-2">

@@ -26,6 +26,7 @@ interface FormData {
   dataFim: string;
   codigoDoenca: string;
   nomeDoenca: string;
+  relacaoTrabalho: string;
   relatoClinico: string;
   profissionalSaude: string;
   ativo: boolean;
@@ -65,6 +66,7 @@ export const EditarDoenca: React.FC = () => {
         dataFim: doenca.dataFim ? new Date(doenca.dataFim).toISOString().split('T')[0] : '',
         codigoDoenca: doenca.codigoDoenca || '',
         nomeDoenca: doenca.nomeDoenca || '',
+        relacaoTrabalho: doenca.relacaoTrabalho || 'comum',
         relatoClinico: doenca.relatoClinico || '',
         profissionalSaude: doenca.profissionalSaude || '',
         ativo: doenca.ativo !== false,
@@ -256,6 +258,20 @@ export const EditarDoenca: React.FC = () => {
                         className="w-full pl-10 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all text-sm"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Relação com o Trabalho</label>
+                    <select
+                      name="relacaoTrabalho"
+                      value={formData.relacaoTrabalho}
+                      onChange={handleChange as any}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-rose-500 outline-none transition-all"
+                    >
+                      <option value="comum">Comum (sem relação)</option>
+                      <option value="ocupacional">Doença Ocupacional (DRT)</option>
+                      <option value="acidente">Acidente de Trabalho</option>
+                    </select>
                   </div>
 
                   <div>

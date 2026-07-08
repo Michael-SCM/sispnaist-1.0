@@ -302,6 +302,7 @@ export interface IDoenca {
   trabalhadorId: string;
   codigoDoenca: string;
   nomeDoenca: string;
+  relacaoTrabalho?: string;
   relatoClinico?: string;
   profissionalSaude?: string;
   ativo?: boolean;
@@ -408,6 +409,7 @@ export interface IUnidade {
   empresaId: string;
   endereco?: IEndereco;
   gestor?: string;
+  esferaAdministrativa?: string;
   possuiPgr?: boolean;
   ativa?: boolean;
   dataCriacao?: string;

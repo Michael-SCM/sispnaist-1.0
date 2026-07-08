@@ -192,6 +192,18 @@ export const DetalhesUnidade: React.FC = () => {
                     </div>
                   )}
                 </div>
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Esfera Administrativa</span>
+                  <p className="font-bold text-sm text-slate-700 mt-1 capitalize">
+                    {{
+                      municipal: 'Municipal (SUS)',
+                      estadual: 'Estadual (SUS)',
+                      federal: 'Federal (SUS)',
+                      privado: 'Privado',
+                      terceiro_setor: 'Terceiro Setor',
+                    }[unidade.esferaAdministrativa || 'municipal'] || unidade.esferaAdministrativa}
+                  </p>
+                </div>
               </div>
             </div>
 

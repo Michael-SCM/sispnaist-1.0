@@ -31,6 +31,7 @@ const FormAto: React.FC = () => {
     nm_subtipo: '',
     nm_categoria: '',
     nm_classe_categoria: '',
+    classificacaoSst: 'outro',
     texto_legal: '',
     texto_ementa: '',
     ativo: true
@@ -224,7 +225,25 @@ const FormAto: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Tipo</label>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">
+                      Classificação SST SUS
+                      <span className="block text-[10px] font-normal text-slate-400 mt-0.5">
+                        Identifica atos relacionados à saúde e segurança do trabalhador do SUS
+                      </span>
+                    </label>
+                    <select
+                      name="classificacaoSst"
+                      value={formData.classificacaoSst || 'outro'}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    >
+                      <option value="outro">Outro (não relacionado)</option>
+                      <option value="analise_situacao">Análise de Situação SST SUS</option>
+                      <option value="plano_programa">Plano/Programa/Política SST SUS</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Tipo do Ato</label>
                     <input
                       name="nm_tipo"
                       value={formData.nm_tipo}

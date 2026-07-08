@@ -14,6 +14,7 @@ export interface AtoMunicipalInovacao {
   texto_legal?: string;
   texto_ementa?: string;
   papeisModoGovernanca?: string[];
+  classificacaoSst?: string;
   ativo: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;

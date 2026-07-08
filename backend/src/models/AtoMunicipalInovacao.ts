@@ -13,6 +13,7 @@ export interface IAtoMunicipalInovacao extends Document {
   texto_legal?: string;
   texto_ementa?: string;
   papeisModoGovernanca?: mongoose.Types.ObjectId[];
+  classificacaoSst?: string;
   ativo: boolean;
   dataCriacao: Date;
   dataAtualizacao: Date;
@@ -32,6 +33,7 @@ const AtoMunicipalInovacaoSchema = new Schema<IAtoMunicipalInovacao>(
     texto_legal: { type: String, trim: true },
     texto_ementa: { type: String, trim: true },
     papeisModoGovernanca: [{ type: Schema.Types.ObjectId as any, ref: 'Catalogo' }],
+    classificacaoSst: { type: String, trim: true },
     ativo: { type: Boolean, default: true }
   },
   {

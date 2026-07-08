@@ -179,6 +179,15 @@ const ListaAtos: React.FC = () => {
                       <td className="px-8 py-6">
                         <span className="text-slate-700 font-bold block">{ato.nm_cidade}</span>
                         <span className="text-xs text-slate-400 font-medium uppercase">{ato.nm_estado}</span>
+                        {ato.classificacaoSst && ato.classificacaoSst !== 'outro' && (
+                          <span className={`mt-1 inline-block px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                            ato.classificacaoSst === 'analise_situacao'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {ato.classificacaoSst === 'analise_situacao' ? 'Análise Situação' : 'Plano/Programa'}
+                          </span>
+                        )}
                       </td>
                       <td className="px-8 py-6">
                         <p className="text-sm text-slate-500 max-w-sm line-clamp-2" title={ato.texto_ementa}>
@@ -364,6 +373,17 @@ const ListaAtos: React.FC = () => {
                   <div className="mt-2 font-bold text-slate-900">{atoSelecionado.nm_tipo || '—'}</div>
                   <div className="text-sm text-slate-600">{atoSelecionado.nm_categoria || '—'}</div>
                   <div className="text-sm text-slate-600">{atoSelecionado.nm_classe_categoria || '—'}</div>
+                  {atoSelecionado.classificacaoSst && atoSelecionado.classificacaoSst !== 'outro' && (
+                    <div className="mt-2">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        atoSelecionado.classificacaoSst === 'analise_situacao'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-purple-100 text-purple-700'
+                      }`}>
+                        {atoSelecionado.classificacaoSst === 'analise_situacao' ? 'Análise de Situação' : 'Plano/Programa'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 

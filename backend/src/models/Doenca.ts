@@ -23,6 +23,11 @@ const DoencaSchema = new Schema<IDoencaDocument>(
       type: String,
       required: [true, 'Nome da doença é obrigatório'],
     },
+    relacaoTrabalho: {
+      type: String,
+      enum: ['comum', 'ocupacional', 'acidente'],
+      default: 'comum',
+    },
     relatoClinico: String,
     profissionalSaude: String,
     ativo: {
