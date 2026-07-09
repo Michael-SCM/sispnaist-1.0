@@ -100,7 +100,7 @@ const {
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {customIndicadores.filter(ind => ind.ativo).slice(0, 8).map(ind => (
                 <KPICard
                   key={ind._id}
@@ -115,7 +115,7 @@ const {
           </div>
         )}
         {loadingIndicadores && (
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-24 bg-slate-50 rounded-xl animate-pulse" />
             ))}
@@ -134,7 +134,7 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <KPICard titulo="Total Acidentes" valor={kpis.totalAcidentes} icone="🚑" cor="blue" />
             <KPICard titulo="Acidentes Abertos" valor={kpis.acidentesAbertos} icone="⚠️" cor="red" />
             <KPICard titulo="Acidentes em Análise" valor={kpis.acidentesEmAnalise} icone="🔍" cor="yellow" />
@@ -196,7 +196,7 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <KPICard titulo="Doenças Ativas" valor={kpis.doencasAtivas} icone="🩺" cor="yellow" />
             <KPICard titulo="Total Vacinações" valor={kpis.totalVacinacoes} icone="💉" cor="green" />
             <KPICard titulo="Vacinações Próximas" valor={kpis.proximasVacinacoes} icone="⏰" cor="orange" descricao="Próximos 30 dias" />
@@ -252,7 +252,7 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <KPICard titulo="Trabalhadores Ativos" valor={kpis.totalTrabalhadores} icone="👥" cor="purple" />
           </div>
 
@@ -276,7 +276,7 @@ const {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <KPICard
               titulo="Habilitados c/ Análise Situação"
               valor={`${kpis.percentualMunicipiosHabilitadosAnaliseSituacao}%`}

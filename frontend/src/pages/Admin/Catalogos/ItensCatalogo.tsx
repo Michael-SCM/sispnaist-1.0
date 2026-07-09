@@ -168,7 +168,7 @@ const ItensCatalogo: React.FC = () => {
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Termo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Descrição</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Descrição</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -196,7 +196,7 @@ const ItensCatalogo: React.FC = () => {
                           <span className="font-bold text-slate-700 block text-lg">{item.valor}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <p className="text-sm text-slate-500 max-w-sm truncate">
                           {item.descricao || <span className="text-slate-300 italic text-xs">Sem descrição</span>}
                         </p>

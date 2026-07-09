@@ -216,7 +216,7 @@ const ListaUsuarios: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Usuário</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Perfil</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Empresa / Unidade</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Empresa / Unidade</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -265,7 +265,7 @@ const ListaUsuarios: React.FC = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 text-slate-600 text-sm font-medium">
                             <Building2 size={14} className="text-slate-400" />

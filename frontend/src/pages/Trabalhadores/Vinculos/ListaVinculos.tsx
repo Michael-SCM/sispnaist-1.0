@@ -102,7 +102,7 @@ export const ListaVinculos: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Ocupação & Setor</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Tipo de Vínculo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Período</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Período</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -151,7 +151,7 @@ export const ListaVinculos: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
                             <Calendar size={18} />

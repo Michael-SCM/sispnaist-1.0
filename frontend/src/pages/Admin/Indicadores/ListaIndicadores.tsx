@@ -143,13 +143,13 @@ const ListaIndicadores: React.FC = () => {
                 <tr className="border-b border-slate-100 bg-slate-50/50">
                   <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-10"></th>
                   <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Nome</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Categoria</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tipo</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Periodicidade</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">UF</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Categoria</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Tipo</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Periodicidade</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">UF</th>
                   <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Meta</th>
                   <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Valor Atual</th>
-                  <th className="text-center px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ativo</th>
+                  <th className="text-center px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Ativo</th>
                   <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
@@ -185,18 +185,18 @@ const ListaIndicadores: React.FC = () => {
                           <p className="text-xs text-slate-400 mt-0.5 truncate max-w-[200px]">{ind.descricao}</p>
                         )}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden md:table-cell">
                         <span className={`inline-flex px-3 py-1 rounded-lg text-sm font-bold ${corMap[ind.cor] || 'bg-slate-50 text-slate-600'}`}>
                           {categoriaLabel(ind.categoria)}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden md:table-cell">
                         <span className="inline-flex px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">
                           {ind.tipo === 'percentual' ? '%' : '#'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-slate-600 text-sm capitalize">{ind.periodicidade}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden md:table-cell text-slate-600 text-sm capitalize">{ind.periodicidade}</td>
+                      <td className="px-6 py-4 hidden md:table-cell">
                         {ind.uf ? (
                           <span className="inline-flex px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm font-bold">{ind.uf}</span>
                         ) : (
@@ -219,7 +219,7 @@ const ListaIndicadores: React.FC = () => {
                           <span className="text-slate-300 text-sm">-</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center hidden md:table-cell">
                         <span className={`inline-flex w-3 h-3 rounded-full ${ind.ativo ? 'bg-green-500' : 'bg-red-400'}`} />
                       </td>
                       <td className="px-6 py-4 text-right">

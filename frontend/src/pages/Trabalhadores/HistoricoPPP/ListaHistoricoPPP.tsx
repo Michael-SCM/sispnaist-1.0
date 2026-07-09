@@ -96,7 +96,7 @@ export const ListaHistoricoPPP: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Período</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Empresa / Cargo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Agentes / Exposição</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Agentes / Exposição</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -146,7 +146,7 @@ export const ListaHistoricoPPP: React.FC = () => {
                           <span className="text-xs text-slate-400">{registro.cargo}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {registro.agentesQuimicos && (
                             <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[10px] font-bold">Químico</span>

@@ -144,7 +144,7 @@ const ListaAtos: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Número/Ano</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Localidade</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Ementa</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Ementa</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -189,7 +189,7 @@ const ListaAtos: React.FC = () => {
                           </span>
                         )}
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <p className="text-sm text-slate-500 max-w-sm line-clamp-2" title={ato.texto_ementa}>
                           {ato.texto_ementa || 'Sem ementa cadastrada.'}
                         </p>

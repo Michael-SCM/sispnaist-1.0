@@ -99,8 +99,8 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Data</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Tipo de Violência</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Motivo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Motivo</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Status</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -148,12 +148,12 @@ export const ListaOcorrenciasViolencia: React.FC = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <span className="text-sm text-slate-600 max-w-[200px] truncate block">
                           {(ocorrencia as any).isAssedio ? (ocorrencia as any).frequenciaAssedio || '-' : ocorrencia.motivoViolencia}
                         </span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
                           ocorrencia.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
                         }`}>

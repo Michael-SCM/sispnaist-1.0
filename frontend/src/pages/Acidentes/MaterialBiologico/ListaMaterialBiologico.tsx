@@ -230,7 +230,7 @@ export const ListaMaterialBiologico: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Trabalhador & Acidente</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Exposição & Agente</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Reavaliação</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Reavaliação</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -279,7 +279,7 @@ export const ListaMaterialBiologico: React.FC = () => {
                           <span className="text-xs text-slate-400">{ficha.agente}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
                           <Calendar size={14} className="text-emerald-500" />
                           <span>{ficha.dataReavaliacao ? new Date(ficha.dataReavaliacao).toLocaleDateString('pt-BR') : 'Não agendada'}</span>

@@ -349,7 +349,7 @@ export const Header: React.FC = React.memo(() => {
           <button
             ref={mobileButtonRef}
             onClick={toggleMobileMenu}
-            className="lg:hidden p-2 rounded-lg hover:bg-blue-700 transition"
+            className="lg:hidden p-2 touch:p-3 rounded-lg hover:bg-blue-700 transition"
             aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={mobileMenuOpen}
           >
@@ -372,9 +372,15 @@ export const Header: React.FC = React.memo(() => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
+          <>
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
           <nav
             ref={mobileMenuRef}
-            className="lg:hidden mt-4 pt-4 border-t border-blue-500 space-y-2 w-full max-w-full overflow-x-hidden"
+            className="lg:hidden mt-4 pt-4 border-t border-blue-500 space-y-2 w-full max-w-full overflow-x-hidden relative z-50"
             aria-label="Navegação mobile"
           >
             <Link
@@ -557,6 +563,7 @@ export const Header: React.FC = React.memo(() => {
               </button>
             </div>
           </nav>
+          </>
         )}
       </div>
     </header>

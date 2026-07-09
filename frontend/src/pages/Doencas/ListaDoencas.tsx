@@ -222,7 +222,7 @@ export const ListaDoencas: React.FC = () => {
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Doença / CID</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Trabalhador</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Trabalhador</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Data Início</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
@@ -264,7 +264,7 @@ export const ListaDoencas: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-slate-600">{(d.trabalhadorId as any)?.nome || 'Não informado'}</span>
                           <span className="text-[10px] font-mono text-slate-400">{(d.trabalhadorId as any)?.cpf || '-'}</span>

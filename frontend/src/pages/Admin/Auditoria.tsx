@@ -240,8 +240,8 @@ export const Auditoria: React.FC = () => {
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Data e Hora</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Usuário</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Ação Realizada</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Módulo</th>
-                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Endereço IP</th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest hidden md:table-cell">Módulo</th>
+                  <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest hidden md:table-cell">Endereço IP</th>
                   <th className="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Detalhes</th>
                 </tr>
               </thead>
@@ -283,13 +283,13 @@ export const Auditoria: React.FC = () => {
                           {log.acao}
                         </span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex items-center gap-2">
                           <Terminal size={14} className="text-slate-300" />
                           <span className="text-sm font-bold text-slate-600 uppercase tracking-tight">{log.entidade}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <code className="text-xs font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{log.ip || '0.0.0.0'}</code>
                       </td>
                       <td className="px-8 py-6 text-right">

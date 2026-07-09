@@ -37,7 +37,7 @@ export const BarChartComponent: React.FC<IBarChartProps> = ({
   }
 
   const LARGURA_POR_BARRA = 70;
-  const larguraGrafico = Math.max(dados.length * LARGURA_POR_BARRA + 60, 400);
+  const larguraGrafico = Math.max(dados.length * LARGURA_POR_BARRA + 60, 280);
 
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200">

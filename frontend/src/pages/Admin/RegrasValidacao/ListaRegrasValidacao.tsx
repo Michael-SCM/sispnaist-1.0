@@ -162,10 +162,10 @@ const ListaRegrasValidacao: React.FC = () => {
                 <tr className="border-b border-slate-100 bg-slate-50/50">
                   <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Nome</th>
                   <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Entidade</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Campo</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Tipo</th>
-                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Localidade</th>
-                  <th className="text-center px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ativo</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Campo</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Tipo</th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Localidade</th>
+                  <th className="text-center px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Ativo</th>
                   <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
@@ -196,13 +196,13 @@ const ListaRegrasValidacao: React.FC = () => {
                           {ENTIDADE_ROTULOS[r.entidade] || r.entidade}
                         </span>
                       </td>
-                      <td className="px-6 py-4"><span className="font-mono text-sm text-slate-600">{r.campo}</span></td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden md:table-cell"><span className="font-mono text-sm text-slate-600">{r.campo}</span></td>
+                      <td className="px-6 py-4 hidden md:table-cell">
                         <span className={`inline-flex px-2 py-1 rounded-lg text-xs font-bold ${TIPO_VALIDACAO_CORES[r.tipoValidacao] || 'bg-slate-100 text-slate-600'}`}>
                           {r.tipoValidacao}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 hidden md:table-cell">
                         {r.tipoLocalidade === 'nacional' ? (
                           <span className="text-slate-600">Nacional</span>
                         ) : r.tipoLocalidade === 'uf' ? (
@@ -220,7 +220,7 @@ const ListaRegrasValidacao: React.FC = () => {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center hidden md:table-cell">
                         <span className={`inline-flex w-3 h-3 rounded-full ${r.ativo ? 'bg-green-500' : 'bg-red-400'}`} />
                       </td>
                       <td className="px-6 py-4 text-right">

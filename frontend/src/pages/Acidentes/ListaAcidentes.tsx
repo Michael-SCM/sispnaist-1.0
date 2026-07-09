@@ -284,7 +284,7 @@ export const ListaAcidentes: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Identificação</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Tipo & Status</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Registro</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Registro</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -340,7 +340,7 @@ export const ListaAcidentes: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex items-center gap-2 text-slate-400 text-sm">
                           <Clock size={14} />
                           <span>{acidente.dataCriacao ? new Date(acidente.dataCriacao).toLocaleDateString('pt-BR') : '-'}</span>

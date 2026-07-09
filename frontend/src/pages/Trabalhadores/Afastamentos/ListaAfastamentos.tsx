@@ -99,7 +99,7 @@ export const ListaAfastamentos: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Período</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Tipo & Motivo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">CID / Status</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">CID / Status</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -148,7 +148,7 @@ export const ListaAfastamentos: React.FC = () => {
                           <span className="text-xs text-slate-400 max-w-[200px] truncate">{afastamento.motivoAfastamento || 'Sem motivo'}</span>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col gap-2">
                           <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-black uppercase w-fit">
                             CID: {afastamento.cid || 'N/A'}

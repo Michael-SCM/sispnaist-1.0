@@ -99,8 +99,8 @@ export const ListaRiscosOcupacionais: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Categoria</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Tipo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Intensidade</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Intensidade</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Status</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -134,12 +134,12 @@ export const ListaRiscosOcupacionais: React.FC = () => {
                       <td className="px-8 py-6">
                         <span className="text-sm text-slate-600">{risco.tipoRisco}</span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${intensidadeColor(risco.intensidade)}`}>
                           {risco.intensidade || 'N/I'}
                         </span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
                           risco.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
                         }`}>

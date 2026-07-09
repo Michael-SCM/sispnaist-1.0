@@ -99,8 +99,8 @@ export const ListaReadaptacoes: React.FC = () => {
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Data</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Motivo</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">CID / Atividades</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">CID / Atividades</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Status</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -143,7 +143,7 @@ export const ListaReadaptacoes: React.FC = () => {
                       <td className="px-8 py-6">
                         <span className="text-sm font-bold text-slate-600">{readaptacao.motivo}</span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col gap-2">
                           <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-black uppercase w-fit">
                             CID: {readaptacao.cid || 'N/A'}
@@ -153,7 +153,7 @@ export const ListaReadaptacoes: React.FC = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col gap-2">
                           <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
                             readaptacao.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'

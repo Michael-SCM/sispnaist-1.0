@@ -222,8 +222,8 @@ export const ListaTrabalhadores: React.FC = () => {
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Trabalhador</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Vínculo & Setor</th>
-                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider">Matrícula</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Vínculo & Setor</th>
+                  <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Matrícula</th>
                   <th className="px-8 py-5 text-sm font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
                 </tr>
               </thead>
@@ -265,7 +265,7 @@ export const ListaTrabalhadores: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 text-slate-600 text-sm font-bold">
                             <Briefcase size={14} className="text-slate-400" />
@@ -277,7 +277,7 @@ export const ListaTrabalhadores: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-6 hidden md:table-cell">
                         <span className="px-3 py-1 bg-slate-50 text-slate-600 rounded-lg text-sm font-bold border border-slate-100">
                           {t.matricula || '-'}
                         </span>
