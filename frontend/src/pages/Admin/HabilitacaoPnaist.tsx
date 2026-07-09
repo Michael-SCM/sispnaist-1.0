@@ -78,7 +78,8 @@ const HabilitacaoPnaist: React.FC = () => {
     if (ufFilter) list = list.filter(m => m.u === ufFilter);
     if (search) {
       const term = search.toLowerCase();
-      list = list.filter(m => m.n.toLowerCase().includes(term));
+      const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      list = list.filter(m => norm(m.n).includes(norm(term)));
     }
     return list;
   }, [municipios, ufFilter, search]);
