@@ -13,6 +13,7 @@ import {
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { publicReportService, IRelatorioConformidade } from '../../services/publicReportService';
 import { KPICard } from '../../components/KPICard';
+import { MainLayout } from '../../layouts/MainLayout.js';
 import {
   LineChart,
   Line,
@@ -192,15 +193,8 @@ export const RelatorioConformidade: React.FC = () => {
 
   if (loading) {
     return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <MainLayout>
         <DocumentTitle title="Relatório de Conformidade" />
-        <header className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
-            <Shield className="text-blue-600" size={28} />
-            <h1 className="text-xl font-bold text-gray-800">SISPNAIST</h1>
-          </div>
-        </header>
-        <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
           {/* Skeleton KPIs */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
@@ -253,59 +247,43 @@ export const RelatorioConformidade: React.FC = () => {
               </div>
             ))}
           </div>
-        </main>
-      </div>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <MainLayout>
         <DocumentTitle title="Relatório de Conformidade" />
-        <header className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
-            <Shield className="text-blue-600" size={28} />
-            <h1 className="text-xl font-bold text-gray-800">SISPNAIST</h1>
-          </div>
-        </header>
-        <main className="max-w-7xl mx-auto px-6 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-            <AlertTriangle className="text-red-500 mx-auto mb-3" size={40} />
-            <p className="text-red-700 font-medium">{error}</p>
-          </div>
-        </main>
-      </div>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <AlertTriangle className="text-red-500 mx-auto mb-3" size={40} />
+          <p className="text-red-700 font-medium">{error}</p>
+        </div>
+      </MainLayout>
     );
   }
 
   if (!data) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <MainLayout>
       <DocumentTitle title="Relatório de Conformidade" />
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield className="text-blue-600" size={28} />
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">SISPNAIST</h1>
-              <p className="text-xs text-gray-500">Relatório de Conformidade e Transparência</p>
-            </div>
-          </div>
-          <span className="text-xs text-gray-400">
-            Dados de {new Date(data.dataReferencia).toLocaleDateString('pt-BR')}
-          </span>
-        </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="space-y-8">
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
-          <h2 className="text-2xl font-bold mb-2">Relatório de Transparência</h2>
-          <p className="text-blue-100 text-sm max-w-2xl">
-            Dados anonimizados e agregados do sistema SISPNAIST. Nenhuma informação pessoal
-            identificável (PII) é exposta. Este relatório atende aos requisitos de anonimização
-            para dados públicos conforme a LGPD e o PNAIST.
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Relatório de Transparência</h2>
+              <p className="text-blue-100 text-sm max-w-2xl">
+                Dados anonimizados e agregados do sistema SISPNAIST. Nenhuma informação pessoal
+                identificável (PII) é exposta. Este relatório atende aos requisitos de anonimização
+                para dados públicos conforme a LGPD e o PNAIST.
+              </p>
+            </div>
+            <span className="text-xs text-blue-200 whitespace-nowrap ml-4">
+              Dados de {new Date(data.dataReferencia).toLocaleDateString('pt-BR')}
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -343,12 +321,8 @@ export const RelatorioConformidade: React.FC = () => {
           </div>
         </div>
 
-        <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-200">
-          <p>SISPNAIST - Sistema de Gerenciamento de Segurança e Saúde do Trabalhador</p>
-          <p className="mt-1">Dados atualizados em {new Date(data.dataReferencia).toLocaleString('pt-BR')}</p>
-        </footer>
-      </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 
