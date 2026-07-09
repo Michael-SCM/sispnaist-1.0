@@ -163,8 +163,8 @@ export class PublicReportService {
           acidentesPorStatus.map((item: any) => ({ nome: item._id || 'Não informado', valor: item.valor }))
         ),
         ultimosMeses: acidentesMeses,
-        porEmpresa: (acidentesPorEmpresa as any[]).map((item: any) => ({
-          nome: item._id,
+        porEmpresa: (acidentesPorEmpresa as any[]).map((item: any, index: number) => ({
+          nome: `Empresa ${index + 1}`,
           valor: item.valor,
         })),
       },
