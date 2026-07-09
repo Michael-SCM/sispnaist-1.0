@@ -271,6 +271,7 @@ const FormUnidade: React.FC = () => {
                       <option value="federal">Federal (SUS)</option>
                       <option value="privado">Privado</option>
                       <option value="terceiro_setor">Terceiro Setor</option>
+                      <option value="misto">Misto (SUS + Privado)</option>
                     </select>
                   </div>
                   <div className="pt-2">

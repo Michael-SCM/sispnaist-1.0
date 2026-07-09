@@ -43,7 +43,7 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
     gestor: String,
     esferaAdministrativa: {
       type: String,
-      enum: ['municipal', 'estadual', 'federal', 'privado', 'terceiro_setor'],
+      enum: ['municipal', 'estadual', 'federal', 'privado', 'terceiro_setor', 'misto'],
       default: 'municipal',
     },
     possuiPgr: {

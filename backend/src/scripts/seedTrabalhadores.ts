@@ -372,11 +372,12 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
       const nomeUnidade = `${empresasDados[e].nomeFantasia} - ${pick(nomesUnidades, r)}${u > 0 ? ` ${u + 1}` : ''}`;
 
       const esferaOptions: Array<{ value: string; weight: number }> = [
-        { value: 'municipal', weight: 0.35 },
-        { value: 'estadual', weight: 0.20 },
-        { value: 'federal', weight: 0.15 },
-        { value: 'privado', weight: 0.20 },
-        { value: 'terceiro_setor', weight: 0.10 },
+        { value: 'municipal', weight: 0.30 },
+        { value: 'estadual', weight: 0.18 },
+        { value: 'federal', weight: 0.12 },
+        { value: 'privado', weight: 0.18 },
+        { value: 'terceiro_setor', weight: 0.08 },
+        { value: 'misto', weight: 0.14 },
       ];
       const esferaRand = r();
       let cumSum = 0;

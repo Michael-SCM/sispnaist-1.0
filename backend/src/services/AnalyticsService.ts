@@ -271,7 +271,7 @@ export class AnalyticsService {
           }
         },
         { $unwind: '$unidade' },
-        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal', 'misto'] } } },
         { $count: 'total' }
       ]),
       Doenca.aggregate([
@@ -295,7 +295,7 @@ export class AnalyticsService {
           }
         },
         { $unwind: '$unidade' },
-        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal', 'misto'] } } },
         { $count: 'total' }
       ]),
       Acidente.aggregate([
@@ -318,7 +318,7 @@ export class AnalyticsService {
           }
         },
         { $unwind: '$unidade' },
-        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal', 'misto'] } } },
         { $count: 'total' }
       ]),
       Acidente.aggregate([
@@ -341,7 +341,7 @@ export class AnalyticsService {
           }
         },
         { $unwind: '$unidade' },
-        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal'] } } },
+        { $match: { 'unidade.esferaAdministrativa': { $in: ['municipal', 'estadual', 'federal', 'misto'] } } },
         { $count: 'total' }
       ])
     ]);
@@ -1005,7 +1005,7 @@ export class AnalyticsService {
 
   private async obterIdsTrabalhadoresSus(): Promise<string[]> {
     const unidadesSus = await Unidade.find({
-      esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal'] },
+      esferaAdministrativa: { $in: ['municipal', 'estadual', 'federal', 'misto'] },
     }).select('_id').lean();
 
     const unidadeIds = unidadesSus.map(u => u._id);

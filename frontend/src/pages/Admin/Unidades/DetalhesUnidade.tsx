@@ -201,6 +201,7 @@ export const DetalhesUnidade: React.FC = () => {
                       federal: 'Federal (SUS)',
                       privado: 'Privado',
                       terceiro_setor: 'Terceiro Setor',
+                      misto: 'Misto (SUS + Privado)',
                     }[unidade.esferaAdministrativa || 'municipal'] || unidade.esferaAdministrativa}
                   </p>
                 </div>
