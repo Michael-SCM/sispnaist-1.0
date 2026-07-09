@@ -97,6 +97,7 @@ axiosInstance.interceptors.response.use(
 
       const newToken = data.data.accessToken;
 
+      sessionStorage.setItem('sispnaist_accessToken', newToken);
       useAuthStore.getState().setAccessToken(newToken);
 
       processQueue(null, newToken);
