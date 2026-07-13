@@ -41,6 +41,7 @@ export const doencaService = {
       nomeDoenca?: string;
       ativo?: boolean;
       trabalhadorId?: string;
+      cartaoSus?: string;
       dataInicio?: string;
       dataFim?: string;
     }
@@ -52,6 +53,7 @@ export const doencaService = {
     if (filtros?.nomeDoenca) queryParams.append('nomeDoenca', filtros.nomeDoenca);
     if (filtros?.ativo !== undefined) queryParams.append('ativo', filtros.ativo.toString());
     if (filtros?.trabalhadorId) queryParams.append('trabalhadorId', filtros.trabalhadorId);
+    if (filtros?.cartaoSus) queryParams.append('cartaoSus', filtros.cartaoSus);
     if (filtros?.dataInicio) queryParams.append('dataInicio', filtros.dataInicio);
     if (filtros?.dataFim) queryParams.append('dataFim', filtros.dataFim);
 

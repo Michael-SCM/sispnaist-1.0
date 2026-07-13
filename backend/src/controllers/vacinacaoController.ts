@@ -49,7 +49,7 @@ export const obterVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 
 export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
-  const { vacina, trabalhadorId } = req.query;
+  const { vacina, trabalhadorId, cartaoSus } = req.query;
   let targetTrabalhadorId = trabalhadorId as string;
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
@@ -76,6 +76,7 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
     limit,
     vacina: vacina as string,
     trabalhadorId: targetTrabalhadorId,
+    cartaoSus: cartaoSus as string,
   });
 
   res.status(200).json({

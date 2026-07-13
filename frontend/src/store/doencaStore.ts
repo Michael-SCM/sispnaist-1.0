@@ -4,6 +4,7 @@ import { IDoenca } from '../types';
 interface DoencaFilters {
   nomeDoenca?: string;
   ativo?: boolean;
+  cartaoSus?: string;
   dataInicio?: string;
   dataFim?: string;
   trabalhadorId?: string;

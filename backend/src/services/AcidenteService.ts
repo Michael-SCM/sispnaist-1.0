@@ -107,6 +107,7 @@ export class AcidenteService {
       dataFim?: string;
       descricao?: string;
       cpfTrabalhador?: string;
+      cartaoSus?: string;
     }
   ): Promise<{ acidentes: IAcidente[]; total: number; pages: number }> {
     const skip = (page - 1) * limit;
@@ -144,6 +145,16 @@ export class AcidenteService {
     }
 
 
+
+    // Filtro por Cartão SUS
+    if (filtros?.cartaoSus) {
+      const trabalhador = await Trabalhador.findOne({ cartaoSus: filtros.cartaoSus }).select('_id').lean();
+      if (trabalhador) {
+        query.trabalhadorId = trabalhador._id.toString();
+      } else {
+        query.trabalhadorId = '000000000000000000000000';
+      }
+    }
 
     if (filtros?.dataInicio || filtros?.dataFim) {
       query.dataAcidente = {};

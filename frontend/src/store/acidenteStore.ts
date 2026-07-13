@@ -5,6 +5,7 @@ interface AcidenteFilters {
   tipoAcidente?: string;
   status?: string;
   trabalhadorId?: string;
+  cartaoSus?: string;
   dataInicio?: string;
   dataFim?: string;
   descricao?: string;

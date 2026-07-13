@@ -38,6 +38,7 @@ export const acidenteService = {
       tipoAcidente?: string;
       status?: string;
       cpfTrabalhador?: string;
+      cartaoSus?: string;
       dataInicio?: string;
       dataFim?: string;
       descricao?: string;
@@ -50,6 +51,7 @@ export const acidenteService = {
     if (filtros?.tipoAcidente) params.append('tipoAcidente', filtros.tipoAcidente);
     if (filtros?.status) params.append('status', filtros.status);
     if (filtros?.cpfTrabalhador) params.append('cpfTrabalhador', filtros.cpfTrabalhador);
+    if (filtros?.cartaoSus) params.append('cartaoSus', filtros.cartaoSus);
     if (filtros?.dataInicio) params.append('dataInicio', filtros.dataInicio);
     if (filtros?.dataFim) params.append('dataFim', filtros.dataFim);
     if (filtros?.descricao) params.append('descricao', filtros.descricao);

@@ -4,6 +4,7 @@ import { ITrabalhador } from '../types';
 interface TrabalhadorFilters {
   nome?: string;
   cpf?: string;
+  cartaoSus?: string;
   matricula?: string;
   setor?: string;
 }

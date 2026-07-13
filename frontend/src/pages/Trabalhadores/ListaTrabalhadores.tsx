@@ -138,7 +138,7 @@ export const ListaTrabalhadores: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por nome, CPF ou matrícula..."
+               placeholder="Buscar por nome, CPF, Cartão SUS ou matrícula..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               value={localFiltros.nome || ''}
               onChange={(e) => setLocalFiltros({ ...localFiltros, nome: e.target.value })}
@@ -174,6 +174,16 @@ export const ListaTrabalhadores: React.FC = () => {
                   value={maskCPF(localFiltros.cpf || '')}
                   onChange={(e) => setLocalFiltros({ ...localFiltros, cpf: unmaskCPF(e.target.value) || undefined })}
                   placeholder="000.000.000-00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Cartão SUS</label>
+                <input 
+                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium"
+                  value={localFiltros.cartaoSus || ''}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, cartaoSus: e.target.value })}
+                  placeholder="Nº do Cartão SUS"
                 />
               </div>
 

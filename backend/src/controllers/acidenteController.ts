@@ -58,6 +58,7 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     dataFim: req.query.dataFim as string | undefined,
     descricao: req.query.descricao as string | undefined,
     cpfTrabalhador: req.query.cpfTrabalhador as string | undefined,
+    cartaoSus: req.query.cartaoSus as string | undefined,
   };
 
     // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador

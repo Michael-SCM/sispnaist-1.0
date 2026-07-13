@@ -57,6 +57,7 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     trabalhadorId: req.query.trabalhadorId as string,
     dataInicio: req.query.dataInicio as string,
     dataFim: req.query.dataFim as string,
+    cartaoSus: req.query.cartaoSus as string,
   };
 
   // Normaliza CPF de filtro (remove máscara) para evitar erros de validação

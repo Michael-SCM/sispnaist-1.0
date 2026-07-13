@@ -4,6 +4,7 @@ import { IVacinacao } from '../types';
 interface VacinacaoFilters {
   vacina?: string;
   ativo?: boolean;
+  cartaoSus?: string;
   dataInicio?: string;
   dataFim?: string;
   trabalhadorId?: string;

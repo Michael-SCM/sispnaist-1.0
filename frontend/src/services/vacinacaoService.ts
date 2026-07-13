@@ -29,12 +29,14 @@ export const vacinacaoService = {
     limit?: number;
     vacina?: string;
     trabalhadorId?: string;
+    cartaoSus?: string;
   }): Promise<ListarVacinacoesResponse> => {
     const params = new URLSearchParams();
     if (filtros?.page) params.append('page', filtros.page.toString());
     if (filtros?.limit) params.append('limit', filtros.limit.toString());
     if (filtros?.vacina) params.append('vacina', filtros.vacina);
     if (filtros?.trabalhadorId) params.append('trabalhadorId', filtros.trabalhadorId);
+    if (filtros?.cartaoSus) params.append('cartaoSus', filtros.cartaoSus);
 
     const response = await api.get<{ data: ListarVacinacoesResponse }>(
       `/vacinacoes?${params.toString()}`

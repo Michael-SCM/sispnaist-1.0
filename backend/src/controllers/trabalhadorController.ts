@@ -16,6 +16,7 @@ export const getTrabalhadores = asyncHandler(async (req: Request, res: Response)
   const filtros: any = {
     nome: req.query.nome as string,
     cpf: req.query.cpf as string,
+    cartaoSus: req.query.cartaoSus as string,
     matricula: req.query.matricula as string,
     setor: req.query.setor as string,
   };

@@ -173,7 +173,17 @@ export const ListaVacinacoes: React.FC = () => {
                   value={maskCPF(localFiltros.trabalhadorId || '')}
                   onChange={(e) => setLocalFiltros({ ...localFiltros, trabalhadorId: unmaskCPF(e.target.value) })}
                 />
+              </div>
 
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Cartão SUS</label>
+                <input 
+                  type="text"
+                  className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-medium"
+                  value={localFiltros.cartaoSus || ''}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, cartaoSus: e.target.value || undefined })}
+                  placeholder="Nº do Cartão SUS"
+                />
               </div>
             </div>
 

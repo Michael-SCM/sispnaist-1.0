@@ -19,6 +19,7 @@ export class TrabalhadorService {
     filtros?: {
       nome?: string;
       cpf?: string;
+      cartaoSus?: string;
       matricula?: string;
       setor?: string;
     }
@@ -38,6 +39,10 @@ export class TrabalhadorService {
       query.cpf = toCPFMaskedOrDigits(filtros.cpf);
     }
 
+
+    if (filtros?.cartaoSus) {
+      query.cartaoSus = filtros.cartaoSus;
+    }
 
     if (filtros?.matricula) {
       query.matricula = filtros.matricula;

@@ -55,6 +55,7 @@ export class VacinacaoService {
     limit?: number;
     vacina?: string;
     trabalhadorId?: string;
+    cartaoSus?: string;
   }): Promise<{ vacinacoes: IVacinacao[]; total: number; pages: number }> {
     const page = filtros.page || 1;
     const limit = filtros.limit || 10;
@@ -78,6 +79,15 @@ export class VacinacaoService {
       query.trabalhadorId = trabalhadorId;
     }
 
+    // Filtro por Cartão SUS
+    if (filtros.cartaoSus) {
+      const trabalhador = await Trabalhador.findOne({ cartaoSus: filtros.cartaoSus }).select('_id').lean();
+      if (trabalhador) {
+        query.trabalhadorId = trabalhador._id.toString();
+      } else {
+        query.trabalhadorId = '000000000000000000000000';
+      }
+    }
 
     const [vacinacoesBrutas, total] = await Promise.all([
       Vacinacao.find(query)
