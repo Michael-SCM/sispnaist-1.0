@@ -76,6 +76,7 @@ const FormHistoricoPPP = React.lazy(() => import('./pages/Trabalhadores/Historic
 const ListaRiscosOcupacionais = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/ListaRiscosOcupacionais.js'));
 const FormRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/FormRiscoOcupacional.js'));
 const DetalhesRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/DetalhesRiscoOcupacional.js'));
+const InternacoesSih = React.lazy(() => import('./pages/Trabalhadores/InternacoesSih.js'));
 const DetalhesAfastamento = React.lazy(() => import('./pages/Trabalhadores/Afastamentos/DetalhesAfastamento.js'));
 const DetalhesDependente = React.lazy(() => import('./pages/Trabalhadores/Dependentes/DetalhesDependente.js'));
 const DetalhesOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/DetalhesOcorrenciaViolencia.js'));
@@ -620,6 +621,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <DetalhesRiscoOcupacional />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/internacoes-sih"
+          element={
+            <ProtectedRoute>
+              <InternacoesSih />
             </ProtectedRoute>
           }
         />

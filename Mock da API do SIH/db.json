@@ -1,0 +1,204 @@
+[
+  {
+    "cns_paciente": "701234567890123",
+    "nome_paciente": "João Trabalhador da Silva",
+    "internacoes": [
+      {
+        "numero_aih": "1234567890123",
+        "cnes_hospital": "2001586",
+        "nome_hospital": "Hospital de Clínicas",
+        "data_internacao": "2026-06-15T08:30:00Z",
+        "data_alta": "2026-06-20T14:00:00Z",
+        "cid_principal": "S62.8",
+        "descricao_cid": "Fratura de outras partes e de partes não especificadas do punho e da mão",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 1540.75
+      }
+    ]
+  },
+  {
+    "cns_paciente": "701234567890456",
+    "nome_paciente": "Maria Aparecida de Souza",
+    "internacoes": [
+      {
+        "numero_aih": "9876543210987",
+        "cnes_hospital": "2002654",
+        "nome_hospital": "Hospital São Lucas",
+        "data_internacao": "2026-03-10T19:45:00Z",
+        "data_alta": "2026-03-18T10:30:00Z",
+        "cid_principal": "J15.9",
+        "descricao_cid": "Pneumonia bacteriana não especificada",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 2890.50
+      },
+      {
+        "numero_aih": "9876543210999",
+        "cnes_hospital": "2002654",
+        "nome_hospital": "Hospital São Lucas",
+        "data_internacao": "2026-05-02T07:15:00Z",
+        "data_alta": "2026-05-05T16:00:00Z",
+        "cid_principal": "Z38.0",
+        "descricao_cid": "Recém-nascido único, nascido em hospital",
+        "carater_atendimento": "Eletivo",
+        "valor_total_aih": 890.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "701234567890789",
+    "nome_paciente": "Carlos Eduardo Oliveira",
+    "internacoes": [
+      {
+        "numero_aih": "4561237890123",
+        "cnes_hospital": "2003321",
+        "nome_hospital": "Hospital Geral do Estado",
+        "data_internacao": "2026-01-22T23:50:00Z",
+        "data_alta": "2026-02-10T08:00:00Z",
+        "cid_principal": "I21.0",
+        "descricao_cid": "Infarto agudo do miocárdio transmural da parede anterior",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 12500.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "701234567890012",
+    "nome_paciente": "Ana Beatriz Costa",
+    "internacoes": []
+  },
+  {
+    "cns_paciente": "701234567890345",
+    "nome_paciente": "Pedro Henrique Santos",
+    "internacoes": [
+      {
+        "numero_aih": "7894561230123",
+        "cnes_hospital": "2004455",
+        "nome_hospital": "Hospital Regional do Amazonas",
+        "data_internacao": "2026-07-01T06:00:00Z",
+        "data_alta": "2026-07-03T11:00:00Z",
+        "cid_principal": "X58",
+        "descricao_cid": "Exposição a outros fatores especificados",
+        "carater_atendimento": "Eletivo",
+        "valor_total_aih": 2340.25
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000001",
+    "nome_paciente": "Ana Silva Rodrigues",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000001",
+        "cnes_hospital": "2001586",
+        "nome_hospital": "Hospital de Clínicas",
+        "data_internacao": "2025-11-10T14:20:00Z",
+        "data_alta": "2025-11-15T09:00:00Z",
+        "cid_principal": "S72.0",
+        "descricao_cid": "Fratura do colo do fêmur",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 3200.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000005",
+    "nome_paciente": "Fernanda Gomes Pereira",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000002",
+        "cnes_hospital": "2002654",
+        "nome_hospital": "Hospital São Lucas",
+        "data_internacao": "2026-02-05T22:10:00Z",
+        "data_alta": "2026-02-12T16:30:00Z",
+        "cid_principal": "K35.3",
+        "descricao_cid": "Apendicite aguda com peritonite",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 4100.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000010",
+    "nome_paciente": "Lucas Santos Oliveira",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000003",
+        "cnes_hospital": "2004455",
+        "nome_hospital": "Hospital Regional do Amazonas",
+        "data_internacao": "2026-04-18T07:45:00Z",
+        "data_alta": "2026-04-22T11:00:00Z",
+        "cid_principal": "J18.9",
+        "descricao_cid": "Pneumonia não especificada",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 1850.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000015",
+    "nome_paciente": "Patrícia Costa Almeida",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000004",
+        "cnes_hospital": "2003321",
+        "nome_hospital": "Hospital Geral do Estado",
+        "data_internacao": "2026-05-20T10:00:00Z",
+        "data_alta": "2026-05-25T14:00:00Z",
+        "cid_principal": "O80.0",
+        "descricao_cid": "Parto único espontâneo",
+        "carater_atendimento": "Eletivo",
+        "valor_total_aih": 950.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000020",
+    "nome_paciente": "Gabriel Ferreira Martins",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000005",
+        "cnes_hospital": "2001586",
+        "nome_hospital": "Hospital de Clínicas",
+        "data_internacao": "2025-08-01T06:30:00Z",
+        "data_alta": "2025-08-03T10:00:00Z",
+        "cid_principal": "S06.0",
+        "descricao_cid": "Concussão",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 780.50
+      },
+      {
+        "numero_aih": "1000000000006",
+        "cnes_hospital": "2001586",
+        "nome_hospital": "Hospital de Clínicas",
+        "data_internacao": "2026-01-10T15:00:00Z",
+        "data_alta": "2026-01-18T11:00:00Z",
+        "cid_principal": "M54.5",
+        "descricao_cid": "Dor lombar baixa",
+        "carater_atendimento": "Eletivo",
+        "valor_total_aih": 2200.00
+      }
+    ]
+  },
+  {
+    "cns_paciente": "700000000000050",
+    "nome_paciente": "Mariana Ribeiro Souza",
+    "internacoes": []
+  },
+  {
+    "cns_paciente": "700000000000100",
+    "nome_paciente": "Rafael Carvalho Lopes",
+    "internacoes": [
+      {
+        "numero_aih": "1000000000007",
+        "cnes_hospital": "2001586",
+        "nome_hospital": "Hospital de Clínicas",
+        "data_internacao": "2026-03-30T20:15:00Z",
+        "data_alta": "2026-04-08T09:30:00Z",
+        "cid_principal": "I63.9",
+        "descricao_cid": "Acidente vascular cerebral não especificado",
+        "carater_atendimento": "Urgência",
+        "valor_total_aih": 8900.00
+      }
+    ]
+  }
+]

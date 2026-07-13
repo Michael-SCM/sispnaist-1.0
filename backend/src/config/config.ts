@@ -42,6 +42,7 @@ const config = {
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   msCadsusApiUrl: process.env.MS_CADSUS_API_URL || '',
+  msSihApiUrl: process.env.MS_SIH_API_URL || '',
 };
 
 export default config;

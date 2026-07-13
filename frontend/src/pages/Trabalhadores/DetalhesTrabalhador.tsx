@@ -32,7 +32,8 @@ import {
   Clock,
   Brain,
   FileText,
-  Shield
+  Shield,
+  Hospital
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { InfoCard } from '../../components/InfoCard.js';
@@ -269,7 +270,8 @@ export const DetalhesTrabalhador: React.FC = () => {
                   { label: 'Readaptações', icon: RefreshCcw, path: 'readaptacoes', color: 'text-purple-400' },
                   { label: 'Informações Históricas', icon: Stethoscope, path: 'informacoes', color: 'text-teal-400' },
                   { label: 'Histórico Laboral / PPP', icon: FileText, path: 'historico-ppp', color: 'text-blue-400' },
-                  { label: 'Riscos Ocupacionais', icon: Shield, path: 'riscos-ocupacionais', color: 'text-amber-400' }
+                  { label: 'Riscos Ocupacionais', icon: Shield, path: 'riscos-ocupacionais', color: 'text-amber-400' },
+                  { label: 'Internações (SIH)', icon: Hospital, path: 'internacoes-sih', color: 'text-green-400' }
                 ].map((item) => (
                   <Link
                     key={item.path}
