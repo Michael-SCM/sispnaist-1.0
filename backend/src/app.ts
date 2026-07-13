@@ -38,6 +38,7 @@ import parametrosUfRoutes from './routes/parametrosUf.js';
 import regrasValidacaoRoutes from './routes/regrasValidacao.js';
 import indicadoresRoutes from './routes/indicadores.js';
 import habilitacaoPnaistRoutes from './routes/habilitacaoPnaist.js';
+import cadsusRoutes from './routes/cadsus.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
@@ -293,6 +294,7 @@ app.use('/api/regras-validacao', regrasValidacaoRoutes);
 app.use('/api/indicadores', indicadoresRoutes);
 app.use('/api/habilitacao-pnaist', habilitacaoPnaistRoutes);
 app.use('/api/public/reports', publicReportsRoutes);
+app.use('/api/integracao/cadsus', cadsusRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

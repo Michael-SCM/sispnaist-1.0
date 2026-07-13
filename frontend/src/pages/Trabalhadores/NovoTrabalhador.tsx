@@ -4,6 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
+import { cadsusService } from '../../services/cadsusService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
 import { useEmpresaStore } from '../../store/empresaStore.js';
@@ -22,7 +23,7 @@ import { AutocompleteCidade } from '../../components/AutocompleteCidade.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
   Building, Calendar, Heart, Shield, Clock, AlertTriangle,
-  Phone, CreditCard, BookOpen, Brain
+  Phone, CreditCard, BookOpen, Brain, Search, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF } from '../../utils/cpfMask.js';
@@ -39,6 +40,7 @@ export const NovoTrabalhador: React.FC = () => {
   const { fetchEmpresaPorUnidade } = useEmpresaStore();
   const { fetchUnidadesFiltradas } = useUnidadeStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [consultandoCadsus, setConsultandoCadsus] = useState(false);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
   const [unidadesFiltradas, setUnidadesFiltradas] = useState<IUnidade[]>([]);
@@ -304,6 +306,50 @@ export const NovoTrabalhador: React.FC = () => {
     }
   };
 
+  const handleBuscarCadsus = async () => {
+    const cpfOuCns = (formData.cpf || formData.cartaoSus || '').replace(/\D/g, '');
+    if (!cpfOuCns || cpfOuCns.length < 11) {
+      toast.error('Digite um CPF ou Cartão SUS válido para consultar');
+      return;
+    }
+
+    setConsultandoCadsus(true);
+    try {
+      const dados = await cadsusService.buscarPorCpfOuCns(cpfOuCns);
+      setFormData((prev) => ({
+        ...prev,
+        cpf: dados.cpf,
+        cartaoSus: dados.cartaoSus,
+        nome: dados.nome,
+        nomeMae: dados.nomeMae,
+        dataNascimento: dados.dataNascimento,
+        sexo: dados.sexo,
+        raca: dados.raca,
+        celular: dados.celular,
+        email: dados.email,
+        endereco: {
+          ...prev.endereco,
+          logradouro: dados.endereco.logradouro,
+          numero: dados.endereco.numero,
+          complemento: dados.endereco.complemento || '',
+          bairro: dados.endereco.bairro,
+          cidade: dados.endereco.cidade,
+          estado: dados.endereco.estado,
+          cep: dados.endereco.cep,
+        },
+      }));
+      toast.success('Dados encontrados no CADSUS!');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error('Cidadão não encontrado no CADSUS. Você pode cadastrar manualmente.');
+      } else {
+        toast.error(error.message || 'Sistema do Ministério da Saúde indisponível no momento');
+      }
+    } finally {
+      setConsultandoCadsus(false);
+    }
+  };
+
   const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
     <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
       <Icon size={20} className="text-blue-600" />
@@ -382,9 +428,38 @@ export const NovoTrabalhador: React.FC = () => {
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={User} title="Informações Gerais" />
             <div className="p-8 space-y-6">
-              {/* CPF + Nome + Nome Social + Nome da Mãe */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {renderInput('cpf', 'CPF', maskCPF(formData.cpf || ''), { required: true, placeholder: '000.000.000-00', })}
+              {/* CPF + Buscar CADSUS + Nome + Nome Social + Nome da Mãe */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div className="md:col-span-2">
+                  <label className={labelCls}>CPF <span className="text-red-500"> *</span></label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="cpf"
+                      value={maskCPF(formData.cpf || '')}
+                      onChange={handleChange}
+                      className={`${inputCls} flex-1`}
+                      placeholder="000.000.000-00"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleBuscarCadsus}
+                      disabled={consultandoCadsus}
+                      className="px-4 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all flex items-center gap-2 shrink-0"
+                      title="Buscar dados no CADSUS (Ministério da Saúde)"
+                    >
+                      {consultandoCadsus ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Search size={18} />
+                      )}
+                      <span className="hidden sm:inline text-sm">Buscar CADSUS</span>
+                    </button>
+                  </div>
+                  {consultandoCadsus && (
+                    <p className="text-xs text-green-600 mt-1 animate-pulse">Consultando a base do Ministério da Saúde...</p>
+                  )}
+                </div>
                 {renderInput('nome', 'Nome Completo', formData.nome || '', { required: true, placeholder: 'Nome completo do trabalhador' })}
                 {renderInput('nomeSocial', 'Nome Social', formData.nomeSocial || '', { placeholder: 'Nome social (opcional)' })}
                 {renderInput('nomeMae', 'Nome da Mãe', formData.nomeMae || '', { required: true })}

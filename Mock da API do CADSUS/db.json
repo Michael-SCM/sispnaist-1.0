@@ -1,0 +1,117 @@
+[
+  {
+    "cns_definitivo": "701234567890123",
+    "cpf": "12345678900",
+    "nome_completo": "João Trabalhador da Silva",
+    "data_nascimento": "1985-04-12",
+    "nome_mae": "Maria da Silva",
+    "sexo": "M",
+    "nacionalidade": "Brasileira",
+    "raca_cor": "Parda",
+    "endereco": {
+      "logradouro": "Rua das Indústrias",
+      "numero": "100",
+      "complemento": "Apt 202",
+      "bairro": "Polo Industrial",
+      "municipio": "Camaçari",
+      "uf": "BA",
+      "cep": "42800-000"
+    },
+    "contato": {
+      "telefone_principal": "71999999999",
+      "email": "joao.trabalhador@email.com"
+    }
+  },
+  {
+    "cns_definitivo": "701234567890456",
+    "cpf": "98765432100",
+    "nome_completo": "Maria Aparecida de Souza",
+    "data_nascimento": "1990-09-22",
+    "nome_mae": "Teresa de Souza",
+    "sexo": "F",
+    "nacionalidade": "Brasileira",
+    "raca_cor": "Branca",
+    "endereco": {
+      "logradouro": "Av. Paulista",
+      "numero": "1500",
+      "complemento": "Sala 301",
+      "bairro": "Bela Vista",
+      "municipio": "São Paulo",
+      "uf": "SP",
+      "cep": "01310-100"
+    },
+    "contato": {
+      "telefone_principal": "11988887777",
+      "email": "maria.souza@email.com"
+    }
+  },
+  {
+    "cns_definitivo": "701234567890789",
+    "cpf": "45678912300",
+    "nome_completo": "Carlos Eduardo Oliveira",
+    "data_nascimento": "1978-01-05",
+    "nome_mae": "Eduarda Oliveira",
+    "sexo": "M",
+    "nacionalidade": "Brasileira",
+    "raca_cor": "Preta",
+    "endereco": {
+      "logradouro": "Rua do Comércio",
+      "numero": "45",
+      "complemento": "",
+      "bairro": "Centro",
+      "municipio": "Feira de Santana",
+      "uf": "BA",
+      "cep": "44000-000"
+    },
+    "contato": {
+      "telefone_principal": "75988885555",
+      "email": "carlos.oliveira@email.com"
+    }
+  },
+  {
+    "cns_definitivo": "701234567890012",
+    "cpf": "32165498700",
+    "nome_completo": "Ana Beatriz Costa",
+    "data_nascimento": "1995-07-18",
+    "nome_mae": "Lucia Costa",
+    "sexo": "F",
+    "nacionalidade": "Brasileira",
+    "raca_cor": "Amarela",
+    "endereco": {
+      "logradouro": "Rua das Flores",
+      "numero": "88",
+      "complemento": "Casa",
+      "bairro": "Jardim América",
+      "municipio": "Goiânia",
+      "uf": "GO",
+      "cep": "74200-000"
+    },
+    "contato": {
+      "telefone_principal": "62977776666",
+      "email": "ana.costa@email.com"
+    }
+  },
+  {
+    "cns_definitivo": "701234567890345",
+    "cpf": "65432198700",
+    "nome_completo": "Pedro Henrique Santos",
+    "data_nascimento": "1982-11-30",
+    "nome_mae": "Rosa Santos",
+    "sexo": "M",
+    "nacionalidade": "Brasileira",
+    "raca_cor": "Indígena",
+    "endereco": {
+      "logradouro": "Estrada do Rio",
+      "numero": "s/n",
+      "complemento": "Aldeia Nova",
+      "bairro": "Zona Rural",
+      "municipio": "Manaus",
+      "uf": "AM",
+      "cep": "69000-000"
+    },
+    "contato": {
+      "telefone_principal": "92988881111",
+      "email": "pedro.santos@email.com"
+    }
+  }
+]

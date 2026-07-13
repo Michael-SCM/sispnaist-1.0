@@ -41,6 +41,7 @@ const config = {
     from: process.env.EMAIL_FROM || '"SISPNAIST" <noreply@sispnaist.com>',
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+  msCadsusApiUrl: process.env.MS_CADSUS_API_URL || '',
 };
 
 export default config;

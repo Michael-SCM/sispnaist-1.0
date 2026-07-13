@@ -1,0 +1,61 @@
+ Card: Criar Mock da API do SIH (Deploy no Render) e Implementar Integração no SISPNAIST
+🎯 Objetivo
+Desenvolver, publicar em nuvem (Render) e consumir uma API simulada (Mock) do SIH (Sistema de Informações Hospitalares) do Ministério da Saúde. A integração no SISPNAIST deve ser configurada via variáveis de ambiente para que, no futuro, a troca para a API de produção oficial do DATASUS exija apenas a alteração de uma URL.
+📖 Contexto
+O nosso sistema (SISPNAIST) precisa cruzar informações com o ecossistema do Ministério da Saúde. O foco desta etapa é o SIH, um sistema estruturante do SUS que processa as internações utilizando as AIHs (Autorizações de Internação Hospitalar). Como não temos o link oficial de produção ainda, você irá criar uma API falsa em Node.js (ou outra tecnologia leve), colocá-la no ar no Render e construir o cliente HTTP no SISPNAIST para consumir e processar os dados clínicos e administrativos dos trabalhadores internados.
+🛠️ Passo a Passo
+1.Criação da API Mock do SIH:Desenvolvimento local.
+Criar um projeto simples (sugestão: Node.js com Express, ou json-server).
+Criar um endpoint (ex: GET /api/v1/internacoes/{cns}) que retorne os dados de internação simulados de um paciente/trabalhador (baseado na estrutura da AIH).
+
+2.Deploy do Mock no Render:Publicação na nuvem.
+Subir o código do Mock para um repositório no GitHub.
+Conectar o repositório ao Render.com e criar um "Web Service" gratuito.
+Garantir que a API esteja acessível publicamente (ex: [https://mock-sih-xyz.onrender.com/api/v1/internacoes/123456789012345](https://mock-sih-xyz.onrender.com/api/v1/internacoes/123456789012345)).
+
+3.Configuração de Variáveis de Ambiente no SISPNAIST:
+Criar uma variável de ambiente no projeto SISPNAIST (ex: MS_SIH_API_URL no arquivo .env).
+Apontar essa variável para a URL pública gerada pelo Render.
+Regra de Ouro: A URL nunca deve ser escrita diretamente no código-fonte (hardcoded).
+
+
+4.Implementação do Cliente de Integração (SISPNAIST):
+Criar a classe/serviço responsável por fazer as chamadas HTTP para o Mock do SIH.
+Implementar um Adapter/DTO: transformar o JSON bruto que simula o DATASUS em um objeto/entidade interna que o SISPNAIST entenda.
+Implementar tratamento de erros: Se a API do Render demorar a responder (Sleep do tier gratuito) ou der erro 500, o SISPNAIST deve tratar o erro de forma elegante (ex: "Sistema do Ministério da Saúde indisponível no momento"), sem travar a aplicação.
+
+✅ Critérios de Aceite
+[ ] O Mock do SIH está publicado no Render e respondendo a requisições web corretamente.
+[ ] O contrato de dados (JSON de resposta) contém informações relevantes de uma AIH (CNS, CID, Data de Internação, Hospital).
+[ ] O SISPNAIST consegue ler a URL da API a partir de variáveis de ambiente (.env).
+[ ] O código da integração trata erros de conexão e timeout.
+[ ] Os dados vindos da API externa estão sendo convertidos corretamente (Padrão Adapter) e exibidos ou salvos no SISPNAIST.
+
+💡 Dicas e Guia de Apoio
+1. Sugestão de Contrato (JSON) para o Mock do SIH
+Aqui está um modelo inicial do que a sua API no Render deve retornar quando buscarmos as internações de um trabalhador pelo CNS (Cartão Nacional de Saúde). O CID S62.8 abaixo é um exemplo comum de acidente de trabalho que o SISPNAIST pode querer rastrear:
+
+JSON
+{
+  "cns_paciente": "701234567890123",
+  "nome_paciente": "Maria da Silva",
+  "internacoes": [
+    {
+      "numero_aih": "1234567890123",
+      "cnes_hospital": "2001586",
+      "nome_hospital": "Hospital de Clínicas",
+      "data_internacao": "2026-06-15T08:30:00Z",
+      "data_alta": "2026-06-20T14:00:00Z",
+      "cid_principal": "S62.8", 
+      "descricao_cid": "Fratura de outras partes e de partes não especificadas do punho e da mão",
+      "carater_atendimento": "Urgência",
+      "valor_total_aih": 1540.75
+    }
+  ]
+}
+
+
+2. Sobre o Render e o "Cold Start"
+Lembre-se que o plano gratuito do Render "adormece" a aplicação após 15 minutos sem uso. A primeira requisição pode demorar até 50 segundos para responder. Use isso a seu favor! É o cenário perfeito para você testar se configurou o Timeout do cliente HTTP no SISPNAIST corretamente (ex: defina o timeout para 60 segundos durante os testes).
+3. Criando o Mock rapidamente
+Se quiser focar na integração do SISPNAIST e ganhar tempo na criação da API, pesquise sobre a biblioteca json-server para Node.js. Ela permite criar uma API REST completa apenas criando um arquivo db.json, sendo extremamente fácil de colocar no ar no Render.

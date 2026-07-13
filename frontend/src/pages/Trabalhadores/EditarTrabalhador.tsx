@@ -4,6 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
+import { cadsusService } from '../../services/cadsusService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
 import { useEmpresaStore } from '../../store/empresaStore.js';
@@ -13,7 +14,7 @@ import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import { AutocompleteCidade } from '../../components/AutocompleteCidade.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
-  Building, AlertTriangle, Loader2, Phone, Brain
+  Building, AlertTriangle, Loader2, Phone, Brain, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -37,6 +38,7 @@ export const EditarTrabalhador: React.FC = () => {
   const { fetchUnidadesFiltradas } = useUnidadeStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [consultandoCadsus, setConsultandoCadsus] = useState(false);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
   const [unidadesFiltradas, setUnidadesFiltradas] = useState<IUnidade[]>([]);
@@ -326,6 +328,49 @@ export const EditarTrabalhador: React.FC = () => {
     }
   };
 
+  const handleBuscarCadsus = async () => {
+    const cartaoSus = (formData.cartaoSus || '').replace(/\D/g, '');
+    if (!cartaoSus || cartaoSus.length < 15) {
+      toast.error('Digite um Cartão SUS válido (15 dígitos) para consultar');
+      return;
+    }
+
+    setConsultandoCadsus(true);
+    try {
+      const dados = await cadsusService.buscarPorCpfOuCns(cartaoSus);
+      setFormData((prev) => ({
+        ...prev,
+        cartaoSus: dados.cartaoSus,
+        nome: dados.nome,
+        nomeMae: dados.nomeMae,
+        dataNascimento: dados.dataNascimento,
+        sexo: dados.sexo,
+        raca: dados.raca,
+        celular: dados.celular,
+        email: dados.email,
+        endereco: {
+          ...prev.endereco,
+          logradouro: dados.endereco.logradouro,
+          numero: dados.endereco.numero,
+          complemento: dados.endereco.complemento || '',
+          bairro: dados.endereco.bairro,
+          cidade: dados.endereco.cidade,
+          estado: dados.endereco.estado,
+          cep: dados.endereco.cep,
+        },
+      }));
+      toast.success('Dados do CADSUS atualizados!');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error('Cidadão não encontrado no CADSUS');
+      } else {
+        toast.error(error.message || 'Sistema do Ministério da Saúde indisponível no momento');
+      }
+    } finally {
+      setConsultandoCadsus(false);
+    }
+  };
+
   const formatDateValue = (val: any): string => {
     if (!val) return '';
     return String(val).split('T')[0];
@@ -430,7 +475,36 @@ export const EditarTrabalhador: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 {renderInput('matricula', 'Matrícula', formData.matricula || '', { required: true })}
-                {renderInput('cartaoSus', 'Cartão do SUS', formData.cartaoSus || '', { required: true })}
+                <div>
+                  <label className={labelCls}>Cartão do SUS <span className="text-red-500"> *</span></label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      name="cartaoSus"
+                      value={formData.cartaoSus || ''}
+                      onChange={handleChange}
+                      className={`${inputCls} flex-1`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleBuscarCadsus}
+                      disabled={consultandoCadsus}
+                      className="px-4 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-2xl font-bold transition-all flex items-center gap-2 shrink-0"
+                      title="Buscar dados no CADSUS"
+                    >
+                      {consultandoCadsus ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Search size={18} />
+                      )}
+                      <span className="hidden sm:inline text-sm">Buscar</span>
+                    </button>
+                  </div>
+                  {consultandoCadsus && (
+                    <p className="text-xs text-green-600 mt-1 animate-pulse">Consultando a base do Ministério da Saúde...</p>
+                  )}
+                </div>
                 {renderInput('celular', 'Celular', formData.celular || '', { required: true })}
                 {renderInput('telefoneContato', 'Outro Contato', formData.telefoneContato || '')}
                 {renderInput('dataNascimento', 'Data de Nascimento', formatDateValue(formData.dataNascimento), { type: 'date', required: true })}
