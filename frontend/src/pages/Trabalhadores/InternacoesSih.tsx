@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
-import { sihService, DadosSih } from '../../services/sihService.js';
+import { sihService, DadosSih, Internacao } from '../../services/sihService.js';
 import { ITrabalhador } from '../../types/index.js';
 import {
   ArrowLeft,
@@ -15,6 +15,14 @@ import {
   DollarSign,
   FileText,
   Activity,
+  X,
+  Hash,
+  Building2,
+  Clock,
+  User,
+  Stethoscope,
+  Tag,
+  CreditCard,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,6 +32,7 @@ export const InternacoesSih: React.FC = () => {
   const [dadosSih, setDadosSih] = useState<DadosSih | null>(null);
   const [consultando, setConsultando] = useState(false);
   const [jaConsultou, setJaConsultou] = useState(false);
+  const [internacaoModal, setInternacaoModal] = useState<Internacao | null>(null);
 
   useEffect(() => {
     const carregar = async () => {
@@ -172,7 +181,14 @@ export const InternacoesSih: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {dadosSih.internacoes.map((int, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                    <tr
+                      key={idx}
+                      className="hover:bg-blue-50/50 transition-colors cursor-pointer"
+                      onClick={() => setInternacaoModal(int)}
+                      tabIndex={0}
+                      role="button"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setInternacaoModal(int); } }}
+                    >
                       <td className="px-6 py-4 font-mono text-sm font-bold text-slate-700">{int.numeroAih}</td>
                       <td className="px-6 py-4">
                         <p className="font-bold text-slate-700">{int.nomeHospital}</p>
@@ -245,6 +261,137 @@ export const InternacoesSih: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Detalhes */}
+      {internacaoModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setInternacaoModal(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                  <Hospital size={22} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">Detalhes da Internação</h2>
+                  <p className="text-sm text-slate-400 font-mono">AIH: {internacaoModal.numeroAih}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setInternacaoModal(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-8 space-y-7">
+              {/* Hospital */}
+              <div className="bg-slate-50/50 rounded-2xl p-5">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Hospital</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Nome</p>
+                      <p className="font-bold text-slate-700">{internacaoModal.nomeHospital}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Hash size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">CNES</p>
+                      <p className="font-bold text-slate-700 font-mono">{internacaoModal.cnesHospital}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Período */}
+              <div className="bg-slate-50/50 rounded-2xl p-5">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Período da Internação</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Calendar size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Data de Internação</p>
+                      <p className="font-bold text-slate-700">{formatarData(internacaoModal.dataInternacao)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Calendar size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Data de Alta</p>
+                      <p className="font-bold text-slate-700">{formatarData(internacaoModal.dataAlta)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Diagnóstico */}
+              <div className="bg-slate-50/50 rounded-2xl p-5">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Diagnóstico</h3>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Stethoscope size={18} className="text-slate-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">CID Principal</p>
+                      <p className="font-bold text-slate-700 text-lg">{internacaoModal.cidPrincipal}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <FileText size={18} className="text-slate-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Descrição</p>
+                      <p className="text-slate-600">{internacaoModal.descricaoCid}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Caráter e Valor */}
+              <div className="bg-slate-50/50 rounded-2xl p-5">
+                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Caráter e Valor</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Tag size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Caráter do Atendimento</p>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border mt-1 ${caraterBadge(internacaoModal.caraterAtendimento)}`}>
+                        {internacaoModal.caraterAtendimento}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CreditCard size={18} className="text-slate-400 shrink-0" />
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">Valor Total da AIH</p>
+                      <p className="font-bold text-green-600 text-lg">{formatarValor(internacaoModal.valorTotalAih)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-8 py-5 border-t border-slate-100 bg-slate-50/30 flex justify-end">
+              <button
+                onClick={() => setInternacaoModal(null)}
+                className="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };
