@@ -13,17 +13,10 @@ export async function buscarInternacoes(req: Request, res: Response, next: NextF
   } catch (error: any) {
     const statusCode = error.statusCode || error.response?.status;
 
-    if (statusCode && statusCode >= 400 && statusCode < 500) {
+    if (statusCode && statusCode >= 400) {
       return res.status(statusCode).json({
-        status: 'erro',
-        mensagem: error.message,
-      });
-    }
-
-    if (statusCode && statusCode >= 500) {
-      return res.status(statusCode).json({
-        status: 'erro',
-        mensagem: error.message,
+        status: 'error',
+        message: error.message,
       });
     }
 
