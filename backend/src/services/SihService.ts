@@ -108,6 +108,13 @@ export class SihService {
         throw err;
       }
 
+      // Qualquer outro erro HTTP da mock (502, 500, etc.) — trata como indisponível
+      if (error.response?.status && error.response.status !== 200) {
+        const err = new Error('Sistema do Ministério da Saúde indisponível no momento');
+        (err as any).statusCode = 503;
+        throw err;
+      }
+
       throw error;
     }
   }

@@ -56,11 +56,11 @@ export const InternacoesSih: React.FC = () => {
         toast.success(`${dados.internacoes.length} internação(ões) encontrada(s)!`);
       }
     } catch (error: any) {
-      if (error.response?.status === 404) {
-        setDadosSih(null);
+      setDadosSih(null);
+      const msg = (error.message || '').toLowerCase();
+      if (msg.includes('não encontrado') || msg.includes('nenhuma internação') || msg.includes('404')) {
         toast.error('Nenhuma internação encontrada para este CNS no SIH');
       } else {
-        setDadosSih(null);
         toast.error(error.message || 'Sistema do Ministério da Saúde indisponível no momento');
       }
     } finally {

@@ -11,15 +11,17 @@ export async function buscarInternacoes(req: Request, res: Response, next: NextF
       data: dados,
     });
   } catch (error: any) {
-    if (error.statusCode === 404) {
-      return res.status(404).json({
+    const statusCode = error.statusCode || error.response?.status;
+
+    if (statusCode && statusCode >= 400 && statusCode < 500) {
+      return res.status(statusCode).json({
         status: 'erro',
         mensagem: error.message,
       });
     }
 
-    if (error.statusCode === 504 || error.statusCode === 503) {
-      return res.status(error.statusCode).json({
+    if (statusCode && statusCode >= 500) {
+      return res.status(statusCode).json({
         status: 'erro',
         mensagem: error.message,
       });
