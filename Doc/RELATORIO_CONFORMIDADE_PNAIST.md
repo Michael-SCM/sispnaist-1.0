@@ -25,13 +25,13 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **51 de 62 requisitos** identificados (~82%), possui **0 requisitos parcialmente implementados** e **11 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **53 de 62 requisitos** identificados (~85%), possui **0 requisitos parcialmente implementados** e **9 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
-| ✅ Implementado | 68 | 83% |
+| ✅ Implementado | 70 | 85% |
 | ⚠️ Parcial | 0 | 0% |
-| ❌ Não implementado | 14 | 17% |
+| ❌ Não implementado | 12 | 15% |
 
 **Principais Pontos Fortes:**
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
@@ -42,7 +42,7 @@ O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema d
 - Acessibilidade WCAG 2.1 AA (aria labels, navegação por teclado, foco visível, leitores de tela, contraste)
 
 **Principais Gaps:**
-- Interoperabilidade com sistemas governamentais (CADSUS, CNES, e-Social, SINAN)
+- Interoperabilidade com sistemas governamentais (e-Social, SINAN)
 - Parametrização por unidade federativa (UF)
 - Indicadores customizáveis por estado/município
 - Suporte offline
@@ -190,8 +190,8 @@ Cada requisito foi classificado como:
 
 | # | Requisito | Status | Implementação Atual |
 |---|-----------|--------|-------------------|
-| 62 | **Integração com CADSUS** | ❌ | API REST disponível, mas sem integração ativa |
-| 63 | **Integração com CNES** | ❌ | idem |
+| 62 | **Integração com CADSUS** | ✅ | Mock API REST (https://mock-da-api-do-cadsus.onrender.com) integrada via adapter, consulta por CNS na ficha do trabalhador com dados demográficos e endereço |
+| 63 | **Integração com CNES** | ✅ | Mock API REST (https://mock-da-api-do-cnes.onrender.com) integrada via adapter, consulta por código CNES no modal de detalhes do SIH com dados completos do estabelecimento (endereço, leitos, serviços, contato) |
 | 64 | **Integração com e-Social** | ❌ | idem |
 | 65 | **Integração com SINAN** | ❌ | idem |
 | 66 | **APIs padronizadas para terceiros** | ❌ | Sem OpenAPI/Swagger, sem webhooks |

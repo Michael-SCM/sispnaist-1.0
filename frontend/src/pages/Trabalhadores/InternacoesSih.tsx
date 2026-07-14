@@ -4,6 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { sihService, DadosSih, Internacao } from '../../services/sihService.js';
+import { cnesService, DadosCnes } from '../../services/cnesService.js';
 import { ITrabalhador } from '../../types/index.js';
 import {
   ArrowLeft,
@@ -33,6 +34,8 @@ export const InternacoesSih: React.FC = () => {
   const [consultando, setConsultando] = useState(false);
   const [jaConsultou, setJaConsultou] = useState(false);
   const [internacaoModal, setInternacaoModal] = useState<Internacao | null>(null);
+  const [dadosCnesPorInternacao, setDadosCnesPorInternacao] = useState<Record<string, DadosCnes>>({});
+  const [cnesLoading, setCnesLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const carregar = async () => {
@@ -74,6 +77,23 @@ export const InternacoesSih: React.FC = () => {
       }
     } finally {
       setConsultando(false);
+    }
+  };
+
+  const handleConsultarCnes = async (cnes: string) => {
+    if (dadosCnesPorInternacao[cnes]) return;
+
+    setCnesLoading(cnes);
+    try {
+      const dados = await cnesService.buscarPorCodigo(cnes);
+      setDadosCnesPorInternacao((prev) => ({ ...prev, [cnes]: dados }));
+    } catch (error: any) {
+      const msg = (error.message || '').toLowerCase();
+      if (!msg.includes('não encontrado')) {
+        toast.error('Não foi possível consultar o CNES');
+      }
+    } finally {
+      setCnesLoading(null);
     }
   };
 
@@ -295,23 +315,145 @@ export const InternacoesSih: React.FC = () => {
             <div className="p-8 space-y-7">
               {/* Hospital */}
               <div className="bg-slate-50/50 rounded-2xl p-5">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Hospital</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Building2 size={18} className="text-slate-400 shrink-0" />
-                    <div>
-                      <p className="text-xs text-slate-400 font-medium">Nome</p>
-                      <p className="font-bold text-slate-700">{internacaoModal.nomeHospital}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Hash size={18} className="text-slate-400 shrink-0" />
-                    <div>
-                      <p className="text-xs text-slate-400 font-medium">CNES</p>
-                      <p className="font-bold text-slate-700 font-mono">{internacaoModal.cnesHospital}</p>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Hospital</h3>
+                  <button
+                    type="button"
+                    onClick={() => handleConsultarCnes(internacaoModal.cnesHospital)}
+                    disabled={cnesLoading === internacaoModal.cnesHospital || !!dadosCnesPorInternacao[internacaoModal.cnesHospital]}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all"
+                  >
+                    {cnesLoading === internacaoModal.cnesHospital ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Building2 size={12} />
+                    )}
+                    {dadosCnesPorInternacao[internacaoModal.cnesHospital] ? 'Consultado' : 'Consultar CNES'}
+                  </button>
                 </div>
+
+                {dadosCnesPorInternacao[internacaoModal.cnesHospital] ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Nome Fantasia</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].nomeFantasia}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Hash size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">CNES</p>
+                          <p className="font-bold text-slate-700 font-mono">{dadosCnesPorInternacao[internacaoModal.cnesHospital].codigoCnes}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <FileText size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Razão Social</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].razaoSocial}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Tag size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Tipo de Unidade</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].tipoUnidade}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Natureza Jurídica</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].naturezaJuridica}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Gestão</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].gestao} / {dadosCnesPorInternacao[internacaoModal.cnesHospital].esferaAdministrativa}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.cidade && (
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Endereço</p>
+                          <p className="font-bold text-slate-700">
+                            {dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.logradouro}, {dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.numero}
+                            {dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.bairro && ` - ${dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.bairro}`}
+                            <br />
+                            <span className="text-slate-500">{dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.cidade}/{dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.estado} - {dadosCnesPorInternacao[internacaoModal.cnesHospital].endereco.cep}</span>
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {dadosCnesPorInternacao[internacaoModal.cnesHospital].telefone && (
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Contato</p>
+                          <p className="font-bold text-slate-700">{dadosCnesPorInternacao[internacaoModal.cnesHospital].telefone}{dadosCnesPorInternacao[internacaoModal.cnesHospital].email ? ` | ${dadosCnesPorInternacao[internacaoModal.cnesHospital].email}` : ''}</p>
+                        </div>
+                      </div>
+                    )}
+                    {dadosCnesPorInternacao[internacaoModal.cnesHospital].leitos.total > 0 && (
+                      <div className="flex items-center gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Leitos</p>
+                          <p className="font-bold text-slate-700">
+                            {dadosCnesPorInternacao[internacaoModal.cnesHospital].leitos.total} total
+                            <span className="text-green-600 ml-2">({dadosCnesPorInternacao[internacaoModal.cnesHospital].leitos.sus} SUS)</span>
+                            {dadosCnesPorInternacao[internacaoModal.cnesHospital].leitos.privado > 0 && (
+                              <span className="text-blue-600 ml-1">(+{dadosCnesPorInternacao[internacaoModal.cnesHospital].leitos.privado} privado)</span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {dadosCnesPorInternacao[internacaoModal.cnesHospital].servicos.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <Building2 size={18} className="text-slate-400 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs text-slate-400 font-medium">Serviços</p>
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {dadosCnesPorInternacao[internacaoModal.cnesHospital].servicos.map((s) => (
+                              <span key={s} className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md text-xs font-bold">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <Building2 size={18} className="text-slate-400 shrink-0" />
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">Nome</p>
+                        <p className="font-bold text-slate-700">{internacaoModal.nomeHospital}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Hash size={18} className="text-slate-400 shrink-0" />
+                      <div>
+                        <p className="text-xs text-slate-400 font-medium">CNES</p>
+                        <p className="font-bold text-slate-700 font-mono">{internacaoModal.cnesHospital}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Período */}

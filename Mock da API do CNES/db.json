@@ -1,0 +1,147 @@
+[
+  {
+    "codigo_cnes": "2001586",
+    "nome_fantasia": "Hospital de Clínicas",
+    "razao_social": "Associação Hospitalar de Clínicas Ltda",
+    "cnpj": "60.123.456/0001-00",
+    "tipo_unidade": "Hospital Geral",
+    "endereco": {
+      "logradouro": "Av. Paulista",
+      "numero": "1000",
+      "complemento": "",
+      "bairro": "Bela Vista",
+      "municipio": "São Paulo",
+      "uf": "SP",
+      "cep": "01310-100"
+    },
+    "telefone": "(11) 3333-1000",
+    "email": "contato@hospitaldeclinicas.com.br",
+    "natureza_juridica": "Privada",
+    "gestao": "Municipal",
+    "esfera_administrativa": "Privada",
+    "latitude": -23.5610,
+    "longitude": -46.6545,
+    "leitos": {
+      "total": 280,
+      "sus": 200,
+      "privado": 80
+    },
+    "servicos": ["Clínica Geral", "Cirurgia Geral", "Cardiologia", "Pediatria", "Ortopedia", "Neurologia"]
+  },
+  {
+    "codigo_cnes": "2002654",
+    "nome_fantasia": "Hospital São Lucas",
+    "razao_social": "Irmandade São Lucas de Assistência à Saúde",
+    "cnpj": "75.987.654/0001-23",
+    "tipo_unidade": "Hospital Especializado",
+    "endereco": {
+      "logradouro": "Rua das Palmeiras",
+      "numero": "500",
+      "complemento": "",
+      "bairro": "Centro",
+      "municipio": "Salvador",
+      "uf": "BA",
+      "cep": "40000-000"
+    },
+    "telefone": "(71) 3444-2000",
+    "email": "contato@saolucas.com.br",
+    "natureza_juridica": "Filantrópica",
+    "gestao": "Estadual",
+    "esfera_administrativa": "Privada",
+    "latitude": -12.9714,
+    "longitude": -38.5014,
+    "leitos": {
+      "total": 180,
+      "sus": 150,
+      "privado": 30
+    },
+    "servicos": ["Cardiologia", "Neurologia", "Oncologia", "Terapia Intensiva", "Cirurgia Vascular"]
+  },
+  {
+    "codigo_cnes": "2003321",
+    "nome_fantasia": "Hospital Geral do Estado",
+    "razao_social": "Secretaria de Estado da Saúde",
+    "cnpj": "15.432.198/0001-76",
+    "tipo_unidade": "Hospital Geral",
+    "endereco": {
+      "logradouro": "Av. Governador",
+      "numero": "s/n",
+      "complemento": "Prédio Principal",
+      "bairro": "Centro",
+      "municipio": "Recife",
+      "uf": "PE",
+      "cep": "50000-000"
+    },
+    "telefone": "(81) 3555-3000",
+    "email": "administracao@hge.pe.gov.br",
+    "natureza_juridica": "Pública",
+    "gestao": "Estadual",
+    "esfera_administrativa": "Estadual",
+    "latitude": -8.0632,
+    "longitude": -34.8712,
+    "leitos": {
+      "total": 450,
+      "sus": 450,
+      "privado": 0
+    },
+    "servicos": ["Clínica Geral", "Cirurgia Geral", "UTI Adulto", "UTI Neonatal", "Pediatria", "Maternidade", "Traumatologia", "Pronto-Socorro"]
+  },
+  {
+    "codigo_cnes": "2004455",
+    "nome_fantasia": "Hospital Regional do Amazonas",
+    "razao_social": "Fundação de Saúde do Amazonas",
+    "cnpj": "32.765.890/0001-12",
+    "tipo_unidade": "Hospital Regional",
+    "endereco": {
+      "logradouro": "Estrada do Contorno",
+      "numero": "200",
+      "complemento": "Zona Oeste",
+      "bairro": "Flores",
+      "municipio": "Manaus",
+      "uf": "AM",
+      "cep": "69000-000"
+    },
+    "telefone": "(92) 3666-4000",
+    "email": "contato@hramazonas.am.gov.br",
+    "natureza_juridica": "Pública",
+    "gestao": "Estadual",
+    "esfera_administrativa": "Estadual",
+    "latitude": -3.1190,
+    "longitude": -60.0217,
+    "leitos": {
+      "total": 320,
+      "sus": 320,
+      "privado": 0
+    },
+    "servicos": ["Clínica Geral", "Cirurgia Geral", "UTI Adulto", "Pediatria", "Maternidade", "Pronto-Socorro", "Doenças Infecciosas"]
+  },
+  {
+    "codigo_cnes": "2005567",
+    "nome_fantasia": "UBS João do Povo",
+    "razao_social": "Prefeitura Municipal de Camaçari",
+    "cnpj": "12.345.678/0001-90",
+    "tipo_unidade": "Unidade Básica de Saúde",
+    "endereco": {
+      "logradouro": "Rua das Indústrias",
+      "numero": "100",
+      "complemento": "",
+      "bairro": "Polo Industrial",
+      "municipio": "Camaçari",
+      "uf": "BA",
+      "cep": "42800-000"
+    },
+    "telefone": "(71) 3777-5000",
+    "email": "ubs.camacari@prefeitura.ba.gov.br",
+    "natureza_juridica": "Pública",
+    "gestao": "Municipal",
+    "esfera_administrativa": "Municipal",
+    "latitude": -12.6998,
+    "longitude": -38.3241,
+    "leitos": {
+      "total": 0,
+      "sus": 0,
+      "privado": 0
+    },
+    "servicos": ["Clínica Geral", "Enfermagem", "Vacinação", "Pré-Natal", "Farmácia", "Odontologia"]
+  }
+]
