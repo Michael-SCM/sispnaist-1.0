@@ -126,6 +126,12 @@ export class CadsusService {
         throw err;
       }
 
+      if (error.response) {
+        const err = new Error('Sistema do Ministério da Saúde indisponível no momento');
+        (err as any).statusCode = 503;
+        throw err;
+      }
+
       throw error;
     }
   }

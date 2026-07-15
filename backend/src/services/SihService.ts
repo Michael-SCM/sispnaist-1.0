@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config/config.js';
 
-interface SihInternacaoRaw {
+export interface SihInternacaoRaw {
   numero_aih: string;
   cnes_hospital: string;
   nome_hospital: string;
@@ -13,7 +13,7 @@ interface SihInternacaoRaw {
   valor_total_aih: number;
 }
 
-interface SihResponseDataRaw {
+export interface SihResponseDataRaw {
   cns_paciente: string;
   nome_paciente: string;
   internacoes: SihInternacaoRaw[];
