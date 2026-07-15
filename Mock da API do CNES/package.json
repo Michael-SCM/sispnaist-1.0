@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Mock API do CNES (Ministério da Saúde) para integração com SISPNAIST",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"

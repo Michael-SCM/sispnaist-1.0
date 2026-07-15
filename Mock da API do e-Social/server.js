@@ -14,19 +14,27 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const trabalhadores = JSON.parse(readFileSync(join(__dirname, 'db.json'), 'utf-8'));
 
-app.get('/api/v1/esocial/eventos/:cpf', (req, res) => {
-  const { cpf } = req.params;
+function buscarTrabalhador(cpf) {
   const busca = cpf.replace(/\D/g, '');
+  return trabalhadores.find((t) => t.cpf === busca);
+}
 
-  const trabalhador = trabalhadores.find((t) => t.cpf === busca);
+app.get('/', (req, res) => {
+  res.json({ status: 'OK', app: 'mock-esocial-api', timestamp: new Date().toISOString() });
+});
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/v1/esocial/eventos/:cpf', (req, res) => {
+  const trabalhador = buscarTrabalhador(req.params.cpf);
   if (!trabalhador) {
     return res.status(404).json({
       status: 'erro',
       mensagem: 'Trabalhador não encontrado na base do e-Social',
     });
   }
-
   return res.json({
     status: 'sucesso',
     data: {
@@ -36,10 +44,6 @@ app.get('/api/v1/esocial/eventos/:cpf', (req, res) => {
       eventos: trabalhador.eventos,
     },
   });
-});
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {

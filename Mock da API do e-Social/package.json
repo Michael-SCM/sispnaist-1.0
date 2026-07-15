@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Mock API do e-Social (S-2210, S-2220, S-2240) para integração com SISPNAIST",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
