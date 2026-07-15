@@ -42,7 +42,6 @@ interface FormData {
   tecnicaMedicao: string;
   resultadoMedicao: string;
   limiteTolerancia: string;
-  fatorRisco: string;
   dataInicioExposicao: string;
   dataFimExposicao: string;
   dataAvaliacao: string;
@@ -72,7 +71,6 @@ const INITIAL_FORM: FormData = {
   tecnicaMedicao: '',
   resultadoMedicao: '',
   limiteTolerancia: '',
-  fatorRisco: '',
   dataInicioExposicao: '',
   dataFimExposicao: '',
   dataAvaliacao: '',
@@ -177,7 +175,6 @@ export const FormRiscoOcupacional: React.FC = () => {
           tecnicaMedicao: risco.tecnicaMedicao || '',
           resultadoMedicao: risco.resultadoMedicao || '',
           limiteTolerancia: risco.limiteTolerancia || '',
-          fatorRisco: risco.fatorRisco || '',
           dataInicioExposicao: risco.dataInicioExposicao ? risco.dataInicioExposicao.split('T')[0] : '',
           dataFimExposicao: risco.dataFimExposicao ? risco.dataFimExposicao.split('T')[0] : '',
           dataAvaliacao: risco.dataAvaliacao ? risco.dataAvaliacao.split('T')[0] : '',
@@ -244,7 +241,7 @@ export const FormRiscoOcupacional: React.FC = () => {
         tecnicaMedicao: fator.tecnicaMedicao || prev.tecnicaMedicao,
         resultadoMedicao: fator.resultadoMedicao || prev.resultadoMedicao,
         limiteTolerancia: fator.limiteTolerancia || prev.limiteTolerancia,
-        fatorRisco: fator.fatorRisco || prev.fatorRisco,
+        categoria: fator.fatorRisco || prev.categoria,
         frequenciaExposicao: fator.frequenciaExposicao || prev.frequenciaExposicao,
         duracaoExposicao: fator.duracaoExposicao || prev.duracaoExposicao,
         medidasControle: fator.medidasAdministrativas || prev.medidasControle,
@@ -286,7 +283,6 @@ export const FormRiscoOcupacional: React.FC = () => {
         tecnicaMedicao: formData.tecnicaMedicao || undefined,
         resultadoMedicao: formData.resultadoMedicao || undefined,
         limiteTolerancia: formData.limiteTolerancia || undefined,
-        fatorRisco: formData.fatorRisco || undefined,
         dataInicioExposicao: formData.dataInicioExposicao ? new Date(formData.dataInicioExposicao) : undefined,
         dataFimExposicao: formData.dataFimExposicao ? new Date(formData.dataFimExposicao) : undefined,
         dataAvaliacao: formData.dataAvaliacao ? new Date(formData.dataAvaliacao) : undefined,
@@ -537,19 +533,6 @@ export const FormRiscoOcupacional: React.FC = () => {
                   </button>
                 </div>
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-600 mb-2">Fator de Risco (e-Social)</label>
-                    <select name="fatorRisco" value={formData.fatorRisco} onChange={handleChange}
-                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
-                    >
-                      <option value="">Selecione...</option>
-                      <option value="fisico">Físico</option>
-                      <option value="quimico">Químico</option>
-                      <option value="biologico">Biológico</option>
-                      <option value="ergonomico">Ergonômico</option>
-                      <option value="acidente">Acidente</option>
-                    </select>
-                  </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Técnica de Medição</label>
                     <input name="tecnicaMedicao" value={formData.tecnicaMedicao} onChange={handleChange}

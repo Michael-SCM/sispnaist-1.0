@@ -196,5 +196,88 @@
         }
       ]
     }
+  },
+  {
+    "cpf": "10000113646",
+    "cns": "898003486500004",
+    "nome": "Carlos Eduardo de Oliveira",
+    "eventos": {
+      "s2210": [
+        {
+          "id": "CAT-2026-001",
+          "dataAcidente": "2026-02-10",
+          "horaAcidente": "10:45",
+          "tipoAcidente": "Típico",
+          "descricao": "Queda de mesma altura ao escorregar em piso molhado",
+          "parteAtingida": "Tornozelo direito",
+          "agenteCausador": "Piso escorregadio",
+          "cid": "S93.4",
+          "afastamento": true,
+          "diasAfastamento": 7,
+          "catEmitida": true,
+          "catNumero": "CAT-2026-001",
+          "catDataEmissao": "2026-02-10",
+          "catTipo": "inicial",
+          "emitenteCat": "empregador",
+          "houveObito": false,
+          "localAcidente": "Cozinha industrial"
+        }
+      ],
+      "s2220": [
+        {
+          "id": "ASO-2025-001",
+          "tipoExame": "Admissional",
+          "dataExame": "2025-01-20",
+          "dataValidade": "2025-04-20",
+          "medicoNome": "Dr. Fernando Alves",
+          "medicoCRM": "CRM 45678",
+          "medicoUFCrm": "BA",
+          "resultado": "apto",
+          "observacaoMedica": "Apto para função de auxiliar de cozinha",
+          "examesRealizados": ["Hemograma", "Glicemia", "Acuidade Visual", "Eletrocardiograma"],
+          "riscosOcupacionais": ["Calor", "Postura Inadequada", "Corte"],
+          "medicoPcmsmoNome": "Dr. Fernando Alves",
+          "medicoPcmsmoCrm": "CRM 45678"
+        },
+        {
+          "id": "ASO-2025-002",
+          "tipoExame": "Periódico",
+          "dataExame": "2025-07-20",
+          "dataValidade": "2026-01-20",
+          "medicoNome": "Dra. Juliana Costa",
+          "medicoCRM": "CRM 78901",
+          "medicoUFCrm": "BA",
+          "resultado": "apto",
+          "observacaoMedica": "Apto, recomenda-se uso de calçado antiderrapante",
+          "examesRealizados": ["Hemograma", "Avaliação Física"],
+          "riscosOcupacionais": ["Calor", "Postura Inadequada", "Corte"],
+          "medicoPcmsmoNome": "Dra. Juliana Costa",
+          "medicoPcmsmoCrm": "CRM 78901"
+        }
+      ],
+      "s2240": [
+        {
+          "id": "RISCO-004",
+          "dataInicioExposicao": "2025-01-20",
+          "dataFimExposicao": null,
+          "fatorRisco": "fisico",
+          "agente": "Calor",
+          "intensidade": "28 °C (WBGT)",
+          "limiteTolerancia": "25 °C (WBGT)",
+          "tecnicaMedicao": "Termometria de Globo",
+          "resultadoMedicao": "28,5 °C",
+          "frequenciaExposicao": "diaria",
+          "duracaoExposicao": "6 horas",
+          "epcUtilizado": true,
+          "epcDescricao": "Exaustores e coifas",
+          "epcEficaz": true,
+          "epiUtilizado": false,
+          "epiDescricao": null,
+          "caEpi": null,
+          "epiEficaz": false,
+          "medidasAdministrativas": "Pausas térmicas de 15 min a cada 2 horas"
+        }
+      ]
+    }
   }
 ]
