@@ -30,6 +30,28 @@ export interface ITrabalhadorDependente {
   dataAtualizacao?: string;
 }
 
+export interface ITrabalhadorExameSaude {
+  _id?: string;
+  trabalhadorId: string;
+  numeroAso?: string;
+  dataAso: string;
+  dataValidadeAso?: string;
+  tipoAso: 'admissional' | 'periodico' | 'retorno' | 'mudanca' | 'demissional';
+  medicoNome: string;
+  medicoCRM: string;
+  medicoUFCrm?: string;
+  resultado: 'apto' | 'inapto' | 'apto_com_restricoes';
+  observacaoMedica?: string;
+  examesRealizados?: string[];
+  riscosOcupacionais?: string[];
+  medicoPcmsmoNome?: string;
+  medicoPcmsmoCrm?: string;
+  arquivoAso?: string;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface IAvaliacaoItem {
   presente: boolean;
   observacao?: string;
@@ -175,12 +197,20 @@ export interface ITrabalhadorRiscoOcupacional {
   duracaoExposicao?: string;
   epcUtilizado?: boolean;
   epcDescricao?: string;
+  epcEficaz?: string;
   epiUtilizado?: boolean;
   epiDescricao?: string;
   caEpis?: string[];
+  epiEficaz?: boolean;
   medidasControle?: string;
   dataAvaliacao?: string;
   avaliador?: string;
+  tecnicaMedicao?: string;
+  resultadoMedicao?: string;
+  limiteTolerancia?: string;
+  fatorRisco?: string;
+  dataInicioExposicao?: string;
+  dataFimExposicao?: string;
   ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
@@ -285,6 +315,14 @@ export interface IAcidente {
   internamento?: boolean;
   duracaoInternamento?: number;
   catNas?: boolean;
+  // e-Social S-2210 (CAT)
+  catNumero?: string;
+  catDataEmissao?: string;
+  catTipo?: 'inicial' | 'reabertura' | 'comunicacao';
+  emitenteCat?: 'empregador' | 'trabalhador' | 'sindico' | 'medico';
+  cidLesao?: string;
+  dataObito?: string;
+
   registroPolicial?: boolean;
   encaminhamentoJuntaMedica?: boolean;
   afastamento?: boolean;
@@ -347,6 +385,14 @@ export interface IAcidentePopulated {
   internamento?: boolean;
   duracaoInternamento?: number;
   catNas?: boolean;
+  // e-Social S-2210 (CAT)
+  catNumero?: string;
+  catDataEmissao?: string;
+  catTipo?: 'inicial' | 'reabertura' | 'comunicacao';
+  emitenteCat?: 'empregador' | 'trabalhador' | 'sindico' | 'medico';
+  cidLesao?: string;
+  dataObito?: string;
+
   registroPolicial?: boolean;
   encaminhamentoJuntaMedica?: boolean;
   afastamento?: boolean;

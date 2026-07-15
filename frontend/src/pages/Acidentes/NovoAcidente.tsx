@@ -22,10 +22,12 @@ import {
   Stethoscope,
   ShieldAlert,
   Heart,
-  Building
+  Building,
+  Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
+import { esocialService } from '../../services/esocialService.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 
@@ -58,6 +60,14 @@ interface FormData {
 
   // CAT/NAS
   catNas: boolean;
+
+  // e-Social S-2210 (CAT)
+  catNumero: string;
+  catDataEmissao: string;
+  catTipo: string;
+  emitenteCat: string;
+  cidLesao: string;
+  dataObito: string;
 
   // Registro Policial
   registroPolicial: boolean;
@@ -99,6 +109,12 @@ const INITIAL_FORM: FormData = {
   internamento: false,
   duracaoInternamento: 0,
   catNas: false,
+  catNumero: '',
+  catDataEmissao: '',
+  catTipo: '',
+  emitenteCat: '',
+  cidLesao: '',
+  dataObito: '',
   registroPolicial: false,
   encaminhamentoJuntaMedica: false,
   afastamento: false,
@@ -218,6 +234,39 @@ export const NovoAcidente: React.FC = () => {
     }));
   };
 
+  const handleConsultarEsocial = async () => {
+    const cpf = formData.trabalhadorId.replace(/\D/g, '');
+    if (!cpf || cpf.length !== 11) {
+      toast.error('Informe um CPF válido do trabalhador para consultar o e-Social');
+      return;
+    }
+    try {
+      const dados = await esocialService.buscarPorCpf(cpf);
+      const catList = dados.eventos?.s2210;
+      if (!catList || catList.length === 0) {
+        toast('Nenhuma CAT encontrada no e-Social para este trabalhador', { icon: 'ℹ️' });
+        return;
+      }
+      const cat = catList.sort((a, b) => new Date(b.dataAcidente).getTime() - new Date(a.dataAcidente).getTime())[0];
+      setFormData((prev) => ({
+        ...prev,
+        catNas: true,
+        catNumero: cat.catNumero || '',
+        catDataEmissao: cat.catDataEmissao ? cat.catDataEmissao.split('T')[0] : '',
+        catTipo: cat.catTipo || '',
+        emitenteCat: cat.emitenteCat || '',
+        cidLesao: cat.cid || '',
+      }));
+      toast.success(`Dados da CAT ${cat.catNumero} carregados do e-Social`);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error('Trabalhador não encontrado no e-Social');
+      } else {
+        toast.error(error.message || 'Erro ao consultar e-Social');
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -253,6 +302,12 @@ export const NovoAcidente: React.FC = () => {
           : undefined,
         dataAtendimento: formData.dataAtendimento
           ? converterDataLocal(formData.dataAtendimento)
+          : undefined,
+        catDataEmissao: formData.catDataEmissao
+          ? converterDataLocal(formData.catDataEmissao)
+          : undefined,
+        dataObito: formData.dataObito
+          ? converterDataLocal(formData.dataObito)
           : undefined,
       };
 
@@ -599,6 +654,103 @@ export const NovoAcidente: React.FC = () => {
                 </div>
               </div>
 
+              {/* Dados da CAT / e-Social (S-2210) */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <ShieldAlert size={20} className="text-amber-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da CAT / e-Social (S-2210)</h2>
+                </div>
+                <div className="p-8 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="catNas"
+                      id="catNas"
+                      checked={formData.catNas}
+                      onChange={handleChange}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500"
+                    />
+                    <label htmlFor="catNas" className="text-sm font-bold text-slate-600">
+                      CAT Emitida?
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleConsultarEsocial}
+                      className="ml-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                    >
+                      <Search size={14} />
+                      Consultar e-Social
+                    </button>
+                  </div>
+
+                  {formData.catNas && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-red-50 rounded-2xl">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Número da CAT</label>
+                        <input
+                          type="text"
+                          name="catNumero"
+                          value={formData.catNumero}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none"
+                          placeholder="Ex: CAT-2025-001"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Data de Emissão</label>
+                        <input
+                          type="date"
+                          name="catDataEmissao"
+                          value={formData.catDataEmissao}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Tipo</label>
+                        <select
+                          name="catTipo"
+                          value={formData.catTipo}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none"
+                        >
+                          <option value="">Selecione</option>
+                          <option value="inicial">Inicial</option>
+                          <option value="reabertura">Reabertura</option>
+                          <option value="comunicacao">Comunicação</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">Emitente</label>
+                        <select
+                          name="emitenteCat"
+                          value={formData.emitenteCat}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none"
+                        >
+                          <option value="">Selecione</option>
+                          <option value="empregador">Empregador</option>
+                          <option value="trabalhador">Trabalhador</option>
+                          <option value="sindico">Sindicato</option>
+                          <option value="medico">Médico</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-600 mb-2">CID da Lesão</label>
+                        <input
+                          type="text"
+                          name="cidLesao"
+                          value={formData.cidLesao}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 bg-white border-transparent rounded-2xl focus:ring-2 focus:ring-red-500 outline-none font-mono"
+                          placeholder="Ex: S61.0"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Outros Campos */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
                 <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
@@ -607,17 +759,6 @@ export const NovoAcidente: React.FC = () => {
                 </div>
                 <div className="p-8 space-y-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <label className="flex items-center gap-3 cursor-pointer group p-3 bg-red-50 rounded-xl">
-                      <input
-                        type="checkbox"
-                        name="catNas"
-                        checked={formData.catNas}
-                        onChange={handleChange}
-                        className="w-5 h-5 rounded-lg border-slate-200 text-red-600 focus:ring-red-500"
-                      />
-                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">CAT/NAS?</span>
-                    </label>
-
                     <label className="flex items-center gap-3 cursor-pointer group p-3 bg-blue-50 rounded-xl">
                       <input
                         type="checkbox"

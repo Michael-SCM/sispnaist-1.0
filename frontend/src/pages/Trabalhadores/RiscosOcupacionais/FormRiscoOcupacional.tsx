@@ -14,9 +14,11 @@ import {
   Save,
   Loader2,
   Building2,
-  MapPin
+  MapPin,
+  Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { esocialService } from '../../../services/esocialService.js';
 
 interface FormData {
   empresaId: string;
@@ -31,10 +33,18 @@ interface FormData {
   duracaoExposicao: string;
   epcUtilizado: boolean;
   epcDescricao: string;
+  epcEficaz: string;
   epiUtilizado: boolean;
   epiDescricao: string;
   caEpis: string;
+  epiEficaz: boolean;
   medidasControle: string;
+  tecnicaMedicao: string;
+  resultadoMedicao: string;
+  limiteTolerancia: string;
+  fatorRisco: string;
+  dataInicioExposicao: string;
+  dataFimExposicao: string;
   dataAvaliacao: string;
   avaliador: string;
   ativo: boolean;
@@ -53,10 +63,18 @@ const INITIAL_FORM: FormData = {
   duracaoExposicao: '',
   epcUtilizado: false,
   epcDescricao: '',
+  epcEficaz: '',
   epiUtilizado: false,
   epiDescricao: '',
   caEpis: '',
+  epiEficaz: false,
   medidasControle: '',
+  tecnicaMedicao: '',
+  resultadoMedicao: '',
+  limiteTolerancia: '',
+  fatorRisco: '',
+  dataInicioExposicao: '',
+  dataFimExposicao: '',
   dataAvaliacao: '',
   avaliador: '',
   ativo: true,
@@ -150,10 +168,18 @@ export const FormRiscoOcupacional: React.FC = () => {
           duracaoExposicao: risco.duracaoExposicao || '',
           epcUtilizado: risco.epcUtilizado || false,
           epcDescricao: risco.epcDescricao || '',
+          epcEficaz: risco.epcEficaz || '',
           epiUtilizado: risco.epiUtilizado || false,
           epiDescricao: risco.epiDescricao || '',
           caEpis: (risco.caEpis || []).join(', '),
+          epiEficaz: risco.epiEficaz || false,
           medidasControle: risco.medidasControle || '',
+          tecnicaMedicao: risco.tecnicaMedicao || '',
+          resultadoMedicao: risco.resultadoMedicao || '',
+          limiteTolerancia: risco.limiteTolerancia || '',
+          fatorRisco: risco.fatorRisco || '',
+          dataInicioExposicao: risco.dataInicioExposicao ? risco.dataInicioExposicao.split('T')[0] : '',
+          dataFimExposicao: risco.dataFimExposicao ? risco.dataFimExposicao.split('T')[0] : '',
           dataAvaliacao: risco.dataAvaliacao ? risco.dataAvaliacao.split('T')[0] : '',
           avaliador: risco.avaliador || '',
           ativo: risco.ativo !== false,
@@ -186,6 +212,53 @@ export const FormRiscoOcupacional: React.FC = () => {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
+  const handleConsultarEsocial2240 = async () => {
+    if (!trabalhador?.cpf) {
+      toast.error('Trabalhador sem CPF para consulta no e-Social');
+      return;
+    }
+    try {
+      const dados = await esocialService.buscarPorCpf(trabalhador.cpf);
+      const riscoList = dados.eventos?.s2240;
+      if (!riscoList || riscoList.length === 0) {
+        toast('Nenhum fator de risco encontrado no e-Social para este trabalhador', { icon: 'ℹ️' });
+        return;
+      }
+      const fatores = riscoList.filter(r =>
+        !formData.tipoRisco || r.agente.toLowerCase().includes(formData.tipoRisco.toLowerCase())
+      );
+      if (fatores.length === 0) {
+        toast('Nenhum fator de risco compatível encontrado no e-Social', { icon: 'ℹ️' });
+        return;
+      }
+      const fator = fatores[0];
+      setFormData((prev) => ({
+        ...prev,
+        intensidade: fator.intensidade || prev.intensidade,
+        epcUtilizado: fator.epcUtilizado || prev.epcUtilizado,
+        epcDescricao: fator.epcDescricao || prev.epcDescricao,
+        epcEficaz: typeof fator.epcEficaz === 'boolean' ? (fator.epcEficaz ? 'sim' : 'nao') : (fator.epcEficaz || ''),
+        epiUtilizado: fator.epiUtilizado || prev.epiUtilizado,
+        epiDescricao: fator.epiDescricao || prev.epiDescricao,
+        epiEficaz: fator.epiEficaz || false,
+        tecnicaMedicao: fator.tecnicaMedicao || prev.tecnicaMedicao,
+        resultadoMedicao: fator.resultadoMedicao || prev.resultadoMedicao,
+        limiteTolerancia: fator.limiteTolerancia || prev.limiteTolerancia,
+        fatorRisco: fator.fatorRisco || prev.fatorRisco,
+        frequenciaExposicao: fator.frequenciaExposicao || prev.frequenciaExposicao,
+        duracaoExposicao: fator.duracaoExposicao || prev.duracaoExposicao,
+        medidasControle: fator.medidasAdministrativas || prev.medidasControle,
+      }));
+      toast.success(`Dados do fator "${fator.agente}" carregados do e-Social`);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        toast.error('Trabalhador não encontrado no e-Social');
+      } else {
+        toast.error(error.message || 'Erro ao consultar e-Social');
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validar()) { toast.error('Preencha os campos obrigatórios'); return; }
@@ -204,10 +277,18 @@ export const FormRiscoOcupacional: React.FC = () => {
         duracaoExposicao: formData.duracaoExposicao,
         epcUtilizado: formData.epcUtilizado,
         epcDescricao: formData.epcDescricao,
+        epcEficaz: formData.epcEficaz || undefined,
         epiUtilizado: formData.epiUtilizado,
         epiDescricao: formData.epiDescricao,
         caEpis: formData.caEpis ? formData.caEpis.split(',').map(s => s.trim()).filter(Boolean) : [],
+        epiEficaz: formData.epiEficaz,
         medidasControle: formData.medidasControle,
+        tecnicaMedicao: formData.tecnicaMedicao || undefined,
+        resultadoMedicao: formData.resultadoMedicao || undefined,
+        limiteTolerancia: formData.limiteTolerancia || undefined,
+        fatorRisco: formData.fatorRisco || undefined,
+        dataInicioExposicao: formData.dataInicioExposicao ? new Date(formData.dataInicioExposicao) : undefined,
+        dataFimExposicao: formData.dataFimExposicao ? new Date(formData.dataFimExposicao) : undefined,
         dataAvaliacao: formData.dataAvaliacao ? new Date(formData.dataAvaliacao) : undefined,
         avaliador: formData.avaliador,
         ativo: formData.ativo,
@@ -437,6 +518,88 @@ export const FormRiscoOcupacional: React.FC = () => {
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all resize-none"
                       placeholder="Descreva as medidas de controle implementadas..."
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Dados Técnicos (S-2240 e-Social) */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                  <Building2 size={20} className="text-amber-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados Técnicos (S-2240 e-Social)</h2>
+                  <button
+                    type="button"
+                    onClick={handleConsultarEsocial2240}
+                    className="ml-auto px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                  >
+                    <Search size={14} />
+                    Consultar e-Social
+                  </button>
+                </div>
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Fator de Risco (e-Social)</label>
+                    <select name="fatorRisco" value={formData.fatorRisco} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      <option value="fisico">Físico</option>
+                      <option value="quimico">Químico</option>
+                      <option value="biologico">Biológico</option>
+                      <option value="ergonomico">Ergonômico</option>
+                      <option value="acidente">Acidente</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Técnica de Medição</label>
+                    <input name="tecnicaMedicao" value={formData.tecnicaMedicao} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                      placeholder="Ex: Dosimetria, Análise Ergonômica"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Resultado da Medição</label>
+                    <input name="resultadoMedicao" value={formData.resultadoMedicao} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                      placeholder="Ex: 92,5 dB(A)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Limite de Tolerância</label>
+                    <input name="limiteTolerancia" value={formData.limiteTolerancia} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                      placeholder="Ex: 85 dB(A)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data Início Exposição</label>
+                    <input type="date" name="dataInicioExposicao" value={formData.dataInicioExposicao} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">Data Fim Exposição</label>
+                    <input type="date" name="dataFimExposicao" value={formData.dataFimExposicao} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-600 mb-2">EPC Eficaz?</label>
+                    <select name="epcEficaz" value={formData.epcEficaz} onChange={handleChange}
+                      className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all"
+                    >
+                      <option value="">Selecione...</option>
+                      <option value="sim">Sim</option>
+                      <option value="nao">Não</option>
+                      <option value="parcial">Parcial</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-3 cursor-pointer group h-full pt-6">
+                      <input type="checkbox" name="epiEficaz" checked={formData.epiEficaz} onChange={handleChange}
+                        className="w-5 h-5 rounded-lg border-slate-200 text-amber-600 focus:ring-amber-500 transition-all" />
+                      <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900">EPI Eficaz?</span>
+                    </label>
                   </div>
                 </div>
               </div>

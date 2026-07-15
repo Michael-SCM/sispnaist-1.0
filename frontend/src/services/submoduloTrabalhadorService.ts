@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional } from '../types';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional, ITrabalhadorExameSaude } from '../types';
 
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
@@ -23,6 +23,10 @@ const SUBMODULOS = {
   processosTrabalho: 'processosTrabalho',
   vinculos: 'vinculos',
   historicoPPP: 'historicoPPP'
+} as const;
+
+const SUBMODULOS_CRUD = {
+  examesSaude: 'examesSaude',
 } as const;
 
 export const submoduloTrabalhadorService = {
@@ -307,5 +311,46 @@ export const submoduloTrabalhadorService = {
 
   deletarRiscoOcupacional: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/riscosOcupacionais/${itemId}`);
+  },
+
+  // EXAMES DE SAÚDE (ASO / S-2220)
+  obterExameSaude: async (trabalhadorId: string, itemId: string): Promise<ITrabalhadorExameSaude> => {
+    const response = await api.get<ITrabalhadorExameSaude>(
+      `/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`
+    );
+    return response.data;
+  },
+
+  listarExamesSaude: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorExameSaude[]> => {
+    const key = `examesSaude-${trabalhadorId}-${ativo}`;
+    const cached = getCached<ITrabalhadorExameSaude[]>(key);
+    if (cached) return cached;
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorExameSaude[]>(
+      `/trabalhadores/${trabalhadorId}/examesSaude?${params.toString()}`
+    );
+    setCache(key, response.data);
+    return response.data;
+  },
+
+  criarExameSaude: async (trabalhadorId: string, data: Partial<ITrabalhadorExameSaude>): Promise<ITrabalhadorExameSaude> => {
+    const response = await api.post<ITrabalhadorExameSaude>(
+      `/trabalhadores/${trabalhadorId}/examesSaude`,
+      data
+    );
+    return response.data;
+  },
+
+  atualizarExameSaude: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorExameSaude>): Promise<ITrabalhadorExameSaude> => {
+    const response = await api.put<ITrabalhadorExameSaude>(
+      `/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deletarExameSaude: async (trabalhadorId: string, itemId: string): Promise<void> => {
+    await api.delete(`/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`);
   },
 };

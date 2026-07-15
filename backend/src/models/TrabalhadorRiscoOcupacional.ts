@@ -15,12 +15,20 @@ export interface ITrabalhadorRiscoOcupacional extends Document {
   duracaoExposicao?: string;
   epcUtilizado?: boolean;
   epcDescricao?: string;
+  epcEficaz?: string;
   epiUtilizado?: boolean;
   epiDescricao?: string;
   caEpis?: string[];
+  epiEficaz?: boolean;
   medidasControle?: string;
   dataAvaliacao?: Date;
   avaliador?: string;
+  tecnicaMedicao?: string;
+  resultadoMedicao?: string;
+  limiteTolerancia?: string;
+  fatorRisco?: string;
+  dataInicioExposicao?: Date;
+  dataFimExposicao?: Date;
   ativo: boolean;
   dataCriacao: Date;
   dataAtualizacao: Date;
@@ -42,12 +50,20 @@ const TrabalhadorRiscoOcupacionalSchema = new Schema<ITrabalhadorRiscoOcupaciona
     duracaoExposicao: { type: String, trim: true },
     epcUtilizado: { type: Boolean, default: false },
     epcDescricao: { type: String, trim: true },
+    epcEficaz: { type: String, trim: true },
     epiUtilizado: { type: Boolean, default: false },
     epiDescricao: { type: String, trim: true },
     caEpis: [{ type: String, trim: true }],
+    epiEficaz: { type: Boolean, default: false },
     medidasControle: { type: String, trim: true },
     dataAvaliacao: { type: Date },
     avaliador: { type: String, trim: true },
+    tecnicaMedicao: { type: String, trim: true },
+    resultadoMedicao: { type: String, trim: true },
+    limiteTolerancia: { type: String, trim: true },
+    fatorRisco: { type: String, trim: true },
+    dataInicioExposicao: { type: Date },
+    dataFimExposicao: { type: Date },
     ativo: { type: Boolean, default: true }
   },
   {

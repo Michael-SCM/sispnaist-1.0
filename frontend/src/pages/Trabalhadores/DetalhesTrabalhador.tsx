@@ -271,6 +271,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                   { label: 'Informações Históricas', icon: Stethoscope, path: 'informacoes', color: 'text-teal-400' },
                   { label: 'Histórico Laboral / PPP', icon: FileText, path: 'historico-ppp', color: 'text-blue-400' },
                   { label: 'Riscos Ocupacionais', icon: Shield, path: 'riscos-ocupacionais', color: 'text-amber-400' },
+                  { label: 'Exames de Saúde (ASO)', icon: Stethoscope, path: 'exames-saude', color: 'text-emerald-400' },
                   { label: 'Internações (SIH)', icon: Hospital, path: 'internacoes-sih', color: 'text-green-400' }
                 ].map((item) => (
                   <Link

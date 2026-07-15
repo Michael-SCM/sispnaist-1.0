@@ -160,6 +160,14 @@ export interface IAcidente {
   // CAT/NAS
   catNas?: boolean;
 
+  // e-Social S-2210 (CAT)
+  catNumero?: string;
+  catDataEmissao?: Date;
+  catTipo?: string;
+  emitenteCat?: string;
+  cidLesao?: string;
+  dataObito?: Date;
+
   // Registro Policial
   registroPolicial?: boolean;
 

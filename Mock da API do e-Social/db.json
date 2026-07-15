@@ -1,0 +1,200 @@
+[
+  {
+    "cpf": "12345678900",
+    "cns": "701234567890123",
+    "nome": "João Trabalhador da Silva",
+    "eventos": {
+      "s2210": [
+        {
+          "id": "CAT-2025-001",
+          "dataAcidente": "2025-03-15",
+          "horaAcidente": "14:30",
+          "tipoAcidente": "Típico",
+          "descricao": "Corte na mão durante manuseio de ferramenta manual",
+          "parteAtingida": "Mão esquerda",
+          "agenteCausador": "Faca de corte",
+          "cid": "S61.0",
+          "afastamento": true,
+          "diasAfastamento": 15,
+          "catEmitida": true,
+          "catNumero": "CAT-2025-001",
+          "catDataEmissao": "2025-03-16",
+          "catTipo": "inicial",
+          "emitenteCat": "empregador",
+          "houveObito": false,
+          "localAcidente": "Setor de produção"
+        },
+        {
+          "id": "CAT-2025-002",
+          "dataAcidente": "2025-07-22",
+          "horaAcidente": "09:15",
+          "tipoAcidente": "Doença Ocupacional",
+          "descricao": "Diagnóstico de LER/DORT em punho direito",
+          "parteAtingida": "Punho direito",
+          "agenteCausador": "Movimentos repetitivos",
+          "cid": "M77.1",
+          "afastamento": true,
+          "diasAfastamento": 45,
+          "catEmitida": true,
+          "catNumero": "CAT-2025-002",
+          "catDataEmissao": "2025-07-22",
+          "catTipo": "inicial",
+          "emitenteCat": "medico",
+          "houveObito": false,
+          "localAcidente": "Linha de montagem"
+        }
+      ],
+      "s2220": [
+        {
+          "id": "ASO-2024-001",
+          "tipoExame": "Admissional",
+          "dataExame": "2024-01-10",
+          "dataValidade": "2024-04-10",
+          "medicoNome": "Dr. Carlos Silva",
+          "medicoCRM": "CRM 12345",
+          "medicoUFCrm": "BA",
+          "resultado": "apto",
+          "observacaoMedica": "Trabalhador apto para a função de operador de produção",
+          "examesRealizados": [
+            "Acuidade Visual",
+            "Hemograma Completo",
+            "Eletrocardiograma",
+            "Raio-X de Tórax",
+            "Audiometria",
+            "Espirometria"
+          ],
+          "riscosOcupacionais": ["Ruído", "Movimentos Repetitivos"],
+          "medicoPcmsmoNome": "Dra. Ana Oliveira",
+          "medicoPcmsmoCrm": "CRM 67890"
+        },
+        {
+          "id": "ASO-2024-002",
+          "tipoExame": "Periódico",
+          "dataExame": "2024-07-15",
+          "dataValidade": "2025-01-15",
+          "medicoNome": "Dr. Carlos Silva",
+          "medicoCRM": "CRM 12345",
+          "medicoUFCrm": "BA",
+          "resultado": "apto_com_restricoes",
+          "observacaoMedica": "Apto com restrição para atividades que exijam movimentos repetitivos do punho direito por mais de 4h contínuas",
+          "examesRealizados": [
+            "Hemograma Completo",
+            "Audiometria",
+            "Espirometria",
+            "Exame Oftalmológico"
+          ],
+          "riscosOcupacionais": ["Ruído", "Movimentos Repetitivos"],
+          "medicoPcmsmoNome": "Dra. Ana Oliveira",
+          "medicoPcmsmoCrm": "CRM 67890"
+        }
+      ],
+      "s2240": [
+        {
+          "id": "RISCO-001",
+          "dataInicioExposicao": "2024-01-10",
+          "dataFimExposicao": null,
+          "fatorRisco": "fisico",
+          "agente": "Ruído",
+          "intensidade": "95 dB(A)",
+          "limiteTolerancia": "85 dB(A)",
+          "tecnicaMedicao": "Dosimetria",
+          "resultadoMedicao": "92,5 dB(A)",
+          "frequenciaExposicao": "diaria",
+          "duracaoExposicao": "8 horas",
+          "epcUtilizado": true,
+          "epcDescricao": "Enclausuramento parcial da máquina",
+          "epcEficaz": false,
+          "epiUtilizado": true,
+          "epiDescricao": "Protetor auricular tipo concha",
+          "caEpi": "CA 12345",
+          "epiEficaz": true,
+          "medidasAdministrativas": "Rodízio de funcionários a cada 2 horas"
+        },
+        {
+          "id": "RISCO-002",
+          "dataInicioExposicao": "2024-01-10",
+          "dataFimExposicao": null,
+          "fatorRisco": "ergonomico",
+          "agente": "Movimentos Repetitivos",
+          "intensidade": "alto",
+          "limiteTolerancia": null,
+          "tecnicaMedicao": "Análise Ergonômica",
+          "resultadoMedicao": "Risco alto para LER/DORT",
+          "frequenciaExposicao": "diaria",
+          "duracaoExposicao": "6 horas",
+          "epcUtilizado": true,
+          "epcDescricao": "Bancada ajustável e ferramentas ergonômicas",
+          "epcEficaz": "parcial",
+          "epiUtilizado": false,
+          "epiDescricao": null,
+          "caEpi": null,
+          "epiEficaz": false,
+          "medidasAdministrativas": "Pausas programadas de 10 min a cada 50 min de trabalho"
+        }
+      ]
+    }
+  },
+  {
+    "cpf": "98765432100",
+    "cns": "701234567890456",
+    "nome": "Maria Aparecida de Souza",
+    "eventos": {
+      "s2210": [],
+      "s2220": [
+        {
+          "id": "ASO-2023-001",
+          "tipoExame": "Admissional",
+          "dataExame": "2023-06-01",
+          "dataValidade": "2023-09-01",
+          "medicoNome": "Dr. Roberto Lima",
+          "medicoCRM": "CRM 98765",
+          "medicoUFCrm": "BA",
+          "resultado": "apto",
+          "observacaoMedica": "Apto para função administrativa",
+          "examesRealizados": ["Hemograma", "Glicemia", "Acuidade Visual"],
+          "riscosOcupacionais": ["Postura Inadequada"],
+          "medicoPcmsmoNome": "Dr. Roberto Lima",
+          "medicoPcmsmoCrm": "CRM 98765"
+        },
+        {
+          "id": "ASO-2024-001",
+          "tipoExame": "Periódico",
+          "dataExame": "2024-06-01",
+          "dataValidade": "2025-06-01",
+          "medicoNome": "Dra. Patrícia Mendes",
+          "medicoCRM": "CRM 54321",
+          "medicoUFCrm": "BA",
+          "resultado": "apto",
+          "observacaoMedica": "Apto, manter acompanhamento ergonômico",
+          "examesRealizados": ["Hemograma", "Glicemia", "Acuidade Visual", "Avaliação Postural"],
+          "riscosOcupacionais": ["Postura Inadequada", "Trabalho Sentado"],
+          "medicoPcmsmoNome": "Dra. Patrícia Mendes",
+          "medicoPcmsmoCrm": "CRM 54321"
+        }
+      ],
+      "s2240": [
+        {
+          "id": "RISCO-003",
+          "dataInicioExposicao": "2023-06-01",
+          "dataFimExposicao": null,
+          "fatorRisco": "ergonomico",
+          "agente": "Postura Inadequada",
+          "intensidade": "medio",
+          "limiteTolerancia": null,
+          "tecnicaMedicao": "Análise Ergonômica",
+          "resultadoMedicao": "Risco médio para distúrbios osteomusculares",
+          "frequenciaExposicao": "diaria",
+          "duracaoExposicao": "8 horas",
+          "epcUtilizado": true,
+          "epcDescricao": "Cadeira ergonômica e mesa ajustável",
+          "epcEficaz": true,
+          "epiUtilizado": false,
+          "epiDescricao": null,
+          "caEpi": null,
+          "epiEficaz": false,
+          "medidasAdministrativas": "Ginástica laboral 2x por semana"
+        }
+      ]
+    }
+  }
+]

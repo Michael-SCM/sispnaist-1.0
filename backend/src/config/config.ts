@@ -44,6 +44,7 @@ const config = {
   msCadsusApiUrl: process.env.MS_CADSUS_API_URL || '',
   msSihApiUrl: process.env.MS_SIH_API_URL || '',
   msCnesApiUrl: process.env.MS_CNES_API_URL || '',
+  msEsocialApiUrl: process.env.MS_ESOCIAL_API_URL || '',
 };
 
 export default config;

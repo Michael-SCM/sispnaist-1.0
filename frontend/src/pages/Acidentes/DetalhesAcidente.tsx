@@ -266,8 +266,58 @@ export const DetalhesAcidente: React.FC = () => {
               </div>
             )}
 
+            {/* Dados da CAT / e-Social (S-2210) */}
+            {acidente.catNas && (
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+                <div className="px-8 py-5 bg-red-50 border-b border-red-100 flex items-center gap-2">
+                  <ShieldAlert size={20} className="text-red-600" />
+                  <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da CAT / e-Social (S-2210)</h2>
+                </div>
+                <div className="p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {acidente.catNumero && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Número da CAT</p>
+                        <p className="font-bold text-slate-700">{acidente.catNumero}</p>
+                      </div>
+                    )}
+                    {acidente.catDataEmissao && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Emissão</p>
+                        <p className="font-bold text-slate-700">{new Date(acidente.catDataEmissao).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                    )}
+                    {acidente.catTipo && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo</p>
+                        <p className="font-bold text-slate-700 capitalize">{acidente.catTipo}</p>
+                      </div>
+                    )}
+                    {acidente.emitenteCat && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Emitente</p>
+                        <p className="font-bold text-slate-700 capitalize">{acidente.emitenteCat}</p>
+                      </div>
+                    )}
+                    {acidente.cidLesao && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">CID da Lesão</p>
+                        <p className="font-bold text-slate-700 font-mono">{acidente.cidLesao}</p>
+                      </div>
+                    )}
+                    {acidente.dataObito && (
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data do Óbito</p>
+                        <p className="font-bold text-red-600">{new Date(acidente.dataObito).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Informações Adicionais */}
-            {(acidente.catNas || acidente.registroPolicial || acidente.encaminhamentoJuntaMedica || acidente.afastamento || acidente.outrosTrabalhadoresAtingidos) && (
+            {(acidente.registroPolicial || acidente.encaminhamentoJuntaMedica || acidente.afastamento || acidente.outrosTrabalhadoresAtingidos) && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
                 <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <ShieldAlert size={20} className="text-amber-600" />
@@ -275,9 +325,6 @@ export const DetalhesAcidente: React.FC = () => {
                 </div>
                 <div className="p-8">
                   <div className="flex flex-wrap gap-3">
-                    {acidente.catNas && (
-                      <span className="px-4 py-2 bg-red-50 text-red-700 rounded-xl text-sm font-bold border border-red-100">CAT/NAS</span>
-                    )}
                     {acidente.registroPolicial && (
                       <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">Registro Policial</span>
                     )}

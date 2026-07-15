@@ -192,7 +192,7 @@ Cada requisito foi classificado como:
 |---|-----------|--------|-------------------|
 | 62 | **Integração com CADSUS** | ✅ | Mock API REST (https://mock-da-api-do-cadsus.onrender.com) integrada via adapter, consulta por CNS na ficha do trabalhador com dados demográficos e endereço |
 | 63 | **Integração com CNES** | ✅ | Mock API REST (https://mock-da-api-do-cnes.onrender.com) integrada via adapter, consulta por código CNES no modal de detalhes do SIH com dados completos do estabelecimento (endereço, leitos, serviços, contato) |
-| 64 | **Integração com e-Social** | ❌ | idem |
+| 64 | **Integração com e-Social** | ✅ | Mock API REST integrada via adapter, consulta por CPF com dados dos eventos S-2210 (CAT no módulo Acidentes), S-2220 (ASO no submódulo Exames de Saúde do trabalhador) e S-2240 (fatores de risco no módulo Riscos Ocupacionais) |
 | 65 | **Integração com SINAN** | ❌ | idem |
 | 66 | **APIs padronizadas para terceiros** | ❌ | Sem OpenAPI/Swagger, sem webhooks |
 

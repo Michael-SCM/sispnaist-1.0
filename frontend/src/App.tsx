@@ -77,6 +77,9 @@ const ListaRiscosOcupacionais = React.lazy(() => import('./pages/Trabalhadores/R
 const FormRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/FormRiscoOcupacional.js'));
 const DetalhesRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/DetalhesRiscoOcupacional.js'));
 const InternacoesSih = React.lazy(() => import('./pages/Trabalhadores/InternacoesSih.js'));
+const ListaExamesSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/ListaExamesSaude.js'));
+const FormExameSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/FormExameSaude.js'));
+const DetalhesExameSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/DetalhesExameSaude.js'));
 const DetalhesAfastamento = React.lazy(() => import('./pages/Trabalhadores/Afastamentos/DetalhesAfastamento.js'));
 const DetalhesDependente = React.lazy(() => import('./pages/Trabalhadores/Dependentes/DetalhesDependente.js'));
 const DetalhesOcorrenciaViolencia = React.lazy(() => import('./pages/Trabalhadores/OcorrenciasViolencia/DetalhesOcorrenciaViolencia.js'));
@@ -629,6 +632,38 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <InternacoesSih />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/exames-saude"
+          element={
+            <ProtectedRoute>
+              <ListaExamesSaude />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/exames-saude/novo"
+          element={
+            <ProtectedRoute>
+              <FormExameSaude />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/exames-saude/:exameId/editar"
+          element={
+            <ProtectedRoute>
+              <FormExameSaude />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/exames-saude/:exameId"
+          element={
+            <ProtectedRoute>
+              <DetalhesExameSaude />
             </ProtectedRoute>
           }
         />

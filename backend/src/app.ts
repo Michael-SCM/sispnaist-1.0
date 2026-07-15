@@ -41,6 +41,7 @@ import habilitacaoPnaistRoutes from './routes/habilitacaoPnaist.js';
 import cadsusRoutes from './routes/cadsus.js';
 import sihRoutes from './routes/sih.js';
 import cnesRoutes from './routes/cnes.js';
+import esocialRoutes from './routes/esocial.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
@@ -299,6 +300,7 @@ app.use('/api/public/reports', publicReportsRoutes);
 app.use('/api/integracao/cadsus', cadsusRoutes);
 app.use('/api/integracao/sih', sihRoutes);
 app.use('/api/integracao/cnes', cnesRoutes);
+app.use('/api/integracao/esocial', esocialRoutes);
 
 // 404 handler
 app.use(notFoundHandler);

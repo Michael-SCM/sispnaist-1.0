@@ -72,6 +72,20 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
     // CAT/NAS
     catNas: Boolean,
 
+    // e-Social S-2210 (CAT)
+    catNumero: { type: String, trim: true },
+    catDataEmissao: { type: Date },
+    catTipo: {
+      type: String,
+      enum: ['inicial', 'reabertura', 'comunicacao'],
+    },
+    emitenteCat: {
+      type: String,
+      enum: ['empregador', 'trabalhador', 'sindico', 'medico'],
+    },
+    cidLesao: { type: String, trim: true },
+    dataObito: { type: Date },
+
     // Registro Policial
     registroPolicial: Boolean,
 
