@@ -25,8 +25,10 @@ import {
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
 import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
-import { esocialService } from '../../services/esocialService.js';
+import { esocialService, EsocialS2210 } from '../../services/esocialService.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
+import { ModalSelecaoESocial } from '../../components/ModalSelecaoESocial.js';
+import { filtrarUltimos30Dias } from '../../utils/filtrarUltimos30Dias.js';
 
 
 interface FormData {
@@ -86,6 +88,8 @@ export const EditarAcidente: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [trabalhadorNome, setTrabalhadorNome] = useState<string | null>(null);
   const [novaLesao, setNovaLesao] = useState('');
+  const [modalItens, setModalItens] = useState<EsocialS2210[]>([]);
+  const [modalAberto, setModalAberto] = useState(false);
 
   // Catálogos
   const { itens: tiposTrauma } = useCatalogo('tipoTrauma');
@@ -290,6 +294,19 @@ export const EditarAcidente: React.FC = () => {
     }
   };
 
+  const aplicarCat = (cat: EsocialS2210) => {
+    setFormData((prev) => prev ? {
+      ...prev,
+      catNas: true,
+      catNumero: cat.catNumero || '',
+      catDataEmissao: cat.catDataEmissao ? cat.catDataEmissao.split('T')[0] : '',
+      catTipo: cat.catTipo || '',
+      emitenteCat: cat.emitenteCat || '',
+      cidLesao: cat.cid || '',
+    } : null);
+    toast.success(`Dados da CAT ${cat.catNumero} carregados do e-Social`);
+  };
+
   const handleConsultarEsocial = async () => {
     if (!formData) return;
     const cpf = formData.trabalhadorId.replace(/\D/g, '');
@@ -304,17 +321,17 @@ export const EditarAcidente: React.FC = () => {
         toast('Nenhuma CAT encontrada no e-Social para este trabalhador', { icon: 'ℹ️' });
         return;
       }
-      const cat = catList.sort((a, b) => new Date(b.dataAcidente).getTime() - new Date(a.dataAcidente).getTime())[0];
-      setFormData((prev) => prev ? {
-        ...prev,
-        catNas: true,
-        catNumero: cat.catNumero || '',
-        catDataEmissao: cat.catDataEmissao ? cat.catDataEmissao.split('T')[0] : '',
-        catTipo: cat.catTipo || '',
-        emitenteCat: cat.emitenteCat || '',
-        cidLesao: cat.cid || '',
-      } : null);
-      toast.success(`Dados da CAT ${cat.catNumero} carregados do e-Social`);
+      const recentes = filtrarUltimos30Dias(catList, 'dataAcidente');
+      if (recentes.length === 0) {
+        toast('Nenhuma CAT nos últimos 30 dias encontrada no e-Social', { icon: 'ℹ️' });
+        return;
+      }
+      if (recentes.length === 1) {
+        aplicarCat(recentes[0]);
+        return;
+      }
+      setModalItens(recentes);
+      setModalAberto(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
         toast.error('Trabalhador não encontrado no e-Social');
@@ -948,6 +965,27 @@ export const EditarAcidente: React.FC = () => {
           </div>
         </form>
       </div>
+
+      <ModalSelecaoESocial
+        isOpen={modalAberto}
+        onClose={() => setModalAberto(false)}
+        titulo="Selecionar CAT (S-2210)"
+        itens={modalItens}
+        onSelecionar={(cat) => { aplicarCat(cat); setModalAberto(false); }}
+        renderItem={(cat) => (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-800">{cat.catNumero || cat.id}</span>
+              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg">{cat.tipoAcidente}</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              <span>{new Date(cat.dataAcidente).toLocaleDateString('pt-BR')}</span>
+              <span className="font-mono">{cat.cid}</span>
+              <span>{cat.diasAfastamento ? `${cat.diasAfastamento} dias afast.` : 'Sem afastamento'}</span>
+            </div>
+          </div>
+        )}
+      />
     </MainLayout>
   );
 };

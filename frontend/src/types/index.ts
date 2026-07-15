@@ -52,6 +52,23 @@ export interface ITrabalhadorExameSaude {
   dataAtualizacao?: string;
 }
 
+export interface ITrabalhadorInternacao {
+  _id?: string;
+  trabalhadorId: string;
+  numeroAih: string;
+  cnesHospital?: string;
+  nomeHospital?: string;
+  dataInternacao: string;
+  dataAlta?: string;
+  cidPrincipal?: string;
+  descricaoCid?: string;
+  caraterAtendimento?: string;
+  valorTotalAih?: number;
+  ativo?: boolean;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+}
+
 export interface IAvaliacaoItem {
   presente: boolean;
   observacao?: string;

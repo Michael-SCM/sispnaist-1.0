@@ -18,7 +18,9 @@ import {
   Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { esocialService } from '../../../services/esocialService.js';
+import { esocialService, EsocialS2240 } from '../../../services/esocialService.js';
+import { ModalSelecaoESocial } from '../../../components/ModalSelecaoESocial.js';
+import { filtrarUltimos30Dias } from '../../../utils/filtrarUltimos30Dias.js';
 
 interface FormData {
   empresaId: string;
@@ -91,6 +93,8 @@ export const FormRiscoOcupacional: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+  const [modalItens, setModalItens] = useState<EsocialS2240[]>([]);
+  const [modalAberto, setModalAberto] = useState(false);
 
   const { itens: tiposRisco } = useCatalogo('tipoRisco');
   const { itens: agentes } = useCatalogo('agente');
@@ -209,6 +213,27 @@ export const FormRiscoOcupacional: React.FC = () => {
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
+  const aplicarRisco = (fator: EsocialS2240) => {
+    setFormData((prev) => ({
+      ...prev,
+      intensidade: fator.intensidade || prev.intensidade,
+      epcUtilizado: fator.epcUtilizado || prev.epcUtilizado,
+      epcDescricao: fator.epcDescricao || prev.epcDescricao,
+      epcEficaz: typeof fator.epcEficaz === 'boolean' ? (fator.epcEficaz ? 'sim' : 'nao') : (fator.epcEficaz || ''),
+      epiUtilizado: fator.epiUtilizado || prev.epiUtilizado,
+      epiDescricao: fator.epiDescricao || prev.epiDescricao,
+      epiEficaz: fator.epiEficaz || false,
+      tecnicaMedicao: fator.tecnicaMedicao || prev.tecnicaMedicao,
+      resultadoMedicao: fator.resultadoMedicao || prev.resultadoMedicao,
+      limiteTolerancia: fator.limiteTolerancia || prev.limiteTolerancia,
+      categoria: fator.fatorRisco || prev.categoria,
+      frequenciaExposicao: fator.frequenciaExposicao || prev.frequenciaExposicao,
+      duracaoExposicao: fator.duracaoExposicao || prev.duracaoExposicao,
+      medidasControle: fator.medidasAdministrativas || prev.medidasControle,
+    }));
+    toast.success(`Dados do fator "${fator.agente}" carregados do e-Social`);
+  };
+
   const handleConsultarEsocial2240 = async () => {
     if (!trabalhador?.cpf) {
       toast.error('Trabalhador sem CPF para consulta no e-Social');
@@ -221,32 +246,17 @@ export const FormRiscoOcupacional: React.FC = () => {
         toast('Nenhum fator de risco encontrado no e-Social para este trabalhador', { icon: 'ℹ️' });
         return;
       }
-      const fatores = riscoList.filter(r =>
-        !formData.tipoRisco || r.agente.toLowerCase().includes(formData.tipoRisco.toLowerCase())
-      );
-      if (fatores.length === 0) {
-        toast('Nenhum fator de risco compatível encontrado no e-Social', { icon: 'ℹ️' });
+      const recentes = filtrarUltimos30Dias(riscoList, 'dataInicioExposicao');
+      if (recentes.length === 0) {
+        toast('Nenhum fator de risco nos últimos 30 dias encontrado no e-Social', { icon: 'ℹ️' });
         return;
       }
-      const fator = fatores[0];
-      setFormData((prev) => ({
-        ...prev,
-        intensidade: fator.intensidade || prev.intensidade,
-        epcUtilizado: fator.epcUtilizado || prev.epcUtilizado,
-        epcDescricao: fator.epcDescricao || prev.epcDescricao,
-        epcEficaz: typeof fator.epcEficaz === 'boolean' ? (fator.epcEficaz ? 'sim' : 'nao') : (fator.epcEficaz || ''),
-        epiUtilizado: fator.epiUtilizado || prev.epiUtilizado,
-        epiDescricao: fator.epiDescricao || prev.epiDescricao,
-        epiEficaz: fator.epiEficaz || false,
-        tecnicaMedicao: fator.tecnicaMedicao || prev.tecnicaMedicao,
-        resultadoMedicao: fator.resultadoMedicao || prev.resultadoMedicao,
-        limiteTolerancia: fator.limiteTolerancia || prev.limiteTolerancia,
-        categoria: fator.fatorRisco || prev.categoria,
-        frequenciaExposicao: fator.frequenciaExposicao || prev.frequenciaExposicao,
-        duracaoExposicao: fator.duracaoExposicao || prev.duracaoExposicao,
-        medidasControle: fator.medidasAdministrativas || prev.medidasControle,
-      }));
-      toast.success(`Dados do fator "${fator.agente}" carregados do e-Social`);
+      if (recentes.length === 1) {
+        aplicarRisco(recentes[0]);
+        return;
+      }
+      setModalItens(recentes);
+      setModalAberto(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
         toast.error('Trabalhador não encontrado no e-Social');
@@ -649,6 +659,26 @@ export const FormRiscoOcupacional: React.FC = () => {
           </div>
         </form>
       </div>
+
+      <ModalSelecaoESocial
+        isOpen={modalAberto}
+        onClose={() => setModalAberto(false)}
+        titulo="Selecionar Fator de Risco (S-2240)"
+        itens={modalItens}
+        onSelecionar={(fator) => { aplicarRisco(fator); setModalAberto(false); }}
+        renderItem={(fator) => (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-800">{fator.agente}</span>
+              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg">{fator.fatorRisco}</span>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              {fator.dataInicioExposicao && <span>Início: {new Date(fator.dataInicioExposicao).toLocaleDateString('pt-BR')}</span>}
+              <span>{fator.intensidade}</span>
+            </div>
+          </div>
+        )}
+      />
     </MainLayout>
   );
 };

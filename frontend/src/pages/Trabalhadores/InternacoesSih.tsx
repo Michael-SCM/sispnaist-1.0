@@ -5,7 +5,10 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { sihService, DadosSih, Internacao } from '../../services/sihService.js';
 import { cnesService, DadosCnes } from '../../services/cnesService.js';
-import { ITrabalhador } from '../../types/index.js';
+import { submoduloTrabalhadorService } from '../../services/submoduloTrabalhadorService.js';
+import { ITrabalhador, ITrabalhadorInternacao } from '../../types/index.js';
+import { ModalSelecaoESocial } from '../../components/ModalSelecaoESocial.js';
+import { filtrarUltimos30Dias } from '../../utils/filtrarUltimos30Dias.js';
 import {
   ArrowLeft,
   Search,
@@ -24,6 +27,8 @@ import {
   Stethoscope,
   Tag,
   CreditCard,
+  CheckCircle2,
+  Download,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -36,6 +41,12 @@ export const InternacoesSih: React.FC = () => {
   const [internacaoModal, setInternacaoModal] = useState<Internacao | null>(null);
   const [dadosCnesPorInternacao, setDadosCnesPorInternacao] = useState<Record<string, DadosCnes>>({});
   const [cnesLoading, setCnesLoading] = useState<string | null>(null);
+  const [filtro30Dias, setFiltro30Dias] = useState(true);
+  const [importando, setImportando] = useState<string | null>(null);
+  const [internacoesImportadas, setInternacoesImportadas] = useState<Set<string>>(new Set());
+  const [modalImportarItens, setModalImportarItens] = useState<Internacao[]>([]);
+  const [modalImportarAberto, setModalImportarAberto] = useState(false);
+  const [carregandoImportadas, setCarregandoImportadas] = useState(true);
 
   useEffect(() => {
     const carregar = async () => {
@@ -49,6 +60,30 @@ export const InternacoesSih: React.FC = () => {
     };
     carregar();
   }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      carregarImportadas();
+    }
+  }, [id]);
+
+  const carregarImportadas = async () => {
+    if (!id) return;
+    try {
+      setCarregandoImportadas(true);
+      const lista = await submoduloTrabalhadorService.listarInternacoes(id, undefined);
+      setInternacoesImportadas(new Set(lista.map((i: ITrabalhadorInternacao) => i.numeroAih)));
+    } catch {
+    } finally {
+      setCarregandoImportadas(false);
+    }
+  };
+
+  useEffect(() => {
+    if (trabalhador?.cartaoSus && !jaConsultou && !consultando) {
+      handleConsultar();
+    }
+  }, [trabalhador]);
 
   const handleConsultar = async () => {
     const cns = (trabalhador?.cartaoSus || '').replace(/\D/g, '');
@@ -65,7 +100,12 @@ export const InternacoesSih: React.FC = () => {
       if (dados.internacoes.length === 0) {
         toast('Nenhuma internação registrada para este CNS no SIH');
       } else {
-        toast.success(`${dados.internacoes.length} internação(ões) encontrada(s)!`);
+        const recentes = filtrarUltimos30Dias(dados.internacoes, 'dataInternacao');
+        if (recentes.length === 0) {
+          toast(`${dados.internacoes.length} internação(ões) encontrada(s), nenhuma nos últimos 30 dias`);
+        } else {
+          toast.success(`${recentes.length} internação(ões) nos últimos 30 dias`);
+        }
       }
     } catch (error: any) {
       setDadosSih(null);
@@ -80,22 +120,58 @@ export const InternacoesSih: React.FC = () => {
     }
   };
 
-  const handleConsultarCnes = async (cnes: string) => {
-    if (dadosCnesPorInternacao[cnes]) return;
+  const aplicarImportacao = async (int: Internacao) => {
+    if (!id) return;
+    setImportando(int.numeroAih);
+    try {
+      await submoduloTrabalhadorService.criarInternacao(id, {
+        numeroAih: int.numeroAih,
+        cnesHospital: int.cnesHospital,
+        nomeHospital: int.nomeHospital,
+        dataInternacao: int.dataInternacao,
+        dataAlta: int.dataAlta,
+        cidPrincipal: int.cidPrincipal,
+        descricaoCid: int.descricaoCid,
+        caraterAtendimento: int.caraterAtendimento,
+        valorTotalAih: int.valorTotalAih,
+      });
+      setInternacoesImportadas(prev => new Set(prev).add(int.numeroAih));
+      toast.success(`Internação ${int.numeroAih} importada com sucesso!`);
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao importar internação');
+    } finally {
+      setImportando(null);
+    }
+  };
 
+  const handleImportarClick = async (int: Internacao) => {
+    if (internacoesImportadas.has(int.numeroAih)) return;
+    aplicarImportacao(int);
+  };
+
+  useEffect(() => {
+    if (internacaoModal?.cnesHospital) {
+      const cnes = internacaoModal.cnesHospital;
+      if (!dadosCnesPorInternacao[cnes]) {
+        consultarCnesAuto(cnes);
+      }
+    }
+  }, [internacaoModal]);
+
+  const consultarCnesAuto = async (cnes: string) => {
     setCnesLoading(cnes);
     try {
       const dados = await cnesService.buscarPorCodigo(cnes);
       setDadosCnesPorInternacao((prev) => ({ ...prev, [cnes]: dados }));
-    } catch (error: any) {
-      const msg = (error.message || '').toLowerCase();
-      if (!msg.includes('não encontrado')) {
-        toast.error('Não foi possível consultar o CNES');
-      }
+    } catch {
     } finally {
       setCnesLoading(null);
     }
   };
+
+  const internacoesFiltradas = dadosSih && filtro30Dias
+    ? filtrarUltimos30Dias(dadosSih.internacoes, 'dataInternacao')
+    : dadosSih?.internacoes || [];
 
   const formatarData = (dataStr: string) => {
     const d = new Date(dataStr);
@@ -179,11 +255,25 @@ export const InternacoesSih: React.FC = () => {
 
         {dadosSih && dadosSih.internacoes.length > 0 && (
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-            <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+            <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2 flex-wrap">
               <Hospital size={20} className="text-blue-600" />
               <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">
-                Internações Encontradas ({dadosSih.internacoes.length})
+                Internações Encontradas
               </h2>
+              <span className="text-xs font-bold text-slate-400">
+                ({internacoesFiltradas.length} de {dadosSih.internacoes.length})
+              </span>
+              <button
+                type="button"
+                onClick={() => setFiltro30Dias(!filtro30Dias)}
+                className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  filtro30Dias
+                    ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                }`}
+              >
+                {filtro30Dias ? 'Últimos 30 dias' : 'Todas'}
+              </button>
             </div>
 
             <div className="overflow-x-auto">
@@ -197,59 +287,87 @@ export const InternacoesSih: React.FC = () => {
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">CID</th>
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Caráter</th>
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider text-right">Valor</th>
+                    <th className="px-4 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider text-center w-14">Imp.</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {dadosSih.internacoes.map((int, idx) => (
-                    <tr
-                      key={idx}
-                      className="hover:bg-blue-50/50 transition-colors cursor-pointer"
-                      onClick={() => setInternacaoModal(int)}
-                      tabIndex={0}
-                      role="button"
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setInternacaoModal(int); } }}
-                    >
-                      <td className="px-6 py-4 font-mono text-sm font-bold text-slate-700">{int.numeroAih}</td>
-                      <td className="px-6 py-4">
-                        <p className="font-bold text-slate-700">{int.nomeHospital}</p>
-                        <p className="text-xs text-slate-400">CNES: {int.cnesHospital}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={14} className="text-slate-400" />
-                          <span className="font-medium text-slate-600">{formatarData(int.dataInternacao)}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={14} className="text-slate-400" />
-                          <span className="font-medium text-slate-600">{formatarData(int.dataAlta)}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5">
-                          <FileText size={14} className="text-slate-400" />
-                          <div>
-                            <p className="font-bold text-slate-700">{int.cidPrincipal}</p>
-                            <p className="text-xs text-slate-400 max-w-[200px] truncate" title={int.descricaoCid}>
-                              {int.descricaoCid}
-                            </p>
+                  {internacoesFiltradas.map((int, idx) => {
+                    const jaImportada = internacoesImportadas.has(int.numeroAih);
+                    return (
+                      <tr
+                        key={idx}
+                        className="hover:bg-blue-50/50 transition-colors cursor-pointer"
+                        onClick={() => setInternacaoModal(int)}
+                        tabIndex={0}
+                        role="button"
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setInternacaoModal(int); } }}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {jaImportada && <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />}
+                            <span className="font-mono text-sm font-bold text-slate-700">{int.numeroAih}</span>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${caraterBadge(int.caraterAtendimento)}`}>
-                          {int.caraterAtendimento}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <DollarSign size={14} className="text-green-500" />
-                          <span className="font-bold text-green-600">{formatarValor(int.valorTotalAih)}</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-slate-700">{int.nomeHospital}</p>
+                          <p className="text-xs text-slate-400">CNES: {int.cnesHospital}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar size={14} className="text-slate-400" />
+                            <span className="font-medium text-slate-600">{formatarData(int.dataInternacao)}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar size={14} className="text-slate-400" />
+                            <span className="font-medium text-slate-600">{formatarData(int.dataAlta)}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5">
+                            <FileText size={14} className="text-slate-400" />
+                            <div>
+                              <p className="font-bold text-slate-700">{int.cidPrincipal}</p>
+                              <p className="text-xs text-slate-400 max-w-[200px] truncate" title={int.descricaoCid}>
+                                {int.descricaoCid}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${caraterBadge(int.caraterAtendimento)}`}>
+                            {int.caraterAtendimento}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <DollarSign size={14} className="text-green-500" />
+                            <span className="font-bold text-green-600">{formatarValor(int.valorTotalAih)}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleImportarClick(int); }}
+                            disabled={jaImportada || importando === int.numeroAih}
+                            className={`p-2 rounded-xl transition-all ${
+                              jaImportada
+                                ? 'bg-emerald-50 text-emerald-500 cursor-not-allowed'
+                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-90'
+                            }`}
+                            title={jaImportada ? 'Já importada' : 'Importar internação'}
+                          >
+                            {importando === int.numeroAih ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Download size={16} />
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -317,19 +435,12 @@ export const InternacoesSih: React.FC = () => {
               <div className="bg-slate-50/50 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Hospital</h3>
-                  <button
-                    type="button"
-                    onClick={() => handleConsultarCnes(internacaoModal.cnesHospital)}
-                    disabled={cnesLoading === internacaoModal.cnesHospital || !!dadosCnesPorInternacao[internacaoModal.cnesHospital]}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all"
-                  >
-                    {cnesLoading === internacaoModal.cnesHospital ? (
+                  {cnesLoading === internacaoModal.cnesHospital && (
+                    <span className="flex items-center gap-1.5 text-xs text-slate-400">
                       <Loader2 size={12} className="animate-spin" />
-                    ) : (
-                      <Building2 size={12} />
-                    )}
-                    {dadosCnesPorInternacao[internacaoModal.cnesHospital] ? 'Consultado' : 'Consultar CNES'}
-                  </button>
+                      Consultando CNES...
+                    </span>
+                  )}
                 </div>
 
                 {dadosCnesPorInternacao[internacaoModal.cnesHospital] ? (
@@ -534,6 +645,31 @@ export const InternacoesSih: React.FC = () => {
           </div>
         </div>
       )}
+
+      <ModalSelecaoESocial
+        isOpen={modalImportarAberto}
+        onClose={() => setModalImportarAberto(false)}
+        titulo="Selecionar Internação para Importar"
+        itens={modalImportarItens}
+        onSelecionar={(int) => { setModalImportarAberto(false); aplicarImportacao(int); }}
+        renderItem={(int) => (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-800">{int.numeroAih}</span>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
+                int.caraterAtendimento === 'Urgência' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
+              }`}>
+                {int.caraterAtendimento}
+              </span>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              <span>{int.nomeHospital}</span>
+              <span>{new Date(int.dataInternacao).toLocaleDateString('pt-BR')}</span>
+              <span className="font-mono">{int.cidPrincipal}</span>
+            </div>
+          </div>
+        )}
+      />
     </MainLayout>
   );
 };

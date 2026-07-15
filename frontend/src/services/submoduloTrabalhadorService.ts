@@ -1,5 +1,5 @@
 import api from './api.js';
-import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional, ITrabalhadorExameSaude } from '../types';
+import { ITrabalhadorDependente, ITrabalhadorAfastamento, ITrabalhadorVinculo, ITrabalhadorOcorrenciaViolencia, ITrabalhadorReadaptacao, ITrabalhadorProcessoTrabalho, ITrabalhadorHistoricoPPP, ITrabalhadorRiscoOcupacional, ITrabalhadorExameSaude, ITrabalhadorInternacao } from '../types';
 
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
@@ -27,6 +27,7 @@ const SUBMODULOS = {
 
 const SUBMODULOS_CRUD = {
   examesSaude: 'examesSaude',
+  internacoes: 'internacoes',
 } as const;
 
 export const submoduloTrabalhadorService = {
@@ -352,5 +353,42 @@ export const submoduloTrabalhadorService = {
 
   deletarExameSaude: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`);
+  },
+
+  // INTERNAÇÕES (SIH)
+  obterInternacao: async (trabalhadorId: string, itemId: string): Promise<ITrabalhadorInternacao> => {
+    const response = await api.get<ITrabalhadorInternacao>(
+      `/trabalhadores/${trabalhadorId}/internacoes/${itemId}`
+    );
+    return response.data;
+  },
+
+  listarInternacoes: async (trabalhadorId: string, ativo?: boolean): Promise<ITrabalhadorInternacao[]> => {
+    const params = new URLSearchParams();
+    if (ativo !== undefined) params.append('ativo', ativo.toString());
+    const response = await api.get<ITrabalhadorInternacao[]>(
+      `/trabalhadores/${trabalhadorId}/internacoes?${params.toString()}`
+    );
+    return response.data;
+  },
+
+  criarInternacao: async (trabalhadorId: string, data: Partial<ITrabalhadorInternacao>): Promise<ITrabalhadorInternacao> => {
+    const response = await api.post<ITrabalhadorInternacao>(
+      `/trabalhadores/${trabalhadorId}/internacoes`,
+      data
+    );
+    return response.data;
+  },
+
+  atualizarInternacao: async (trabalhadorId: string, itemId: string, data: Partial<ITrabalhadorInternacao>): Promise<ITrabalhadorInternacao> => {
+    const response = await api.put<ITrabalhadorInternacao>(
+      `/trabalhadores/${trabalhadorId}/internacoes/${itemId}`,
+      data
+    );
+    return response.data;
+  },
+
+  deletarInternacao: async (trabalhadorId: string, itemId: string): Promise<void> => {
+    await api.delete(`/trabalhadores/${trabalhadorId}/internacoes/${itemId}`);
   },
 };

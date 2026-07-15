@@ -4,8 +4,10 @@ import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
-import { esocialService } from '../../../services/esocialService.js';
+import { esocialService, EsocialS2220 } from '../../../services/esocialService.js';
 import { ITrabalhadorExameSaude, ITrabalhador } from '../../../types/index.js';
+import { ModalSelecaoESocial } from '../../../components/ModalSelecaoESocial.js';
+import { filtrarUltimos30Dias } from '../../../utils/filtrarUltimos30Dias.js';
 import {
   Stethoscope, ArrowLeft, Save, Loader2, Search
 } from 'lucide-react';
@@ -55,6 +57,8 @@ export const FormExameSaude: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isCarregando, setIsCarregando] = useState(isEdicao);
+  const [modalItens, setModalItens] = useState<EsocialS2220[]>([]);
+  const [modalAberto, setModalAberto] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -104,6 +108,26 @@ export const FormExameSaude: React.FC = () => {
     }
   };
 
+  const aplicarAso = (aso: EsocialS2220) => {
+    setFormData((prev) => ({
+      ...prev,
+      numeroAso: aso.id || '',
+      dataAso: aso.dataExame ? aso.dataExame.split('T')[0] : '',
+      dataValidadeAso: aso.dataValidade ? aso.dataValidade.split('T')[0] : '',
+      tipoAso: aso.tipoExame?.toLowerCase() || '',
+      medicoNome: aso.medicoNome || '',
+      medicoCRM: aso.medicoCRM || '',
+      medicoUFCrm: aso.medicoUFCrm || '',
+      resultado: aso.resultado || '',
+      observacaoMedica: aso.observacaoMedica || '',
+      examesRealizados: (aso.examesRealizados || []).join(', '),
+      riscosOcupacionais: (aso.riscosOcupacionais || []).join(', '),
+      medicoPcmsmoNome: aso.medicoPcmsmoNome || '',
+      medicoPcmsmoCrm: aso.medicoPcmsmoCrm || '',
+    }));
+    toast.success(`Dados do ASO ${aso.id} carregados do e-Social`);
+  };
+
   const handleConsultarEsocial2220 = async () => {
     if (!trabalhador?.cpf) {
       toast.error('Trabalhador sem CPF para consulta no e-Social');
@@ -116,24 +140,17 @@ export const FormExameSaude: React.FC = () => {
         toast('Nenhum ASO encontrado no e-Social para este trabalhador', { icon: 'ℹ️' });
         return;
       }
-      const aso = asoList.sort((a, b) => new Date(b.dataExame).getTime() - new Date(a.dataExame).getTime())[0];
-      setFormData((prev) => ({
-        ...prev,
-        numeroAso: aso.id || '',
-        dataAso: aso.dataExame ? aso.dataExame.split('T')[0] : '',
-        dataValidadeAso: aso.dataValidade ? aso.dataValidade.split('T')[0] : '',
-        tipoAso: aso.tipoExame?.toLowerCase() || '',
-        medicoNome: aso.medicoNome || '',
-        medicoCRM: aso.medicoCRM || '',
-        medicoUFCrm: aso.medicoUFCrm || '',
-        resultado: aso.resultado || '',
-        observacaoMedica: aso.observacaoMedica || '',
-        examesRealizados: (aso.examesRealizados || []).join(', '),
-        riscosOcupacionais: (aso.riscosOcupacionais || []).join(', '),
-        medicoPcmsmoNome: aso.medicoPcmsmoNome || '',
-        medicoPcmsmoCrm: aso.medicoPcmsmoCrm || '',
-      }));
-      toast.success(`Dados do ASO ${aso.id} carregados do e-Social`);
+      const recentes = filtrarUltimos30Dias(asoList, 'dataExame');
+      if (recentes.length === 0) {
+        toast('Nenhum ASO nos últimos 30 dias encontrado no e-Social', { icon: 'ℹ️' });
+        return;
+      }
+      if (recentes.length === 1) {
+        aplicarAso(recentes[0]);
+        return;
+      }
+      setModalItens(recentes);
+      setModalAberto(true);
     } catch (error: any) {
       if (error.response?.status === 404) {
         toast.error('Trabalhador não encontrado no e-Social');
@@ -390,6 +407,33 @@ export const FormExameSaude: React.FC = () => {
           </div>
         </form>
       </div>
+
+      <ModalSelecaoESocial
+        isOpen={modalAberto}
+        onClose={() => setModalAberto(false)}
+        titulo="Selecionar ASO (S-2220)"
+        itens={modalItens}
+        onSelecionar={(aso) => { aplicarAso(aso); setModalAberto(false); }}
+        renderItem={(aso) => (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-800">{aso.id}</span>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${
+                aso.resultado === 'apto' ? 'bg-emerald-50 text-emerald-600' :
+                aso.resultado === 'inapto' ? 'bg-red-50 text-red-600' :
+                'bg-amber-50 text-amber-600'
+              }`}>
+                {aso.resultado === 'apto' ? 'Apto' : aso.resultado === 'inapto' ? 'Inapto' : 'Apto c/ Restrições'}
+              </span>
+            </div>
+            <div className="flex items-center gap-4 text-xs text-slate-500">
+              <span>{new Date(aso.dataExame).toLocaleDateString('pt-BR')}</span>
+              <span>{aso.tipoExame}</span>
+              <span>{aso.medicoNome}</span>
+            </div>
+          </div>
+        )}
+      />
     </MainLayout>
   );
 };
