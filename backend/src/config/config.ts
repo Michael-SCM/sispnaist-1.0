@@ -23,7 +23,7 @@ function validateConfig() {
 validateConfig();
 
 const config = {
-  port: process.env.PORT || 3001,
+  port: parseInt(process.env.PORT || '3001', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
   mongodbUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
@@ -42,9 +42,17 @@ const config = {
   },
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
   msCadsusApiUrl: process.env.MS_CADSUS_API_URL || '',
+  msCadsusToken: process.env.MS_CADSUS_TOKEN || '',
+  msCadsusApiKey: process.env.MS_CADSUS_API_KEY || '',
   msSihApiUrl: process.env.MS_SIH_API_URL || '',
+  msSihToken: process.env.MS_SIH_TOKEN || '',
+  msSihApiKey: process.env.MS_SIH_API_KEY || '',
   msCnesApiUrl: process.env.MS_CNES_API_URL || '',
+  msCnesToken: process.env.MS_CNES_TOKEN || '',
+  msCnesApiKey: process.env.MS_CNES_API_KEY || '',
   msEsocialApiUrl: process.env.MS_ESOCIAL_API_URL || '',
+  msEsocialToken: process.env.MS_ESOCIAL_TOKEN || '',
+  msEsocialApiKey: process.env.MS_ESOCIAL_API_KEY || '',
 };
 
 export default config;

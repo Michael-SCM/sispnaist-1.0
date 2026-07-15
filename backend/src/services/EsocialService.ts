@@ -1,5 +1,81 @@
-import axios from 'axios';
 import config from '../config/config.js';
+import { createApiClient } from '../utils/apiClient.js';
+
+export interface EsocialS2210Raw {
+  id: string;
+  data_acidente: string;
+  hora_acidente?: string;
+  tipo_acidente: string;
+  descricao: string;
+  parte_atingida?: string;
+  agente_causador?: string;
+  cid?: string;
+  afastamento: boolean;
+  dias_afastamento?: number;
+  cat_emitida: boolean;
+  cat_numero?: string;
+  cat_data_emissao?: string;
+  cat_tipo?: string;
+  emitente_cat?: string;
+  houve_obito: boolean;
+  local_acidente?: string;
+}
+
+export interface EsocialS2220Raw {
+  id: string;
+  tipo_exame: string;
+  data_exame: string;
+  data_validade?: string;
+  medico_nome: string;
+  medico_crm: string;
+  medico_uf_crm?: string;
+  resultado: string;
+  observacao_medica?: string;
+  exames_realizados?: string[];
+  riscos_ocupacionais?: string[];
+  medico_pcmsmo_nome?: string;
+  medico_pcmsmo_crm?: string;
+}
+
+export interface EsocialS2240Raw {
+  id: string;
+  data_inicio_exposicao?: string;
+  data_fim_exposicao?: string | null;
+  fator_risco: string;
+  agente: string;
+  intensidade?: string;
+  limite_tolerancia?: string;
+  tecnica_medicao?: string;
+  resultado_medicao?: string;
+  frequencia_exposicao?: string;
+  duracao_exposicao?: string;
+  epc_utilizado: boolean;
+  epc_descricao?: string;
+  epc_eficaz?: boolean | string;
+  epi_utilizado: boolean;
+  epi_descricao?: string;
+  ca_epi?: string | null;
+  epi_eficaz?: boolean;
+  medidas_administrativas?: string;
+}
+
+export interface EsocialEventosRaw {
+  s2210: EsocialS2210Raw[];
+  s2220: EsocialS2220Raw[];
+  s2240: EsocialS2240Raw[];
+}
+
+export interface EsocialResponseDataRaw {
+  cpf: string;
+  cns?: string;
+  nome: string;
+  eventos: EsocialEventosRaw;
+}
+
+interface EsocialApiResponse {
+  status: string;
+  data: EsocialResponseDataRaw;
+}
 
 export interface EsocialS2210 {
   id: string;
@@ -44,7 +120,7 @@ export interface EsocialS2240 {
   fatorRisco: string;
   agente: string;
   intensidade?: string;
-  limiteTolerancia?: string;
+  limitTolerancia?: string;
   tecnicaMedicao?: string;
   resultadoMedicao?: string;
   frequenciaExposicao?: string;
@@ -65,18 +141,6 @@ export interface EsocialEventos {
   s2240: EsocialS2240[];
 }
 
-export interface EsocialResponseData {
-  cpf: string;
-  cns?: string;
-  nome: string;
-  eventos: EsocialEventos;
-}
-
-interface EsocialApiResponse {
-  status: string;
-  data: EsocialResponseData;
-}
-
 export interface DadosEsocialAdaptado {
   cpf: string;
   cns?: string;
@@ -84,24 +148,96 @@ export interface DadosEsocialAdaptado {
   eventos: EsocialEventos;
 }
 
-function adapter(raw: EsocialResponseData): DadosEsocialAdaptado {
+function adapterS2210(raw: EsocialS2210Raw): EsocialS2210 {
+  return {
+    id: raw.id,
+    dataAcidente: raw.data_acidente,
+    horaAcidente: raw.hora_acidente,
+    tipoAcidente: raw.tipo_acidente,
+    descricao: raw.descricao,
+    parteAtingida: raw.parte_atingida,
+    agenteCausador: raw.agente_causador,
+    cid: raw.cid,
+    afastamento: raw.afastamento,
+    diasAfastamento: raw.dias_afastamento,
+    catEmitida: raw.cat_emitida,
+    catNumero: raw.cat_numero,
+    catDataEmissao: raw.cat_data_emissao,
+    catTipo: raw.cat_tipo,
+    emitenteCat: raw.emitente_cat,
+    houveObito: raw.houve_obito,
+    localAcidente: raw.local_acidente,
+  };
+}
+
+function adapterS2220(raw: EsocialS2220Raw): EsocialS2220 {
+  return {
+    id: raw.id,
+    tipoExame: raw.tipo_exame,
+    dataExame: raw.data_exame,
+    dataValidade: raw.data_validade,
+    medicoNome: raw.medico_nome,
+    medicoCRM: raw.medico_crm,
+    medicoUFCrm: raw.medico_uf_crm,
+    resultado: raw.resultado,
+    observacaoMedica: raw.observacao_medica,
+    examesRealizados: raw.exames_realizados,
+    riscosOcupacionais: raw.riscos_ocupacionais,
+    medicoPcmsmoNome: raw.medico_pcmsmo_nome,
+    medicoPcmsmoCrm: raw.medico_pcmsmo_crm,
+  };
+}
+
+function adapterS2240(raw: EsocialS2240Raw): EsocialS2240 {
+  return {
+    id: raw.id,
+    dataInicioExposicao: raw.data_inicio_exposicao,
+    dataFimExposicao: raw.data_fim_exposicao,
+    fatorRisco: raw.fator_risco,
+    agente: raw.agente,
+    intensidade: raw.intensidade,
+    limitTolerancia: raw.limite_tolerancia,
+    tecnicaMedicao: raw.tecnica_medicao,
+    resultadoMedicao: raw.resultado_medicao,
+    frequenciaExposicao: raw.frequencia_exposicao,
+    duracaoExposicao: raw.duracao_exposicao,
+    epcUtilizado: raw.epc_utilizado,
+    epcDescricao: raw.epc_descricao,
+    epcEficaz: raw.epc_eficaz,
+    epiUtilizado: raw.epi_utilizado,
+    epiDescricao: raw.epi_descricao,
+    caEpi: raw.ca_epi,
+    epiEficaz: raw.epi_eficaz,
+    medidasAdministrativas: raw.medidas_administrativas,
+  };
+}
+
+function adapter(raw: EsocialResponseDataRaw): DadosEsocialAdaptado {
   return {
     cpf: raw.cpf,
     cns: raw.cns,
     nome: raw.nome,
-    eventos: raw.eventos,
+    eventos: {
+      s2210: raw.eventos.s2210.map(adapterS2210),
+      s2220: raw.eventos.s2220.map(adapterS2220),
+      s2240: raw.eventos.s2240.map(adapterS2240),
+    },
   };
 }
 
 export class EsocialService {
-  private baseUrl: string;
+  private client: ReturnType<typeof createApiClient>;
 
   constructor() {
-    this.baseUrl = config.msEsocialApiUrl;
+    this.client = createApiClient({
+      baseURL: config.msEsocialApiUrl,
+      authToken: config.msEsocialToken,
+      apiKey: config.msEsocialApiKey,
+    });
   }
 
   async buscarPorCpf(cpf: string): Promise<DadosEsocialAdaptado> {
-    if (!this.baseUrl) {
+    if (!config.msEsocialApiUrl) {
       throw new Error('MS_ESOCIAL_API_URL não configurada');
     }
 
@@ -111,9 +247,8 @@ export class EsocialService {
     }
 
     try {
-      const response = await axios.get<EsocialApiResponse>(
-        `${this.baseUrl}/api/v1/esocial/eventos/${cpfLimpo}`,
-        { timeout: 60000 }
+      const response = await this.client.get<EsocialApiResponse>(
+        `/api/v1/esocial/eventos/${cpfLimpo}`
       );
 
       const raw = response.data?.data;
@@ -141,7 +276,7 @@ export class EsocialService {
         throw err;
       }
 
-      if (error.response) {
+      if (error.response?.status && error.response.status !== 200) {
         const err = new Error('Sistema e-Social indisponível no momento');
         (err as any).statusCode = 503;
         throw err;

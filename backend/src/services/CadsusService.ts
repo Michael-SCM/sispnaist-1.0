@@ -1,7 +1,7 @@
-import axios from 'axios';
 import config from '../config/config.js';
+import { createApiClient } from '../utils/apiClient.js';
 
-interface CadsusEndereco {
+export interface CadsusEndereco {
   logradouro: string;
   numero: string;
   complemento?: string;
@@ -11,7 +11,7 @@ interface CadsusEndereco {
   cep: string;
 }
 
-interface CadsusContato {
+export interface CadsusContato {
   telefone_principal: string;
   email: string;
 }
@@ -41,6 +41,7 @@ export interface DadosCadsusAdaptado {
   dataNascimento: string;
   nomeMae: string;
   sexo: string;
+  nacionalidade: string;
   raca: string;
   endereco: {
     logradouro: string;
@@ -63,6 +64,7 @@ function adapter(raw: CadsusResponseData): DadosCadsusAdaptado {
     dataNascimento: raw.data_nascimento,
     nomeMae: raw.nome_mae,
     sexo: raw.sexo,
+    nacionalidade: raw.nacionalidade,
     raca: raw.raca_cor,
     endereco: {
       logradouro: raw.endereco.logradouro,
@@ -79,14 +81,18 @@ function adapter(raw: CadsusResponseData): DadosCadsusAdaptado {
 }
 
 export class CadsusService {
-  private baseUrl: string;
+  private client: ReturnType<typeof createApiClient>;
 
   constructor() {
-    this.baseUrl = config.msCadsusApiUrl;
+    this.client = createApiClient({
+      baseURL: config.msCadsusApiUrl,
+      authToken: config.msCadsusToken,
+      apiKey: config.msCadsusApiKey,
+    });
   }
 
   async buscarPorCpfOuCns(cpfOuCns: string): Promise<DadosCadsusAdaptado> {
-    if (!this.baseUrl) {
+    if (!config.msCadsusApiUrl) {
       throw new Error('MS_CADSUS_API_URL não configurada');
     }
 
@@ -96,9 +102,8 @@ export class CadsusService {
     }
 
     try {
-      const response = await axios.get<CadsusApiResponse>(
-        `${this.baseUrl}/cadsus/usuarios/${cpfOuCnsLimpo}`,
-        { timeout: 60000 }
+      const response = await this.client.get<CadsusApiResponse>(
+        `/cadsus/usuarios/${cpfOuCnsLimpo}`
       );
 
       const raw = response.data?.data;
@@ -126,7 +131,7 @@ export class CadsusService {
         throw err;
       }
 
-      if (error.response) {
+      if (error.response?.status && error.response.status !== 200) {
         const err = new Error('Sistema do Ministério da Saúde indisponível no momento');
         (err as any).statusCode = 503;
         throw err;

@@ -1,9 +1,9 @@
-jest.mock('axios');
+const mockGet = jest.fn();
+jest.mock('../../utils/apiClient', () => ({
+  createApiClient: jest.fn(() => ({ get: mockGet })),
+}));
 
-import axios from 'axios';
 import { sihService, SihResponseDataRaw } from '../../services/SihService';
-
-const mockAxiosGet = axios.get as jest.Mock;
 
 const mockData: SihResponseDataRaw = {
   cns_paciente: '701234567890123',
@@ -29,7 +29,7 @@ describe('SihService', () => {
   });
 
   it('deve retornar dados adaptados quando a API responde com sucesso', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     const result = await sihService.buscarPorCns('701234567890123');
 
@@ -50,10 +50,7 @@ describe('SihService', () => {
         },
       ],
     });
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-sih:3000/api/v1/internacoes/701234567890123',
-      { timeout: 60000 }
-    );
+    expect(mockGet).toHaveBeenCalledWith('/internacoes/701234567890123');
   });
 
   it('deve retornar lista vazia de internações quando não há registros', async () => {
@@ -63,14 +60,14 @@ describe('SihService', () => {
       internacoes: [],
     };
 
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: vazio } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: vazio } });
 
     const result = await sihService.buscarPorCns('701234567890012');
     expect(result.internacoes).toEqual([]);
   });
 
   it('deve lançar erro 404 quando nenhuma internação é encontrada', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 404 } });
+    mockGet.mockRejectedValue({ response: { status: 404 } });
 
     await expect(sihService.buscarPorCns('000000000000000')).rejects.toThrow(
       'Nenhuma internação encontrada para este CNS'
@@ -79,7 +76,7 @@ describe('SihService', () => {
   });
 
   it('deve lançar erro 504 quando ocorre timeout', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNABORTED' });
+    mockGet.mockRejectedValue({ code: 'ECONNABORTED' });
 
     await expect(sihService.buscarPorCns('701234567890123')).rejects.toThrow(
       'O Ministério da Saúde está demorando para responder. Tente novamente.'
@@ -88,20 +85,20 @@ describe('SihService', () => {
   });
 
   it('deve lançar erro 503 para erros de conexão', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNREFUSED' });
+    mockGet.mockRejectedValue({ code: 'ECONNREFUSED' });
     await expect(sihService.buscarPorCns('701234567890123')).rejects.toThrow(
       'Sistema do Ministério da Saúde indisponível no momento'
     );
 
-    mockAxiosGet.mockRejectedValue({ code: 'ENOTFOUND' });
+    mockGet.mockRejectedValue({ code: 'ENOTFOUND' });
     await expect(sihService.buscarPorCns('701234567890123')).rejects.toMatchObject({ statusCode: 503 });
 
-    mockAxiosGet.mockRejectedValue({ code: 'ERR_NETWORK' });
+    mockGet.mockRejectedValue({ code: 'ERR_NETWORK' });
     await expect(sihService.buscarPorCns('701234567890123')).rejects.toMatchObject({ statusCode: 503 });
   });
 
   it('deve lançar erro 503 para qualquer erro HTTP não-200', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 502 } });
+    mockGet.mockRejectedValue({ response: { status: 502 } });
 
     await expect(sihService.buscarPorCns('701234567890123')).rejects.toThrow(
       'Sistema do Ministério da Saúde indisponível no momento'
@@ -113,12 +110,9 @@ describe('SihService', () => {
   });
 
   it('deve limpar caracteres não numéricos do CNS', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     await sihService.buscarPorCns('701.2345.6789.0123');
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-sih:3000/api/v1/internacoes/701234567890123',
-      expect.any(Object)
-    );
+    expect(mockGet).toHaveBeenCalledWith('/internacoes/701234567890123');
   });
 });

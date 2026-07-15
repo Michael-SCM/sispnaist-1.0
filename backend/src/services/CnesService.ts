@@ -1,5 +1,5 @@
-import axios from 'axios';
 import config from '../config/config.js';
+import { createApiClient } from '../utils/apiClient.js';
 
 export interface CnesEndereco {
   logradouro: string;
@@ -99,14 +99,18 @@ function adapter(raw: CnesResponseData): DadosCnesAdaptado {
 }
 
 export class CnesService {
-  private baseUrl: string;
+  private client: ReturnType<typeof createApiClient>;
 
   constructor() {
-    this.baseUrl = config.msCnesApiUrl;
+    this.client = createApiClient({
+      baseURL: config.msCnesApiUrl,
+      authToken: config.msCnesToken,
+      apiKey: config.msCnesApiKey,
+    });
   }
 
   async buscarPorCodigo(codigo: string): Promise<DadosCnesAdaptado> {
-    if (!this.baseUrl) {
+    if (!config.msCnesApiUrl) {
       throw new Error('MS_CNES_API_URL não configurada');
     }
 
@@ -116,9 +120,8 @@ export class CnesService {
     }
 
     try {
-      const response = await axios.get<CnesApiResponse>(
-        `${this.baseUrl}/cnes/estabelecimentos/${codigoLimpo}`,
-        { timeout: 60000 }
+      const response = await this.client.get<CnesApiResponse>(
+        `/cnes/estabelecimentos/${codigoLimpo}`
       );
 
       const raw = response.data?.data;
@@ -146,7 +149,7 @@ export class CnesService {
         throw err;
       }
 
-      if (error.response) {
+      if (error.response?.status && error.response.status !== 200) {
         const err = new Error('Sistema do Ministério da Saúde indisponível no momento');
         (err as any).statusCode = 503;
         throw err;

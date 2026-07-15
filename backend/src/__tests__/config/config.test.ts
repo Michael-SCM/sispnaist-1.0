@@ -21,7 +21,7 @@ describe('config', () => {
     process.env.JWT_EXPIRE = '24h';
 
     const config = (await import('../../config/config')).default;
-    expect(config.port).toBe('5000');
+    expect(config.port).toBe(5000);
     expect(config.jwtExpire).toBe('24h');
   });
 

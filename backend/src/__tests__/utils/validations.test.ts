@@ -7,6 +7,7 @@ describe('registerSchema', () => {
     email: 'joao@email.com',
     senha: 'Abc@1234',
     dataNascimento: '1990-01-01',
+    consentimentoLGPD: true,
   };
 
   it('deve aceitar dados válidos', () => {

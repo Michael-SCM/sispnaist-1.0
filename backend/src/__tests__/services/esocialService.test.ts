@@ -1,11 +1,11 @@
-jest.mock('axios');
+const mockGet = jest.fn();
+jest.mock('../../utils/apiClient', () => ({
+  createApiClient: jest.fn(() => ({ get: mockGet })),
+}));
 
-import axios from 'axios';
-import { esocialService, EsocialResponseData } from '../../services/EsocialService';
+import { esocialService, EsocialResponseDataRaw } from '../../services/EsocialService';
 
-const mockAxiosGet = axios.get as jest.Mock;
-
-const mockData: EsocialResponseData = {
+const mockData: EsocialResponseDataRaw = {
   cpf: '12345678900',
   cns: '701234567890123',
   nome: 'João Trabalhador da Silva',
@@ -13,22 +13,22 @@ const mockData: EsocialResponseData = {
     s2210: [
       {
         id: 'CAT-2025-001',
-        dataAcidente: '2025-03-15',
-        horaAcidente: '14:30',
-        tipoAcidente: 'Típico',
+        data_acidente: '2025-03-15',
+        hora_acidente: '14:30',
+        tipo_acidente: 'Típico',
         descricao: 'Corte na mão durante manuseio de ferramenta manual',
-        parteAtingida: 'Mão esquerda',
-        agenteCausador: 'Faca de corte',
+        parte_atingida: 'Mão esquerda',
+        agente_causador: 'Faca de corte',
         cid: 'S61.0',
         afastamento: true,
-        diasAfastamento: 15,
-        catEmitida: true,
-        catNumero: 'CAT-2025-001',
-        catDataEmissao: '2025-03-16',
-        catTipo: 'inicial',
-        emitenteCat: 'empregador',
-        houveObito: false,
-        localAcidente: 'Setor de produção',
+        dias_afastamento: 15,
+        cat_emitida: true,
+        cat_numero: 'CAT-2025-001',
+        cat_data_emissao: '2025-03-16',
+        cat_tipo: 'inicial',
+        emitente_cat: 'empregador',
+        houve_obito: false,
+        local_acidente: 'Setor de produção',
       },
     ],
     s2220: [],
@@ -41,8 +41,8 @@ describe('EsocialService', () => {
     jest.clearAllMocks();
   });
 
-  it('deve retornar dados adaptados quando a API responde com sucesso', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+  it('deve retornar dados adaptados convertendo snake_case para camelCase', async () => {
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     const result = await esocialService.buscarPorCpf('12345678900');
 
@@ -51,21 +51,36 @@ describe('EsocialService', () => {
       cns: '701234567890123',
       nome: 'João Trabalhador da Silva',
       eventos: {
-        s2210: expect.any(Array),
-        s2220: expect.any(Array),
-        s2240: expect.any(Array),
+        s2210: [
+          {
+            id: 'CAT-2025-001',
+            dataAcidente: '2025-03-15',
+            horaAcidente: '14:30',
+            tipoAcidente: 'Típico',
+            descricao: 'Corte na mão durante manuseio de ferramenta manual',
+            parteAtingida: 'Mão esquerda',
+            agenteCausador: 'Faca de corte',
+            cid: 'S61.0',
+            afastamento: true,
+            diasAfastamento: 15,
+            catEmitida: true,
+            catNumero: 'CAT-2025-001',
+            catDataEmissao: '2025-03-16',
+            catTipo: 'inicial',
+            emitenteCat: 'empregador',
+            houveObito: false,
+            localAcidente: 'Setor de produção',
+          },
+        ],
+        s2220: [],
+        s2240: [],
       },
     });
-    expect(result.eventos.s2210).toHaveLength(1);
-    expect(result.eventos.s2210[0].id).toBe('CAT-2025-001');
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-esocial:3000/api/v1/esocial/eventos/12345678900',
-      { timeout: 60000 }
-    );
+    expect(mockGet).toHaveBeenCalledWith('/api/v1/esocial/eventos/12345678900');
   });
 
   it('deve lançar erro 404 quando trabalhador não é encontrado', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 404 } });
+    mockGet.mockRejectedValue({ response: { status: 404 } });
 
     await expect(esocialService.buscarPorCpf('00000000000')).rejects.toThrow(
       'Trabalhador não encontrado na base do e-Social'
@@ -74,7 +89,7 @@ describe('EsocialService', () => {
   });
 
   it('deve lançar erro 504 quando ocorre timeout', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNABORTED' });
+    mockGet.mockRejectedValue({ code: 'ECONNABORTED' });
 
     await expect(esocialService.buscarPorCpf('12345678900')).rejects.toThrow(
       'O e-Social está demorando para responder. Tente novamente.'
@@ -83,20 +98,20 @@ describe('EsocialService', () => {
   });
 
   it('deve lançar erro 503 para erros de conexão', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNREFUSED' });
+    mockGet.mockRejectedValue({ code: 'ECONNREFUSED' });
     await expect(esocialService.buscarPorCpf('12345678900')).rejects.toThrow(
       'Sistema e-Social indisponível no momento'
     );
 
-    mockAxiosGet.mockRejectedValue({ code: 'ENOTFOUND' });
+    mockGet.mockRejectedValue({ code: 'ENOTFOUND' });
     await expect(esocialService.buscarPorCpf('12345678900')).rejects.toMatchObject({ statusCode: 503 });
 
-    mockAxiosGet.mockRejectedValue({ code: 'ERR_NETWORK' });
+    mockGet.mockRejectedValue({ code: 'ERR_NETWORK' });
     await expect(esocialService.buscarPorCpf('12345678900')).rejects.toMatchObject({ statusCode: 503 });
   });
 
-  it('deve lançar erro 503 para qualquer erro HTTP não-404', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 502 } });
+  it('deve lançar erro 503 para qualquer erro HTTP não-200', async () => {
+    mockGet.mockRejectedValue({ response: { status: 502 } });
 
     await expect(esocialService.buscarPorCpf('12345678900')).rejects.toThrow(
       'Sistema e-Social indisponível no momento'
@@ -109,12 +124,9 @@ describe('EsocialService', () => {
   });
 
   it('deve limpar caracteres não numéricos do CPF', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     await esocialService.buscarPorCpf('123.456.789-00');
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-esocial:3000/api/v1/esocial/eventos/12345678900',
-      expect.any(Object)
-    );
+    expect(mockGet).toHaveBeenCalledWith('/api/v1/esocial/eventos/12345678900');
   });
 });

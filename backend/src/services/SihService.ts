@@ -1,5 +1,5 @@
-import axios from 'axios';
 import config from '../config/config.js';
+import { createApiClient } from '../utils/apiClient.js';
 
 export interface SihInternacaoRaw {
   numero_aih: string;
@@ -61,14 +61,18 @@ function adapter(raw: SihResponseDataRaw): DadosSihAdaptado {
 }
 
 export class SihService {
-  private baseUrl: string;
+  private client: ReturnType<typeof createApiClient>;
 
   constructor() {
-    this.baseUrl = config.msSihApiUrl;
+    this.client = createApiClient({
+      baseURL: config.msSihApiUrl,
+      authToken: config.msSihToken,
+      apiKey: config.msSihApiKey,
+    });
   }
 
   async buscarPorCns(cns: string): Promise<DadosSihAdaptado> {
-    if (!this.baseUrl) {
+    if (!config.msSihApiUrl) {
       throw new Error('MS_SIH_API_URL não configurada');
     }
 
@@ -78,9 +82,8 @@ export class SihService {
     }
 
     try {
-      const response = await axios.get<SihApiResponse>(
-        `${this.baseUrl}/internacoes/${cnsLimpo}`,
-        { timeout: 60000 }
+      const response = await this.client.get<SihApiResponse>(
+        `/internacoes/${cnsLimpo}`
       );
 
       const raw = response.data?.data;
@@ -108,7 +111,6 @@ export class SihService {
         throw err;
       }
 
-      // Qualquer outro erro HTTP da mock (502, 500, etc.) — trata como indisponível
       if (error.response?.status && error.response.status !== 200) {
         const err = new Error('Sistema do Ministério da Saúde indisponível no momento');
         (err as any).statusCode = 503;

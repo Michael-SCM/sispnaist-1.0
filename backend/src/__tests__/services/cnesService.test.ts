@@ -1,9 +1,9 @@
-jest.mock('axios');
+const mockGet = jest.fn();
+jest.mock('../../utils/apiClient', () => ({
+  createApiClient: jest.fn(() => ({ get: mockGet })),
+}));
 
-import axios from 'axios';
 import { cnesService, CnesResponseData } from '../../services/CnesService';
-
-const mockAxiosGet = axios.get as jest.Mock;
 
 const mockData: CnesResponseData = {
   codigo_cnes: '2001586',
@@ -37,7 +37,7 @@ describe('CnesService', () => {
   });
 
   it('deve retornar dados adaptados quando a API responde com sucesso', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     const result = await cnesService.buscarPorCodigo('2001586');
 
@@ -66,14 +66,11 @@ describe('CnesService', () => {
       leitos: { total: 280, sus: 200, privado: 80 },
       servicos: ['Clínica Geral', 'Cirurgia Geral', 'Cardiologia', 'Pediatria', 'Ortopedia', 'Neurologia'],
     });
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-cnes:3000/api/v1/cnes/estabelecimentos/2001586',
-      { timeout: 60000 }
-    );
+    expect(mockGet).toHaveBeenCalledWith('/cnes/estabelecimentos/2001586');
   });
 
   it('deve lançar erro 404 quando estabelecimento não é encontrado', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 404 } });
+    mockGet.mockRejectedValue({ response: { status: 404 } });
 
     await expect(cnesService.buscarPorCodigo('0000000')).rejects.toThrow(
       'Estabelecimento não encontrado na base do Ministério da Saúde'
@@ -82,7 +79,7 @@ describe('CnesService', () => {
   });
 
   it('deve lançar erro 504 quando ocorre timeout', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNABORTED' });
+    mockGet.mockRejectedValue({ code: 'ECONNABORTED' });
 
     await expect(cnesService.buscarPorCodigo('2001586')).rejects.toThrow(
       'O Ministério da Saúde está demorando para responder. Tente novamente.'
@@ -91,20 +88,20 @@ describe('CnesService', () => {
   });
 
   it('deve lançar erro 503 para erros de conexão', async () => {
-    mockAxiosGet.mockRejectedValue({ code: 'ECONNREFUSED' });
+    mockGet.mockRejectedValue({ code: 'ECONNREFUSED' });
     await expect(cnesService.buscarPorCodigo('2001586')).rejects.toThrow(
       'Sistema do Ministério da Saúde indisponível no momento'
     );
 
-    mockAxiosGet.mockRejectedValue({ code: 'ENOTFOUND' });
+    mockGet.mockRejectedValue({ code: 'ENOTFOUND' });
     await expect(cnesService.buscarPorCodigo('2001586')).rejects.toMatchObject({ statusCode: 503 });
 
-    mockAxiosGet.mockRejectedValue({ code: 'ERR_NETWORK' });
+    mockGet.mockRejectedValue({ code: 'ERR_NETWORK' });
     await expect(cnesService.buscarPorCodigo('2001586')).rejects.toMatchObject({ statusCode: 503 });
   });
 
-  it('deve lançar erro 503 para qualquer erro HTTP não-404', async () => {
-    mockAxiosGet.mockRejectedValue({ response: { status: 500 } });
+  it('deve lançar erro 503 para qualquer erro HTTP não-200', async () => {
+    mockGet.mockRejectedValue({ response: { status: 500 } });
 
     await expect(cnesService.buscarPorCodigo('2001586')).rejects.toThrow(
       'Sistema do Ministério da Saúde indisponível no momento'
@@ -117,12 +114,9 @@ describe('CnesService', () => {
   });
 
   it('deve limpar caracteres não numéricos do código', async () => {
-    mockAxiosGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
+    mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     await cnesService.buscarPorCodigo('2001.586');
-    expect(mockAxiosGet).toHaveBeenCalledWith(
-      'http://mock-cnes:3000/api/v1/cnes/estabelecimentos/2001586',
-      expect.any(Object)
-    );
+    expect(mockGet).toHaveBeenCalledWith('/cnes/estabelecimentos/2001586');
   });
 });
