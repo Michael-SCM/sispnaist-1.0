@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
@@ -135,6 +135,7 @@ const TIPOS_ACIDENTE = [
 
 export const NovoAcidente: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const { adicionarAcidente } = useAcidenteStore();
 
@@ -150,6 +151,20 @@ export const NovoAcidente: React.FC = () => {
   const { itens: tiposTrauma } = useCatalogo('tipoTrauma');
   const { itens: agentesCausador } = useCatalogo('causadorTrauma');
   const { itens: partesCorpo } = useCatalogo('parteCorpo');
+
+  // Dados importados do SINAN
+  useEffect(() => {
+    const state = location.state as { trabalhadorCpf?: string; notificacao?: any } | null;
+    if (state?.trabalhadorCpf && state?.notificacao) {
+      setFormData((prev) => ({
+        ...prev,
+        trabalhadorId: state.trabalhadorCpf!.replace(/\D/g, ''),
+        dataAcidente: state.notificacao.dataOcorrencia || '',
+        dataNotificacao: state.notificacao.dataNotificacao || '',
+      }));
+      toast.success('Dados importados do SINAN');
+    }
+  }, []);
 
   // Buscar trabalhador por CPF
   useEffect(() => {

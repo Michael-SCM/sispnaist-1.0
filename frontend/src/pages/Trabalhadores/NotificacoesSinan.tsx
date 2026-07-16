@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
+import { acidenteService } from '../../services/acidenteService.js';
+import { doencaService } from '../../services/doencaService.js';
 import { sinanService, DadosSinan, NotificacaoSinan } from '../../services/sinanService.js';
 import { ITrabalhador } from '../../types/index.js';
 import {
@@ -23,6 +25,7 @@ import {
   CheckCircle2,
   Download,
   HeartPulse,
+  PlusCircle,
   Shield,
   Syringe,
 } from 'lucide-react';
@@ -52,6 +55,7 @@ const evolucaoBadge: Record<string, string> = {
 
 export const NotificacoesSinan: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [dadosSinan, setDadosSinan] = useState<DadosSinan | null>(null);
   const [consultando, setConsultando] = useState(false);
@@ -136,6 +140,42 @@ export const NotificacoesSinan: React.FC = () => {
       ? dadosSinan.notificacoes.filter((n) => n.tipoNotificacao === filtroTipo)
       : dadosSinan.notificacoes
     : [];
+
+  const handleImportar = async (notificacao: NotificacaoSinan) => {
+    const cpf = dadosSinan?.cpf || trabalhador?.cpf || '';
+    if (!cpf) {
+      toast.error('CPF do trabalhador não disponível para importação');
+      return;
+    }
+
+    try {
+      if (notificacao.tipoNotificacao === 'Acidente de Trabalho') {
+        const result = await acidenteService.obterPorTrabalhador(id!, 1, 100);
+        const existe = result.acidentes.some(
+          (a) => a.dataAcidente === notificacao.dataOcorrencia
+        );
+        if (existe) {
+          toast.error('Este acidente já está registrado no SISPNAIST');
+          return;
+        }
+        navigate('/acidentes/novo', { state: { trabalhadorCpf: cpf, notificacao } });
+      } else if (notificacao.tipoNotificacao === 'Doença Relacionada ao Trabalho') {
+        const result = await doencaService.obterPorTrabalhador(id!, 1, 100);
+        const existe = result.dados.some(
+          (d) => d.dataInicio === notificacao.dataOcorrencia && d.codigoDoenca === notificacao.codigoAgravo
+        );
+        if (existe) {
+          toast.error('Esta doença já está registrada no SISPNAIST');
+          return;
+        }
+        navigate('/doencas/novo', { state: { trabalhadorCpf: cpf, notificacao } });
+      } else {
+        toast.error('Importação não disponível para este tipo de notificação');
+      }
+    } catch {
+      toast.error('Erro ao verificar duplicidade no SISPNAIST');
+    }
+  };
 
   return (
     <MainLayout>
@@ -245,6 +285,7 @@ export const NotificacoesSinan: React.FC = () => {
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Data Notificação</th>
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">UF</th>
                     <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Evolução</th>
+                    <th className="px-6 py-4 font-bold text-slate-500 uppercase text-[10px] tracking-wider">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -291,6 +332,16 @@ export const NotificacoesSinan: React.FC = () => {
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${evolucaoBadge[notif.evolucao] || 'bg-slate-50 text-slate-700 border-slate-100'}`}>
                           {notif.evolucao}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); handleImportar(notif); }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold transition-all border border-emerald-200"
+                        >
+                          <PlusCircle size={14} />
+                          Importar
+                        </button>
                       </td>
                     </tr>
                   ))}

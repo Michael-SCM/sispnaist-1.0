@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { doencaService } from '../../services/doencaService.js';
@@ -48,12 +48,28 @@ const INITIAL_FORM: FormData = {
 
 export const NovaDoenca: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const { adicionarDoenca } = useDoencaStore();
 
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // Dados importados do SINAN
+  useEffect(() => {
+    const state = location.state as { trabalhadorCpf?: string; notificacao?: any } | null;
+    if (state?.trabalhadorCpf && state?.notificacao) {
+      setFormData((prev) => ({
+        ...prev,
+        trabalhadorId: state.trabalhadorCpf!.replace(/\D/g, ''),
+        codigoDoenca: state.notificacao.codigoAgravo || '',
+        nomeDoenca: state.notificacao.nomeAgravo || '',
+        dataInicio: state.notificacao.dataOcorrencia || '',
+      }));
+      toast.success('Dados importados do SINAN');
+    }
+  }, []);
 
   const validar = (): boolean => {
     const novoErros: Record<string, string> = {};
