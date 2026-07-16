@@ -148,11 +148,14 @@ export const NotificacoesSinan: React.FC = () => {
       return;
     }
 
+    const normalizarData = (d: string) => d?.split('T')[0]?.split(' ')[0] || d;
+    const dataSinan = normalizarData(notificacao.dataOcorrencia);
+
     try {
       if (notificacao.tipoNotificacao === 'Acidente de Trabalho') {
         const result = await acidenteService.obterPorTrabalhador(id!, 1, 100);
         const existe = result.acidentes.some(
-          (a) => a.dataAcidente === notificacao.dataOcorrencia
+          (a) => normalizarData(a.dataAcidente) === dataSinan
         );
         if (existe) {
           toast.error('Este acidente já está registrado no SISPNAIST');
@@ -162,7 +165,9 @@ export const NotificacoesSinan: React.FC = () => {
       } else if (notificacao.tipoNotificacao === 'Doença Relacionada ao Trabalho') {
         const result = await doencaService.obterPorTrabalhador(id!, 1, 100);
         const existe = result.dados.some(
-          (d) => d.dataInicio === notificacao.dataOcorrencia && d.codigoDoenca === notificacao.codigoAgravo
+          (d) =>
+            normalizarData(d.dataInicio) === dataSinan &&
+            (d.codigoDoenca || '').trim().toUpperCase() === (notificacao.codigoAgravo || '').trim().toUpperCase()
         );
         if (existe) {
           toast.error('Esta doença já está registrada no SISPNAIST');

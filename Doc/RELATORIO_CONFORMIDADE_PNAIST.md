@@ -25,7 +25,7 @@
 
 O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema de Gerenciamento de Segurança do Trabalhador) frente aos requisitos levantados no documento **"Análise das oficinas estaduais do PNAIST - Contribuições para o Sistema de Informação"**, que consolida as percepções e expectativas dos estados brasileiros para o desenvolvimento do PNAIST-SIS.
 
-**Resultado Geral:** O SISPNAIST atende **53 de 62 requisitos** identificados (~85%), possui **0 requisitos parcialmente implementados** e **9 requisitos não implementados**.
+**Resultado Geral:** O SISPNAIST atende **55 de 62 requisitos** identificados (~89%), possui **0 requisitos parcialmente implementados** e **7 requisitos não implementados**.
 
 | Status | Quantidade | Percentual |
 |--------|-----------|-----------|
@@ -37,16 +37,16 @@ O presente relatório analisa a conformidade do sistema **SISPNAIST** (Sistema d
 - Cobertura completa dos dados sociodemográficos, laborais e de histórico de saúde
 - Módulo de avaliação de ambiente de trabalho detalhado (4 subdimensões)
 - Gestão de acidentes, doenças ocupacionais e vacinação
+- Integração bidirecional com SINAN (consulta, importação e notificação automática)
 - Dashboard analítico com KPIs e monitoramento clínico
 - Segurança em camadas (JWT, CSRF, rate limiting, RBAC)
 - Acessibilidade WCAG 2.1 AA (aria labels, navegação por teclado, foco visível, leitores de tela, contraste)
 
 **Principais Gaps:**
-- Interoperabilidade com sistemas governamentais (e-Social, SINAN)
-- Parametrização por unidade federativa (UF)
-- Indicadores customizáveis por estado/município
-- Suporte offline
+- APIs padronizadas para terceiros (OpenAPI/Swagger, webhooks)
+- Suporte offline e aplicativo mobile
 - Termo de consentimento explícito, política de retenção e exportação de dados pelo titular (LGPD)
+- Endpoints otimizados para ferramentas de BI externo
 
 ---
 
@@ -172,7 +172,7 @@ Cada requisito foi classificado como:
 | 55 | Causas dos acidentes | ✅ | `agenteCausador`, `descricao`, `descricaoTrauma` |
 | 56 | Doenças relacionadas ao trabalho | ✅ | Módulo `Doenca` com CID, nome, relato clínico |
 | 57 | Notificações (CAT) | ✅ | `catNas`, `comunicado`, `dataComunicacao`, `dataNotificacao` |
-| 58 | **Integração com SINAN** | ❌ | Sem integração automática com Sistema de Informação de Agravos de Notificação |
+| 58 | **Integração com SINAN** | ✅ | Integração bidirecional: consulta de notificações por CPF/CNS via API REST, importação seletiva com verificação de duplicidade, e notificação automática ao registrar acidentes/doenças |
 
 #### Subdimensão: Afastamentos
 
@@ -193,7 +193,7 @@ Cada requisito foi classificado como:
 | 62 | **Integração com CADSUS** | ✅ | Mock API REST (https://mock-da-api-do-cadsus.onrender.com) integrada via adapter, consulta por CNS na ficha do trabalhador com dados demográficos e endereço |
 | 63 | **Integração com CNES** | ✅ | Mock API REST (https://mock-da-api-do-cnes.onrender.com) integrada via adapter, consulta por código CNES no modal de detalhes do SIH com dados completos do estabelecimento (endereço, leitos, serviços, contato) |
 | 64 | **Integração com e-Social** | ✅ | Mock API REST integrada via adapter, consulta por CPF com dados dos eventos S-2210 (CAT no módulo Acidentes), S-2220 (ASO no submódulo Exames de Saúde do trabalhador) e S-2240 (fatores de risco no módulo Riscos Ocupacionais) |
-| 65 | **Integração com SINAN** | ❌ | idem |
+| 65 | **Integração com SINAN** | ✅ | Integração via API REST com adapter pattern; consulta de notificações por CPF/CNS, importação com pré-preenchimento de formulários (acidentes e doenças) e notificação de agravos ao SINAN no momento do registro |
 | 66 | **APIs padronizadas para terceiros** | ❌ | Sem OpenAPI/Swagger, sem webhooks |
 
 #### Subdimensão: Segurança e Privacidade
@@ -242,18 +242,18 @@ Cada requisito foi classificado como:
 |----------|-------|---|---|---|-------------|
 | Dados do Trabalhador | 33 | 31 | 0 | 2 | 94% |
 | Ambiente e Processo de Trabalho | 15 | 15 | 0 | 0 | 100% |
-| Gestão da Saúde e Segurança | 13 | 12 | 0 | 1 | 92% |
-| Aspectos Transversais | 21 | 11 | 0 | 10 | 52% |
-| **Total** | **82** | **68** | **0** | **14** | **83%** |
+| Gestão da Saúde e Segurança | 13 | 13 | 0 | 0 | 100% |
+| Aspectos Transversais | 21 | 12 | 0 | 9 | 57% |
+| **Total** | **82** | **70** | **0** | **12** | **85%** |
 
 > Nota: O total de requisitos nesta tabela (82) difere do resumo executivo (61) porque inclui desdobramentos mais granulares das subdimensões.
 
 ### Por Status
 
 ```
-✅ Implementado:    68 requisitos (83%)
+✅ Implementado:    70 requisitos (85%)
 ⚠️ Parcial:          0 requisitos (0%)
-❌ Não implementado: 14 requisitos (17%)
+❌ Não implementado: 12 requisitos (15%)
 ```
 
 ---
@@ -291,7 +291,7 @@ Cada requisito foi classificado como:
 | 15 | Suporte offline | Frontend | Cache local (IndexedDB), fila de sincronização, conflitos de dados | 30h |
 | 16 | Módulo de capacitação e treinamento | Full-stack | Conteúdo educativo, quiz, certificados, progresso do usuário | 24h |
 | 17 | Aplicativo mobile (React Native) | Mobile | Versão nativa para iOS/Android com funcionalidades principais | 60h+ |
-| 18 | Integração SINAN automática | Backend | Agendamento (cron) para enviar notificações de acidentes/doenças ao SINAN via webservice | 12h |
+| 18 | Sincronização SINAN automática (cron) | Backend | Agendamento para reconsultar notificações periodicamente e sincronizar alterações de evolução | 8h |
 
 ### Cronograma Sugerido
 
@@ -338,17 +338,17 @@ Fase 4 - Longo Prazo (2-4 meses):
 
 ### Gaps Críticos
 
-1. **Interoperabilidade:** É o tema mais citado nas oficinas ("mencionado em praticamente todos os estados") e o menos implementado no SISPNAIST. Sem integração com CADSUS, CNES ou e-Social, o sistema corre o risco de duplicar cadastros e sobrecarregar os usuários.
+1. **Exposição de APIs padronizadas:** O SISPNAIST não possui documentação OpenAPI/Swagger pública nem webhooks para notificação de eventos, o que dificulta a integração por sistemas externos e limita a adoção como plataforma de interoperabilidade.
 
 2. **Parametrização local:** A necessidade de adaptação às realidades de cada UF é um tema recorrente no documento. A ausência de `tb_parametro_uf` e `tb_indicador_uf` limita a adoção do sistema por estados com necessidades específicas.
 
 3. **LGPD:** Medidas de segurança implementadas (JWT, CSRF, rate-limit, Helmet, sanitização de senhas com histórico e bcrypt). Pendentes: termo de consentimento explícito, política de retenção, e exportação de dados pelo titular.
 
-4. **Acessibilidade:** Implementado conforme WCAG 2.1 AA (skip link, aria labels, navegação por teclado, foco visível, leitores de tela, contraste, títulos dinâmicos). Pendente: suporte offline para cenários sem conectividade.
+4. **Acessibilidade e suporte offline:** Acessibilidade implementado conforme WCAG 2.1 AA. Pendente: suporte offline para cenários sem conectividade e versão mobile.
 
 ### Recomendações Estratégicas
 
-1. **Priorizar interoperabilidade:** A integração com e-Social e CADSUS deve ser a primeira grande iniciativa, pois resolve o problema mais citado nas oficinas e reduz a carga de trabalho dos usuários.
+1. **Criar API pública padronizada:** Documentar endpoints com OpenAPI/Swagger e implementar webhooks para eventos críticos (novas notificações SINAN, acidentes registrados), permitindo integração com sistemas estaduais e ferramentas de BI.
 
 2. **Criar comitê de governança de dados:** Para definir indicadores nacionais vs. locais, responsáveis pela alimentação, e periodicidade de atualização - conforme sugerido nas oficinas.
 
