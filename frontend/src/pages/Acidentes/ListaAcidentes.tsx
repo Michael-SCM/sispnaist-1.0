@@ -44,6 +44,9 @@ export const ListaAcidentes: React.FC = () => {
   const [localSearch, setLocalSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    return () => clearFiltros();
+  }, []);
 
   // Carregar acidentes
   const carregarAcidentes = async (pageNumber: number = 1) => {
@@ -153,20 +156,27 @@ export const ListaAcidentes: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por descrição..."
+              placeholder="Buscar por descrição ou CPF..."
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   const valor = localSearch.trim();
+                  const digits = valor.replace(/\D/g, '');
                   const nextFiltros: typeof localFiltros = { ...localFiltros };
-                  if (valor) {
+
+                  if (digits.length >= 11) {
+                    nextFiltros.trabalhadorId = digits;
+                    delete nextFiltros.descricao;
+                  } else if (valor) {
                     nextFiltros.descricao = valor;
+                    delete nextFiltros.trabalhadorId;
                   } else {
                     delete nextFiltros.descricao;
+                    delete nextFiltros.trabalhadorId;
                   }
+
                   setLocalFiltros(nextFiltros);
-                  // garante que o filtro CPF (cpfTrabalhador) não é perdido ao digitar descrição
                   setFiltros(nextFiltros);
                   setShowFilters(false);
                 }
@@ -253,8 +263,8 @@ export const ListaAcidentes: React.FC = () => {
                   type="text"
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-amber-500 outline-none transition-all font-mono"
                   placeholder="000.000.000-00"
-                  value={maskCPF(localFiltros.cpfTrabalhador || '')}
-                  onChange={(e) => setLocalFiltros({ ...localFiltros, cpfTrabalhador: unmaskCPF(e.target.value) || undefined })}
+                  value={maskCPF(localFiltros.trabalhadorId || '')}
+                  onChange={(e) => setLocalFiltros({ ...localFiltros, trabalhadorId: unmaskCPF(e.target.value) || undefined })}
                 />
               </div>
 

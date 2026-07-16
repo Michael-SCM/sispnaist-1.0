@@ -43,6 +43,10 @@ export const ListaTrabalhadores: React.FC = () => {
   const [localFiltros, setLocalFiltros] = useState(filtros);
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    return () => clearFiltros();
+  }, []);
+
   const carregarTrabalhadores = async (pageNumber: number = 1) => {
     try {
       setIsLoading(true);
@@ -142,7 +146,18 @@ export const ListaTrabalhadores: React.FC = () => {
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               value={localFiltros.nome || ''}
               onChange={(e) => setLocalFiltros({ ...localFiltros, nome: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && handleAplicarFiltros()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const digits = (localFiltros.nome || '').replace(/\D/g, '');
+                  if (digits.length >= 11) {
+                    setLocalFiltros((prev) => ({ ...prev, nome: '', cpf: digits }));
+                    setFiltros({ ...localFiltros, nome: '', cpf: digits });
+                    setShowFilters(false);
+                  } else {
+                    handleAplicarFiltros();
+                  }
+                }
+              }}
             />
           </div>
           <button 

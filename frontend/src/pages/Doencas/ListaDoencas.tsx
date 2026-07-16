@@ -47,6 +47,10 @@ export const ListaDoencas: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
+    return () => clearFiltros();
+  }, []);
+
+  useEffect(() => {
     carregarDoencas();
   }, [page, filtros]);
 
@@ -141,11 +145,24 @@ export const ListaDoencas: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por nome da doença ou código..."
+              placeholder="Buscar por nome da doença, código ou CPF..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-rose-500 outline-none transition-all"
               value={localFiltros.nomeDoenca || ''}
               onChange={(e) => setLocalFiltros({ ...localFiltros, nomeDoenca: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && aplicarFiltros()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const digits = (localFiltros.nomeDoenca || '').replace(/\D/g, '');
+                  if (digits.length >= 11) {
+                    const next = { ...localFiltros, nomeDoenca: '', trabalhadorId: digits };
+                    setLocalFiltros(next);
+                    setPage(1);
+                    setFiltros(next);
+                    setShowFilters(false);
+                  } else {
+                    aplicarFiltros();
+                  }
+                }
+              }}
             />
           </div>
           <button 

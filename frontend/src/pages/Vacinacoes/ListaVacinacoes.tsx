@@ -44,6 +44,10 @@ export const ListaVacinacoes: React.FC = () => {
   const [localFiltros, setLocalFiltros] = useState(filtros);
   const [showFilters, setShowFilters] = useState(false);
 
+  useEffect(() => {
+    return () => clearFiltros();
+  }, []);
+
   const carregarVacinacoes = async () => {
     setIsLoading(true);
     try {
@@ -140,11 +144,24 @@ export const ListaVacinacoes: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por nome da vacina..."
+              placeholder="Buscar por nome da vacina ou CPF..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
               value={localFiltros.vacina || ''}
               onChange={(e) => setLocalFiltros({ ...localFiltros, vacina: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && aplicarFiltros()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const digits = (localFiltros.vacina || '').replace(/\D/g, '');
+                  if (digits.length >= 11) {
+                    const next = { ...localFiltros, vacina: '', trabalhadorId: digits };
+                    setLocalFiltros(next);
+                    setPage(1);
+                    setFiltros(next);
+                    setShowFilters(false);
+                  } else {
+                    aplicarFiltros();
+                  }
+                }
+              }}
             />
           </div>
           <button 
