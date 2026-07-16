@@ -156,11 +156,18 @@ export const NovoAcidente: React.FC = () => {
   useEffect(() => {
     const state = location.state as { trabalhadorCpf?: string; notificacao?: any } | null;
     if (state?.trabalhadorCpf && state?.notificacao) {
+      const n = state.notificacao;
       setFormData((prev) => ({
         ...prev,
         trabalhadorId: state.trabalhadorCpf!.replace(/\D/g, ''),
-        dataAcidente: state.notificacao.dataOcorrencia || '',
-        dataNotificacao: state.notificacao.dataNotificacao || '',
+        dataAcidente: n.dataOcorrencia || '',
+        dataNotificacao: n.dataNotificacao || '',
+        cidLesao: n.codigoAgravo || '',
+        unidadeAtendimento: n.unidadeSaude || '',
+        descricao: n.nomeAgravo || '',
+        local: [n.municipioNotificacao, n.ufNotificacao].filter(Boolean).join(' - '),
+        catNumero: n.catRelacionada || '',
+        catNas: !!n.catRelacionada,
       }));
       toast.success('Dados importados do SINAN');
     }
