@@ -1,0 +1,382 @@
+[
+  {
+    "cpf": "12345678900",
+    "cns": "701234567890123",
+    "nome": "João Trabalhador da Silva",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2025-001",
+        "data_notificacao": "2025-03-17",
+        "data_ocorrencia": "2025-03-15",
+        "codigo_agravo": "S61.0",
+        "nome_agravo": "Ferimento da mão",
+        "tipo_notificacao": "Acidente de Trabalho",
+        "cbo_ocupacao": "7221-05 - Operador de máquina de corte",
+        "cnae_empresa": "25.99-3 - Fabricação de outros produtos de metal",
+        "uf_notificacao": "BA",
+        "municipio_notificacao": "Camaçari",
+        "unidade_saude": "UPA Camaçari",
+        "evolucao": "Incapacidade temporária",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cat_relacionada": "CAT-2025-001",
+        "cns_paciente": "701234567890123",
+        "data_nascimento": "1985-04-12",
+        "sexo": "M",
+        "raca_cor": "Parda",
+        "escolaridade": "Ensino Médio Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "290570"
+      },
+      {
+        "numero_notificacao": "SINAN-2025-002",
+        "data_notificacao": "2025-07-24",
+        "data_ocorrencia": "2025-07-22",
+        "codigo_agravo": "M77.1",
+        "nome_agravo": "Epicondilite lateral (LER/DORT)",
+        "tipo_notificacao": "Doença Relacionada ao Trabalho",
+        "cbo_ocupacao": "7221-05 - Operador de máquina de corte",
+        "cnae_empresa": "25.99-3 - Fabricação de outros produtos de metal",
+        "uf_notificacao": "BA",
+        "municipio_notificacao": "Camaçari",
+        "unidade_saude": "CEREST Camaçari",
+        "evolucao": "Incapacidade temporária",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cat_relacionada": "CAT-2025-002",
+        "cns_paciente": "701234567890123",
+        "data_nascimento": "1985-04-12",
+        "sexo": "M",
+        "raca_cor": "Parda",
+        "escolaridade": "Ensino Médio Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "290570"
+      }
+    ]
+  },
+  {
+    "cpf": "98765432100",
+    "cns": "701234567890456",
+    "nome": "Maria Aparecida de Souza",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2025-003",
+        "data_notificacao": "2025-08-10",
+        "data_ocorrencia": "2025-08-08",
+        "codigo_agravo": "M54.5",
+        "nome_agravo": "Dor lombar baixa (DORT)",
+        "tipo_notificacao": "Doença Relacionada ao Trabalho",
+        "cbo_ocupacao": "4110-05 - Assistente administrativo",
+        "cnae_empresa": "47.81-1 - Comércio varejista de artigos de escritório",
+        "uf_notificacao": "SP",
+        "municipio_notificacao": "São Paulo",
+        "unidade_saude": "CEREST São Paulo",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "701234567890456",
+        "data_nascimento": "1990-09-22",
+        "sexo": "F",
+        "raca_cor": "Branca",
+        "escolaridade": "Ensino Superior Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "355030"
+      }
+    ]
+  },
+  {
+    "cpf": "45678912300",
+    "cns": "701234567890789",
+    "nome": "Carlos Eduardo Oliveira",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-001",
+        "data_notificacao": "2026-02-12",
+        "data_ocorrencia": "2026-02-10",
+        "codigo_agravo": "S93.4",
+        "nome_agravo": "Entorse do tornozelo direito",
+        "tipo_notificacao": "Acidente de Trabalho",
+        "cbo_ocupacao": "5132-10 - Auxiliar de cozinha",
+        "cnae_empresa": "56.11-2 - Restaurantes e similares",
+        "uf_notificacao": "BA",
+        "municipio_notificacao": "Feira de Santana",
+        "unidade_saude": "UPA Feira de Santana",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cat_relacionada": "CAT-2026-001",
+        "cns_paciente": "701234567890789",
+        "data_nascimento": "1978-01-05",
+        "sexo": "M",
+        "raca_cor": "Preta",
+        "escolaridade": "Ensino Fundamental Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "291080"
+      }
+    ]
+  },
+  {
+    "cpf": "32165498700",
+    "cns": "701234567890012",
+    "nome": "Ana Beatriz Costa",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-002",
+        "data_notificacao": "2026-03-05",
+        "data_ocorrencia": "2026-03-04",
+        "codigo_agravo": "Y04.0",
+        "nome_agravo": "Agressão por força corporal (Violência no trabalho)",
+        "tipo_notificacao": "Violência Interpessoal",
+        "cbo_ocupacao": "2235-05 - Técnico de enfermagem",
+        "cnae_empresa": "86.10-1 - Atividades de hospitais",
+        "uf_notificacao": "GO",
+        "municipio_notificacao": "Goiânia",
+        "unidade_saude": "Hospital de Clínicas de Goiânia",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "701234567890012",
+        "data_nascimento": "1995-07-18",
+        "sexo": "F",
+        "raca_cor": "Amarela",
+        "escolaridade": "Ensino Técnico Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "520870"
+      }
+    ]
+  },
+  {
+    "cpf": "65432198700",
+    "cns": "701234567890345",
+    "nome": "Pedro Henrique Santos",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-003",
+        "data_notificacao": "2026-06-20",
+        "data_ocorrencia": "2026-06-18",
+        "codigo_agravo": "X58",
+        "nome_agravo": "Exposição a outros fatores especificados",
+        "tipo_notificacao": "Acidente de Trabalho",
+        "cbo_ocupacao": "6222-05 - Pescador artesanal",
+        "cnae_empresa": "03.11-6 - Pesca artesanal",
+        "uf_notificacao": "AM",
+        "municipio_notificacao": "Manaus",
+        "unidade_saude": "UBS Manaus Zona Rural",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Trabalhador avulso",
+        "cns_paciente": "701234567890345",
+        "data_nascimento": "1982-11-30",
+        "sexo": "M",
+        "raca_cor": "Indígena",
+        "escolaridade": "Ensino Fundamental Incompleto",
+        "gestante": false,
+        "codigo_municipio_ibge": "130260"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000001",
+    "cns": "700000000000001",
+    "nome": "Ana Silva Rodrigues",
+    "notificacoes": []
+  },
+  {
+    "cpf": "700000000000005",
+    "cns": "700000000000005",
+    "nome": "Fernanda Gomes Pereira",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2025-004",
+        "data_notificacao": "2025-11-20",
+        "data_ocorrencia": "2025-11-15",
+        "codigo_agravo": "M65.9",
+        "nome_agravo": "Sinovite e tenossinovite não especificada (LER/DORT)",
+        "tipo_notificacao": "Doença Relacionada ao Trabalho",
+        "cbo_ocupacao": "4110-10 - Supervisor administrativo",
+        "cnae_empresa": "82.11-3 - Serviços combinados de escritório",
+        "uf_notificacao": "MG",
+        "municipio_notificacao": "Belo Horizonte",
+        "unidade_saude": "CEREST Belo Horizonte",
+        "evolucao": "Incapacidade temporária",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "700000000000005",
+        "data_nascimento": "1988-03-15",
+        "sexo": "F",
+        "raca_cor": "Branca",
+        "escolaridade": "Ensino Superior Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "310620"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000010",
+    "cns": "700000000000010",
+    "nome": "Lucas Santos Oliveira",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-004",
+        "data_notificacao": "2026-07-10",
+        "data_ocorrencia": "2026-07-09",
+        "codigo_agravo": "W25.0",
+        "nome_agravo": "Contato com vidro quebrado",
+        "tipo_notificacao": "Acidente de Trabalho",
+        "cbo_ocupacao": "9143-05 - Coletor de lixo",
+        "cnae_empresa": "38.11-4 - Coleta de resíduos não perigosos",
+        "uf_notificacao": "RJ",
+        "municipio_notificacao": "Rio de Janeiro",
+        "unidade_saude": "UPA Tijuca",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "700000000000010",
+        "data_nascimento": "1992-07-25",
+        "sexo": "M",
+        "raca_cor": "Parda",
+        "escolaridade": "Ensino Fundamental Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "330455"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000015",
+    "cns": "700000000000015",
+    "nome": "Patrícia Costa Almeida",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-005",
+        "data_notificacao": "2026-05-22",
+        "data_ocorrencia": "2026-05-21",
+        "codigo_agravo": "W46.0",
+        "nome_agravo": "Acidente com agulha hipodérmica",
+        "tipo_notificacao": "Acidente com Material Biológico",
+        "cbo_ocupacao": "2235-10 - Enfermeiro",
+        "cnae_empresa": "86.10-1 - Atividades de hospitais",
+        "uf_notificacao": "PE",
+        "municipio_notificacao": "Recife",
+        "unidade_saude": "Hospital das Clínicas de Recife",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cat_relacionada": "CAT-2026-002",
+        "cns_paciente": "700000000000015",
+        "data_nascimento": "1991-11-03",
+        "sexo": "F",
+        "raca_cor": "Branca",
+        "escolaridade": "Ensino Superior Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "261160"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000020",
+    "cns": "700000000000020",
+    "nome": "Gabriel Ferreira Martins",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2025-005",
+        "data_notificacao": "2025-08-03",
+        "data_ocorrencia": "2025-08-01",
+        "codigo_agravo": "S06.0",
+        "nome_agravo": "Concussão cerebral",
+        "tipo_notificacao": "Acidente de Trabalho",
+        "cbo_ocupacao": "7151-05 - Pedreiro",
+        "cnae_empresa": "41.20-4 - Construção de edifícios",
+        "uf_notificacao": "RS",
+        "municipio_notificacao": "Porto Alegre",
+        "unidade_saude": "Hospital de Pronto Socorro de Porto Alegre",
+        "evolucao": "Cura",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cat_relacionada": "CAT-2025-003",
+        "cns_paciente": "700000000000020",
+        "data_nascimento": "1987-05-18",
+        "sexo": "M",
+        "raca_cor": "Branca",
+        "escolaridade": "Ensino Fundamental Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "431490"
+      },
+      {
+        "numero_notificacao": "SINAN-2026-006",
+        "data_notificacao": "2026-01-12",
+        "data_ocorrencia": "2026-01-10",
+        "codigo_agravo": "M54.5",
+        "nome_agravo": "Dor lombar baixa (DORT)",
+        "tipo_notificacao": "Doença Relacionada ao Trabalho",
+        "cbo_ocupacao": "7151-05 - Pedreiro",
+        "cnae_empresa": "41.20-4 - Construção de edifícios",
+        "uf_notificacao": "RS",
+        "municipio_notificacao": "Porto Alegre",
+        "unidade_saude": "CEREST Porto Alegre",
+        "evolucao": "Incapacidade temporária",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "700000000000020",
+        "data_nascimento": "1987-05-18",
+        "sexo": "M",
+        "raca_cor": "Branca",
+        "escolaridade": "Ensino Fundamental Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "431490"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000050",
+    "cns": "700000000000050",
+    "nome": "Mariana Ribeiro Souza",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-007",
+        "data_notificacao": "2026-04-15",
+        "data_ocorrencia": "2026-04-14",
+        "codigo_agravo": "Y07.3",
+        "nome_agravo": "Maus-tatos psicológicos (Assédio moral no trabalho)",
+        "tipo_notificacao": "Violência Interpessoal",
+        "cbo_ocupacao": "2512-05 - Analista de sistemas",
+        "cnae_empresa": "62.01-5 - Desenvolvimento de programas de computador",
+        "uf_notificacao": "SP",
+        "municipio_notificacao": "Campinas",
+        "unidade_saude": "CEREST Campinas",
+        "evolucao": "Encaminhamento para acompanhamento psicológico",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "700000000000050",
+        "data_nascimento": "1994-12-01",
+        "sexo": "F",
+        "raca_cor": "Parda",
+        "escolaridade": "Ensino Superior Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "350950"
+      }
+    ]
+  },
+  {
+    "cpf": "700000000000100",
+    "cns": "700000000000100",
+    "nome": "Rafael Carvalho Lopes",
+    "notificacoes": [
+      {
+        "numero_notificacao": "SINAN-2026-008",
+        "data_notificacao": "2026-04-02",
+        "data_ocorrencia": "2026-03-30",
+        "codigo_agravo": "I63.9",
+        "nome_agravo": "Acidente vascular cerebral não especificado",
+        "tipo_notificacao": "Doença Relacionada ao Trabalho",
+        "cbo_ocupacao": "2522-05 - Diretor de operações",
+        "cnae_empresa": "82.11-3 - Serviços combinados de escritório",
+        "uf_notificacao": "DF",
+        "municipio_notificacao": "Brasília",
+        "unidade_saude": "Hospital de Base de Brasília",
+        "evolucao": "Óbito",
+        "situacao_mercado_trabalho": "Empregado com carteira assinada",
+        "cns_paciente": "700000000000100",
+        "data_nascimento": "1975-08-22",
+        "sexo": "M",
+        "raca_cor": "Parda",
+        "escolaridade": "Ensino Superior Completo",
+        "gestante": false,
+        "codigo_municipio_ibge": "530010"
+      }
+    ]
+  },
+  {
+    "cpf": "10000113646",
+    "cns": "898003486500004",
+    "nome": "Carlos Eduardo de Oliveira",
+    "notificacoes": []
+  }
+]

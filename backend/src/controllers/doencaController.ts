@@ -3,6 +3,7 @@ import doencaService from '../services/DoencaService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../middleware/errorHandler.js';
 import Trabalhador from '../models/Trabalhador.js';
+import { sinanService } from '../services/SinanService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 
@@ -20,8 +21,38 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), doenca);
 
+  notificarSinan(req, doenca);
+
   res.status(201).json({ sucesso: true, dados: doenca });
 });
+
+async function notificarSinan(req: Request, doenca: any) {
+  try {
+    const trabalhador = await Trabalhador.findById(doenca.trabalhadorId);
+    if (!trabalhador) return;
+
+    const cpf = trabalhador.cpf?.replace(/\D/g, '');
+    const cns = trabalhador.cartaoSus?.replace(/\D/g, '');
+
+    await sinanService.notificar({
+      tipoNotificacao: 'Doença Relacionada ao Trabalho',
+      cpf,
+      cns,
+      nome: trabalhador.nome,
+      dataOcorrencia: doenca.dataInicio?.toISOString?.() || doenca.dataInicio,
+      codigoAgravo: doenca.codigoDoenca || '',
+      nomeAgravo: doenca.nomeDoenca || '',
+      cboOcupacao: trabalhador.trabalho?.ocupacao || '',
+      cnaeEmpresa: '',
+      ufNotificacao: trabalhador.endereco?.estado || '',
+      municipioNotificacao: trabalhador.endereco?.cidade || '',
+      unidadeSaude: '',
+      situacaoMercadoTrabalho: trabalhador.vinculo?.tipo || '',
+    });
+  } catch (err: any) {
+    console.error('[SINAN] Erro ao notificar doença:', err.message);
+  }
+}
 
 export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;

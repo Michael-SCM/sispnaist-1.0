@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
+import { sinanService } from '../services/SinanService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
@@ -15,11 +16,41 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), acidente);
 
+  notificarSinan(req, acidente);
+
   res.status(201).json({
     status: 'success',
     data: { acidente },
   });
 });
+
+async function notificarSinan(req: Request, acidente: any) {
+  try {
+    const trabalhador = await Trabalhador.findById(acidente.trabalhadorId);
+    if (!trabalhador) return;
+
+    const cpf = trabalhador.cpf?.replace(/\D/g, '');
+    const cns = trabalhador.cartaoSus?.replace(/\D/g, '');
+
+    await sinanService.notificar({
+      tipoNotificacao: 'Acidente de Trabalho',
+      cpf,
+      cns,
+      nome: trabalhador.nome,
+      dataOcorrencia: acidente.dataAcidente?.toISOString?.() || acidente.dataAcidente,
+      codigoAgravo: acidente.lesoes?.[0] || '',
+      nomeAgravo: acidente.descricao || '',
+      cboOcupacao: trabalhador.trabalho?.ocupacao || '',
+      cnaeEmpresa: '',
+      ufNotificacao: trabalhador.endereco?.estado || '',
+      municipioNotificacao: trabalhador.endereco?.cidade || '',
+      unidadeSaude: '',
+      situacaoMercadoTrabalho: trabalhador.vinculo?.tipo || '',
+    });
+  } catch (err: any) {
+    console.error('[SINAN] Erro ao notificar acidente:', err.message);
+  }
+}
 
 export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;

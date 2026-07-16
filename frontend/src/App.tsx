@@ -77,6 +77,7 @@ const ListaRiscosOcupacionais = React.lazy(() => import('./pages/Trabalhadores/R
 const FormRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/FormRiscoOcupacional.js'));
 const DetalhesRiscoOcupacional = React.lazy(() => import('./pages/Trabalhadores/RiscosOcupacionais/DetalhesRiscoOcupacional.js'));
 const InternacoesSih = React.lazy(() => import('./pages/Trabalhadores/InternacoesSih.js'));
+const NotificacoesSinan = React.lazy(() => import('./pages/Trabalhadores/NotificacoesSinan.js'));
 const ListaExamesSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/ListaExamesSaude.js'));
 const FormExameSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/FormExameSaude.js'));
 const DetalhesExameSaude = React.lazy(() => import('./pages/Trabalhadores/ExamesSaude/DetalhesExameSaude.js'));
@@ -632,6 +633,14 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <InternacoesSih />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabalhadores/:id/notificacoes-sinan"
+          element={
+            <ProtectedRoute>
+              <NotificacoesSinan />
             </ProtectedRoute>
           }
         />

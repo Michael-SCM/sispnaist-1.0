@@ -53,6 +53,9 @@ const config = {
   msEsocialApiUrl: process.env.MS_ESOCIAL_API_URL || '',
   msEsocialToken: process.env.MS_ESOCIAL_TOKEN || '',
   msEsocialApiKey: process.env.MS_ESOCIAL_API_KEY || '',
+  msSinanApiUrl: process.env.MS_SINAN_API_URL || '',
+  msSinanToken: process.env.MS_SINAN_TOKEN || '',
+  msSinanApiKey: process.env.MS_SINAN_API_KEY || '',
 };
 
 export default config;
