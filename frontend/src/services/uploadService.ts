@@ -57,13 +57,13 @@ export const uploadService = {
   // Download
   download: async (id: string): Promise<void> => {
     const token = useAuthStore.getState().accessToken;
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/download?token=${token}`, '_blank');
+    window.open(`${import.meta.env.VITE_API_URL || '/api'}/uploads/${id}/download?token=${token}`, '_blank');
   },
 
   // Visualizar inline (abre PDF no navegador)
   visualizar: async (id: string): Promise<void> => {
     const token = useAuthStore.getState().accessToken;
-    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/uploads/${id}/view?token=${token}`, '_blank');
+    window.open(`${import.meta.env.VITE_API_URL || '/api'}/uploads/${id}/view?token=${token}`, '_blank');
   },
 
   deletar: async (id: string): Promise<void> => {

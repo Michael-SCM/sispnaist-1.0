@@ -18,7 +18,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://sispatnaist-backend.onrender.com/api/$1"
+      "destination": "https://sispnaist-1-0.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",

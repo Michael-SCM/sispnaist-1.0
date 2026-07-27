@@ -144,7 +144,7 @@ export const ListaMaterialBiologico: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href={`${import.meta.env.VITE_API_URL}/api/export/material-biologico`}
+              href={`${import.meta.env.VITE_API_URL}/export/material-biologico`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm"

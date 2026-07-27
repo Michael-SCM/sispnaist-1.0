@@ -24,7 +24,6 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
-  const API_BASE = String(import.meta.env.VITE_API_URL ?? '').replace(/\/api\/?$/, '');
   const {
     acidentes,
     total,
