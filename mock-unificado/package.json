@@ -1,7 +1,7 @@
 {
-  "name": "mock-cadsus-api",
+  "name": "mock-apis-sispnaist",
   "version": "1.0.0",
-  "description": "Mock API do CADSUS (Ministério da Saúde) para integração com SISPNAIST",
+  "description": "Mock APIs unificadas (CADSUS, CNES, e-Social, SIH, SINAN) para SISPNAIST",
   "main": "server.js",
   "type": "module",
   "scripts": {
