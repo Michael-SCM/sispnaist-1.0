@@ -9,6 +9,8 @@ export interface IAuthRequest extends Request {
     cpf: string;
     email: string;
     perfil: string;
+    empresa?: string;
+    unidade?: string;
   };
 }
 
@@ -29,7 +31,7 @@ export const authMiddleware = async (req: IAuthRequest, res: Response, next: Nex
     }
 
     // Verificar se o usuário ainda existe, está ativo e tokenVersion é compatível
-    const user = await User.findById(decoded.id).select('ativo tokenVersion').lean();
+    const user = await User.findById(decoded.id).select('ativo tokenVersion empresa unidade').lean();
     if (!user) {
       res.status(401).json({ message: 'Usuário não encontrado' });
       return;
@@ -51,6 +53,8 @@ export const authMiddleware = async (req: IAuthRequest, res: Response, next: Nex
       cpf: decoded.cpf || '',
       email: decoded.email || '',
       perfil: decoded.perfil || '',
+      empresa: user.empresa ? String(user.empresa) : undefined,
+      unidade: user.unidade ? String(user.unidade) : undefined,
     };
 
     next();

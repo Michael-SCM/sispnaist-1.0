@@ -288,3 +288,107 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     }
   }
 };
+
+/**
+ * Envia um e-mail de alerta/notificação para um destinatário.
+ * Segue a mesma estratégia híbrida: Brevo HTTP API -> Resend HTTP API -> Gmail SMTP.
+ */
+export const sendAlertaEmail = async (
+  to: string,
+  dados: {
+    titulo: string;
+    descricao: string;
+    nivel: string;
+    tipo: string;
+    link?: string;
+    data?: string;
+  }
+): Promise<void> => {
+  const nivelCor = dados.nivel === 'alto' ? '#dc2626' : dados.nivel === 'medio' ? '#d97706' : '#2563eb';
+  const nivelLabel = dados.nivel.charAt(0).toUpperCase() + dados.nivel.slice(1);
+  const link = dados.link || `${config.frontendUrl}/alertas`;
+  const dataHora = dados.data || new Date().toLocaleString('pt-BR');
+
+  const htmlContent = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      <div style="background-color: ${nivelCor}; color: #fff; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+        <strong>${nivelLabel.toUpperCase()} - Alerta do SISPNAIST</strong>
+      </div>
+      <h2 style="color: #111; margin: 0 0 8px;">${dados.titulo}</h2>
+      <p style="color: #6b7280; font-size: 14px; margin: 0 0 16px;">
+        Tipo: ${dados.tipo} &nbsp;•&nbsp; Nível: ${nivelLabel} &nbsp;•&nbsp; ${dataHora}
+      </p>
+      <p style="color: #374151; font-size: 15px; line-height: 1.6; white-space: pre-line;">${dados.descricao}</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${link}" style="background-color: #2563eb; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+          Ver Alertas
+        </a>
+      </div>
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático gerado pelo sistema de alertas do SISPNAIST. Por favor, não responda.</p>
+    </div>
+  `;
+
+  // 1. Brevo HTTP API
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: { name: 'SISPNAIST', email: config.email.user || 'sispnaist@gmail.com' },
+        to: [{ email: to }],
+        subject: `[Alerta] ${dados.titulo}`,
+        htmlContent,
+      }, {
+        headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' },
+      });
+      return;
+    } catch (brevoError: any) {
+      const errorMsg = brevoError.response?.data || brevoError.message;
+      if (process.env.NODE_ENV !== 'production') console.error('ERRO BREVO:', errorMsg);
+      throw new Error(`Falha ao enviar alerta via Brevo: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 2. Resend HTTP API
+  if (process.env.RESEND_API_KEY) {
+    const fromEmail =
+      config.email.from && config.email.from.includes('gmail')
+        ? 'SISPNAIST <onboarding@resend.dev>'
+        : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
+    try {
+      await axios.post('https://api.resend.com/emails', {
+        from: fromEmail,
+        to,
+        subject: `Alerta — ${dados.titulo}`,
+        html: htmlContent,
+      }, {
+        headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      });
+      return;
+    } catch (resendError: any) {
+      const errorMsg = resendError.response?.data || resendError.message;
+      if (process.env.NODE_ENV !== 'production') console.error('Erro RESEND:', errorMsg);
+      throw new Error(`Falha ao enviar alerta via Resend: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 3. Fallback Gmail SMTP
+  if (!config.email.user || !config.email.pass) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Nenhum serviço de envio de e-mail (Brevo/Resend/SMTP) configurado para o sistema de alertas.');
+    }
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: config.email.from,
+      to,
+      subject: `Alerta — ${dados.titulo}`,
+      html: htmlContent,
+    });
+  } catch (smtpError: any) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    }
+  }
+};

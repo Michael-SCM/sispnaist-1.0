@@ -89,6 +89,7 @@ const DetalhesReadaptacao = React.lazy(() => import('./pages/Trabalhadores/Reada
 const ListaAtos = React.lazy(() => import('./pages/AtosMunicipais/ListaAtos.js'));
 const FormAto = React.lazy(() => import('./pages/AtosMunicipais/FormAto.js'));
 const Monitoramento = React.lazy(() => import('./pages/Monitoramento.js'));
+const Alertas = React.lazy(() => import('./pages/Alertas.js'));
 const RelatorioConformidade = React.lazy(() => import('./pages/Publico/RelatorioConformidade.js'));
 
 const ListaEmpresas = React.lazy(() => import('./pages/Admin/Empresas/ListaEmpresas.js'));
@@ -708,6 +709,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute authorize={['admin', 'gestor']}>
               <Monitoramento />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/alertas"
+          element={
+            <ProtectedRoute authorize={['admin', 'gestor']}>
+              <Alertas />
             </ProtectedRoute>
           }
         />

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore.js';
 import { authService } from '../services/authService.js';
+import { NotificacoesDropdown } from './NotificacoesDropdown.js';
 
 export const Header: React.FC = React.memo(() => {
   const navigate = useNavigate();
@@ -94,6 +95,16 @@ export const Header: React.FC = React.memo(() => {
                     aria-current={isActive('/monitoramento') ? 'page' : undefined}
                   >
                     Monitoramento
+                  </Link>
+                )}
+
+                {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+                  <Link
+                    to="/alertas"
+                    className="hover:text-blue-100 transition text-sm"
+                    aria-current={isActive('/alertas') ? 'page' : undefined}
+                  >
+                    Alertas
                   </Link>
                 )}
 
@@ -286,6 +297,11 @@ export const Header: React.FC = React.memo(() => {
                     )}
                   </div>
                 )}
+                {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+                  <div className="flex items-center border-l border-blue-400 pl-4">
+                    <NotificacoesDropdown />
+                  </div>
+                )}
                 <div className="relative flex items-center" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -425,6 +441,16 @@ export const Header: React.FC = React.memo(() => {
                 aria-current={isActive('/monitoramento') ? 'page' : undefined}
               >
                 Monitoramento
+              </Link>
+            )}
+            {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
+              <Link
+                to="/alertas"
+                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-current={isActive('/alertas') ? 'page' : undefined}
+              >
+                Alertas
               </Link>
             )}
             <div className="pt-2 border-t border-blue-500">

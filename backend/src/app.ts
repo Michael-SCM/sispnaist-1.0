@@ -43,10 +43,13 @@ import sihRoutes from './routes/sih.js';
 import cnesRoutes from './routes/cnes.js';
 import esocialRoutes from './routes/esocial.js';
 import sinanRoutes from './routes/sinan.js';
+import alertasRoutes from './routes/alertas.js';
 import { csrfProtection } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
 import { seedRegrasValidacao } from './utils/seedRegrasValidacao.js';
+import { seedAlertasRegras } from './utils/seedAlertasRegras.js';
+import { initAlertScheduler } from './services/alertaScheduler.js';
 
 const app = express();
 
@@ -128,6 +131,8 @@ connectDB().then(() => {
   if (process.env.NODE_ENV !== 'test') {
     seedCatalogos();
     seedRegrasValidacao();
+    seedAlertasRegras();
+    initAlertScheduler();
   }
 });
 
@@ -303,6 +308,7 @@ app.use('/api/integracao/sih', sihRoutes);
 app.use('/api/integracao/cnes', cnesRoutes);
 app.use('/api/integracao/esocial', esocialRoutes);
 app.use('/api/integracao/sinan', sinanRoutes);
+app.use('/api/alertas', alertasRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
