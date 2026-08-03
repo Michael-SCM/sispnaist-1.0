@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout.js';
 import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import {
@@ -9,8 +10,9 @@ import {
   TipoAlerta,
   NivelAlerta,
   StatusAlerta,
+  obterDestinoAlerta,
 } from '../services/alertaService.js';
-import { Bell, BellOff, Check, Archive, RotateCcw, RefreshCw, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Bell, BellOff, Check, Archive, RotateCcw, RefreshCw, Plus, Pencil, Trash2, ExternalLink } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore.js';
 
@@ -50,6 +52,7 @@ const REGRA_OPERADORES = ['>=', '>', '<', '<=', '=='];
 const Alertas: React.FC = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.perfil === 'admin';
+  const navigate = useNavigate();
   const [alertas, setAlertas] = useState<IAlerta[]>([]);
   const [resumo, setResumo] = useState<IAlertaResumo>({ totalAtivos: 0, novos: 0, alto: 0 });
   const [regras, setRegras] = useState<IAlertaRegra[]>([]);
@@ -403,7 +406,11 @@ const Alertas: React.FC = () => {
                 )}
                 {alertas.map((alerta) => (
                   <div key={alerta._id} className="px-8 py-5 flex flex-col md:flex-row md:items-center gap-4">
-                    <div className="flex-1 min-w-0">
+                    <button
+                      onClick={() => navigate(obterDestinoAlerta(alerta, user?.perfil))}
+                      className="flex-1 min-w-0 text-left group"
+                      title="Ir para os dados do alerta"
+                    >
                       <div className="flex flex-wrap items-center gap-2">
                         <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full ${TIPO_CORES[alerta.tipo]}`}>
                           {TIPO_ROTULOS[alerta.tipo]}
@@ -415,13 +422,16 @@ const Alertas: React.FC = () => {
                           {STATUS_ROTULOS[alerta.status]}
                         </span>
                       </div>
-                      <h4 className="font-bold text-slate-800 mt-2">{alerta.titulo}</h4>
+                      <h4 className="font-bold text-slate-800 mt-2 group-hover:text-indigo-600 transition">{alerta.titulo}</h4>
                       <p className="text-sm text-slate-500 mt-1">{alerta.descricao}</p>
                       <p className="text-xs text-slate-400 mt-2">
                         {new Date(alerta.dataAlerta).toLocaleString('pt-BR')}
                         {alerta.referencia?.entidade && ` • ${alerta.referencia.entidade}`}
                       </p>
-                    </div>
+                      <span className="inline-flex items-center gap-1 mt-2 text-xs font-semibold text-indigo-600 opacity-0 group-hover:opacity-100 transition">
+                        Ver dados <ExternalLink size={12} />
+                      </span>
+                    </button>
                     {alerta.status !== 'arquivada' && (
                       <div className="flex gap-2">
                         {alerta.status !== 'lida' && (

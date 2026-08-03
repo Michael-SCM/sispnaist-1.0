@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell } from 'lucide-react';
-import alertaService, { IAlerta, IAlertaResumo } from '../services/alertaService.js';
+import alertaService, { IAlerta, IAlertaResumo, obterDestinoAlerta } from '../services/alertaService.js';
+import { useAuthStore } from '../store/authStore.js';
 
 const NIVEL_CORES: Record<string, string> = {
   alto: 'bg-red-500',
@@ -10,6 +11,7 @@ const NIVEL_CORES: Record<string, string> = {
 };
 
 export const NotificacoesDropdown: React.FC = () => {
+  const { user } = useAuthStore();
   const [resumo, setResumo] = useState<IAlertaResumo>({ totalAtivos: 0, novos: 0, alto: 0 });
   const [alertas, setAlertas] = useState<IAlerta[]>([]);
   const [open, setOpen] = useState(false);
@@ -81,7 +83,7 @@ export const NotificacoesDropdown: React.FC = () => {
             {alertas.map((alerta) => (
               <Link
                 key={alerta._id}
-                to="/alertas"
+                to={obterDestinoAlerta(alerta, user?.perfil)}
                 onClick={() => setOpen(false)}
                 className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition"
                 role="menuitem"

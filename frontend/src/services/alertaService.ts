@@ -62,6 +62,28 @@ export interface IAlertaRegra {
   dataAtualizacao: string;
 }
 
+export function obterDestinoAlerta(alerta: IAlerta, perfil?: string): string {
+  const ref = alerta.referencia;
+  if (ref?.entidade && ref.entidadeId) {
+    if (ref.entidade === 'Trabalhador') return `/trabalhadores/${ref.entidadeId}`;
+    if (ref.entidade === 'Empresa' && perfil === 'admin') return `/admin/empresas/${ref.entidadeId}`;
+    if (ref.entidade === 'Unidade' && perfil === 'admin') return `/admin/unidades/${ref.entidadeId}`;
+    if (ref.entidade === 'RegraValidacao' && perfil === 'admin') return '/admin/regras-validacao';
+  }
+  switch (alerta.tipo) {
+    case 'PICO_ACIDENTES':
+      return '/acidentes';
+    case 'VACINA_VENCENDO':
+      return '/vacinacoes';
+    case 'MONITORAMENTO_CRITICO':
+      return '/trabalhadores';
+    case 'NAO_CONFORMIDADE':
+      return perfil === 'admin' ? '/admin/regras-validacao' : '/dashboard';
+    default:
+      return '/alertas';
+  }
+}
+
 export const alertaService = {
   listar: async (params?: {
     page?: number;
