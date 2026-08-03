@@ -71,7 +71,7 @@ export class AlertaService {
    * Gera alertas de vacinação vencida/próxima de vencer, agregados por empresa.
    */
   async avaliarVacinacoes(): Promise<void> {
-    const regras = await AlertaRegra.find({ tipo: 'VACINA_VENCENDO', ativo: true }).lean();
+    const regras = (await AlertaRegra.find({ tipo: 'VACINA_VENCENDO', ativo: true }).lean()) as unknown as IAlertaRegra[];
     if (regras.length === 0) return;
 
     const diasAntecedencia = await this.obterParametro('dias_alerta_vacina', config.alert.diasAntecedenciaVacina);
@@ -127,7 +127,7 @@ export class AlertaService {
    * Gera alertas de pico/aumento de acidentes com base nas regras configuradas.
    */
   async avaliarPicosAcidentes(): Promise<void> {
-    const regras = await AlertaRegra.find({ tipo: 'PICO_ACIDENTES', ativo: true }).lean();
+    const regras = (await AlertaRegra.find({ tipo: 'PICO_ACIDENTES', ativo: true }).lean()) as unknown as IAlertaRegra[];
     if (regras.length === 0) return;
 
     for (const regra of regras) {
@@ -210,7 +210,7 @@ export class AlertaService {
    * Gera alertas de monitoramento clínico (trabalhadores com múltiplos acidentes).
    */
   async avaliarMonitoramentoCritico(): Promise<void> {
-    const regras = await AlertaRegra.find({ tipo: 'MONITORAMENTO_CRITICO', ativo: true }).lean();
+    const regras = (await AlertaRegra.find({ tipo: 'MONITORAMENTO_CRITICO', ativo: true }).lean()) as unknown as IAlertaRegra[];
     if (regras.length === 0) return;
 
     const emRisco: any[] = await Acidente.aggregate([
@@ -246,7 +246,7 @@ export class AlertaService {
    * Gera alertas de não conformidade a partir das regras de validação obrigatórias.
    */
   async avaliarNaoConformidades(): Promise<void> {
-    const alertaRegras = await AlertaRegra.find({ tipo: 'NAO_CONFORMIDADE', ativo: true }).lean();
+    const alertaRegras = (await AlertaRegra.find({ tipo: 'NAO_CONFORMIDADE', ativo: true }).lean()) as unknown as IAlertaRegra[];
     if (alertaRegras.length === 0) return;
 
     const hoje = new Date();
