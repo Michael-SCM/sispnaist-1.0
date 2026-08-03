@@ -20,7 +20,7 @@ export const NotificacoesDropdown: React.FC = () => {
   const carregar = useCallback(async () => {
     try {
       const [res, lista] = await Promise.all([
-        alertaService.obterResumo(),
+        alertaService.obterResumo(true),
         alertaService.listar({ status: 'ativa', limit: 8, naoLidos: true }),
       ]);
       setResumo(res);

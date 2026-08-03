@@ -97,8 +97,8 @@ export const alertaService = {
     return response.data;
   },
 
-  obterResumo: async (): Promise<IAlertaResumo> => {
-    const response = await api.get('/alertas/resumo');
+  obterResumo: async (naoLidos?: boolean): Promise<IAlertaResumo> => {
+    const response = await api.get('/alertas/resumo', { params: { naoLidos } });
     return response.data;
   },
 

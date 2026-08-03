@@ -449,13 +449,13 @@ export class AlertaService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async obterResumo(params: { perfil: string; empresaId?: string; userId?: string }) {
+  async obterResumo(params: { perfil: string; empresaId?: string; userId?: string; naoLidos?: boolean }) {
     const base: any = {};
     if (params.perfil === 'gestor') {
       if (!params.empresaId) return { totalAtivos: 0, novos: 0, alto: 0 };
       base.empresaId = params.empresaId;
     }
-    if (params.userId) base.lidoPorUsuarios = { $ne: params.userId };
+    if (params.userId && params.naoLidos) base.lidoPorUsuarios = { $ne: params.userId };
     const ativo = { ...base, status: { $in: ['ativa', 'reagindo'] } };
     const [totalAtivos, novos, alto] = await Promise.all([
       Alerta.countDocuments(ativo),

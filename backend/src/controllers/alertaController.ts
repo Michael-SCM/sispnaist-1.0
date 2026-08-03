@@ -33,6 +33,7 @@ class AlertaController {
         perfil: user.perfil,
         empresaId: user.empresa,
         userId: user.id,
+        naoLidos: (req.query.naoLidos as string | undefined) === 'true',
       });
       return res.status(200).json(resumo);
     } catch (error) {
