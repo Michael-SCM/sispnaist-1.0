@@ -425,6 +425,7 @@ export class AlertaService {
     tipo?: string;
     status?: string;
     nivel?: string;
+    naoLidos?: boolean;
   }) {
     const page = Math.max(1, params.page || 1);
     const limit = Math.min(100, Math.max(1, params.limit || 20));
@@ -438,6 +439,7 @@ export class AlertaService {
     if (params.tipo) filtro.tipo = params.tipo;
     if (params.status) filtro.status = params.status;
     if (params.nivel) filtro.nivel = params.nivel;
+    if (params.naoLidos) filtro.lidoPorUsuarios = { $ne: params.userId };
 
     const [data, total] = await Promise.all([
       Alerta.find(filtro).sort({ dataAlerta: -1 }).skip(skip).limit(limit).lean(),
@@ -447,12 +449,13 @@ export class AlertaService {
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
-  async obterResumo(params: { perfil: string; empresaId?: string }) {
+  async obterResumo(params: { perfil: string; empresaId?: string; userId?: string }) {
     const base: any = {};
     if (params.perfil === 'gestor') {
       if (!params.empresaId) return { totalAtivos: 0, novos: 0, alto: 0 };
       base.empresaId = params.empresaId;
     }
+    if (params.userId) base.lidoPorUsuarios = { $ne: params.userId };
     const ativo = { ...base, status: { $in: ['ativa', 'reagindo'] } };
     const [totalAtivos, novos, alto] = await Promise.all([
       Alerta.countDocuments(ativo),
@@ -477,6 +480,32 @@ export class AlertaService {
     alerta.status = status;
     await alerta.save();
     return alerta;
+  }
+
+  /**
+   * Registra que um usuário leu/reconheceu um alerta (uso interno do sino, por usuário).
+   * Não altera o status global do alerta.
+   */
+  async marcarLidoParaUsuario(id: string, userId: string, params: { perfil: string; empresaId?: string }) {
+    const alerta = await Alerta.findById(id);
+    if (!alerta) throw new AppError('Alerta não encontrado', 404);
+
+    if (params.perfil === 'gestor' && (!alerta.empresaId || String(alerta.empresaId) !== params.empresaId)) {
+      throw new AppError('Sem permissão para acessar este alerta', 403);
+    }
+
+    await Alerta.updateOne({ _id: alerta._id }, { $addToSet: { lidoPorUsuarios: userId } });
+    return Alerta.findById(id);
+  }
+
+  async marcarTodosLidosParaUsuario(userId: string, params: { perfil: string; empresaId?: string }) {
+    const filtro: any = { status: { $in: ['ativa', 'reagindo'] } };
+    if (params.perfil === 'gestor') {
+      if (!params.empresaId) return { modifiedCount: 0 };
+      filtro.empresaId = params.empresaId;
+    }
+    const result = await Alerta.updateMany(filtro, { $addToSet: { lidoPorUsuarios: userId } });
+    return { modifiedCount: result.modifiedCount };
   }
 
   // ============================== REGRAS (admin) ==============================

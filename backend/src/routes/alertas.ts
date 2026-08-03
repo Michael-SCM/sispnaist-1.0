@@ -22,7 +22,9 @@ router.delete('/regras/:id', adminMiddleware, validateObjectId('id'), alertaCont
 router.post('/executar', adminOuGestorMiddleware, alertaController.executarAgora);
 
 // Ações sobre alertas
+router.post('/ler-todos', alertaController.marcarTodosLidosSinSino);
 router.post('/:id/lido', validateObjectId('id'), alertaController.marcarLido);
+router.post('/:id/lido-sino', validateObjectId('id'), alertaController.marcarLidoSino);
 router.post('/:id/arquivar', validateObjectId('id'), alertaController.arquivar);
 
 export default router;

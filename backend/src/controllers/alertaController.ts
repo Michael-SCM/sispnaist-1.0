@@ -17,6 +17,7 @@ class AlertaController {
         tipo: tipo as string | undefined,
         status: status as string | undefined,
         nivel: nivel as string | undefined,
+        naoLidos: (req.query.naoLidos as string | undefined) === 'true',
       });
 
       return res.status(200).json(resultado);
@@ -31,6 +32,7 @@ class AlertaController {
       const resumo = await alertService.obterResumo({
         perfil: user.perfil,
         empresaId: user.empresa,
+        userId: user.id,
       });
       return res.status(200).json(resumo);
     } catch (error) {
@@ -51,6 +53,19 @@ class AlertaController {
     }
   }
 
+  async marcarLidoSino(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = (req as IAuthRequest).user!;
+      const alerta = await alertService.marcarLidoParaUsuario(req.params.id, user.id, {
+        perfil: user.perfil,
+        empresaId: user.empresa,
+      });
+      return res.status(200).json(alerta);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async arquivar(req: Request, res: Response, next: NextFunction) {
     try {
       const user = (req as IAuthRequest).user!;
@@ -59,6 +74,19 @@ class AlertaController {
         empresaId: user.empresa,
       });
       return res.status(200).json(alerta);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async marcarTodosLidosSinSino(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = (req as IAuthRequest).user!;
+      const resultado = await alertService.marcarTodosLidosParaUsuario(user.id, {
+        perfil: user.perfil,
+        empresaId: user.empresa,
+      });
+      return res.status(200).json(resultado);
     } catch (error) {
       next(error);
     }

@@ -98,16 +98,6 @@ export const Header: React.FC = React.memo(() => {
                   </Link>
                 )}
 
-                {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
-                  <Link
-                    to="/alertas"
-                    className="hover:text-blue-100 transition text-sm"
-                    aria-current={isActive('/alertas') ? 'page' : undefined}
-                  >
-                    Alertas
-                  </Link>
-                )}
-
                 <div className="relative" ref={registrosRef}>
                   <button
                     onClick={() => setRegistrosOpen(!registrosOpen)}
@@ -441,16 +431,6 @@ export const Header: React.FC = React.memo(() => {
                 aria-current={isActive('/monitoramento') ? 'page' : undefined}
               >
                 Monitoramento
-              </Link>
-            )}
-            {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
-              <Link
-                to="/alertas"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-current={isActive('/alertas') ? 'page' : undefined}
-              >
-                Alertas
               </Link>
             )}
             <div className="pt-2 border-t border-blue-500">

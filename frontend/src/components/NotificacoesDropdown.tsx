@@ -21,7 +21,7 @@ export const NotificacoesDropdown: React.FC = () => {
     try {
       const [res, lista] = await Promise.all([
         alertaService.obterResumo(),
-        alertaService.listar({ status: 'ativa', limit: 8 }),
+        alertaService.listar({ status: 'ativa', limit: 8, naoLidos: true }),
       ]);
       setResumo(res);
       setAlertas(lista.data);
@@ -45,6 +45,16 @@ export const NotificacoesDropdown: React.FC = () => {
   }, []);
 
   const exibirBadge = resumo.totalAtivos > 0;
+
+  const aoClicarAlerta = (id: string) => {
+    setOpen(false);
+    alertaService.marcarLidoSino(id).then(carregar).catch(carregar);
+  };
+
+  const aoClicarVerTodos = () => {
+    setOpen(false);
+    alertaService.marcarTodosLidosSino().then(carregar).catch(carregar);
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -84,7 +94,7 @@ export const NotificacoesDropdown: React.FC = () => {
               <Link
                 key={alerta._id}
                 to={obterDestinoAlerta(alerta, user?.perfil)}
-                onClick={() => setOpen(false)}
+                onClick={() => aoClicarAlerta(alerta._id)}
                 className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition"
                 role="menuitem"
               >
@@ -102,7 +112,7 @@ export const NotificacoesDropdown: React.FC = () => {
           <div className="px-4 py-2 border-t border-gray-100">
             <Link
               to="/alertas"
-              onClick={() => setOpen(false)}
+              onClick={() => aoClicarVerTodos()}
               className="block text-center text-sm font-semibold text-indigo-600 hover:text-indigo-700"
             >
               Ver todos os alertas

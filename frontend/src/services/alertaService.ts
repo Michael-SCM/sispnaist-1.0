@@ -91,6 +91,7 @@ export const alertaService = {
     tipo?: TipoAlerta;
     status?: StatusAlerta;
     nivel?: NivelAlerta;
+    naoLidos?: boolean;
   }): Promise<IAlertaListResponse> => {
     const response = await api.get('/alertas', { params });
     return response.data;
@@ -103,6 +104,16 @@ export const alertaService = {
 
   marcarLido: async (id: string): Promise<IAlerta> => {
     const response = await api.post(`/alertas/${id}/lido`);
+    return response.data;
+  },
+
+  marcarLidoSino: async (id: string): Promise<IAlerta> => {
+    const response = await api.post(`/alertas/${id}/lido-sino`);
+    return response.data;
+  },
+
+  marcarTodosLidosSino: async (): Promise<{ modifiedCount: number }> => {
+    const response = await api.post('/alertas/ler-todos');
     return response.data;
   },
 

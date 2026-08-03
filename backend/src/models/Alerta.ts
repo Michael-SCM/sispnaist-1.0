@@ -19,6 +19,7 @@ export interface IAlerta extends Document {
   uf?: string;
   municipio?: string;
   usuariosNotificados: mongoose.Types.ObjectId[];
+  lidoPorUsuarios: mongoose.Types.ObjectId[];
   ultimoEmailEnviadoEm?: Date;
   status: StatusAlerta;
   dataAlerta: Date;
@@ -50,6 +51,7 @@ const AlertaSchema = new Schema<IAlerta>(
     uf: { type: String, trim: true },
     municipio: { type: String, trim: true },
     usuariosNotificados: [{ type: Schema.Types.ObjectId as any, ref: 'User' }],
+    lidoPorUsuarios: [{ type: Schema.Types.ObjectId as any, ref: 'User' }],
     ultimoEmailEnviadoEm: { type: Date },
     status: {
       type: String,
