@@ -77,17 +77,17 @@ const AuditLogSchema = new Schema<IAuditLogDocument>(
 );
 
 // Imutabilidade: bloquear updateMany, updateOne, findOneAndUpdate, findOneAndReplace
-const operacoesMutacao = ['updateMany', 'updateOne', 'findOneAndUpdate', 'findOneAndReplace', 'replaceOne'];
+const operacoesMutacao = ['updateMany', 'updateOne', 'findOneAndUpdate', 'findOneAndReplace', 'replaceOne'] as const;
 for (const op of operacoesMutacao) {
-  AuditLogSchema.pre(op, function () {
+  AuditLogSchema.pre(op as any, function () {
     throw new Error('Audit logs são imutáveis — operação de escrita bloqueada.');
   });
 }
 
 // Imutabilidade: bloquear deleteMany, deleteOne, findOneAndDelete
-const operacoesDelete = ['deleteMany', 'deleteOne', 'findOneAndDelete'];
+const operacoesDelete = ['deleteMany', 'deleteOne', 'findOneAndDelete'] as const;
 for (const op of operacoesDelete) {
-  AuditLogSchema.pre(op, function () {
+  AuditLogSchema.pre(op as any, function () {
     throw new Error('Audit logs são imutáveis — operação de exclusão bloqueada.');
   });
 }
