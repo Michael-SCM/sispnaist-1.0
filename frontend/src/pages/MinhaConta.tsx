@@ -23,6 +23,17 @@ export const MinhaConta: React.FC = () => {
   const [pw, setPw] = useState({ senhaAtual: '', novaSenha: '', confirmarSenha: '', codigo: '' });
   const [isSendingPwCode, setIsSendingPwCode] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+
+  const openPasswordForm = () => {
+    setPw({ senhaAtual: '', novaSenha: '', confirmarSenha: '', codigo: '' });
+    setShowPasswordForm(true);
+  };
+
+  const closePasswordForm = () => {
+    setPw({ senhaAtual: '', novaSenha: '', confirmarSenha: '', codigo: '' });
+    setShowPasswordForm(false);
+  };
 
   // 2FA
   const doisFatores = user?.doisFatoresHabilitado === true;
@@ -65,7 +76,7 @@ export const MinhaConta: React.FC = () => {
       const msg = await authService.habilitar2FA();
       toast.success(msg);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao enviar o código de confirmação.');
+      toast.error(error.message || 'Erro ao enviar o código de confirmação.');
     } finally {
       setIsSendingPwCode(false);
     }
@@ -92,9 +103,10 @@ export const MinhaConta: React.FC = () => {
       toast.success(msg);
       clearAuth();
       setPw({ senhaAtual: '', novaSenha: '', confirmarSenha: '', codigo: '' });
+      setShowPasswordForm(false);
       setTimeout(() => navigate('/login'), 2000);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao alterar a senha.');
+      toast.error(error.message || 'Erro ao alterar a senha.');
     } finally {
       setIsChangingPassword(false);
     }
@@ -108,7 +120,7 @@ export const MinhaConta: React.FC = () => {
       setCodigo2FA('');
       toast.success(msg);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao solicitar a habilitação da autenticação de dois fatores.');
+      toast.error(error.message || 'Erro ao solicitar a habilitação da autenticação de dois fatores.');
     } finally {
       setIs2FALoading(false);
     }
@@ -146,7 +158,7 @@ export const MinhaConta: React.FC = () => {
       setCodigo2FA('');
       setSenhaAtualDisable('');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao confirmar a operação.');
+      toast.error(error.message || 'Erro ao confirmar a operação.');
     } finally {
       setIs2FALoading(false);
     }
@@ -274,84 +286,107 @@ export const MinhaConta: React.FC = () => {
             </div>
 
             {/* Troca de senha */}
-            <form onSubmit={handleChangePassword} className="rounded-2xl border border-slate-100 p-5 bg-slate-50/50 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
-                  <KeyRound size={18} />
+            <div className="rounded-2xl border border-slate-100 p-5 bg-slate-50/50 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                    <KeyRound size={18} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-700">Alterar senha</p>
+                    <p className="text-xs text-slate-500">
+                      Para alterar sua senha, primeiro receba um código de confirmação por e-mail.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-700">Alterar senha</p>
-                  <p className="text-xs text-slate-500">
-                    Para alterar sua senha, primeiro receba um código de confirmação por e-mail.
-                  </p>
-                </div>
+                {!showPasswordForm && (
+                  <button
+                    type="button"
+                    onClick={openPasswordForm}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all"
+                  >
+                    Redefinir senha
+                  </button>
+                )}
               </div>
 
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleSendPasswordCode}
-                  disabled={isSendingPwCode}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm transition-all disabled:opacity-50"
-                >
-                  {isSendingPwCode ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
-                  {isSendingPwCode ? 'Enviando...' : 'Enviar código por e-mail'}
-                </button>
-              </div>
+              {showPasswordForm && (
+                <form onSubmit={handleChangePassword} className="space-y-3 pt-2 border-t border-slate-200">
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSendPasswordCode}
+                      disabled={isSendingPwCode}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm transition-all disabled:opacity-50"
+                    >
+                      {isSendingPwCode ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
+                      {isSendingPwCode ? 'Enviando...' : 'Enviar código por e-mail'}
+                    </button>
+                  </div>
 
-              <input
-                type="password"
-                placeholder="Senha atual"
-                value={pw.senhaAtual}
-                onChange={(e) => setPw({ ...pw, senhaAtual: e.target.value })}
-                className="input"
-                aria-label="Senha atual"
-                autoComplete="current-password"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Nova senha"
-                value={pw.novaSenha}
-                onChange={(e) => setPw({ ...pw, novaSenha: e.target.value })}
-                className="input"
-                aria-label="Nova senha"
-                autoComplete="new-password"
-                required
-              />
-              <input
-                type="password"
-                placeholder="Confirmar nova senha"
-                value={pw.confirmarSenha}
-                onChange={(e) => setPw({ ...pw, confirmarSenha: e.target.value })}
-                className="input"
-                aria-label="Confirmar nova senha"
-                autoComplete="new-password"
-                required
-              />
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="Código de confirmação (enviado por e-mail)"
-                value={pw.codigo}
-                onChange={(e) => setPw({ ...pw, codigo: e.target.value.replace(/\D/g, '') })}
-                className="input"
-                aria-label="Código de confirmação"
-                required
-              />
+                  <input
+                    type="password"
+                    placeholder="Senha atual"
+                    value={pw.senhaAtual}
+                    onChange={(e) => setPw({ ...pw, senhaAtual: e.target.value })}
+                    className="input"
+                    aria-label="Senha atual"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Nova senha"
+                    value={pw.novaSenha}
+                    onChange={(e) => setPw({ ...pw, novaSenha: e.target.value })}
+                    className="input"
+                    aria-label="Nova senha"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirmar nova senha"
+                    value={pw.confirmarSenha}
+                    onChange={(e) => setPw({ ...pw, confirmarSenha: e.target.value })}
+                    className="input"
+                    aria-label="Confirmar nova senha"
+                    autoComplete="new-password"
+                    required
+                  />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="Código de confirmação (enviado por e-mail)"
+                    value={pw.codigo}
+                    onChange={(e) => setPw({ ...pw, codigo: e.target.value.replace(/\D/g, '') })}
+                    className="input"
+                    aria-label="Código de confirmação"
+                    required
+                  />
 
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isChangingPassword}
-                  className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-50 flex items-center gap-2"
-                >
-                  {isChangingPassword ? <Loader2 size={18} className="animate-spin" /> : <KeyRound size={18} />}
-                  {isChangingPassword ? 'Salvando...' : 'Alterar senha'}
-                </button>
-              </div>
-            </form>
+                  <div className="flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={closePasswordForm}
+                      disabled={isChangingPassword}
+                      className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isChangingPassword}
+                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isChangingPassword ? <Loader2 size={18} className="animate-spin" /> : <KeyRound size={18} />}
+                      {isChangingPassword ? 'Salvando...' : 'Alterar senha'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
 
