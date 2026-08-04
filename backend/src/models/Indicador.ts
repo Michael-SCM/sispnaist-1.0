@@ -12,7 +12,7 @@ export interface IFormulaIndicador {
 }
 
 export interface IIndicador extends Document {
-  _id?: string;
+  _id: mongoose.Types.ObjectId;
   nome: string;
   descricao?: string;
   categoria: string;

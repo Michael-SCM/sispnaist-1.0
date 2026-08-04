@@ -7,7 +7,7 @@ export interface IPasswordHistoryEntry {
 }
 
 export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade' | 'senha'>, Document {
-  _id?: string;
+  _id: mongoose.Types.ObjectId;
   empresa?: mongoose.Types.ObjectId;
   unidade?: mongoose.Types.ObjectId;
   senha?: string;

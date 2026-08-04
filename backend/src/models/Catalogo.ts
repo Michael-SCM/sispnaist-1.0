@@ -9,7 +9,7 @@ import mongoose, { Document, Schema } from 'mongoose';
  */
 
 export interface ICatalogoItem extends Document {
-  _id?: string;
+  _id: mongoose.Types.ObjectId;
   entidade: string;        // 'sexo', 'genero', 'racaCor', 'escolaridade', etc.
   nome: string;            // nome do item (ex: 'Masculino', 'Feminino')
   sigla?: string;          // sigla opcional (ex: 'M', 'F')
