@@ -101,9 +101,7 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO BREVO HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO BREVO HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar e-mail via Brevo API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -134,9 +132,7 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO RESEND HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO RESEND HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar e-mail via Resend API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -160,8 +156,9 @@ export const sendResetPasswordEmail = async (email: string, token: string) => {
       console.log(`E-mail de redefinição enviado com sucesso via Gmail SMTP para: ${email}`);
     }
   } catch (smtpError: any) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    console.error(`ERRO NO GMAIL SMTP (Nodemailer) para ${email}:`, smtpError);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Falha ao enviar e-mail de redefinição via Gmail SMTP: ${smtpError?.message || 'erro desconhecido'}`);
     }
   }
 };
@@ -221,9 +218,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO BREVO HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO BREVO HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar e-mail de verificação via Brevo API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -254,9 +249,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO RESEND HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO RESEND HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar e-mail de verificação via Resend API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -283,8 +276,9 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       console.log(`E-mail de verificação enviado com sucesso via Gmail SMTP para: ${email}`);
     }
   } catch (smtpError: any) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    console.error(`ERRO NO GMAIL SMTP (Nodemailer) para ${email}:`, smtpError);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Falha ao enviar e-mail de verificação via Gmail SMTP: ${smtpError?.message || 'erro desconhecido'}`);
     }
   }
 };
@@ -337,9 +331,7 @@ export const send2FACodigoEmail = async (email: string, codigo: string) => {
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO BREVO HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO BREVO HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar código 2FA via Brevo API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -370,9 +362,7 @@ export const send2FACodigoEmail = async (email: string, codigo: string) => {
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('ERRO NO RESEND HTTP API:', errorMsg);
-      }
+      console.error('ERRO NO RESEND HTTP API:', errorMsg);
       throw new Error(`Falha ao enviar código 2FA via Resend API: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -399,8 +389,9 @@ export const send2FACodigoEmail = async (email: string, codigo: string) => {
       console.log(`Código 2FA enviado com sucesso via Gmail SMTP para: ${email}`);
     }
   } catch (smtpError: any) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    console.error(`ERRO NO GMAIL SMTP (Nodemailer) para ${email}:`, smtpError);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Falha ao enviar código 2FA via Gmail SMTP: ${smtpError?.message || 'erro desconhecido'}`);
     }
   }
 };
@@ -459,7 +450,7 @@ export const sendAlertaEmail = async (
       return;
     } catch (brevoError: any) {
       const errorMsg = brevoError.response?.data || brevoError.message;
-      if (process.env.NODE_ENV !== 'production') console.error('ERRO BREVO:', errorMsg);
+      console.error('ERRO BREVO:', errorMsg);
       throw new Error(`Falha ao enviar alerta via Brevo: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -482,7 +473,7 @@ export const sendAlertaEmail = async (
       return;
     } catch (resendError: any) {
       const errorMsg = resendError.response?.data || resendError.message;
-      if (process.env.NODE_ENV !== 'production') console.error('Erro RESEND:', errorMsg);
+      console.error('Erro RESEND:', errorMsg);
       throw new Error(`Falha ao enviar alerta via Resend: ${JSON.stringify(errorMsg)}`);
     }
   }
@@ -502,9 +493,13 @@ export const sendAlertaEmail = async (
       subject: `Alerta — ${dados.titulo}`,
       html: htmlContent,
     });
-  } catch (smtpError: any) {
     if (process.env.NODE_ENV !== 'production') {
-      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+      console.log(`Alerta enviado via Gmail SMTP para: ${to}`);
+    }
+  } catch (smtpError: any) {
+    console.error(`ERRO NO GMAIL SMTP (Nodemailer) para ${to}:`, smtpError);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Falha ao enviar alerta via Gmail SMTP: ${smtpError?.message || 'erro desconhecido'}`);
     }
   }
 };
