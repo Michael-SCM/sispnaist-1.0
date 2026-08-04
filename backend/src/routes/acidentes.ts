@@ -1,8 +1,8 @@
 import express from 'express';
 import * as acidenteController from '../controllers/acidenteController.js';
-import { validateRequest, validateObjectId } from '../middleware/validation.js';
+import { validateRequest, validateObjectId, validateQuery } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { criarAcidenteSchema, atualizarAcidenteSchema } from '../utils/validations.js';
+import { criarAcidenteSchema, atualizarAcidenteSchema, listarAcidentesQuerySchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.use(authMiddleware);
 
 // CRUD básico
 router.post('/', validateRequest(criarAcidenteSchema), acidenteController.criar);
-router.get('/', acidenteController.listar);
+router.get('/', validateQuery(listarAcidentesQuerySchema), acidenteController.listar);
 
 // Rotas estáticas/específicas SEMPRE antes das dinâmicas
 router.get('/stats/estatisticas', acidenteController.obterEstatisticas);

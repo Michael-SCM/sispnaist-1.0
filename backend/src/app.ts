@@ -45,6 +45,8 @@ import esocialRoutes from './routes/esocial.js';
 import sinanRoutes from './routes/sinan.js';
 import alertasRoutes from './routes/alertas.js';
 import { csrfProtection } from './middleware/csrf.js';
+import { sanitizeRequestBody } from './middleware/sanitizeBody.js';
+import mongoSanitize from 'mongo-sanitize';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { seedCatalogos } from './utils/seedCatalogos.js';
 import { seedRegrasValidacao } from './utils/seedRegrasValidacao.js';
@@ -96,6 +98,12 @@ app.use(helmet({
 app.use(express.json({ limit: '10mb', strict: false }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
+
+// Sanitização: remove operadores NoSQL ($gt, $regex, etc.) de body e query
+app.use(mongoSanitize({ replaceWith: '_' }));
+
+// Sanitização: red Campos sensíveis (senha, token) em logs de request
+app.use(sanitizeRequestBody);
 
 // Rate limiting global
 const apiLimiter = rateLimit({

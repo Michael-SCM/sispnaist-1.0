@@ -898,3 +898,57 @@ export const atualizarTrabalhadorSchema = Joi.object({
     tipoAfastamento: Joi.string().trim().allow('', null),
   }).optional(),
 }).min(1);
+
+// ==================== SCHEMAS DE QUERY (GET) ====================
+
+export const listarTrabalhadoresQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
+  nome: Joi.string().trim().max(200).optional(),
+  cpf: Joi.string().trim().max(20).optional(),
+  cartaoSus: Joi.string().trim().max(20).optional(),
+  matricula: Joi.string().trim().max(50).optional(),
+  setor: Joi.string().trim().max(100).optional(),
+}).options({ stripUnknown: true });
+
+export const listarAcidentesQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
+  tipoAcidente: Joi.string().trim().max(100).optional(),
+  status: Joi.string().valid('Aberto', 'Em Análise', 'Fechado').optional(),
+  trabalhadorId: Joi.string().trim().max(50).optional(),
+  dataInicio: Joi.date().iso().optional(),
+  dataFim: Joi.date().iso().optional(),
+  descricao: Joi.string().trim().max(500).optional(),
+  cpfTrabalhador: Joi.string().trim().max(20).optional(),
+  cartaoSus: Joi.string().trim().max(20).optional(),
+}).options({ stripUnknown: true });
+
+export const listarVacinacoesQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
+  vacina: Joi.string().trim().max(200).optional(),
+  trabalhadorId: Joi.string().trim().max(50).optional(),
+  cartaoSus: Joi.string().trim().max(20).optional(),
+}).options({ stripUnknown: true });
+
+export const listarDoencasQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
+  nomeDoenca: Joi.string().trim().max(200).optional(),
+  ativo: Joi.boolean().optional(),
+  trabalhadorId: Joi.string().trim().max(50).optional(),
+  dataInicio: Joi.date().iso().optional(),
+  dataFim: Joi.date().iso().optional(),
+  cartaoSus: Joi.string().trim().max(20).optional(),
+}).options({ stripUnknown: true });
+
+export const listarAuditLogsQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).max(100).optional(),
+  usuarioId: Joi.string().trim().max(50).optional(),
+  entidade: Joi.string().trim().max(100).optional(),
+  acao: Joi.string().valid('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'READ', 'EXPORT').optional(),
+  dataInicio: Joi.date().iso().optional(),
+  dataFim: Joi.date().iso().optional(),
+}).options({ stripUnknown: true });

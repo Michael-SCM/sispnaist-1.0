@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { obterLogs, obterEstatisticas } from '../controllers/auditController.js';
 import { authMiddleware, authorize } from '../middleware/auth.js';
+import { validateQuery } from '../middleware/validation.js';
+import { listarAuditLogsQuerySchema } from '../utils/validations.js';
 
 const router = Router();
 
@@ -9,7 +11,7 @@ router.use(authMiddleware);
 router.use(authorize('admin'));
 
 // Rotas de auditoria (apenas admin)
-router.get('/logs', obterLogs);
+router.get('/logs', validateQuery(listarAuditLogsQuerySchema), obterLogs);
 router.get('/stats', obterEstatisticas);
 
 export default router;

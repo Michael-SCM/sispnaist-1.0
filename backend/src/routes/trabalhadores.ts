@@ -1,9 +1,9 @@
 import express from 'express';
 import * as trabalhadorController from '../controllers/trabalhadorController.js';
 import informacaoController from '../controllers/TrabalhadorInformacaoController.js';
-import { validateRequest, validateObjectId } from '../middleware/validation.js';
+import { validateRequest, validateObjectId, validateQuery } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { criarTrabalhadorSchema, atualizarTrabalhadorSchema } from '../utils/validations.js';
+import { criarTrabalhadorSchema, atualizarTrabalhadorSchema, listarTrabalhadoresQuerySchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // CRUD de Trabalhadores
-router.get('/', trabalhadorController.getTrabalhadores);
+router.get('/', validateQuery(listarTrabalhadoresQuerySchema), trabalhadorController.getTrabalhadores);
 
 router.post('/', validateRequest(criarTrabalhadorSchema), trabalhadorController.createTrabalhador);
 

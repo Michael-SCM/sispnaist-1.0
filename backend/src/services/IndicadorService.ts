@@ -3,6 +3,7 @@ import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
+import { escapeRegex } from '../utils/sanitize.js';
 
 export interface IMetricaDisponivel {
   chave: string;
@@ -37,7 +38,7 @@ export class IndicadorService {
     if (filtro.uf) query.uf = filtro.uf?.toString().toUpperCase();
     if (filtro.ativo === 'true') query.ativo = true;
     else if (filtro.ativo === 'false') query.ativo = false;
-    if (filtro.nome) query.nome = { $regex: filtro.nome, $options: 'i' };
+    if (filtro.nome) query.nome = { $regex: escapeRegex(filtro.nome), $options: 'i' };
 
     return Indicador.find(query).sort({ ordem: 1, nome: 1 }).lean();
   }

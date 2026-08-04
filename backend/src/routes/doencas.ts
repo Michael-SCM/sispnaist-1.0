@@ -1,8 +1,8 @@
 import express from 'express';
 import * as doencaController from '../controllers/doencaController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { validateRequest, validateObjectId } from '../middleware/validation.js';
-import { criarDoencaSchema, atualizarDoencaSchema } from '../utils/validations.js';
+import { validateRequest, validateObjectId, validateQuery } from '../middleware/validation.js';
+import { criarDoencaSchema, atualizarDoencaSchema, listarDoencasQuerySchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.get('/trabalhador/:trabalhadorId', doencaController.obterPorTrabalhador);
 
 // CRUD padrão (rotas genéricas por último)
 router.post('/', validateRequest(criarDoencaSchema), doencaController.criar);
-router.get('/', doencaController.listar);
+router.get('/', validateQuery(listarDoencasQuerySchema), doencaController.listar);
 router.get('/:id', validateObjectId('id'), doencaController.obter);
 router.put('/:id', validateObjectId('id'), validateRequest(atualizarDoencaSchema), doencaController.atualizar);
 router.delete('/:id', validateObjectId('id'), doencaController.deletar);

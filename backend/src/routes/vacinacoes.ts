@@ -9,8 +9,8 @@ import {
   obterEstatisticas,
 } from '../controllers/vacinacaoController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { validateRequest, validateObjectId } from '../middleware/validation.js';
-import { criarVacinacaoSchema, atualizarVacinacaoSchema } from '../utils/validations.js';
+import { validateRequest, validateObjectId, validateQuery } from '../middleware/validation.js';
+import { criarVacinacaoSchema, atualizarVacinacaoSchema, listarVacinacoesQuerySchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.get('/trabalhador/:trabalhadorId', obterVacinacoesPorTrabalhador);
 
 // CRUD padrão
 router.post('/', validateRequest(criarVacinacaoSchema), criarVacinacao);
-router.get('/', listarVacinacoes);
+router.get('/', validateQuery(listarVacinacoesQuerySchema), listarVacinacoes);
 router.get('/:id', validateObjectId('id'), obterVacinacao);
 router.put('/:id', validateObjectId('id'), validateRequest(atualizarVacinacaoSchema), atualizarVacinacao);
 router.delete('/:id', validateObjectId('id'), deletarVacinacao);

@@ -3,6 +3,7 @@ import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { escapeRegex } from '../utils/sanitize.js';
 
 class AtoMunicipalInovacaoController {
   
@@ -12,7 +13,7 @@ class AtoMunicipalInovacaoController {
       const { cidade, ano } = req.query;
       const filter: any = { ativo: true };
 
-      if (cidade) filter.nm_cidade = new RegExp(String(cidade), 'i');
+      if (cidade) filter.nm_cidade = new RegExp(escapeRegex(String(cidade)), 'i');
       if (ano) filter.ano_ato = Number(ano);
 
       const [items, total] = await Promise.all([

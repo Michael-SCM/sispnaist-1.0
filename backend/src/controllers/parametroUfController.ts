@@ -3,6 +3,7 @@ import ParametroPorUF from '../models/ParametroPorUF';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { escapeRegex } from '../utils/sanitize.js';
 
 class ParametroUfController {
   async listar(req: Request, res: Response, next: NextFunction) {
@@ -15,7 +16,7 @@ class ParametroUfController {
       if (categoria) filtro.categoria = categoria;
       if (ativo === 'true') filtro.ativo = true;
       else if (ativo === 'false') filtro.ativo = false;
-      if (chave) filtro.chave = { $regex: chave, $options: 'i' };
+      if (chave) filtro.chave = { $regex: escapeRegex(String(chave)), $options: 'i' };
 
       const [parametros, total] = await Promise.all([
         ParametroPorUF.find(filtro).sort({ uf: 1, categoria: 1, chave: 1 }).skip(skip).limit(limit).lean(),

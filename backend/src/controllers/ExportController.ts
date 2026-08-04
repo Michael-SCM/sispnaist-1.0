@@ -7,6 +7,7 @@ import pdfService from '../services/PdfService.js';
 import analyticsService from '../services/AnalyticsService.js';
 import { toCPFMaskedOrDigits } from '../utils/cpf.js';
 import mongoose from 'mongoose';
+import { escapeRegex, safeDate, safeString } from '../utils/sanitize.js';
 
 class ExportController {
 
@@ -90,10 +91,7 @@ class ExportController {
    */
   async exportarTrabalhadoresPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      // Extrair filtros da query string com sanitização
       const filtros: Record<string, any> = {};
-
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
       if (req.query.nome && typeof req.query.nome === 'string') {
         filtros.nome = { $regex: escapeRegex(req.query.nome), $options: 'i' };
@@ -102,7 +100,7 @@ class ExportController {
         filtros.cpf = toCPFMaskedOrDigits(req.query.cpf);
       }
       if (req.query.matricula && typeof req.query.matricula === 'string') {
-        filtros.matricula = req.query.matricula;
+        filtros.matricula = safeString(req.query.matricula, 50);
       }
       if (req.query.setor && typeof req.query.setor === 'string') {
         filtros['trabalho.setor'] = { $regex: escapeRegex(req.query.setor), $options: 'i' };
@@ -119,7 +117,6 @@ class ExportController {
    */
   async exportarAcidentesPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const filtros: Record<string, any> = {};
 
       if (req.query.status && typeof req.query.status === 'string') filtros.status = req.query.status;
@@ -131,13 +128,13 @@ class ExportController {
           filtros.trabalhadorId = trabalhador._id.toString();
         }
       }
-      if ((req.query.dataInicio || req.query.dataFim) && (typeof req.query.dataInicio === 'string' || typeof req.query.dataFim === 'string')) {
-        filtros.dataAcidente = {};
-        if (req.query.dataInicio && typeof req.query.dataInicio === 'string') {
-          filtros.dataAcidente.$gte = new Date(req.query.dataInicio);
-        }
-        if (req.query.dataFim && typeof req.query.dataFim === 'string') {
-          filtros.dataAcidente.$lte = new Date(req.query.dataFim);
+      if (req.query.dataInicio || req.query.dataFim) {
+        const inicio = safeDate(req.query.dataInicio);
+        const fim = safeDate(req.query.dataFim);
+        if (inicio || fim) {
+          filtros.dataAcidente = {};
+          if (inicio) filtros.dataAcidente.$gte = inicio;
+          if (fim) filtros.dataAcidente.$lte = fim;
         }
       }
       if (req.query.descricao && typeof req.query.descricao === 'string') {
@@ -155,7 +152,6 @@ class ExportController {
    */
   async exportarDoencasPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const filtros: Record<string, any> = {};
 
       if (req.query.ativo !== undefined) filtros.ativo = req.query.ativo === 'true';
@@ -173,13 +169,13 @@ class ExportController {
           }
         }
       }
-      if ((req.query.dataInicio || req.query.dataFim) && (typeof req.query.dataInicio === 'string' || typeof req.query.dataFim === 'string')) {
-        filtros.dataInicio = {};
-        if (req.query.dataInicio && typeof req.query.dataInicio === 'string') {
-          filtros.dataInicio.$gte = new Date(req.query.dataInicio);
-        }
-        if (req.query.dataFim && typeof req.query.dataFim === 'string') {
-          filtros.dataInicio.$lte = new Date(req.query.dataFim);
+      if (req.query.dataInicio || req.query.dataFim) {
+        const inicio = safeDate(req.query.dataInicio);
+        const fim = safeDate(req.query.dataFim);
+        if (inicio || fim) {
+          filtros.dataInicio = {};
+          if (inicio) filtros.dataInicio.$gte = inicio;
+          if (fim) filtros.dataInicio.$lte = fim;
         }
       }
 
@@ -194,7 +190,6 @@ class ExportController {
    */
   async exportarVacinacoesPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const filtros: Record<string, any> = {};
 
       if (req.query.vacina && typeof req.query.vacina === 'string') {
