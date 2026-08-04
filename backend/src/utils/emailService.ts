@@ -324,6 +324,10 @@ export const send2FACodigoEmail = async (email: string, codigo: string) => {
           'api-key': process.env.BREVO_API_KEY,
           'Content-Type': 'application/json'
         }
+      }).then((r) => {
+        const msgId = r?.data?.messageId || 'n/a';
+        const parts = msgId ? String(msgId).split('@') : [];
+        console.log(`Brevo aceitou o código 2FA para ${email} — messageId: ${parts[0] || msgId}`);
       });
       if (process.env.NODE_ENV !== 'production') {
         console.log(`Código 2FA enviado com sucesso via Brevo HTTP API para: ${email}`);
