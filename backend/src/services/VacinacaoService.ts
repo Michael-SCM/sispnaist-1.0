@@ -26,7 +26,7 @@ export class VacinacaoService {
 
   async obter(id: string): Promise<IVacinacao> {
     // Validar se é ObjectId válido
-    if (!Types.ObjectId.isValid(id)) {
+    if (!(Types.ObjectId as any).isValid(id)) {
       throw new AppError('ID de vacinação inválido', 400);
     }
 
@@ -41,7 +41,7 @@ export class VacinacaoService {
       if (doc && doc.trabalhadorId) {
         const identifier = doc.trabalhadorId.toString();
         let t = null;
-        if (mongoose.Types.ObjectId.isValid(identifier)) {
+        if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
           t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
           if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
         } else {
@@ -109,7 +109,7 @@ export class VacinacaoService {
         if (doc && doc.trabalhadorId) {
           const identifier = doc.trabalhadorId.toString();
           let t = null;
-          if (mongoose.Types.ObjectId.isValid(identifier)) {
+          if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
             t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
             if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
           } else {
@@ -131,7 +131,7 @@ export class VacinacaoService {
 
   async atualizar(id: string, data: Partial<IVacinacao>): Promise<IVacinacao> {
     // Validar se é ObjectId válido
-    if (!Types.ObjectId.isValid(id)) {
+    if (!(Types.ObjectId as any).isValid(id)) {
       throw new AppError('ID de vacinação inválido', 400);
     }
 
@@ -158,7 +158,7 @@ export class VacinacaoService {
 
   async deletar(id: string): Promise<void> {
     // Validar se é ObjectId válido
-    if (!Types.ObjectId.isValid(id)) {
+    if (!(Types.ObjectId as any).isValid(id)) {
       throw new AppError('ID de vacinação inválido', 400);
     }
 
@@ -190,7 +190,7 @@ export class VacinacaoService {
         if (doc && doc.trabalhadorId) {
           const identifier = doc.trabalhadorId.toString();
           let t = null;
-          if (mongoose.Types.ObjectId.isValid(identifier)) {
+          if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
             t = await Trabalhador.findById(identifier).select('nome cpf email').lean();
             if (!t) t = await User.findById(identifier).select('nome cpf email').lean();
           } else {

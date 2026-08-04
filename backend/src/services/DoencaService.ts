@@ -9,7 +9,7 @@ import { resolverTrabalhadorId } from '../utils/resolverTrabalhadorId.js';
 export class DoencaService {
   async criar(doencaData: Partial<IDoenca>): Promise<IDoenca> {
     // Resolver trabalhadorId se for CPF
-    if (doencaData.trabalhadorId && !mongoose.Types.ObjectId.isValid(doencaData.trabalhadorId as string)) {
+    if (doencaData.trabalhadorId && !(mongoose.Types.ObjectId as any).isValid(doencaData.trabalhadorId as string)) {
       doencaData.trabalhadorId = await resolverTrabalhadorId(doencaData.trabalhadorId as string);
     }
 
@@ -110,7 +110,7 @@ export class DoencaService {
     }
 
     // Resolver trabalhadorId se for CPF
-    if (doencaData.trabalhadorId && !mongoose.Types.ObjectId.isValid(doencaData.trabalhadorId as string)) {
+    if (doencaData.trabalhadorId && !(mongoose.Types.ObjectId as any).isValid(doencaData.trabalhadorId as string)) {
       doencaData.trabalhadorId = await resolverTrabalhadorId(doencaData.trabalhadorId as string);
     }
 

@@ -14,7 +14,7 @@ const connectDB = async (): Promise<void> => {
       family: 4 // Força IPv4
     };
 
-    await mongoose.connect(mongoUri, options);
+    await mongoose.connect(mongoUri, options as any);
 
     console.log('✓ MongoDB connected successfully');
   } catch (error) {

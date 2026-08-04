@@ -46,7 +46,7 @@ class TrabalhadorInformacaoController {
 
       const informacao = await TrabalhadorInformacaoService.obterPorId(infoId);
 
-      if (!informacao || informacao.trabalhadorId !== id) {
+      if (!informacao || informacao.trabalhadorId.toString() !== id) {
         throw new AppError('Informação não encontrada', 404);
       }
 
@@ -91,7 +91,7 @@ class TrabalhadorInformacaoController {
 
       const informacao = await TrabalhadorInformacaoService.atualizar(infoId, dados);
 
-      if (!informacao || informacao.trabalhadorId !== id) {
+      if (!informacao || informacao.trabalhadorId.toString() !== id) {
         throw new AppError('Informação não encontrada', 404);
       }
 
@@ -111,7 +111,7 @@ class TrabalhadorInformacaoController {
       }
 
       const existe = await TrabalhadorInformacaoService.obterPorId(infoId);
-      if (!existe || existe.trabalhadorId !== id) {
+      if (!existe || existe.trabalhadorId.toString() !== id) {
         throw new AppError('Informação não encontrada', 404);
       }
 

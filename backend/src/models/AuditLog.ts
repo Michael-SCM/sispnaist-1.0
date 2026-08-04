@@ -97,7 +97,7 @@ AuditLogSchema.post('save', function (doc) {
   try {
     const hash = calcularHash(doc);
     doc.set('hashAnterior', hash, { silent: true });
-    doc.collection.updateOne({ _id: doc._id }, { $set: { hashAnterior: hash } }).catch(() => {});
+    (doc.collection as any).updateOne({ _id: doc._id }, { $set: { hashAnterior: hash } }).catch(() => {});
   } catch {
     // Ignorar erros de hash — não deve interromper a operação principal
   }

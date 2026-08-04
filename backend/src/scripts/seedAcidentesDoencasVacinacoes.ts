@@ -197,7 +197,7 @@ async function seedAcidentesDoencasVacinacoes() {
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
         family: 4,
-      });
+      } as any);
     }
 
     clearTimeout(timeoutId);

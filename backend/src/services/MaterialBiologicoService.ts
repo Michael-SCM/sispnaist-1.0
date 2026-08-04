@@ -48,7 +48,7 @@ export class MaterialBiologicoService {
       if (trabalhadorIdValue) {
         const identifier = trabalhadorIdValue.toString();
         let t = null;
-        if (mongoose.Types.ObjectId.isValid(identifier)) {
+        if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
           t = await Trabalhador.findById(identifier).select('nome cpf').lean();
           if (!t) t = await User.findById(identifier).select('nome cpf').lean();
         } else {
@@ -112,7 +112,7 @@ export class MaterialBiologicoService {
         if (trabalhadorIdValue) {
           const identifier = trabalhadorIdValue.toString();
           let t = null;
-          if (mongoose.Types.ObjectId.isValid(identifier)) {
+          if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
             t = await Trabalhador.findById(identifier).select('nome cpf').lean();
             if (!t) t = await User.findById(identifier).select('nome cpf').lean();
           } else {

@@ -11,7 +11,7 @@ import { resolverTrabalhadorId } from '../utils/resolverTrabalhadorId.js';
 export class AcidenteService {
   async criar(acidenteData: Partial<IAcidente>): Promise<IAcidente> {
     // Resolver trabalhadorId se for CPF
-    if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
+    if (acidenteData.trabalhadorId && !(mongoose.Types.ObjectId as any).isValid(acidenteData.trabalhadorId as string)) {
       acidenteData.trabalhadorId = await resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 
@@ -44,7 +44,7 @@ export class AcidenteService {
         
         // Tentar buscar por ID ou CPF
         let t = null;
-        if (mongoose.Types.ObjectId.isValid(identifier)) {
+        if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
           t = await Trabalhador.findById(identifier).select('nome cpf').lean();
           if (!t) {
             t = await User.findById(identifier).select('nome cpf').lean();
@@ -101,7 +101,7 @@ export class AcidenteService {
 
     if (filtros?.trabalhadorId) {
       // Se já for ObjectId válido, usa direto (vem do controller para perfil trabalhador)
-      if (mongoose.Types.ObjectId.isValid(filtros.trabalhadorId)) {
+      if ((mongoose.Types.ObjectId as any).isValid(filtros.trabalhadorId)) {
         query.trabalhadorId = filtros.trabalhadorId;
       } else {
         // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
@@ -163,7 +163,7 @@ export class AcidenteService {
         if (doc && doc.trabalhadorId) {
           const identifier = doc.trabalhadorId.toString();
           let t = null;
-          if (mongoose.Types.ObjectId.isValid(identifier)) {
+          if ((mongoose.Types.ObjectId as any).isValid(identifier)) {
             t = await Trabalhador.findById(identifier).select('nome cpf').lean();
             if (!t) t = await User.findById(identifier).select('nome cpf').lean();
           } else {
@@ -200,7 +200,7 @@ export class AcidenteService {
     }
 
     // Resolver trabalhadorId se for CPF
-    if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
+    if (acidenteData.trabalhadorId && !(mongoose.Types.ObjectId as any).isValid(acidenteData.trabalhadorId as string)) {
       acidenteData.trabalhadorId = await resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 

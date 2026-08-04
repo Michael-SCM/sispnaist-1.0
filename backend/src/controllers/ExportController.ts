@@ -168,7 +168,7 @@ class ExportController {
         filtros.nomeDoenca = { $regex: escapeRegex(req.query.nomeDoenca), $options: 'i' };
       }
       if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') {
-        if (mongoose.Types.ObjectId.isValid(req.query.trabalhadorId)) {
+        if ((mongoose.Types.ObjectId as any).isValid(req.query.trabalhadorId)) {
           filtros.trabalhadorId = req.query.trabalhadorId;
         } else {
           const cpfFormatado = toCPFMaskedOrDigits(req.query.trabalhadorId);
@@ -206,7 +206,7 @@ class ExportController {
         filtros.vacina = { $regex: escapeRegex(req.query.vacina), $options: 'i' };
       }
       if (req.query.trabalhadorId && typeof req.query.trabalhadorId === 'string') {
-        if (mongoose.Types.ObjectId.isValid(req.query.trabalhadorId)) {
+        if ((mongoose.Types.ObjectId as any).isValid(req.query.trabalhadorId)) {
           filtros.trabalhadorId = req.query.trabalhadorId;
         } else {
           const cpfFormatado = toCPFMaskedOrDigits(req.query.trabalhadorId);
