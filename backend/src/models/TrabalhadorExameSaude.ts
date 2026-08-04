@@ -13,8 +13,8 @@ export interface ITrabalhadorExameSaude extends Document {
   observacaoMedica?: string;
   examesRealizados?: string[];
   riscosOcupacionais?: string[];
-  medicoPcmsmoNome?: string;
-  medicoPcmsmoCrm?: string;
+  medicoPCMSONome?: string;
+  medicoPCMSOCrm?: string;
   arquivoAso?: string;
   ativo: boolean;
   dataCriacao: Date;
@@ -43,8 +43,8 @@ const TrabalhadorExameSaudeSchema = new Schema<ITrabalhadorExameSaude>(
     observacaoMedica: { type: String, trim: true },
     examesRealizados: [{ type: String, trim: true }],
     riscosOcupacionais: [{ type: String, trim: true }],
-    medicoPcmsmoNome: { type: String, trim: true },
-    medicoPcmsmoCrm: { type: String, trim: true },
+    medicoPCMSONome: { type: String, trim: true },
+    medicoPCMSOCrm: { type: String, trim: true },
     arquivoAso: { type: String, trim: true },
     ativo: { type: Boolean, default: true },
   },

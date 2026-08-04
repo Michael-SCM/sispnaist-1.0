@@ -1,8 +1,7 @@
 import Unidade, { IUnidadeDocument } from '../models/Unidade.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUnidade } from '../types/index.js';
-
-const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+import { escapeRegex } from '../utils/sanitize.js';
 
 export class UnidadeService {
   async listar(

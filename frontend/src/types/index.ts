@@ -44,8 +44,8 @@ export interface ITrabalhadorExameSaude {
   observacaoMedica?: string;
   examesRealizados?: string[];
   riscosOcupacionais?: string[];
-  medicoPcmsmoNome?: string;
-  medicoPcmsmoCrm?: string;
+  medicoPCMSONome?: string;
+  medicoPCMSOCrm?: string;
   arquivoAso?: string;
   ativo?: boolean;
   dataCriacao?: string;
@@ -465,7 +465,7 @@ export interface IEmpresa {
   email?: string;
   telefone?: string;
   endereco?: IEndereco;
-  ativa?: boolean;
+  ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
@@ -478,7 +478,7 @@ export interface IUnidade {
   gestor?: string;
   esferaAdministrativa?: string;
   possuiPgr?: boolean;
-  ativa?: boolean;
+  ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
@@ -660,7 +660,7 @@ export interface IProgressoTreinamento {
   quizRealizado: boolean;
   quizAprovado: boolean;
   tentativasQuiz: ITentativaQuiz[];
-  melhormaPontuacao?: number;
+  melhorPontuacao?: number;
   certificadoEmitido: boolean;
   dataConclusao?: string;
   favorito: boolean;

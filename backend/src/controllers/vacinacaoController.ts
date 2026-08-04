@@ -6,6 +6,7 @@ import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user?.perfil === 'trabalhador') {
@@ -29,17 +30,10 @@ export const obterVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
     throw new AppError('Vacinação não encontrada', 404);
   }
 
-  // Se o usuário logado for trabalhador, só pode visualizar se for dele
-  if (req.user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
-    const recordTrabalhadorId = (vacinacao.trabalhadorId && (vacinacao.trabalhadorId as any)._id)
-      ? (vacinacao.trabalhadorId as any)._id.toString()
-      : vacinacao.trabalhadorId.toString();
-
-    if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
-      throw new AppError('Sem permissão para acessar os dados desta vacinação', 403);
-    }
-  }
+  const recordTrabalhadorId = (vacinacao.trabalhadorId && (vacinacao.trabalhadorId as any)._id)
+    ? (vacinacao.trabalhadorId as any)._id.toString()
+    : vacinacao.trabalhadorId.toString();
+  await exigirProprioTrabalhador(req, recordTrabalhadorId);
 
   res.status(200).json({
     status: 'success',

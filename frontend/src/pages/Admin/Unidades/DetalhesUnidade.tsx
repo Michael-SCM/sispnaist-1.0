@@ -84,8 +84,8 @@ export const DetalhesUnidade: React.FC = () => {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{unidade.nome}</h1>
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${unidade.ativa ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                  {unidade.ativa ? 'Ativa' : 'Inativa'}
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${unidade.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                  {unidade.ativo ? 'Ativa' : 'Inativa'}
                 </span>
               </div>
               <p className="text-slate-500 font-medium flex items-center gap-2">
@@ -170,13 +170,13 @@ export const DetalhesUnidade: React.FC = () => {
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-3">
-                  {unidade.ativa ? (
+                  {unidade.ativo ? (
                     <CheckCircle2 size={24} className="text-emerald-500" />
                   ) : (
                     <XCircle size={24} className="text-slate-400" />
                   )}
-                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${unidade.ativa ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
-                    {unidade.ativa ? 'Ativa' : 'Inativa'}
+                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${unidade.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                    {unidade.ativo ? 'Ativa' : 'Inativa'}
                   </span>
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-100">

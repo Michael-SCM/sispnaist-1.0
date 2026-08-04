@@ -25,8 +25,8 @@ interface FormData {
   observacaoMedica: string;
   examesRealizados: string;
   riscosOcupacionais: string;
-  medicoPcmsmoNome: string;
-  medicoPcmsmoCrm: string;
+  medicoPCMSONome: string;
+  medicoPCMSOCrm: string;
   ativo: boolean;
 }
 
@@ -42,8 +42,8 @@ const INITIAL_FORM: FormData = {
   observacaoMedica: '',
   examesRealizados: '',
   riscosOcupacionais: '',
-  medicoPcmsmoNome: '',
-  medicoPcmsmoCrm: '',
+  medicoPCMSONome: '',
+  medicoPCMSOCrm: '',
   ativo: true,
 };
 
@@ -93,8 +93,8 @@ export const FormExameSaude: React.FC = () => {
           observacaoMedica: exame.observacaoMedica || '',
           examesRealizados: (exame.examesRealizados || []).join(', '),
           riscosOcupacionais: (exame.riscosOcupacionais || []).join(', '),
-          medicoPcmsmoNome: exame.medicoPcmsmoNome || '',
-          medicoPcmsmoCrm: exame.medicoPcmsmoCrm || '',
+          medicoPCMSONome: exame.medicoPCMSONome || '',
+          medicoPCMSOCrm: exame.medicoPCMSOCrm || '',
           ativo: exame.ativo !== false,
         });
       } else {
@@ -122,8 +122,8 @@ export const FormExameSaude: React.FC = () => {
       observacaoMedica: aso.observacaoMedica || '',
       examesRealizados: (aso.examesRealizados || []).join(', '),
       riscosOcupacionais: (aso.riscosOcupacionais || []).join(', '),
-      medicoPcmsmoNome: aso.medicoPcmsmoNome || '',
-      medicoPcmsmoCrm: aso.medicoPcmsmoCrm || '',
+      medicoPCMSONome: aso.medicoPCMSONome || '',
+      medicoPCMSOCrm: aso.medicoPCMSOCrm || '',
     }));
     toast.success(`Dados do ASO ${aso.id} carregados do e-Social`);
   };
@@ -195,8 +195,8 @@ export const FormExameSaude: React.FC = () => {
         observacaoMedica: formData.observacaoMedica || undefined,
         examesRealizados: formData.examesRealizados ? formData.examesRealizados.split(',').map(s => s.trim()).filter(Boolean) : [],
         riscosOcupacionais: formData.riscosOcupacionais ? formData.riscosOcupacionais.split(',').map(s => s.trim()).filter(Boolean) : [],
-        medicoPcmsmoNome: formData.medicoPcmsmoNome || undefined,
-        medicoPcmsmoCrm: formData.medicoPcmsmoCrm || undefined,
+        medicoPCMSONome: formData.medicoPCMSONome || undefined,
+        medicoPCMSOCrm: formData.medicoPCMSOCrm || undefined,
         ativo: formData.ativo,
       };
       if (isEdicao) {
@@ -355,13 +355,13 @@ export const FormExameSaude: React.FC = () => {
                 <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Nome</label>
-                    <input type="text" name="medicoPcmsmoNome" value={formData.medicoPcmsmoNome} onChange={handleChange}
+                    <input type="text" name="medicoPCMSONome" value={formData.medicoPCMSONome} onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none"
                       placeholder="Nome do médico coordenador do PCMSO" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">CRM</label>
-                    <input type="text" name="medicoPcmsmoCrm" value={formData.medicoPcmsmoCrm} onChange={handleChange}
+                    <input type="text" name="medicoPCMSOCrm" value={formData.medicoPCMSOCrm} onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none"
                       placeholder="Ex: CRM 67890" />
                   </div>

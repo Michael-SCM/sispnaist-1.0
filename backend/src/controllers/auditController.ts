@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import AuditLog from '../models/AuditLog.js';
 import auditService from '../services/AuditService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';

@@ -105,7 +105,7 @@ const AcidenteSchema = new Schema<IAcidenteDocument>(
       default: 'Aberto',
     },
   },
-  { collection: 'acidentes', timestamps: true }
+  { collection: 'acidentes', timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' } }
 );
 
 AcidenteSchema.index({ trabalhadorId: 1, dataAcidente: -1 });

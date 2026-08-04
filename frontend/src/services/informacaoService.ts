@@ -33,7 +33,7 @@ export interface ITrabalhadorInformacao {
   foiInternado: boolean;
   diasInternacao: number;
   foiIntubado: boolean;
-  allergy: boolean;
+  alergia: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
   acompanhamentoMedicoMotivo: string;

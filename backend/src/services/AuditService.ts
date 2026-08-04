@@ -48,12 +48,12 @@ export class AuditService {
     }
 
     if (filtros?.dataInicio || filtros?.dataFim) {
-      query.createdAt = {};
+      query.dataCriacao = {};
       if (filtros?.dataInicio) {
-        query.createdAt.$gte = new Date(filtros.dataInicio);
+        query.dataCriacao.$gte = new Date(filtros.dataInicio);
       }
       if (filtros?.dataFim) {
-        query.createdAt.$lte = new Date(filtros.dataFim);
+        query.dataCriacao.$lte = new Date(filtros.dataFim);
       }
     }
 

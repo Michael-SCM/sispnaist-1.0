@@ -22,7 +22,8 @@ const ParametroSchema = new Schema<IParametro>(
     valor: { type: String, required: true },
     descricao: { type: String, trim: true },
     categoria: { type: String, trim: true },
-    tipo: { type: String, required: true, default: 'texto' }
+    tipo: { type: String, required: true, default: 'texto' },
+    ativo: { type: Boolean, default: true }
   },
   {
     timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },

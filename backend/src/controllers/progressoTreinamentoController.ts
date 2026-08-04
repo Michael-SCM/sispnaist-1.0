@@ -18,15 +18,19 @@ function gerarCodigoCertificado(): string {
   return `${prefixo}-${timestamp}-${random}`;
 }
 
+async function findOrCreateProgresso(usuarioId: string, videoAulaId: string) {
+  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
+  if (!progresso) {
+    progresso = await ProgressoTreinamento.create({ usuarioId, videoAulaId }) as any;
+  }
+  return progresso;
+}
+
 export const obterProgresso = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
-
-  if (!progresso) {
-    progresso = await ProgressoTreinamento.create({ usuarioId, videoAulaId }) as any;
-  }
+  const progresso = await findOrCreateProgresso(usuarioId, videoAulaId);
 
   return res.status(200).json(progresso);
 });
@@ -43,11 +47,7 @@ export const marcarAssistido = asyncHandler(async (req: IAuthRequest, res: Respo
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
-
-  if (!progresso) {
-    progresso = await ProgressoTreinamento.create({ usuarioId, videoAulaId }) as any;
-  }
+  const progresso = await findOrCreateProgresso(usuarioId, videoAulaId);
 
   progresso.assistido = true;
   progresso.dataUltimaVisualizacao = new Date();
@@ -65,11 +65,7 @@ export const alternarFavorito = asyncHandler(async (req: IAuthRequest, res: Resp
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
-
-  if (!progresso) {
-    progresso = await ProgressoTreinamento.create({ usuarioId, videoAulaId }) as any;
-  }
+  const progresso = await findOrCreateProgresso(usuarioId, videoAulaId);
 
   progresso.favorito = !progresso.favorito;
   await progresso.save();
@@ -177,8 +173,8 @@ export const submeterQuiz = asyncHandler(async (req: IAuthRequest, res: Response
   progresso.quizAprovado = aprovado;
   progresso.sessaoAtiva = undefined;
 
-  if (progresso.melhormaPontuacao === undefined || pontuacao > progresso.melhormaPontuacao) {
-    progresso.melhormaPontuacao = pontuacao;
+  if (progresso.melhorPontuacao === undefined || pontuacao > progresso.melhorPontuacao) {
+    progresso.melhorPontuacao = pontuacao;
   }
 
   if (aprovado) {
@@ -239,7 +235,7 @@ export const emitirCertificado = asyncHandler(async (req: IAuthRequest, res: Res
     descricaoTreinamento: videoAula.descricao,
     categoriaTreinamento: videoAula.categoria,
     cargaHoraria: videoAula.duracao,
-    pontuacaoQuiz: progresso.melhormaPontuacao || 0,
+    pontuacaoQuiz: progresso.melhorPontuacao || 0,
     codigoCertificado: gerarCodigoCertificado(),
     dataConclusao: progresso.dataConclusao || new Date(),
     emitidoPor: `SISPNAIST - ${req.user?.perfil || 'Sistema'}`

@@ -17,7 +17,7 @@ const FormEmpresa: React.FC = () => {
     cnpj: '',
     email: '',
     telefone: '',
-    ativa: true,
+    ativo: true,
     endereco: {
       logradouro: '',
       numero: '',
@@ -44,7 +44,7 @@ const FormEmpresa: React.FC = () => {
         cnpj: empresaAtual.cnpj || '',
         email: empresaAtual.email || '',
         telefone: empresaAtual.telefone || '',
-        ativa: empresaAtual.ativa ?? true,
+        ativo: empresaAtual.ativo ?? true,
         endereco: {
           logradouro: empresaAtual.endereco?.logradouro || '',
           numero: empresaAtual.endereco?.numero || '',
@@ -233,7 +233,7 @@ const FormEmpresa: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-600 mb-2">Status da Empresa</label>
                     <select
                       name="ativa"
-                      value={String(formData.ativa)}
+                      value={String(formData.ativo)}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-blue-600"
                     >

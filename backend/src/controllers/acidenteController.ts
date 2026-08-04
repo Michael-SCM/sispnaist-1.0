@@ -2,10 +2,11 @@ import { Request, Response } from "express";
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import acidenteService from '../services/AcidenteService.js';
 import Trabalhador from '../models/Trabalhador.js';
-import { sinanService } from '../services/SinanService.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { notificarSinanParaTrabalhador } from '../utils/notificarSinan.js';
+import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -16,41 +17,18 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), acidente);
 
-  notificarSinan(req, acidente);
+  notificarSinanParaTrabalhador(req, acidente.trabalhadorId, {
+    tipoNotificacao: 'Acidente de Trabalho',
+    dataOcorrencia: (acidente.dataAcidente as Date)?.toISOString?.() || String(acidente.dataAcidente),
+    codigoAgravo: acidente.lesoes?.[0] || '',
+    nomeAgravo: acidente.descricao || '',
+  });
 
   res.status(201).json({
     status: 'success',
     data: { acidente },
   });
 });
-
-async function notificarSinan(req: Request, acidente: any) {
-  try {
-    const trabalhador = await Trabalhador.findById(acidente.trabalhadorId);
-    if (!trabalhador) return;
-
-    const cpf = trabalhador.cpf?.replace(/\D/g, '');
-    const cns = trabalhador.cartaoSus?.replace(/\D/g, '');
-
-    await sinanService.notificar({
-      tipoNotificacao: 'Acidente de Trabalho',
-      cpf,
-      cns,
-      nome: trabalhador.nome,
-      dataOcorrencia: acidente.dataAcidente?.toISOString?.() || acidente.dataAcidente,
-      codigoAgravo: acidente.lesoes?.[0] || '',
-      nomeAgravo: acidente.descricao || '',
-      cboOcupacao: trabalhador.trabalho?.ocupacao || '',
-      cnaeEmpresa: '',
-      ufNotificacao: trabalhador.endereco?.estado || '',
-      municipioNotificacao: trabalhador.endereco?.cidade || '',
-      unidadeSaude: '',
-      situacaoMercadoTrabalho: trabalhador.vinculo?.tipo || '',
-    });
-  } catch (err: any) {
-    console.error('[SINAN] Erro ao notificar acidente:', err.message);
-  }
-}
 
 export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -60,17 +38,10 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Acidente não encontrado', 404);
   }
 
-  // Se o usuário logado for trabalhador, só pode visualizar se o acidente for dele
-  if ((req as any).user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-    const recordTrabalhadorId = (acidente.trabalhadorId && (acidente.trabalhadorId as any)._id)
-      ? (acidente.trabalhadorId as any)._id.toString()
-      : acidente.trabalhadorId.toString();
-
-    if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
-      throw new AppError('Sem permissão para acessar os dados deste acidente', 403);
-    }
-  }
+  const recordTrabalhadorId = (acidente.trabalhadorId && (acidente.trabalhadorId as any)._id)
+    ? (acidente.trabalhadorId as any)._id.toString()
+    : acidente.trabalhadorId.toString();
+  await exigirProprioTrabalhador(req, recordTrabalhadorId);
 
   res.status(200).json({
     status: 'success',

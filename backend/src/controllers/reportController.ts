@@ -42,7 +42,7 @@ export const gerarRelatorioAcidentes = asyncHandler(async (req: Request, res: Re
     Local: ac.local || 'N/A',
     Status: ac.status || 'N/A',
     Lesões: Array.isArray(ac.lesoes) ? ac.lesoes.join(', ') : 'Nenhuma',
-    'Data Registro': new Date(ac.createdAt).toLocaleDateString('pt-BR'),
+    'Data Registro': new Date(ac.dataCriacao).toLocaleDateString('pt-BR'),
   }));
 
   res.json({

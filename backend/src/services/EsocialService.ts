@@ -109,8 +109,8 @@ export interface EsocialS2220 {
   observacaoMedica?: string;
   examesRealizados?: string[];
   riscosOcupacionais?: string[];
-  medicoPcmsmoNome?: string;
-  medicoPcmsmoCrm?: string;
+  medicoPCMSONome?: string;
+  medicoPCMSOCrm?: string;
 }
 
 export interface EsocialS2240 {
@@ -183,8 +183,8 @@ function adapterS2220(raw: EsocialS2220Raw): EsocialS2220 {
     observacaoMedica: raw.observacao_medica,
     examesRealizados: raw.exames_realizados,
     riscosOcupacionais: raw.riscos_ocupacionais,
-    medicoPcmsmoNome: raw.medico_pcmsmo_nome,
-    medicoPcmsmoCrm: raw.medico_pcmsmo_crm,
+    medicoPCMSONome: raw.medico_pcmsmo_nome,
+    medicoPCMSOCrm: raw.medico_pcmsmo_crm,
   };
 }
 

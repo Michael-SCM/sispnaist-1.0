@@ -13,7 +13,7 @@ router.get('/ativas', async (req, res) => {
     const unidadeService = (await import('../services/UnidadeService.js')).default;
     const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
     const result = await unidadeService.listar(page, limit, {});
-    const unidadesAtivas = result.unidades.filter((u: any) => u.ativa !== false);
+    const unidadesAtivas = result.unidades.filter((u: any) => u.ativo !== false);
     res.json({
       status: 'success',
       data: {

@@ -9,8 +9,7 @@ import TrabalhadorOcorrenciaViolencia from '../models/TrabalhadorOcorrenciaViole
 import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { ITrabalhador } from '../types/index.js';
-
-const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+import { escapeRegex } from '../utils/sanitize.js';
 
 export class TrabalhadorService {
   async listar(

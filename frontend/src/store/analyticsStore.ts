@@ -73,7 +73,7 @@ export const useAnalyticsStore = create<IAnalyticsStore>((set, get) => ({
       set({ proximasVacinacoes, isLoading: false });
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : 'Erro ao car próximas vacinações',
+        error: error instanceof Error ? error.message : 'Erro ao carregar próximas vacinações',
         isLoading: false,
       });
     }

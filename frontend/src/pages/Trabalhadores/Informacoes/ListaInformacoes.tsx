@@ -162,8 +162,8 @@ export const ListaInformacoes: React.FC = () => {
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
               <SectionHeader icon={AlertCircle} title="Alergias e Acompanhamentos" />
               <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InfoCard label="Possui Alergias?" value={info.allergy ? 'Sim' : 'Não'} icon={AlertCircle} color="text-red-500" />
-                {info.allergy && <InfoCard label="Descrição das Alergias" value={info.descricaoAlergia} icon={AlertCircle} color="text-orange-500" />}
+                <InfoCard label="Possui Alergias?" value={info.alergia ? 'Sim' : 'Não'} icon={AlertCircle} color="text-red-500" />
+                {info.alergia && <InfoCard label="Descrição das Alergias" value={info.descricaoAlergia} icon={AlertCircle} color="text-orange-500" />}
                 <InfoCard label="Acompanhamento Médico?" value={info.acompanhamentoMedico ? 'Sim' : 'Não'} icon={Heart} color="text-blue-500" />
                 {info.acompanhamentoMedico && <InfoCard label="Motivo do Acompanhamento" value={info.acompanhamentoMedicoMotivo} icon={Heart} color="text-indigo-500" />}
                 <InfoCard label="Programa de Reabilitação?" value={info.acompanhamentoReabilitacao ? 'Sim' : 'Não'} icon={Activity} color="text-green-500" />

@@ -34,7 +34,7 @@ const TrabalhadorAfastamentoSchema = new Schema<ITrabalhadorAfastamentoDocument>
     dataInicio: { type: Date, required: true },
     dataFim: { type: Date },
     dataRetorno: { type: Date, required: true },
-    dataPericia: { type: Date, required: true },
+    dataPericia: { type: Date },
     desfecho: { type: String, trim: true, required: true },
     tempoAfastamento: { type: String, trim: true, required: true },
     laudoMedico: { type: String, trim: true },

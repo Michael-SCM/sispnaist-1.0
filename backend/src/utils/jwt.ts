@@ -59,10 +59,4 @@ export const verifyRefreshToken = (token: string): TokenPayload | null => {
   }
 };
 
-export const decodeToken = (token: string): TokenPayload | null => {
-  try {
-    return jwt.decode(token) as TokenPayload;
-  } catch {
-    return null;
-  }
-};
+

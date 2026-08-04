@@ -665,7 +665,7 @@ export const VideoPlayer: React.FC = () => {
                     {progresso.quizAprovado && (
                       <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs">
                         <Award size={14} />
-                        Aprovado ({progresso.melhormaPontuacao}%)
+                        Aprovado ({progresso.melhorPontuacao}%)
                       </div>
                     )}
                   </>
@@ -733,7 +733,7 @@ export const VideoPlayer: React.FC = () => {
                 <ClipboardCheck size={24} />
               )}
               {progresso?.quizAprovado
-                ? `Aprovado (${progresso.melhormaPontuacao}%)`
+                ? `Aprovado (${progresso.melhorPontuacao}%)`
                 : progresso?.quizRealizado
                 ? 'Fazer Prova Novamente'
                 : 'Fazer Prova'}

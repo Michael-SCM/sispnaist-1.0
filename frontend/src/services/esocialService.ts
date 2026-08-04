@@ -32,8 +32,8 @@ export interface EsocialS2220 {
   observacaoMedica?: string;
   examesRealizados?: string[];
   riscosOcupacionais?: string[];
-  medicoPcmsmoNome?: string;
-  medicoPcmsmoCrm?: string;
+  medicoPCMSONome?: string;
+  medicoPCMSOCrm?: string;
 }
 
 export interface EsocialS2240 {

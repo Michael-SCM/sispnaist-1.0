@@ -256,7 +256,7 @@ export interface IEmpresa {
   email?: string;
   telefone?: string;
   endereco?: IEndereco;
-  ativa?: boolean;
+  ativo?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
 }
@@ -270,7 +270,7 @@ export interface IUnidade {
   gestor?: string;
   esferaAdministrativa?: string;
   possuiPgr?: boolean;
-  ativa?: boolean;
+  ativo?: boolean;
   dataCriacao?: Date;
   dataAtualizacao?: Date;
 }

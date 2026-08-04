@@ -19,7 +19,7 @@ const FormUnidade: React.FC = () => {
     tipo: 'Própria',
     esferaAdministrativa: 'municipal',
     possuiPgr: false,
-    ativa: true,
+    ativo: true,
     endereco: {
       logradouro: '',
       numero: '',
@@ -47,7 +47,7 @@ const FormUnidade: React.FC = () => {
         tipo: unidadeAtual.tipo || 'Própria',
         esferaAdministrativa: unidadeAtual.esferaAdministrativa || 'municipal',
         possuiPgr: unidadeAtual.possuiPgr ?? false,
-        ativa: unidadeAtual.ativa ?? true,
+        ativo: unidadeAtual.ativo ?? true,
         endereco: {
           logradouro: unidadeAtual.endereco?.logradouro || '',
           numero: unidadeAtual.endereco?.numero || '',
@@ -238,7 +238,7 @@ const FormUnidade: React.FC = () => {
                     <label className="block text-sm font-bold text-slate-600 mb-2">Status da Unidade</label>
                     <select
                       name="ativa"
-                      value={String(formData.ativa)}
+                      value={String(formData.ativo)}
                       onChange={handleChange}
                       className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-bold text-indigo-600"
                     >

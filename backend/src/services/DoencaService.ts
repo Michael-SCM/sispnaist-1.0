@@ -1,34 +1,16 @@
 import Doenca, { IDoencaDocument } from '../models/Doenca.js';
 import Trabalhador from '../models/Trabalhador.js';
-import User from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IDoenca } from '../types/index.js';
 import mongoose from 'mongoose';
+import { escapeRegex } from '../utils/sanitize.js';
+import { resolverTrabalhadorId } from '../utils/resolverTrabalhadorId.js';
 
 export class DoencaService {
-  /**
-   * Resolve trabalhadorId de CPF para ObjectId
-   */
-  private async resolverTrabalhadorId(identifier: string): Promise<string> {
-    if (mongoose.Types.ObjectId.isValid(identifier)) {
-      return identifier;
-    }
-
-    const [usuario, trabalhador] = await Promise.all([
-      User.findOne({ cpf: identifier }).select('_id').lean(),
-      Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
-    ]);
-
-    if (usuario) return usuario._id.toString();
-    if (trabalhador) return trabalhador._id.toString();
-
-    throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
-  }
-
   async criar(doencaData: Partial<IDoenca>): Promise<IDoenca> {
     // Resolver trabalhadorId se for CPF
     if (doencaData.trabalhadorId && !mongoose.Types.ObjectId.isValid(doencaData.trabalhadorId as string)) {
-      doencaData.trabalhadorId = await this.resolverTrabalhadorId(doencaData.trabalhadorId as string);
+      doencaData.trabalhadorId = await resolverTrabalhadorId(doencaData.trabalhadorId as string);
     }
 
     const doenca = new Doenca(doencaData);
@@ -65,7 +47,6 @@ export class DoencaService {
 
 
     if (filtros?.nomeDoenca) {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const nomeDoenca = escapeRegex(String(filtros.nomeDoenca).trim());
       const pattern = new RegExp('^' + nomeDoenca, 'i');
       query.nomeDoenca = { $regex: pattern };
@@ -79,7 +60,7 @@ export class DoencaService {
       // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
       const cpfNorm = toCPFMaskedOrDigits(String(filtros.trabalhadorId));
-      query.trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
+      query.trabalhadorId = await resolverTrabalhadorId(cpfNorm);
     }
 
 
@@ -130,7 +111,7 @@ export class DoencaService {
 
     // Resolver trabalhadorId se for CPF
     if (doencaData.trabalhadorId && !mongoose.Types.ObjectId.isValid(doencaData.trabalhadorId as string)) {
-      doencaData.trabalhadorId = await this.resolverTrabalhadorId(doencaData.trabalhadorId as string);
+      doencaData.trabalhadorId = await resolverTrabalhadorId(doencaData.trabalhadorId as string);
     }
 
     const doenca = await Doenca.findByIdAndUpdate(

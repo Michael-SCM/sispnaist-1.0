@@ -39,7 +39,7 @@ const NIVEL_CORES: Record<NivelAlerta, string> = {
 };
 
 const STATUS_ROTULOS: Record<StatusAlerta, string> = {
-  ativa: 'Ativa',
+  ativo: 'Ativa',
   reagindo: 'Reagindo',
   lida: 'Lida',
   arquivada: 'Arquivada',

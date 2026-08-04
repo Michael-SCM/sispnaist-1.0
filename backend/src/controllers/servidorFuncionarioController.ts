@@ -3,6 +3,7 @@ import ServidorFuncionario from '../models/ServidorFuncionario';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { escapeRegex } from '../utils/sanitize.js';
 
 class ServidorFuncionarioController {
   // GET /api/servidores - Listar servidores
@@ -16,7 +17,6 @@ class ServidorFuncionarioController {
       else if (ativo === 'false') filtro.ativo = false;
       if (situacaoFuncional) filtro.situacaoFuncional = situacaoFuncional;
       if (lotacao) {
-        const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         filtro.lotacao = { $regex: new RegExp(escapeRegex(String(lotacao)), 'i') };
       }
 

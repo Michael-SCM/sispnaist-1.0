@@ -3,9 +3,10 @@ import doencaService from '../services/DoencaService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { AppError } from '../middleware/errorHandler.js';
 import Trabalhador from '../models/Trabalhador.js';
-import { sinanService } from '../services/SinanService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { notificarSinanParaTrabalhador } from '../utils/notificarSinan.js';
+import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -21,38 +22,15 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
   await logAction(req, 'CREATE', 'Doenca', doenca._id!.toString(), doenca);
 
-  notificarSinan(req, doenca);
+  notificarSinanParaTrabalhador(req, doenca.trabalhadorId, {
+    tipoNotificacao: 'Doença Relacionada ao Trabalho',
+    dataOcorrencia: (doenca.dataInicio as Date)?.toISOString?.() || String(doenca.dataInicio),
+    codigoAgravo: doenca.codigoDoenca || '',
+    nomeAgravo: doenca.nomeDoenca || '',
+  });
 
   res.status(201).json({ sucesso: true, dados: doenca });
 });
-
-async function notificarSinan(req: Request, doenca: any) {
-  try {
-    const trabalhador = await Trabalhador.findById(doenca.trabalhadorId);
-    if (!trabalhador) return;
-
-    const cpf = trabalhador.cpf?.replace(/\D/g, '');
-    const cns = trabalhador.cartaoSus?.replace(/\D/g, '');
-
-    await sinanService.notificar({
-      tipoNotificacao: 'Doença Relacionada ao Trabalho',
-      cpf,
-      cns,
-      nome: trabalhador.nome,
-      dataOcorrencia: doenca.dataInicio?.toISOString?.() || doenca.dataInicio,
-      codigoAgravo: doenca.codigoDoenca || '',
-      nomeAgravo: doenca.nomeDoenca || '',
-      cboOcupacao: trabalhador.trabalho?.ocupacao || '',
-      cnaeEmpresa: '',
-      ufNotificacao: trabalhador.endereco?.estado || '',
-      municipioNotificacao: trabalhador.endereco?.cidade || '',
-      unidadeSaude: '',
-      situacaoMercadoTrabalho: trabalhador.vinculo?.tipo || '',
-    });
-  } catch (err: any) {
-    console.error('[SINAN] Erro ao notificar doença:', err.message);
-  }
-}
 
 export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -62,17 +40,10 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Doença não encontrada', 404);
   }
 
-  // Se o usuário logado for trabalhador, só pode visualizar se for dele
-  if ((req as any).user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-    const recordTrabalhadorId = (doenca.trabalhadorId && (doenca.trabalhadorId as any)._id)
-      ? (doenca.trabalhadorId as any)._id.toString()
-      : doenca.trabalhadorId.toString();
-
-    if (!trabalhador || recordTrabalhadorId !== trabalhador._id.toString()) {
-      throw new AppError('Sem permissão para acessar os dados desta doença', 403);
-    }
-  }
+  const recordTrabalhadorId = (doenca.trabalhadorId && (doenca.trabalhadorId as any)._id)
+    ? (doenca.trabalhadorId as any)._id.toString()
+    : doenca.trabalhadorId.toString();
+  await exigirProprioTrabalhador(req, recordTrabalhadorId);
 
   res.status(200).json({ sucesso: true, dados: doenca });
 });

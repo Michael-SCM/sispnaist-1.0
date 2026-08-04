@@ -47,7 +47,7 @@ const EmpresaSchema = new Schema<IEmpresaDocument>(
       },
       cep: String,
     },
-    ativa: {
+    ativo: {
       type: Boolean,
       default: true,
     },

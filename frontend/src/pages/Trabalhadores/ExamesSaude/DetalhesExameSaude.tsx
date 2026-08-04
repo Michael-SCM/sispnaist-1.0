@@ -201,23 +201,23 @@ export const DetalhesExameSaude: React.FC = () => {
             </div>
 
             {/* Médico PCMSO */}
-            {(exame.medicoPcmsmoNome || exame.medicoPcmsmoCrm) && (
+            {(exame.medicoPCMSONome || exame.medicoPCMSOCrm) && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
                 <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <User size={20} className="text-slate-500" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Coordenador PCMSO</h2>
                 </div>
                 <div className="p-8 space-y-4">
-                  {exame.medicoPcmsmoNome && (
+                  {exame.medicoPCMSONome && (
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nome</p>
-                      <p className="font-bold text-slate-700">{exame.medicoPcmsmoNome}</p>
+                      <p className="font-bold text-slate-700">{exame.medicoPCMSONome}</p>
                     </div>
                   )}
-                  {exame.medicoPcmsmoCrm && (
+                  {exame.medicoPCMSOCrm && (
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">CRM</p>
-                      <p className="font-bold text-slate-700">{exame.medicoPcmsmoCrm}</p>
+                      <p className="font-bold text-slate-700">{exame.medicoPCMSOCrm}</p>
                     </div>
                   )}
                 </div>

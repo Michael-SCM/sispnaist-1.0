@@ -569,27 +569,6 @@ export class PdfService {
   }
 
   /**
-   * Retorna a data atual no fuso horário de Brasília (America/Sao_Paulo)
-   * Ajuste: UTC-3 (horário de Brasília)
-   */
-  private getDataAtualBrasil(): Date {
-    const now = new Date();
-    // Subtquir 3 horas para obter o horário de Brasília (UTC-3)
-    return new Date(now.getTime() - 3 * 60 * 60 * 1000);
-  }
-
-  /**
-   * Retorna a data formatada ISO (YYYY-MM-DD) no fuso de Brasília
-   */
-  private getDataBrasilISO(): string {
-    const dataBrasil = this.getDataAtualBrasil();
-    const ano = dataBrasil.getUTCFullYear();
-    const mes = String(dataBrasil.getUTCMonth() + 1).padStart(2, '0');
-    const dia = String(dataBrasil.getUTCDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
-  }
-
-  /**
    * Gera PDF de acidentes
    */
   async gerarPdfAcidentes(
@@ -1885,8 +1864,8 @@ export class PdfService {
       { label: 'Perfil', value: dadosCadastrais.perfil || '-' },
       { label: 'Conta verificada', value: dadosCadastrais.isVerified ? 'Sim' : 'Não' },
       { label: 'Conta ativa', value: dadosCadastrais.ativo !== false ? 'Sim' : 'Não' },
-      { label: 'Data de criação', value: this.formatarData(dadosCadastrais.createdAt) },
-      { label: 'Última atualização', value: this.formatarData(dadosCadastrais.updatedAt) },
+      { label: 'Data de criação', value: this.formatarData(dadosCadastrais.dataCriacao) },
+      { label: 'Última atualização', value: this.formatarData(dadosCadastrais.dataAtualizacao) },
     ], yPos);
 
     // Consentimento LGPD

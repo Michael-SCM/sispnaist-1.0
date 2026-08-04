@@ -1,8 +1,7 @@
 import User, { IUserDocument } from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
-
-const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+import { escapeRegex } from '../utils/sanitize.js';
 
 export class UserService {
   async listar(

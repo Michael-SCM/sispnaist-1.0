@@ -2,8 +2,7 @@ import Empresa, { IEmpresaDocument } from '../models/Empresa.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IEmpresa } from '../types/index.js';
 import Unidade from '../models/Unidade.js';
-
-const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+import { escapeRegex } from '../utils/sanitize.js';
 
 export class EmpresaService {
   async listar(

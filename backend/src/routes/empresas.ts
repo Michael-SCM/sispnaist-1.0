@@ -13,7 +13,7 @@ router.get('/ativas', async (req, res) => {
     const empresaService = (await import('../services/EmpresaService.js')).default;
     const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
     const result = await empresaService.listar(page, limit, {});
-    const empresasAtivas = result.empresas.filter((e: any) => e.ativa !== false);
+    const empresasAtivas = result.empresas.filter((e: any) => e.ativo !== false);
     res.json({
       status: 'success',
       data: {

@@ -5,46 +5,23 @@ import { AppError } from '../middleware/errorHandler.js';
 import { IAcidente } from '../types/index.js';
 import mongoose from 'mongoose';
 import MaterialBiologico from '../models/MaterialBiologico.js';
+import { escapeRegex } from '../utils/sanitize.js';
+import { resolverTrabalhadorId } from '../utils/resolverTrabalhadorId.js';
 
 export class AcidenteService {
-  /**
-   * Resolve trabalhadorId de CPF para ObjectId
-   * Se o valor já for um ObjectId válido, retorna como está
-   * Se for um CPF, busca o usuário ou trabalhador e retorna seu ObjectId
-   */
-  private async resolverTrabalhadorId(identifier: string): Promise<string> {
-    // Se já for um ObjectId válido, retorna como está
-    if (mongoose.Types.ObjectId.isValid(identifier)) {
-      return identifier;
-    }
-
-    // Tentar buscar na coleção de usuários e trabalhadores em paralelo
-    const [usuario, trabalhador] = await Promise.all([
-      User.findOne({ cpf: identifier }).select('_id').lean(),
-      Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
-    ]);
-
-    if (usuario) return usuario._id.toString();
-    if (trabalhador) return trabalhador._id.toString();
-
-    throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
-  }
-
   async criar(acidenteData: Partial<IAcidente>): Promise<IAcidente> {
     // Resolver trabalhadorId se for CPF
     if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
-      acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
+      acidenteData.trabalhadorId = await resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 
     const acidente = new Acidente(acidenteData);
     await acidente.save();
 
-    // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
+    // Mapear campos do documento
     const acidenteObj = acidente.toObject() as any;
     return {
       ...acidenteObj,
-      dataCriacao: acidenteObj.createdAt,
-      dataAtualizacao: acidenteObj.updatedAt,
     } as IAcidente;
   }
 
@@ -89,8 +66,8 @@ export class AcidenteService {
     // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
     const acidenteMapeado = {
       ...acidente,
-      dataCriacao: (acidente as any).createdAt || (acidente as any).dataCriacao,
-      dataAtualizacao: (acidente as any).updatedAt || (acidente as any).dataAtualizacao,
+      dataCriacao: (acidente as any).dataCriacao,
+      dataAtualizacao: (acidente as any).dataAtualizacao,
     };
 
     return acidenteMapeado as unknown as IAcidente;
@@ -130,7 +107,7 @@ export class AcidenteService {
         // Se vier CPF (com máscara ou só dígitos), resolve para ObjectId
         const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
         const cpfNorm = toCPFMaskedOrDigits(filtros.trabalhadorId);
-        query.trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
+        query.trabalhadorId = await resolverTrabalhadorId(cpfNorm);
       }
     }
 
@@ -140,7 +117,7 @@ export class AcidenteService {
       // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
       const cpfNorm = toCPFMaskedOrDigits(String(filtros.cpfTrabalhador));
-      const resolvedId = await this.resolverTrabalhadorId(cpfNorm);
+      const resolvedId = await resolverTrabalhadorId(cpfNorm);
       query.trabalhadorId = resolvedId;
     }
 
@@ -167,7 +144,6 @@ export class AcidenteService {
     }
 
     if (filtros?.descricao) {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       query.descricao = { $regex: escapeRegex(filtros.descricao), $options: 'i' };
     }
 
@@ -205,8 +181,8 @@ export class AcidenteService {
     // Mapear timestamps do MongoDB para os nomes esperados pelo frontend
     const acidentesMapeados = acidentes.map((a: any) => ({
       ...a,
-      dataCriacao: a.createdAt || a.dataCriacao,
-      dataAtualizacao: a.updatedAt || a.dataAtualizacao,
+      dataCriacao: a.dataCriacao,
+      dataAtualizacao: a.dataAtualizacao,
     }));
 
     return {
@@ -225,7 +201,7 @@ export class AcidenteService {
 
     // Resolver trabalhadorId se for CPF
     if (acidenteData.trabalhadorId && !mongoose.Types.ObjectId.isValid(acidenteData.trabalhadorId as string)) {
-      acidenteData.trabalhadorId = await this.resolverTrabalhadorId(acidenteData.trabalhadorId as string);
+      acidenteData.trabalhadorId = await resolverTrabalhadorId(acidenteData.trabalhadorId as string);
     }
 
     // Garantir que lesões é um array, mas SOMENTE se ele foi enviado no payload
@@ -250,8 +226,8 @@ export class AcidenteService {
     // Mapear createdAt/updatedAt (timestamps do MongoDB) para dataCriacao/dataAtualizacao
     const acidenteMapeado = {
       ...acidente,
-      dataCriacao: (acidente as any).createdAt || (acidente as any).dataCriacao,
-      dataAtualizacao: (acidente as any).updatedAt || (acidente as any).dataAtualizacao,
+      dataCriacao: (acidente as any).dataCriacao,
+      dataAtualizacao: (acidente as any).dataAtualizacao,
     };
 
     return acidenteMapeado as unknown as IAcidente;

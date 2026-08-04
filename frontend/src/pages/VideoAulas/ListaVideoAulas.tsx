@@ -238,7 +238,7 @@ export const ListaVideoAulas: React.FC = () => {
                       {prog.quizAprovado && (
                         <div className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-lg flex items-center gap-1">
                           <Award size={12} />
-                          {prog.melhormaPontuacao}%
+                          {prog.melhorPontuacao}%
                         </div>
                       )}
                       {prog.assistido && !prog.quizAprovado && (

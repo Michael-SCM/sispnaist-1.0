@@ -50,7 +50,7 @@ const UnidadeSchema = new Schema<IUnidadeDocument>(
       type: Boolean,
       default: false,
     },
-    ativa: {
+    ativo: {
       type: Boolean,
       default: true,
     },

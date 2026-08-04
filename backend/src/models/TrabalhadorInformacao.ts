@@ -13,7 +13,7 @@ export interface IExame {
 }
 
 export interface ITrabalhadorInformacao extends Document {
-  trabalhadorId: string;
+  trabalhadorId: mongoose.Types.ObjectId;
   doencaBase: string;
   estadoVacinal: string;
   tipoDroga: string;
@@ -32,7 +32,7 @@ export interface ITrabalhadorInformacao extends Document {
   foiInternado: boolean;
   diasInternacao: number;
   foiIntubado: boolean;
-  allergy: boolean;
+  alergia: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
   acompanhamentoMedicoMotivo: string;
@@ -86,7 +86,8 @@ const ExameSchema = new Schema<IExame>(
 const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
   {
     trabalhadorId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Trabalhador',
       required: true,
       index: true,
     },
@@ -162,7 +163,7 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
       type: Boolean,
       default: false,
     },
-    allergy: {
+    alergia: {
       type: Boolean,
       default: false,
     },
@@ -288,7 +289,7 @@ const TrabalhadorInformacaoSchema = new Schema<ITrabalhadorInformacao>(
     },
   },
   {
-    timestamps: true,
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
     collection: 'trabalhador_informacoes',
   }
 );

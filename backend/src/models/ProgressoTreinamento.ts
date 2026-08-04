@@ -21,7 +21,7 @@ export interface IProgressoTreinamento extends Document {
   quizRealizado: boolean;
   quizAprovado: boolean;
   tentativasQuiz: ITentativaQuiz[];
-  melhormaPontuacao?: number;
+  melhorPontuacao?: number;
   certificadoEmitido: boolean;
   dataConclusao?: Date;
   favorito: boolean;
@@ -50,7 +50,7 @@ const ProgressoTreinamentoSchema = new Schema<IProgressoTreinamento>(
     quizRealizado: { type: Boolean, default: false },
     quizAprovado: { type: Boolean, default: false },
     tentativasQuiz: [TentativaQuizSchema],
-    melhormaPontuacao: { type: Number, min: 0, max: 100 },
+    melhorPontuacao: { type: Number, min: 0, max: 100 },
     certificadoEmitido: { type: Boolean, default: false },
     dataConclusao: { type: Date },
     favorito: { type: Boolean, default: false },

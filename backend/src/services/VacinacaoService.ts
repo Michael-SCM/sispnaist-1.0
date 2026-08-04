@@ -4,11 +4,16 @@ import User from '../models/User.js';
 import { IVacinacao } from '../types/index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import mongoose, { Types } from 'mongoose';
+import { escapeRegex } from '../utils/sanitize.js';
+import { resolverTrabalhadorId } from '../utils/resolverTrabalhadorId.js';
 
 export class VacinacaoService {
   async criar(data: Partial<IVacinacao>): Promise<IVacinacao> {
     // Resolver CPF para ObjectId se necessário
-    const trabalhadorId = await this.resolverTrabalhadorId(data.trabalhadorId);
+    if (!data.trabalhadorId) {
+      throw new AppError('Trabalhador é obrigatório', 400);
+    }
+    const trabalhadorId = await resolverTrabalhadorId(data.trabalhadorId);
 
     const vacinacao = new Vacinacao({
       ...data,
@@ -65,7 +70,6 @@ export class VacinacaoService {
 
 
     if (filtros.vacina) {
-      const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const vacina = escapeRegex(String(filtros.vacina).trim());
       const pattern = new RegExp('^' + vacina, 'i');
       query.vacina = { $regex: pattern };
@@ -75,7 +79,7 @@ export class VacinacaoService {
       // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
       const cpfNorm = toCPFMaskedOrDigits(filtros.trabalhadorId);
-      const trabalhadorId = await this.resolverTrabalhadorId(cpfNorm);
+      const trabalhadorId = await resolverTrabalhadorId(cpfNorm);
       query.trabalhadorId = trabalhadorId;
     }
 
@@ -133,7 +137,7 @@ export class VacinacaoService {
 
     // Se houver trabalhadorId, resolver CPF para ObjectId
     if (data.trabalhadorId) {
-      data.trabalhadorId = await this.resolverTrabalhadorId(data.trabalhadorId);
+      data.trabalhadorId = await resolverTrabalhadorId(data.trabalhadorId);
     }
 
     const vacinacao = await Vacinacao.findByIdAndUpdate(
@@ -166,7 +170,7 @@ export class VacinacaoService {
   }
 
   async obterPorTrabalhador(trabalhadorId: string, page = 1, limit = 10): Promise<{ vacinacoes: IVacinacao[]; total: number; pages: number }> {
-    const resolvedId = await this.resolverTrabalhadorId(trabalhadorId);
+    const resolvedId = await resolverTrabalhadorId(trabalhadorId);
 
     const skip = (page - 1) * limit;
 
@@ -232,28 +236,6 @@ export class VacinacaoService {
       porVacina: Object.fromEntries(porVacina.map((p) => [p._id, p.count])),
       proximasDoses,
     };
-  }
-
-  private async resolverTrabalhadorId(trabalhadorId: string | undefined): Promise<string> {
-    if (!trabalhadorId) {
-      throw new AppError('Trabalhador é obrigatório', 400);
-    }
-
-    // Se já é ObjectId válido, usar direto
-    if (Types.ObjectId.isValid(trabalhadorId)) {
-      return trabalhadorId;
-    }
-
-    // Tentar buscar por CPF em User e Trabalhador em paralelo
-    const [usuario, trabalhador] = await Promise.all([
-      User.findOne({ cpf: trabalhadorId }).select('_id').lean(),
-      Trabalhador.findOne({ cpf: trabalhadorId }).select('_id').lean()
-    ]);
-
-    if (usuario) return usuario._id.toString();
-    if (trabalhador) return trabalhador._id.toString();
-
-    throw new AppError('Trabalhador não encontrado', 404);
   }
 }
 

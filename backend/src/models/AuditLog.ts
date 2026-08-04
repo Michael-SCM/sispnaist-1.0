@@ -25,7 +25,7 @@ function calcularHash(doc: any): string {
     acao: doc.acao,
     entidade: doc.entidade,
     entidadeId: doc.entidadeId,
-    createdAt: doc.createdAt?.toISOString?.() || doc.createdAt,
+    createdAt: doc.dataCriacao?.toISOString?.() || doc.dataCriacao,
   });
   return crypto.createHash('sha256').update(payload).digest('hex').slice(0, 16);
 }
@@ -72,7 +72,7 @@ const AuditLogSchema = new Schema<IAuditLogDocument>(
   },
   {
     collection: 'audit_logs',
-    timestamps: true,
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
   }
 );
 

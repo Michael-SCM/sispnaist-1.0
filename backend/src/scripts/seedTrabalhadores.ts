@@ -787,7 +787,7 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
       foiInternado: teveCovid && rand() > 0.8,
       diasInternacao: teveCovid && rand() > 0.8 ? 5 + Math.floor(rand() * 15) : 0,
       foiIntubado: teveCovid && rand() > 0.9,
-      allergy: rand() > 0.85,
+      alergia: rand() > 0.85,
       descricaoAlergia: rand() > 0.85 ? 'Alergia a Dipirona' : '',
       acompanhamentoMedico: rand() > 0.5,
       acompanhamentoMedicoMotivo: rand() > 0.5 ? 'Acompanhamento cardiológico semestral' : '',

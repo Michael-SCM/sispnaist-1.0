@@ -55,7 +55,7 @@ const MaterialBiologicoSchema = new Schema<IMaterialBiologicoDocument>(
   },
   {
     collection: 'material_biologico',
-    timestamps: true,
+    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
   }
 );
 

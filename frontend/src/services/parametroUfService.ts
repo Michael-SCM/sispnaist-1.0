@@ -1,5 +1,4 @@
 import api from './api';
-import type { ApiResponse } from './api';
 
 export interface IParametroPorUF {
   _id: string;

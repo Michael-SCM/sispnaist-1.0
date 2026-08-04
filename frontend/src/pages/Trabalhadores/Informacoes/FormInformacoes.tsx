@@ -48,7 +48,7 @@ interface FormData {
   foiInternado: boolean;
   diasInternacao: number;
   foiIntubado: boolean;
-  allergy: boolean;
+  alergia: boolean;
   descricaoAlergia: string;
   acompanhamentoMedico: boolean;
   acompanhamentoMedicoMotivo: string;
@@ -104,7 +104,7 @@ const INITIAL_FORM: FormData = {
   foiInternado: false,
   diasInternacao: 0,
   foiIntubado: false,
-  allergy: false,
+  alergia: false,
   descricaoAlergia: '',
   acompanhamentoMedico: false,
   acompanhamentoMedicoMotivo: '',
@@ -201,7 +201,7 @@ export const FormInformacoes: React.FC = () => {
           foiInternado: info.foiInternado || false,
           diasInternacao: info.diasInternacao || 0,
           foiIntubado: info.foiIntubado || false,
-          allergy: info.allergy || false,
+          alergia: info.alergia || false,
           descricaoAlergia: info.descricaoAlergia || '',
           acompanhamentoMedico: info.acompanhamentoMedico || false,
           acompanhamentoMedicoMotivo: info.acompanhamentoMedicoMotivo || '',
@@ -641,17 +641,17 @@ export const FormInformacoes: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    name="allergy"
-                    id="allergy"
-                    checked={formData.allergy}
+                    name="alergia"
+                    id="alergia"
+                    checked={formData.alergia}
                     onChange={handleChange}
                     className="w-5 h-5 text-red-600 rounded border-red-300 focus:ring-red-500"
                   />
-                  <label htmlFor="allergy" className="text-sm font-bold text-slate-600">
+                  <label htmlFor="alergia" className="text-sm font-bold text-slate-600">
                     Tem algum tipo de alergia?
                   </label>
                 </div>
-                {formData.allergy && (
+                {formData.alergia && (
                   <div>
                     <label className={labelCls}>Descrição da(s) alergia(s)</label>
                     <textarea
