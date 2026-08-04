@@ -100,7 +100,12 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 // Sanitização: remove operadores NoSQL ($gt, $regex, etc.) de body e query
-app.use(mongoSanitize({ replaceWith: '_' }));
+app.use((req: any, _res: any, next: any) => {
+  if (req.body) req.body = mongoSanitize(req.body);
+  if (req.query) req.query = mongoSanitize(req.query);
+  if (req.params) req.params = mongoSanitize(req.params);
+  next();
+});
 
 // Sanitização: red Campos sensíveis (senha, token) em logs de request
 app.use(sanitizeRequestBody);
