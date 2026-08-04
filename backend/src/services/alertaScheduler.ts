@@ -17,9 +17,11 @@ export const initAlertScheduler = (): void => {
       config.alert.cronSchedule,
       () => {
         console.log('[Alertas] Executando avaliação agendada de alertas...');
-        alertService.avaliarTodos().catch((err) => {
-          console.error('[Alertas] Erro na avaliação agendada:', err);
-        });
+        alertService.avaliarTodos()
+          .then(() => alertService.enviarResumoDiario())
+          .catch((err) => {
+            console.error('[Alertas] Erro na avaliação agendada:', err);
+          });
       },
       { timezone: 'America/Sao_Paulo' }
     );

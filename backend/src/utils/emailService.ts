@@ -507,3 +507,150 @@ export const sendAlertaEmail = async (
     }
   }
 };
+
+const labelTipoAlerta = (tipo: string): string =>
+  ({
+    PICO_ACIDENTES: 'Pico de Acidentes',
+    VACINA_VENCENDO: 'Vacina Vencendo',
+    NAO_CONFORMIDADE: 'Não Conformidade',
+    MONITORAMENTO_CRITICO: 'Monitoramento Crítico',
+  }[tipo] || tipo);
+
+/**
+ * Gera o HTML de um resumo diário de alertas (lista de itens agregados).
+ */
+export const gerarHtmlResumoAlertas = (
+  itens: {
+    titulo: string;
+    descricao: string;
+    nivel: string;
+    tipo: string;
+    data?: string;
+  }[],
+  link?: string
+): string => {
+  const linhas = itens
+    .map((item) => {
+      const nivelLabel = item.nivel.charAt(0).toUpperCase() + item.nivel.slice(1);
+      const dataHora = item.data || new Date().toLocaleString('pt-BR');
+      return `
+        <tr>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #eee; vertical-align: top;">
+            <div style="font-weight: bold; color: #111; margin-bottom: 4px;">${item.titulo}</div>
+            <div style="color: #6b7280; font-size: 12px; margin-bottom: 6px;">
+              Tipo: ${labelTipoAlerta(item.tipo)} &nbsp;•&nbsp; Nível: <strong>${nivelLabel}</strong> &nbsp;•&nbsp; ${dataHora}
+            </div>
+            <div style="color: #374151; font-size: 14px; line-height: 1.5; white-space: pre-line;">${item.descricao}</div>
+          </td>
+        </tr>`;
+    })
+    .join('');
+
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      <div style="background-color: #dc2626; color: #fff; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;">
+        <strong>RESUMO DIÁRIO DE ALERTAS - SISPNAIST</strong>
+      </div>
+      <p style="color: #374151; font-size: 15px; line-height: 1.6;">
+        Olá, abaixo estão os <strong>${itens.length}</strong> alerta(s) novos que requerem sua atenção:
+      </p>
+      <table style="width: 100%; border-collapse: collapse; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+        ${linhas}
+      </table>
+      <div style="text-align: center; margin: 24px 0;">
+        <a href="${link || `${config.frontendUrl}/alertas`}" style="background-color: #2563eb; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+          Ver Alertas
+        </a>
+      </div>
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático gerado pelo sistema de alertas do SISPNAIST. Por favor, não responda.</p>
+    </div>
+  `;
+};
+
+/**
+ * Envia o resumo diário de alertas para um destinatário.
+ * Segue a mesma estratégia híbrida: Brevo HTTP API -> Resend HTTP API -> Gmail SMTP.
+ */
+export const sendAlertaResumoEmail = async (
+  to: string,
+  itens: {
+    titulo: string;
+    descricao: string;
+    nivel: string;
+    tipo: string;
+    data?: string;
+  }[],
+  link?: string
+): Promise<void> => {
+  const htmlContent = gerarHtmlResumoAlertas(itens, link);
+  const qtd = itens.length;
+  const subject = `Resumo diário de alertas (${qtd} novo${qtd > 1 ? 's' : ''}) - SISPNAIST`;
+
+  // 1. Brevo HTTP API
+  if (process.env.BREVO_API_KEY) {
+    try {
+      await axios.post(
+        'https://api.brevo.com/v3/smtp/email',
+        {
+          sender: { name: 'SISPNAIST', email: config.email.user || 'sispnaist@gmail.com' },
+          to: [{ email: to }],
+          subject,
+          htmlContent,
+        },
+        { headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json' } }
+      );
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Resumo diário de alertas enviado via Brevo para: ${to} (${qtd} item(ns))`);
+      }
+      return;
+    } catch (brevoError: any) {
+      const errorMsg = brevoError.response?.data || brevoError.message;
+      console.error('ERRO BREVO no resumo diário:', errorMsg);
+      throw new Error(`Falha ao enviar resumo diário via Brevo: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 2. Resend HTTP API
+  if (process.env.RESEND_API_KEY) {
+    const fromEmail =
+      config.email.from && config.email.from.includes('gmail')
+        ? 'SISPNAIST <onboarding@resend.dev>'
+        : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
+    try {
+      await axios.post(
+        'https://api.resend.com/emails',
+        { from: fromEmail, to, subject, html: htmlContent },
+        { headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' } }
+      );
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Resumo diário de alertas enviado via Resend para: ${to} (${qtd} item(ns))`);
+      }
+      return;
+    } catch (resendError: any) {
+      const errorMsg = resendError.response?.data || resendError.message;
+      console.error('Erro RESEND no resumo diário:', errorMsg);
+      throw new Error(`Falha ao enviar resumo diário via Resend: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 3. Fallback Gmail SMTP
+  if (!config.email.user || !config.email.pass) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Nenhum serviço de envio de e-mail (Brevo/Resend/SMTP) configurado para o resumo diário.');
+    }
+    return;
+  }
+
+  try {
+    await transporter.sendMail({ from: config.email.from, to, subject, html: htmlContent });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`Resumo diário de alertas enviado via Gmail SMTP para: ${to} (${qtd} item(ns))`);
+    }
+  } catch (smtpError: any) {
+    console.error(`ERRO NO GMAIL SMTP (Nodemailer) no resumo diário para ${to}:`, smtpError);
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Falha ao enviar resumo diário via Gmail SMTP: ${smtpError?.message || 'erro desconhecido'}`);
+    }
+  }
+};

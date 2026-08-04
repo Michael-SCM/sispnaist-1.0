@@ -8,7 +8,7 @@ import RegraValidacao from '../models/RegraValidacao.js';
 import PreferenciaUsuario from '../models/PreferenciaUsuario.js';
 import Parametro from '../models/Parametro.js';
 import config from '../config/config.js';
-import { sendAlertaEmail } from '../utils/emailService.js';
+import { sendAlertaResumoEmail } from '../utils/emailService.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 const UM_DIA = 24 * 60 * 60 * 1000;
@@ -340,58 +340,118 @@ export class AlertaService {
       dataAlerta: new Date(),
     });
 
-    if (regra.notificarEmail) {
-      await this.notificarDestinatarios(novo);
-    }
     return novo;
   }
 
   /**
-   * Notifica admins (todos os alertas) e gestores (somente alertas da sua empresa).
+   * Envia o resumo diário de alertas novos ainda não notificados.
+   * Dispara apenas se houver >= 5 alertas pendentes no sistema.
+   * Admins recebem todos os pendentes; cada gestor, apenas os da própria empresa.
    */
-  private async notificarDestinatarios(alerta: IAlerta): Promise<void> {
+  async enviarResumoDiario(): Promise<void> {
+    const pendentes = (await Alerta.find({
+      status: { $in: ['ativa', 'reagindo'] },
+      'usuariosNotificados.0': { $exists: false },
+    })
+      .sort({ nivel: -1, dataAlerta: -1 })
+      .lean()) as unknown as (IAlerta & { _id: any })[];
+
+    if (pendentes.length < 5) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[Alertas] Resumo diário: ${pendentes.length} pendente(s), abaixo do limite de 5. Nenhum e-mail enviado.`);
+      }
+      return;
+    }
+
     const usuarios = await User.find({ perfil: { $in: ['admin', 'gestor'] }, ativo: true })
       .select('_id email perfil empresa')
       .lean();
 
-    const admins = usuarios.filter((u) => u.perfil === 'admin');
-    const gestores = usuarios.filter(
-      (u) => u.perfil === 'gestor' && alerta.empresaId && u.empresa && String(u.empresa) === String(alerta.empresaId)
-    );
-
-    const destinatarios = [...admins, ...gestores];
-    if (destinatarios.length === 0) return;
-
-    const prefs = await PreferenciaUsuario.find({ usuarioId: { $in: destinatarios.map((u) => u._id) } })
+    const prefs = await PreferenciaUsuario.find({ usuarioId: { $in: usuarios.map((u) => u._id) } })
       .select('usuarioId notificacoesEmail')
       .lean();
     const prefMap = new Map(prefs.map((p) => [String(p.usuarioId), p.notificacoesEmail !== false]));
 
-    const aReceber = destinatarios.filter((u) => prefMap.get(String(u._id)) !== false);
-    let enviados = 0;
-    for (const u of aReceber) {
-      try {
-        await sendAlertaEmail(u.email, {
-          titulo: alerta.titulo,
-          descricao: alerta.descricao,
-          nivel: alerta.nivel,
-          tipo: alerta.tipo,
-          link: `${config.frontendUrl}/alertas`,
+    const mapaItens = new Map<
+      string,
+      { usuario: any; itens: { _id: any; titulo: string; descricao: string; nivel: string; tipo: string; dataAlerta: Date }[] }
+    >();
+    // Alerta -> usuários que devem ser marcados como notificados
+    const notificadosPorAlerta = new Map<string, Set<any>>();
+    // Usuário -> total de itens efetivamente enviados (só conta se o e-mail não falhou)
+    const enviadosPorUsuario = new Map<string, number>();
+
+    for (const u of usuarios) {
+      if (prefMap.get(String(u._id)) === false) continue;
+
+      for (const pendente of pendentes) {
+        const pertence =
+          u.perfil === 'admin' ||
+          (u.perfil === 'gestor' && pendente.empresaId && u.empresa && String(u.empresa) === String(pendente.empresaId));
+        if (!pertence) continue;
+
+        let grupo = mapaItens.get(String(u._id));
+        if (!grupo) {
+          grupo = { usuario: u, itens: [] };
+          mapaItens.set(String(u._id), grupo);
+        }
+        grupo.itens.push({
+          _id: pendente._id,
+          titulo: pendente.titulo,
+          descricao: pendente.descricao,
+          nivel: pendente.nivel,
+          tipo: pendente.tipo,
+          dataAlerta: pendente.dataAlerta,
         });
-        enviados++;
-      } catch (err) {
-        console.error(`[Alertas] Falha ao enviar e-mail para ${u.email}:`, err);
+
+        let ids = notificadosPorAlerta.get(String(pendente._id));
+        if (!ids) {
+          ids = new Set();
+          notificadosPorAlerta.set(String(pendente._id), ids);
+        }
+        ids.add(u._id);
       }
     }
 
-    if (enviados > 0) {
-      await Alerta.updateOne(
-        { _id: alerta._id },
-        {
-          $addToSet: { usuariosNotificados: { $each: aReceber.map((u) => u._id) } },
-          ultimoEmailEnviadoEm: new Date(),
-        }
-      );
+    for (const { usuario, itens } of mapaItens.values()) {
+      if (itens.length === 0) continue;
+
+      try {
+        await sendAlertaResumoEmail(
+          usuario.email,
+          itens.map((i) => ({
+            titulo: i.titulo,
+            descricao: i.descricao,
+            nivel: i.nivel,
+            tipo: i.tipo,
+            data: new Date(i.dataAlerta).toLocaleString('pt-BR'),
+          })),
+          `${config.frontendUrl}/alertas`
+        );
+        enviadosPorUsuario.set(String(usuario._id), itens.length);
+      } catch (err) {
+        console.error(`[Alertas] Falha ao enviar resumo diário para ${usuario.email}:`, err);
+      }
+    }
+
+    if (enviadosPorUsuario.size > 0) {
+      const now = new Date();
+      for (const [alertaId, ids] of notificadosPorAlerta) {
+        // Só marca usuários cujo e-mail foi enviado com sucesso
+        const aMarcar = [...ids].filter((id) => enviadosPorUsuario.has(String(id)));
+        if (aMarcar.length === 0) continue;
+        await Alerta.updateOne(
+          { _id: alertaId },
+          {
+            $addToSet: { usuariosNotificados: { $each: aMarcar } },
+            ultimoEmailEnviadoEm: now,
+          }
+        );
+      }
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[Alertas] Resumo diário concluído: ${pendentes.length} pendente(s), ${enviadosPorUsuario.size} e-mail(s) enviado(s).`);
     }
   }
 
