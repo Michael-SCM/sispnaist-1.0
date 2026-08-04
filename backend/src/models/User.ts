@@ -7,6 +7,7 @@ export interface IPasswordHistoryEntry {
 }
 
 export interface IUserDocument extends Omit<IUser, '_id' | 'empresa' | 'unidade' | 'senha'>, Document {
+  _id?: string;
   empresa?: mongoose.Types.ObjectId;
   unidade?: mongoose.Types.ObjectId;
   senha?: string;
@@ -115,6 +116,23 @@ const UserSchema = new Schema<IUserDocument>(
       }],
       select: false,
       default: [],
+    },
+    // 2FA (Autenticação de Dois Fatores por e-mail)
+    doisFatoresHabilitado: {
+      type: Boolean,
+      default: false,
+    },
+    codigo2FA: {
+      type: String,
+      select: false,
+    },
+    codigo2FAExpira: {
+      type: Date,
+      select: false,
+    },
+    ultimaTrocaSenha: {
+      type: Date,
+      select: false,
     },
     // LGPD
     consentimentoLGPD: {

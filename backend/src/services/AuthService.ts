@@ -1,11 +1,24 @@
 import User, { IUserDocument } from '../models/User.js';
-import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken, generate2FAToken, verify2FAToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
-import { sendResetPasswordEmail, sendVerificationEmail, validateEmailDomain } from '../utils/emailService.js';
+import { sendResetPasswordEmail, sendVerificationEmail, send2FACodigoEmail, validateEmailDomain } from '../utils/emailService.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import config from '../config/config.js';
 import bcrypt from 'bcryptjs';
+
+const CODIGO2FA_EXPIRA_MS = 5 * 60 * 1000; // 5 minutos
+const PERFIS_COM_2FA_OBRIGATORIO = ['admin', 'gestor'];
+
+export interface LoginResult {
+  needs2FA: boolean;
+  user?: IUser;
+  accessToken?: string;
+  refreshToken?: string;
+  preAuthToken?: string;
+  doisFatoresHabilitado?: boolean;
+}
 
 export class AuthService {
   async register(userData: Partial<IUser> & { senha: string }): Promise<{ user: IUser; verificationLink?: string }> {
@@ -106,7 +119,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async login(email: string, password: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
+  async login(email: string, password: string): Promise<LoginResult> {
     const user = await User.findOne({ email }).select('+senha');
 
     if (!user) {
@@ -123,12 +136,133 @@ export class AuthService {
       throw new AppError('Email ou senha inválidos', 401);
     }
 
+    const perfil = user.perfil || 'trabalhador';
+    const doisFatoresAtivos = user.doisFatoresHabilitado === true;
+    // Perfis admin/gestor sempre passam pela etapa de código por e-mail no login
+    const requer2FA = doisFatoresAtivos || PERFIS_COM_2FA_OBRIGATORIO.includes(perfil);
+
+    if (requer2FA) {
+      await this.gerarEEnviarCodigo2FA(user);
+
+      const preAuthToken = generate2FAToken({
+        id: user._id.toString(),
+        email: user.email,
+        perfil,
+      });
+
+      return {
+        needs2FA: true,
+        doisFatoresHabilitado: doisFatoresAtivos,
+        preAuthToken,
+      };
+    }
+
     const tokens = await this.generateTokens(user);
 
     const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
-    return { user: userObj, ...tokens };
+    return { needs2FA: false, user: userObj, ...tokens };
+  }
+
+  /**
+   * Passo 1 alternativo do login (pós-senha): reenvia o código e gera um novo preAuthToken.
+   * Usado pelo endpoint POST /auth/2fa/enviar-codigo.
+   */
+  async enviarCodigo2FA(email: string, password: string): Promise<{ preAuthToken: string; doisFatoresHabilitado: boolean }> {
+    const user = await User.findOne({ email }).select('+senha');
+
+    if (!user || user.isVerified === false) {
+      throw new AppError('Email ou senha inválidos', 401);
+    }
+
+    const isPasswordValid = await (user as IUserDocument).comparePassword(password);
+    if (!isPasswordValid) {
+      throw new AppError('Email ou senha inválidos', 401);
+    }
+
+    await this.gerarEEnviarCodigo2FA(user);
+
+    const preAuthToken = generate2FAToken({
+      id: user._id.toString(),
+      email: user.email,
+      perfil: user.perfil || 'trabalhador',
+    });
+
+    return {
+      preAuthToken,
+      doisFatoresHabilitado: user.doisFatoresHabilitado === true,
+    };
+  }
+
+  /**
+   * Passo 2 do login: valida o código e emite os tokens de sessão.
+   */
+  async verificar2FA(preAuthToken: string, codigo: string): Promise<{ user: IUser; accessToken: string; refreshToken: string; doisFatoresHabilitado: boolean }> {
+    const payload = verify2FAToken(preAuthToken);
+    if (!payload) {
+      throw new AppError('Token temporário inválido ou expirado. Faça o login novamente.', 401);
+    }
+
+    const user = await User.findById(payload.id).select('+senha');
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    await this.validarCodigo2FA(user._id.toString(), codigo);
+
+    const tokens = await this.generateTokens(user);
+
+    const userObj = user.toObject() as unknown as IUser;
+    delete userObj.senha;
+
+    return { user: userObj, ...tokens, doisFatoresHabilitado: user.doisFatoresHabilitado === true };
+  }
+
+  /**
+   * Envia um código de confirmação genérico (endpoint POST /auth/2fa/habilitar).
+   * Reaproveitado para habilitar 2FA ou confirmar a troca de senha por e-mail.
+   */
+  async enviarCodigoConfirmacao(userId: string): Promise<void> {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    await this.gerarEEnviarCodigo2FA(user);
+  }
+
+  async confirmar2FA(userId: string, codigo: string): Promise<void> {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    if (user.doisFatoresHabilitado === true) {
+      throw new AppError('A autenticação de dois fatores já está habilitada.', 400);
+    }
+
+    await this.validarCodigo2FA(userId, codigo);
+    await User.findByIdAndUpdate(userId, { doisFatoresHabilitado: true });
+  }
+
+  async desabilitar2FA(userId: string, senhaAtual: string, codigo: string): Promise<void> {
+    const user = await User.findById(userId).select('+senha');
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    if (PERFIS_COM_2FA_OBRIGATORIO.includes(user.perfil || '')) {
+      throw new AppError('A autenticação de dois fatores é obrigatória para este perfil e não pode ser desabilitada.', 400);
+    }
+
+    const isPasswordValid = await (user as IUserDocument).comparePassword(senhaAtual);
+    if (!isPasswordValid) {
+      throw new AppError('Senha atual incorreta', 401);
+    }
+
+    await this.validarCodigo2FA(userId, codigo);
+    await User.findByIdAndUpdate(userId, { doisFatoresHabilitado: false });
   }
 
   async me(userId: string): Promise<IUser> {
@@ -290,7 +424,7 @@ export class AuthService {
     user.passwordHistory = history;
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(userId: string, currentPassword: string, newPassword: string, codigo: string): Promise<void> {
     const user = await User.findById(userId).select('+senha +passwordHistory');
     if (!user) {
       throw new AppError('Usuário não encontrado', 404);
@@ -307,6 +441,9 @@ export class AuthService {
 
     await this.checkReuse(user, newPassword);
 
+    // Exigir código de confirmação enviado por e-mail antes de aplicar a nova senha
+    await this.validarCodigo2FA(userId, codigo);
+
     const currentHash = user.senha;
     if (currentHash) {
       await this.pushPasswordHistory(user, currentHash);
@@ -316,6 +453,7 @@ export class AuthService {
     user.tokenVersion = (user.tokenVersion || 1) + 1;
     user.refreshToken = undefined;
     user.refreshTokenExpires = undefined;
+    user.ultimaTrocaSenha = new Date();
     await user.save();
   }
 
@@ -409,6 +547,63 @@ export class AuthService {
         telefone: '',
         endereco: '',
       },
+    });
+  }
+
+  // =========== HELPERS 2FA (Autenticação de Dois Fatores por e-mail) ===========
+
+  /**
+   * Gera um código OTP de 6 dígitos, salva o hash com expiração de 5 minutos
+   * e envia o código por e-mail ao usuário.
+   */
+  private async gerarEEnviarCodigo2FA(user: IUserDocument): Promise<string> {
+    const codigo = String(crypto.randomInt(100000, 1000000));
+    const hash = await bcrypt.hash(codigo, 10);
+    const expira = new Date(Date.now() + CODIGO2FA_EXPIRA_MS);
+
+    await User.findByIdAndUpdate(user._id, {
+      codigo2FA: hash,
+      codigo2FAExpira: expira,
+    });
+
+    await send2FACodigoEmail(user.email, codigo);
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n=== CÓDIGO 2FA (DESENVOLVIMENTO) para ${user.email} ===`);
+      console.log(codigo);
+      console.log(`===============================================\n`);
+    }
+
+    return codigo;
+  }
+
+  /**
+   * Valida o código informado contra o hash armazenado e o invalida em caso de sucesso.
+   */
+  private async validarCodigo2FA(userId: string, codigo: string): Promise<void> {
+    const user = await User.findById(userId).select('+codigo2FA +codigo2FAExpira');
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    if (!user.codigo2FA || !user.codigo2FAExpira) {
+      throw new AppError('Nenhum código de confirmação pendente. Solicite um novo código.', 400);
+    }
+
+    if (user.codigo2FAExpira < new Date()) {
+      await User.findByIdAndUpdate(userId, {
+        $unset: { codigo2FA: '', codigo2FAExpira: '' },
+      });
+      throw new AppError('Código expirado. Solicite um novo código.', 400);
+    }
+
+    const isMatch = await bcrypt.compare(codigo, user.codigo2FA);
+    if (!isMatch) {
+      throw new AppError('Código inválido.', 400);
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $unset: { codigo2FA: '', codigo2FAExpira: '' },
     });
   }
 }

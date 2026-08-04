@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validateRequest } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema, refreshTokenSchema, changePasswordSchema } from '../utils/validations.js';
+import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema, refreshTokenSchema, changePasswordSchema, enviarCodigo2FASchema, verificar2FASchema, confirmar2FASchema, desabilitar2FASchema } from '../utils/validations.js';
 
 const router = express.Router();
 
@@ -27,6 +27,14 @@ const changePasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   message: { status: 'error', message: 'Muitas tentativas de alteração de senha. Tente novamente em 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const twoFactorLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { status: 'error', message: 'Muitas tentativas de verificação. Tente novamente em 15 minutos.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -81,6 +89,38 @@ router.post(
   authMiddleware,
   validateRequest(changePasswordSchema),
   authController.changePassword
+);
+
+// 2FA (Autenticação de Dois Fatores por e-mail)
+router.post(
+  '/2fa/enviar-codigo',
+  authLimiter,
+  validateRequest(enviarCodigo2FASchema),
+  authController.enviarCodigo2FA
+);
+
+router.post(
+  '/2fa/verificar',
+  twoFactorLimiter,
+  validateRequest(verificar2FASchema),
+  authController.verificar2FA
+);
+
+router.post('/2fa/habilitar', authMiddleware, authController.habilitar2FA);
+
+router.post(
+  '/2fa/confirmar',
+  authMiddleware,
+  validateRequest(confirmar2FASchema),
+  authController.confirmar2FA
+);
+
+router.post(
+  '/2fa/desabilitar',
+  changePasswordLimiter,
+  authMiddleware,
+  validateRequest(desabilitar2FASchema),
+  authController.desabilitar2FA
 );
 
 router.post('/revoke-sessions', authMiddleware, authController.revokeAllSessions);

@@ -283,6 +283,7 @@ export interface IUser {
   perfil?: string;
   ativo?: boolean;
   isVerified?: boolean;
+  doisFatoresHabilitado?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
   consentimentoLGPD?: boolean;
@@ -301,10 +302,13 @@ export interface IEndereco {
 }
 
 export interface IAuthResponse {
-  user: IUser;
-  accessToken: string;
-  refreshToken: string;
+  user?: IUser;
+  accessToken?: string;
+  refreshToken?: string;
   csrfToken?: string;
+  needs2FA?: boolean;
+  preAuthToken?: string;
+  doisFatoresHabilitado?: boolean;
 }
 
 export interface IAcidente {

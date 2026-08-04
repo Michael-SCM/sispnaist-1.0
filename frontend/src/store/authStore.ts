@@ -11,8 +11,12 @@ interface AuthStore {
   accessToken: string | null;
   isAuthenticated: boolean;
   loading: boolean;
+  preAuthToken: string | null;
+  needs2FA: boolean;
   setAuth: (user: IUser, accessToken: string, refreshToken: string) => void;
+  setUser: (user: IUser) => void;
   setAccessToken: (token: string | null) => void;
+  setPreAuth: (preAuthToken: string | null) => void;
   clearAuth: () => void;
   initializeAuth: () => Promise<void>;
 }
@@ -22,10 +26,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
   isAuthenticated: false,
   loading: true,
+  preAuthToken: null,
+  needs2FA: false,
 
   setAuth: (user, accessToken, _refreshToken) => {
     sessionStorage.setItem(STORAGE_KEY, accessToken);
-    set({ user, accessToken, isAuthenticated: true });
+    set({ user, accessToken, isAuthenticated: true, preAuthToken: null, needs2FA: false });
+  },
+
+  setUser: (user) => {
+    set({ user });
   },
 
   setAccessToken: (token) => {
@@ -37,9 +47,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({ accessToken: token });
   },
 
+  setPreAuth: (preAuthToken) => {
+    set({ preAuthToken, needs2FA: !!preAuthToken });
+  },
+
   clearAuth: () => {
     sessionStorage.removeItem(STORAGE_KEY);
-    set({ user: null, accessToken: null, isAuthenticated: false });
+    set({ user: null, accessToken: null, isAuthenticated: false, preAuthToken: null, needs2FA: false });
   },
 
   initializeAuth: async () => {

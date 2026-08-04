@@ -290,6 +290,122 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 };
 
 /**
+ * Envia o código de autenticação de dois fatores (OTP de 6 dígitos) por e-mail.
+ * Segue a mesma estratégia híbrida: Brevo HTTP API -> Resend HTTP API -> Gmail SMTP.
+ */
+export const send2FACodigoEmail = async (email: string, codigo: string) => {
+  const htmlContent = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      <h2 style="color: #2563eb; text-align: center;">Código de Verificação</h2>
+      <p>Olá,</p>
+      <p>Use o código abaixo para concluir sua solicitação no sistema <strong>SISPNAIST</strong>:</p>
+      <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #f3f4f6; border-radius: 10px;">
+        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1e3a8a;">${codigo}</span>
+      </div>
+      <p>Este código expira em <strong>5 minutos</strong>.</p>
+      <p>Se você não realizou esta solicitação, ignore este e-mail e considere alterar sua senha.</p>
+      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+      <p style="font-size: 12px; color: #999; text-align: center;">Este é um e-mail automático, por favor não responda.</p>
+    </div>
+  `;
+
+  // 1. Usar Brevo HTTP API se a chave estiver configurada
+  if (process.env.BREVO_API_KEY) {
+    console.log('Tentando enviar código 2FA via API da Brevo (Porta 443 HTTPS)...');
+    try {
+      await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: {
+          name: 'SISPNAIST',
+          email: config.email.user || 'sispnaist@gmail.com'
+        },
+        to: [
+          {
+            email: email
+          }
+        ],
+        subject: "Seu código de verificação - SISPNAIST",
+        htmlContent: htmlContent
+      }, {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Código 2FA enviado com sucesso via Brevo HTTP API para: ${email}`);
+      }
+      return;
+    } catch (brevoError: any) {
+      const errorMsg = brevoError.response?.data || brevoError.message;
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO BREVO HTTP API:', errorMsg);
+      }
+      throw new Error(`Falha ao enviar código 2FA via Brevo API: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 2. Usar Resend HTTP API se a chave estiver configurada
+  if (process.env.RESEND_API_KEY) {
+    console.log('Tentando enviar código 2FA via API do Resend (Porta 443 HTTPS)...');
+
+    const fromEmail = config.email.from && config.email.from.includes('gmail')
+      ? 'SISPNAIST <onboarding@resend.dev>'
+      : config.email.from || 'SISPNAIST <onboarding@resend.dev>';
+
+    try {
+      await axios.post('https://api.resend.com/emails', {
+        from: fromEmail,
+        to: email,
+        subject: "Seu código de verificação - SISPNAIST",
+        html: htmlContent
+      }, {
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Código 2FA enviado com sucesso via Resend HTTP API para: ${email}`);
+      }
+      return;
+    } catch (resendError: any) {
+      const errorMsg = resendError.response?.data || resendError.message;
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('ERRO NO RESEND HTTP API:', errorMsg);
+      }
+      throw new Error(`Falha ao enviar código 2FA via Resend API: ${JSON.stringify(errorMsg)}`);
+    }
+  }
+
+  // 3. Fallback para Gmail SMTP se nenhuma API Key estiver configurada
+  if (!config.email.user || !config.email.pass) {
+    console.log('AVISO: Nenhuma chave de API (Brevo/Resend) configurada e credenciais SMTP locais incompletas.');
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Nenhum serviço de envio de e-mail (Brevo/Resend/SMTP) foi configurado nas variáveis de ambiente do servidor.');
+    }
+    return;
+  }
+
+  console.log('Tentando enviar código 2FA via Gmail SMTP (Nodemailer)...');
+
+  try {
+    await transporter.sendMail({
+      from: config.email.from,
+      to: email,
+      subject: "Seu código de verificação - SISPNAIST",
+      html: htmlContent
+    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`Código 2FA enviado com sucesso via Gmail SMTP para: ${email}`);
+    }
+  } catch (smtpError: any) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('ERRO NO GMAIL SMTP (Nodemailer):', smtpError);
+    }
+  }
+};
+
+/**
  * Envia um e-mail de alerta/notificação para um destinatário.
  * Segue a mesma estratégia híbrida: Brevo HTTP API -> Resend HTTP API -> Gmail SMTP.
  */

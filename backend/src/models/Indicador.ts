@@ -12,6 +12,7 @@ export interface IFormulaIndicador {
 }
 
 export interface IIndicador extends Document {
+  _id?: string;
   nome: string;
   descricao?: string;
   categoria: string;

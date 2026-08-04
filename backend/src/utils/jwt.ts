@@ -31,6 +31,24 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
   });
 };
 
+export const generate2FAToken = (payload: { id: string; email: string; perfil?: string }): string => {
+  return jwt.sign({ ...payload, type: '2fa' }, config.jwtSecret, {
+    expiresIn: '10m',
+  });
+};
+
+export const verify2FAToken = (
+  token: string
+): { id: string; email: string; perfil?: string; type?: string } | null => {
+  try {
+    const decoded = jwt.verify(token, config.jwtSecret) as { id: string; email: string; perfil?: string; type?: string };
+    if (decoded.type !== '2fa') return null;
+    return decoded;
+  } catch {
+    return null;
+  }
+};
+
 export const verifyRefreshToken = (token: string): TokenPayload | null => {
   try {
     const decoded = jwt.verify(token, config.jwtRefreshSecret) as TokenPayload & { type?: string };

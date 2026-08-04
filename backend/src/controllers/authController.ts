@@ -80,7 +80,53 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, senha } = req.body;
-  const { user, accessToken, refreshToken } = await authService.login(email, senha);
+  const result = await authService.login(email, senha);
+
+  // Login em 2 passos: senha válida, agora aguarda o código enviado por e-mail
+  if (result.needs2FA) {
+    res.status(200).json({
+      status: 'success',
+      data: {
+        needs2FA: true,
+        preAuthToken: result.preAuthToken,
+        doisFatoresHabilitado: result.doisFatoresHabilitado,
+      },
+    });
+    return;
+  }
+
+  setAuthCookies(res, result.accessToken!, result.refreshToken!);
+  const csrfToken = setCsrfCookie(res);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      csrfToken,
+    },
+  });
+});
+
+export const enviarCodigo2FA = asyncHandler(async (req: Request, res: Response) => {
+  const { email, senha } = req.body;
+  const { preAuthToken, doisFatoresHabilitado } = await authService.enviarCodigo2FA(email, senha);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Código de verificação enviado para o seu e-mail.',
+    data: {
+      needs2FA: true,
+      preAuthToken,
+      doisFatoresHabilitado,
+    },
+  });
+});
+
+export const verificar2FA = asyncHandler(async (req: Request, res: Response) => {
+  const { preAuthToken, codigo } = req.body;
+  const { user, accessToken, refreshToken } = await authService.verificar2FA(preAuthToken, codigo);
 
   setAuthCookies(res, accessToken, refreshToken);
   const csrfToken = setCsrfCookie(res);
@@ -93,6 +139,48 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       refreshToken,
       csrfToken,
     },
+  });
+});
+
+export const habilitar2FA = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  await authService.enviarCodigoConfirmacao(req.user.id);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Código de confirmação enviado para o seu e-mail.',
+  });
+});
+
+export const confirmar2FA = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  await authService.confirmar2FA(req.user.id, req.body.codigo);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Autenticação de dois fatores habilitada com sucesso.',
+  });
+});
+
+export const desabilitar2FA = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Não autenticado' });
+    return;
+  }
+
+  await authService.desabilitar2FA(req.user.id, req.body.senhaAtual, req.body.codigo);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Autenticação de dois fatores desabilitada com sucesso.',
   });
 });
 
@@ -189,8 +277,8 @@ export const changePassword = asyncHandler(async (req: IAuthRequest, res: Respon
     return;
   }
 
-  const { senhaAtual, novaSenha } = req.body;
-  await authService.changePassword(req.user.id, senhaAtual, novaSenha);
+  const { senhaAtual, novaSenha, codigo } = req.body;
+  await authService.changePassword(req.user.id, senhaAtual, novaSenha, codigo);
 
   clearAuthCookies(res);
 

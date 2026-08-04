@@ -23,6 +23,11 @@ export interface IUser {
   dataCriacao?: Date;
   dataAtualizacao?: Date;
   passwordHistory?: { hash: string; dataAlteracao: Date }[];
+  // 2FA (Autenticação de Dois Fatores por e-mail)
+  doisFatoresHabilitado?: boolean;
+  codigo2FA?: string;
+  codigo2FAExpira?: Date;
+  ultimaTrocaSenha?: Date;
   // LGPD
   consentimentoLGPD?: boolean;
   dataAceiteLGPD?: Date;

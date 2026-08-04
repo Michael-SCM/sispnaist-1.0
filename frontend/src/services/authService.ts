@@ -8,10 +8,42 @@ export const authService = {
   },
 
   login: async (email: string, senha: string): Promise<IAuthResponse> => {
-    const response = await api.post<{
-      data: IAuthResponse & { accessToken: string; refreshToken: string; csrfToken: string }
-    }>('/auth/login', { email, senha });
+    const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha });
     return response.data.data;
+  },
+
+  // 2FA (Autenticação de Dois Fatores por e-mail)
+  enviarCodigo2FA: async (email: string, senha: string): Promise<{ needs2FA: boolean; preAuthToken: string; doisFatoresHabilitado: boolean }> => {
+    const response = await api.post<{ data: { needs2FA: boolean; preAuthToken: string; doisFatoresHabilitado: boolean } }>(
+      '/auth/2fa/enviar-codigo',
+      { email, senha }
+    );
+    return response.data.data;
+  },
+
+  verificar2FA: async (preAuthToken: string, codigo: string): Promise<IAuthResponse> => {
+    const response = await api.post<{ data: IAuthResponse }>('/auth/2fa/verificar', { preAuthToken, codigo });
+    return response.data.data;
+  },
+
+  habilitar2FA: async (): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/2fa/habilitar');
+    return response.data.message;
+  },
+
+  confirmar2FA: async (codigo: string): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/2fa/confirmar', { codigo });
+    return response.data.message;
+  },
+
+  desabilitar2FA: async (senhaAtual: string, codigo: string): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/2fa/desabilitar', { senhaAtual, codigo });
+    return response.data.message;
+  },
+
+  changePassword: async (senhaAtual: string, novaSenha: string, confirmarSenha: string, codigo: string): Promise<string> => {
+    const response = await api.post<{ status: string; message: string }>('/auth/change-password', { senhaAtual, novaSenha, confirmarSenha, codigo });
+    return response.data.message;
   },
 
   logout: async (): Promise<void> => {

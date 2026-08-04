@@ -54,7 +54,7 @@ axiosInstance.interceptors.response.use(
 
     const responseData = error.response?.data as any;
 
-    const authEndpoints = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email', '/auth/me'];
+    const authEndpoints = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password', '/auth/verify-email', '/auth/me', '/auth/2fa/enviar-codigo', '/auth/2fa/verificar'];
     if (authEndpoints.some(url => originalRequest.url?.includes(url))) {
       const errorMessage = responseData?.message || error.message || 'Erro na requisição';
       const customError = new Error(errorMessage) as any;

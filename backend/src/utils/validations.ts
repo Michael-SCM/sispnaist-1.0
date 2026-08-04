@@ -328,6 +328,61 @@ export const materialBiologicoUpdateSchema = Joi.object({
 
 // =========== SCHEMA PARA REFRESH TOKEN ===========
 
+// =========== SCHEMAS PARA 2FA (AUTENTICAÇÃO DE DOIS FATORES) ===========
+
+export const enviarCodigo2FASchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .messages({
+      'string.email': 'Email inválido',
+      'any.required': 'Email é obrigatório',
+    }),
+  senha: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Senha é obrigatória',
+    }),
+});
+
+export const verificar2FASchema = Joi.object({
+  preAuthToken: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Token temporário é obrigatório',
+    }),
+  codigo: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'O código deve conter 6 dígitos',
+      'any.required': 'Código é obrigatório',
+    }),
+});
+
+export const confirmar2FASchema = Joi.object({
+  codigo: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'O código deve conter 6 dígitos',
+      'any.required': 'Código é obrigatório',
+    }),
+});
+
+export const desabilitar2FASchema = Joi.object({
+  senhaAtual: Joi.string().required().messages({
+    'any.required': 'Senha atual é obrigatória',
+  }),
+  codigo: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'O código deve conter 6 dígitos',
+      'any.required': 'Código é obrigatório',
+    }),
+});
+
 // =========== SCHEMA PARA ALTERAÇÃO DE SENHA ===========
 
 export const changePasswordSchema = Joi.object({
@@ -349,6 +404,13 @@ export const changePasswordSchema = Joi.object({
     'any.only': 'As senhas não conferem',
     'any.required': 'Confirmação de senha é obrigatória',
   }),
+  codigo: Joi.string()
+    .pattern(/^\d{6}$/)
+    .required()
+    .messages({
+      'string.pattern.base': 'O código de confirmação deve conter 6 dígitos',
+      'any.required': 'O código de confirmação enviado por e-mail é obrigatório',
+    }),
 });
 
 export const refreshTokenSchema = Joi.object({
