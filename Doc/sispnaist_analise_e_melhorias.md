@@ -125,7 +125,7 @@ Para facilitar a vida dos gestores, o projeto já possui um dashboard administra
 *   **Autenticação de Dois Fatores (2FA)**: Adicionar 2FA para aumentar a segurança das contas de usuário, especialmente para perfis de administrador e gestor.
 *   **Políticas de Senha Robustas**: Forçar senhas complexas e rotação periódica de senhas.
 *   **Rate Limiting**: Implementar rate limiting nas APIs para prevenir ataques de força bruta e abuso de recursos.
-*   **Validação de Entrada (Input Validation)**: Embora já existam validações, revisar e fortalecer todas as validações de entrada para prevenir ataques como injeção de SQL/NoSQL, XSS, etc.
+*   **Validação de Entrada (Input Validation)✅Concluído**: Embora já existam validações, revisar e fortalecer todas as validações de entrada para prevenir ataques como injeção de SQL/NoSQL, XSS, etc.
 *   **Auditoria de Acesso a Dados Sensíveis**: A auditoria já existe, mas garantir que o acesso a dados sensíveis (como informações de saúde) seja registrado com detalhes (quem acessou, quando, qual dado) e que esses logs sejam imutáveis e protegidos.
 *   **Segregação de Ambientes**: Garantir que os ambientes de desenvolvimento, staging e produção sejam completamente separados, com credenciais e configurações distintas.
 *   **Varredura de Vulnerabilidades**: Utilizar ferramentas de SAST (Static Application Security Testing) e DAST (Dynamic Application Security Testing) para identificar vulnerabilidades no código e na aplicação em execução.

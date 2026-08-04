@@ -10,7 +10,7 @@ import { getPaginationParams, getPaginationResult } from '../utils/pagination.js
  */
 export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
   const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
-  const { usuarioId, entidade, acao, dataInicio, dataFim } = req.query;
+  const { usuarioId, entidade, acao, dataInicio, dataFim, sensivel } = req.query;
 
   const result = await auditService.obterLogs(
     page,
@@ -20,7 +20,8 @@ export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
       entidade: entidade as string,
       acao: acao as string,
       dataInicio: dataInicio as string,
-      dataFim: dataFim as string
+      dataFim: dataFim as string,
+      sensivel: sensivel === 'true' ? true : sensivel === 'false' ? false : undefined,
     }
   );
 

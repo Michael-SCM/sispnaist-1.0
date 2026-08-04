@@ -10,7 +10,6 @@ export class AuditService {
       await AuditLog.create(data);
     } catch (error) {
       console.error('Erro ao registrar audit log:', error);
-      // Não lançar erro para não interromper operação principal
     }
   }
 
@@ -26,6 +25,7 @@ export class AuditService {
       acao?: string;
       dataInicio?: string;
       dataFim?: string;
+      sensivel?: boolean;
     }
   ): Promise<{ logs: any[]; total: number; pages: number }> {
     const skip = (page - 1) * limit;
@@ -41,6 +41,10 @@ export class AuditService {
 
     if (filtros?.acao) {
       query.acao = filtros.acao;
+    }
+
+    if (filtros?.sensivel !== undefined) {
+      query.sensivel = filtros.sensivel;
     }
 
     if (filtros?.dataInicio || filtros?.dataFim) {
@@ -78,6 +82,7 @@ export class AuditService {
     porAcao: Record<string, number>;
     porEntidade: Record<string, number>;
     ultimasAtividades: any[];
+    acessosSensiveis: number;
   }> {
     const totalLogs = await AuditLog.countDocuments();
 
@@ -106,6 +111,8 @@ export class AuditService {
       .limit(10)
       .lean();
 
+    const acessosSensiveis = await AuditLog.countDocuments({ sensivel: true });
+
     const porAcao = porAcaoAgg.reduce(
       (acc: Record<string, number>, item: any) => {
         acc[item._id] = item.total;
@@ -127,6 +134,7 @@ export class AuditService {
       porAcao,
       porEntidade,
       ultimasAtividades,
+      acessosSensiveis,
     };
   }
 }

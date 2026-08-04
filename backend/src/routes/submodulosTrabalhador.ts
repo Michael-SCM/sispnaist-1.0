@@ -2,6 +2,7 @@ import { Router } from 'express';
 import submoduloTrabalhadorController from '../controllers/submoduloTrabalhadorController';
 import { authMiddleware } from '../middleware/auth';
 import { validateObjectId } from '../middleware/validation';
+import { auditRead } from '../middleware/auditRead';
 
 const router = Router();
 
@@ -15,8 +16,8 @@ const router = Router();
 router.use(authMiddleware);
 
 // CRUD unificado para todos os submódulos
-router.get('/:id/:submodulo', validateObjectId('id'), submoduloTrabalhadorController.listar);
-router.get('/:id/:submodulo/:itemId', validateObjectId('id', 'itemId'), submoduloTrabalhadorController.obter);
+router.get('/:id/:submodulo', validateObjectId('id'), auditRead('SubmoduloTrabalhador'), submoduloTrabalhadorController.listar);
+router.get('/:id/:submodulo/:itemId', validateObjectId('id', 'itemId'), auditRead('SubmoduloTrabalhador'), submoduloTrabalhadorController.obter);
 router.post('/:id/:submodulo', validateObjectId('id'), submoduloTrabalhadorController.criar);
 router.put('/:id/:submodulo/:itemId', validateObjectId('id', 'itemId'), submoduloTrabalhadorController.atualizar);
 router.delete('/:id/:submodulo/:itemId', validateObjectId('id', 'itemId'), submoduloTrabalhadorController.deletar);

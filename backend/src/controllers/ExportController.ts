@@ -8,6 +8,7 @@ import analyticsService from '../services/AnalyticsService.js';
 import { toCPFMaskedOrDigits } from '../utils/cpf.js';
 import mongoose from 'mongoose';
 import { escapeRegex, safeDate, safeString } from '../utils/sanitize.js';
+import { logExport } from '../utils/auditLogger.js';
 
 class ExportController {
 
@@ -29,6 +30,8 @@ class ExportController {
       const json2csv = new Parser({ fields });
       const csv = json2csv.parse(acidentes);
 
+      logExport(req, 'Acidente', 'csv', { totalRegistros: acidentes.length }).catch(() => {});
+
       res.header('Content-Type', 'text/csv');
       res.attachment('acidentes_sispnaist.csv');
       return res.send(csv);
@@ -44,6 +47,8 @@ class ExportController {
       const fields = ['nome', 'cpf', 'email', 'dataNascimento', 'sexo', 'empresa', 'unidade'];
       const json2csv = new Parser({ fields });
       const csv = json2csv.parse(trabalhadores);
+
+      logExport(req, 'Trabalhador', 'csv', { totalRegistros: trabalhadores.length }).catch(() => {});
 
       res.header('Content-Type', 'text/csv');
       res.attachment('trabalhadores_sispnaist.csv');
@@ -77,6 +82,8 @@ class ExportController {
       const json2csv = new Parser({ fields });
       const csv = json2csv.parse(fichas);
 
+      logExport(req, 'MaterialBiologico', 'csv', { totalRegistros: fichas.length }).catch(() => {});
+
       res.header('Content-Type', 'text/csv');
       res.attachment('material_biologico_sispnaist.csv');
       return res.send(csv);
@@ -107,6 +114,7 @@ class ExportController {
       }
 
       await pdfService.gerarPdfTrabalhadores(res, filtros);
+      logExport(req, 'Trabalhador', 'pdf', { filtros }).catch(() => {});
     } catch (error) {
       next(error);
     }
@@ -142,6 +150,7 @@ class ExportController {
       }
 
       await pdfService.gerarPdfAcidentes(res, filtros);
+      logExport(req, 'Acidente', 'pdf', { filtros }).catch(() => {});
     } catch (error) {
       next(error);
     }
@@ -180,6 +189,7 @@ class ExportController {
       }
 
       await pdfService.gerarPdfDoencas(res, filtros);
+      logExport(req, 'Doenca', 'pdf', { filtros }).catch(() => {});
     } catch (error) {
       next(error);
     }
@@ -208,6 +218,7 @@ class ExportController {
       }
 
       await pdfService.gerarPdfVacinacoes(res, filtros);
+      logExport(req, 'Vacinacao', 'pdf', { filtros }).catch(() => {});
     } catch (error) {
       next(error);
     }
@@ -220,6 +231,7 @@ class ExportController {
     try {
       const monitoramento = await analyticsService.obterMonitoramentoClinico();
       await pdfService.gerarPdfMonitoramento(res, monitoramento);
+      logExport(req, 'Monitoramento', 'pdf', {}).catch(() => {});
     } catch (error) {
       next(error);
     }

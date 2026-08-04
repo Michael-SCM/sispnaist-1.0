@@ -951,4 +951,5 @@ export const listarAuditLogsQuerySchema = Joi.object({
   acao: Joi.string().valid('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'READ', 'EXPORT').optional(),
   dataInicio: Joi.date().iso().optional(),
   dataFim: Joi.date().iso().optional(),
+  sensivel: Joi.boolean().optional(),
 }).options({ stripUnknown: true });

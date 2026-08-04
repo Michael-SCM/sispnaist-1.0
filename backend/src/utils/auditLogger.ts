@@ -1,33 +1,44 @@
 import AuditLog from '../models/AuditLog.js';
+import { AcaoAudit } from '../models/AuditLog.js';
 import { Request } from 'express';
 
 /**
- * Registra uma ação no audit log com dados estruturados
- * ✅ USE ESTA FUNÇÃO nos controllers para máximo detalhe!
- * 
+ * Registra uma ação no audit log com dados estruturados.
+ *
  * Exemplo de CREATE:
  *   await logAction(req, 'CREATE', 'Empresa', empresa._id, {
  *     razaoSocial: empresa.razaoSocial,
  *     cnpj: empresa.cnpj
  *   });
- * 
- * Exemplo de UPDATE com compção:
+ *
+ * Exemplo de UPDATE com comparação:
  *   const mudancas = compararDados(empresaAntiga, empresaNova);
  *   await logAction(req, 'UPDATE', 'Empresa', id, mudancas);
- * 
+ *
  * Exemplo de DELETE (capture antes de deletar!):
  *   const dados = await Empresa.findById(id);
- *   await logAction(req, 'DELETE', 'Empresa', id, { 
+ *   await logAction(req, 'DELETE', 'Empresa', id, {
  *     razaoSocial: dados.razaoSocial,
- *     cnpj: dados.cnpj 
+ *     cnpj: dados.cnpj
  *   });
+ *
+ * Exemplo de READ (acesso a dados sensíveis):
+ *   await logAction(req, 'READ', 'TrabalhadorExameSaude', itemId, {
+ *     trabalhadorId, tipoAso: exame.tipoAso, resultado: exame.resultado
+ *   }, { sensivel: true });
+ *
+ * Exemplo de EXPORT:
+ *   await logAction(req, 'EXPORT', 'Acidente', 'csv', {
+ *     filtros, totalRegistros: acidentes.length
+ *   }, { sensivel: true });
  */
 export const logAction = async (
   req: Request | any,
-  acao: 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT',
+  acao: AcaoAudit,
   entidade: string,
   entidadeId: string,
-  detalhes?: Record<string, any>
+  detalhes?: Record<string, any>,
+  opcoes?: { sensivel?: boolean }
 ) => {
   try {
     const usuarioId = req.user?.id || req.user?._id || req.body?.usuarioId || 'system';
@@ -41,11 +52,12 @@ export const logAction = async (
       entidadeId,
       detalhes: detalhes ? sanitizeDetails(detalhes) : undefined,
       ip,
-      userAgent
+      userAgent,
+      sensivel: opcoes?.sensivel ?? false,
     });
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log(`[AUDIT] ${acao} - ${entidade}:${entidadeId} by ${usuarioId}`);
+      console.log(`[AUDIT] ${acao} - ${entidade}:${entidadeId} by ${usuarioId}${opcoes?.sensivel ? ' (SENSÍVEL)' : ''}`);
     }
   } catch (error) {
     console.error('Erro ao salvar log de auditoria:', error);
@@ -53,8 +65,33 @@ export const logAction = async (
 };
 
 /**
- * 🔥 Para UPDATE: Cria objeto com antes/depois automático
- * 
+ * Atalho para logar acesso (READ) a dados sensíveis.
+ * Usado pelo middleware auditRead e em controllers que acessam dados de saúde.
+ */
+export const logReadSensivel = async (
+  req: Request | any,
+  entidade: string,
+  entidadeId: string,
+  detalhes?: Record<string, any>
+) => {
+  return logAction(req, 'READ', entidade, entidadeId, detalhes, { sensivel: true });
+};
+
+/**
+ * Atalho para logar exportação de dados sensíveis.
+ */
+export const logExport = async (
+  req: Request | any,
+  entidade: string,
+  formato: string,
+  detalhes?: Record<string, any>
+) => {
+  return logAction(req, 'EXPORT', entidade, formato, detalhes, { sensivel: true });
+};
+
+/**
+ * Para UPDATE: Cria objeto com antes/depois automático
+ *
  * Retorna:
  * {
  *   resumo: "3 campo(s) alterado(s)",
@@ -70,7 +107,6 @@ export const compararDados = (
   datosAntigosRaw: Record<string, any>,
   datosNovosRaw: Record<string, any>
 ): Record<string, any> => {
-  // Converte documentos Mongoose para objetos puros se necessário
   const datosAntigos = typeof datosAntigosRaw?.toObject === 'function' ? datosAntigosRaw.toObject() : JSON.parse(JSON.stringify(datosAntigosRaw || {}));
   const datosNovos = typeof datosNovosRaw?.toObject === 'function' ? datosNovosRaw.toObject() : JSON.parse(JSON.stringify(datosNovosRaw || {}));
 
@@ -79,7 +115,6 @@ export const compararDados = (
   const mudancas: Record<string, any> = {};
   const camposMudados: string[] = [];
 
-  // Detecta campos que mudaram (existentes ou novos)
   for (const campo in datosNovos) {
     if (ignoreFields.includes(campo)) continue;
 
@@ -92,7 +127,6 @@ export const compararDados = (
     }
   }
 
-  // Detecta campos que foram removidos
   for (const campo in datosAntigos) {
     if (ignoreFields.includes(campo)) continue;
 
@@ -119,12 +153,12 @@ export const compararDados = (
  */
 function sanitizeDetails(dataRaw: Record<string, any>): Record<string, any> {
   if (!dataRaw) return {};
-  
+
   const data = typeof dataRaw?.toObject === 'function' ? dataRaw.toObject() : dataRaw;
   const sensitiveFields = ['senha', 'password', 'token', 'secret', 'apiKey', 'refreshToken'];
   const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt'];
 
-  const sanitized = JSON.parse(JSON.stringify(data)); // deep copy
+  const sanitized = JSON.parse(JSON.stringify(data));
 
   const removeSensitive = (obj: any) => {
     for (const field of sensitiveFields) {
@@ -137,7 +171,6 @@ function sanitizeDetails(dataRaw: Record<string, any>): Record<string, any> {
         delete obj[field];
       }
     }
-    // Recursivo para objetos aninhados
     for (const key in obj) {
       if (typeof obj[key] === 'object' && obj[key] !== null) {
         removeSensitive(obj[key]);

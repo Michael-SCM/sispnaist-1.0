@@ -3,6 +3,7 @@ import * as trabalhadorController from '../controllers/trabalhadorController.js'
 import informacaoController from '../controllers/TrabalhadorInformacaoController.js';
 import { validateRequest, validateObjectId, validateQuery } from '../middleware/validation.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { auditRead } from '../middleware/auditRead.js';
 import { criarTrabalhadorSchema, atualizarTrabalhadorSchema, listarTrabalhadoresQuerySchema } from '../utils/validations.js';
 
 const router = express.Router();
@@ -11,14 +12,14 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // CRUD de Trabalhadores
-router.get('/', validateQuery(listarTrabalhadoresQuerySchema), trabalhadorController.getTrabalhadores);
+router.get('/', validateQuery(listarTrabalhadoresQuerySchema), auditRead('Trabalhador'), trabalhadorController.getTrabalhadores);
 
 router.post('/', validateRequest(criarTrabalhadorSchema), trabalhadorController.createTrabalhador);
 
 // Rota para obter trabalhador com todos os submódulos (deve vir ANTES de /:id)
-router.get('/:id/completo', validateObjectId('id'), trabalhadorController.getTrabalhadorCompleto);
+router.get('/:id/completo', validateObjectId('id'), auditRead('Trabalhador'), trabalhadorController.getTrabalhadorCompleto);
 
-router.get('/:id', validateObjectId('id'), trabalhadorController.getTrabalhador);
+router.get('/:id', validateObjectId('id'), auditRead('Trabalhador'), trabalhadorController.getTrabalhador);
 
 router.put('/:id', validateObjectId('id'), validateRequest(atualizarTrabalhadorSchema), trabalhadorController.updateTrabalhador);
 
