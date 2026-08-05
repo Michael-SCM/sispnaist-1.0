@@ -345,7 +345,7 @@ export class AlertaService {
 
   /**
    * Envia o resumo diário de alertas novos ainda não notificados.
-   * Dispara apenas se houver >= 5 alertas pendentes no sistema.
+   * Dispara apenas se houver >= 1 alerta pendente no sistema.
    * Admins recebem todos os pendentes; cada gestor, apenas os da própria empresa.
    */
   async enviarResumoDiario(): Promise<void> {
@@ -356,9 +356,9 @@ export class AlertaService {
       .sort({ nivel: -1, dataAlerta: -1 })
       .lean()) as unknown as (IAlerta & { _id: any })[];
 
-    if (pendentes.length < 5) {
+    if (pendentes.length < 1) {
       if (process.env.NODE_ENV !== 'production') {
-        console.log(`[Alertas] Resumo diário: ${pendentes.length} pendente(s), abaixo do limite de 5. Nenhum e-mail enviado.`);
+        console.log(`[Alertas] Resumo diário: ${pendentes.length} pendente(s), abaixo do limite de 1. Nenhum e-mail enviado.`);
       }
       return;
     }
