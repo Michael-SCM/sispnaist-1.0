@@ -18,8 +18,10 @@ export async function resolverTrabalhadorId(identifier: string): Promise<string>
     Trabalhador.findOne({ cpf: identifier }).select('_id').lean()
   ]);
 
-  if (usuario) return usuario._id.toString();
+  // Priorizar Trabalhador sobre User — os modelos (Doenca, Acidente, etc.)
+  // referenciam Trabalhador via ref: 'Trabalhador', então precisam do _id do Trabalhador
   if (trabalhador) return trabalhador._id.toString();
+  if (usuario) return usuario._id.toString();
 
   throw new AppError(`Trabalhador com CPF ${identifier} não encontrado`, 404);
 }
