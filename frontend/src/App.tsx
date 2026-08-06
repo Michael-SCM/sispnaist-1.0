@@ -157,7 +157,7 @@ const App: React.FC = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute authorize={['admin', 'gestor']}>
+              <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             }

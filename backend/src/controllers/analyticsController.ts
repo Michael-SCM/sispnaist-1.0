@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import analyticsService from '../services/AnalyticsService.js';
 import { IAuthRequest } from '../middleware/auth.js';
+import Trabalhador from '../models/Trabalhador.js';
 
 /**
  * GET /api/analytics/kpis
@@ -76,16 +77,25 @@ export const obterDashboardAdmin = asyncHandler(async (req: IAuthRequest, res: R
  */
 export const obterDashboardTrabalhador = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const authReq = req as IAuthRequest;
-  const trabalhadorId = authReq.user?.id;
+  const userCpf = authReq.user?.cpf;
 
-  if (!trabalhadorId) {
+  if (!userCpf) {
     return res.status(401).json({
       status: 'error',
       message: 'Usuário não autenticado',
     });
   }
 
-  const dados = await analyticsService.obterDadosDashboardTrabalhador(trabalhadorId);
+  // Buscar o registro do trabalhador pelo CPF (coleção trabalhadores ≠ coleção usuarios)
+  const trabalhador = await Trabalhador.findOne({ cpf: userCpf }).select('_id');
+  if (!trabalhador) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'Registro de trabalhador não encontrado para este usuário',
+    });
+  }
+
+  const dados = await analyticsService.obterDadosDashboardTrabalhador(trabalhador._id.toString());
 
   res.status(200).json({
     status: 'success',
