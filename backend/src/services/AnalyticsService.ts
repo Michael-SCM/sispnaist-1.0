@@ -744,12 +744,16 @@ export class AnalyticsService {
 
   /**
    * Obtém dados resumidos para dashboard do trabalhador
+   * Aceita array de IDs para compatibilidade com registros antigos (User._id) e novos (Trabalhador._id)
    */
-  async obterDadosDashboardTrabalhador(trabalhadorId: string): Promise<any> {
-    const acidentes = await Acidente.countDocuments({ trabalhadorId });
-    const doencas = await Doenca.countDocuments({ trabalhadorId, ativo: true });
+  async obterDadosDashboardTrabalhador(trabalhadorIds: string | string[]): Promise<any> {
+    const ids = Array.isArray(trabalhadorIds) ? trabalhadorIds : [trabalhadorIds];
+    const condicaoTrabalhador = ids.length > 1 ? { $or: ids.map(id => ({ trabalhadorId: id })) } : { trabalhadorId: ids[0] };
+
+    const acidentes = await Acidente.countDocuments(condicaoTrabalhador);
+    const doencas = await Doenca.countDocuments({ ...condicaoTrabalhador, ativo: true });
     
-    const vacinacoes = await Vacinacao.find({ trabalhadorId })
+    const vacinacoes = await Vacinacao.find(condicaoTrabalhador)
       .sort({ proximoDose: 1 })
       .lean();
 
@@ -773,7 +777,7 @@ export class AnalyticsService {
       },
       proximaVacinacao: proximaVacinacao || null,
       vacinacaoVencida: vacinacaoVencida || null,
-      ultimosAcidentes: await Acidente.find({ trabalhadorId })
+      ultimosAcidentes: await Acidente.find(condicaoTrabalhador)
         .sort({ dataAcidente: -1 })
         .limit(3)
         .lean(),

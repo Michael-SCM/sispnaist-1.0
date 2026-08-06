@@ -7,6 +7,7 @@ import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
+import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user?.perfil === 'trabalhador') {
@@ -48,8 +49,22 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
   if (req.user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
-    targetTrabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
+    const ids = await obterIdsTrabalhadorPorCpf(req.user.cpf);
+    const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
+    if (idsValidos.length > 1) {
+      const result = await vacinacaoService.listar({
+        page,
+        limit,
+        vacina: vacina as string,
+        trabalhadorIds: idsValidos,
+        cartaoSus: cartaoSus as string,
+      });
+      return res.status(200).json({
+        status: 'success',
+        data: result,
+      });
+    }
+    targetTrabalhadorId = idsValidos[0] || '000000000000000000000000';
   }
 
   // Normaliza CPF recebido no filtro: remove máscara (.,-) se vier mascarado

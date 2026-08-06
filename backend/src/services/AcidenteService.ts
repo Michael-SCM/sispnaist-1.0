@@ -80,6 +80,7 @@ export class AcidenteService {
       tipoAcidente?: string;
       status?: string;
       trabalhadorId?: string;
+      trabalhadorIds?: string[];
       dataInicio?: string;
       dataFim?: string;
       descricao?: string;
@@ -99,7 +100,10 @@ export class AcidenteService {
       query.status = filtros.status;
     }
 
-    if (filtros?.trabalhadorId) {
+    // Suporte a ambos os IDs (Trabalhador._id e User._id) para compatibilidade com registros antigos
+    if (filtros?.trabalhadorIds && filtros.trabalhadorIds.length > 1) {
+      query.$or = filtros.trabalhadorIds.map(id => ({ trabalhadorId: id }));
+    } else if (filtros?.trabalhadorId) {
       // Se já for ObjectId válido, usa direto (vem do controller para perfil trabalhador)
       if ((mongoose.Types.ObjectId as any).isValid(filtros.trabalhadorId)) {
         query.trabalhadorId = filtros.trabalhadorId;

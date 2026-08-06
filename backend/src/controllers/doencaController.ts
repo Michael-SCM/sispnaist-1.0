@@ -7,6 +7,7 @@ import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 import { notificarSinanParaTrabalhador } from '../utils/notificarSinan.js';
 import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
+import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -69,8 +70,14 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
   if ((req as any).user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-    filtros.trabalhadorId = trabalhador ? trabalhador._id.toString() : '000000000000000000000000';
+    const ids = await obterIdsTrabalhadorPorCpf((req as any).user.cpf);
+    const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
+    if (idsValidos.length > 1) {
+      filtros.trabalhadorIds = idsValidos;
+      delete filtros.trabalhadorId;
+    } else {
+      filtros.trabalhadorId = idsValidos[0] || '000000000000000000000000';
+    }
   }
 
   // Remover filtros undefined

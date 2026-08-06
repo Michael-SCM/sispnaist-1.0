@@ -3,6 +3,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import analyticsService from '../services/AnalyticsService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import Trabalhador from '../models/Trabalhador.js';
+import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
 
 /**
  * GET /api/analytics/kpis
@@ -86,16 +87,17 @@ export const obterDashboardTrabalhador = asyncHandler(async (req: IAuthRequest, 
     });
   }
 
-  // Buscar o registro do trabalhador pelo CPF (coleção trabalhadores ≠ coleção usuarios)
-  const trabalhador = await Trabalhador.findOne({ cpf: userCpf }).select('_id');
-  if (!trabalhador) {
+  const ids = await obterIdsTrabalhadorPorCpf(userCpf);
+  const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
+
+  if (idsValidos.length === 0) {
     return res.status(404).json({
       status: 'error',
       message: 'Registro de trabalhador não encontrado para este usuário',
     });
   }
 
-  const dados = await analyticsService.obterDadosDashboardTrabalhador(trabalhador._id.toString());
+  const dados = await analyticsService.obterDadosDashboardTrabalhador(idsValidos);
 
   res.status(200).json({
     status: 'success',

@@ -37,6 +37,7 @@ export class DoencaService {
       nomeDoenca?: string;
       ativo?: boolean;
       trabalhadorId?: string;
+      trabalhadorIds?: string[];
       dataInicio?: string;
       dataFim?: string;
       cartaoSus?: string;
@@ -56,7 +57,10 @@ export class DoencaService {
       query.ativo = filtros.ativo;
     }
 
-    if (filtros?.trabalhadorId) {
+    // Suporte a ambos os IDs (Trabalhador._id e User._id) para compatibilidade com registros antigos
+    if (filtros?.trabalhadorIds && filtros.trabalhadorIds.length > 1) {
+      query.$or = filtros.trabalhadorIds.map(id => ({ trabalhadorId: id }));
+    } else if (filtros?.trabalhadorId) {
       // Normaliza CPF de filtro (mascarado ou dígitos) antes de resolver
       const { toCPFMaskedOrDigits } = await import('../utils/cpf.js');
       const cpfNorm = toCPFMaskedOrDigits(String(filtros.trabalhadorId));
