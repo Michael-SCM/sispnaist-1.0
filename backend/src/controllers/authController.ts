@@ -168,8 +168,8 @@ export const enviarCodigo2FA = asyncHandler(async (req: Request, res: Response) 
 });
 
 export const verificar2FA = asyncHandler(async (req: Request, res: Response) => {
-  const { preAuthToken, codigo } = req.body;
-  const { user, accessToken, refreshToken, confiarDispositivo } = await authService.verificar2FA(preAuthToken, codigo);
+  const { preAuthToken, codigo, confiarDispositivo } = req.body;
+  const { user, accessToken, refreshToken } = await authService.verificar2FA(preAuthToken, codigo);
 
   setAuthCookies(res, accessToken, refreshToken);
   const csrfToken = setCsrfCookie(res);
