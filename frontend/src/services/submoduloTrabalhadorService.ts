@@ -15,6 +15,16 @@ function setCache(key: string, data: any) {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
+function clearCache(trabalhadorId?: string) {
+  if (trabalhadorId) {
+    for (const key of cache.keys()) {
+      if (key.includes(trabalhadorId)) cache.delete(key);
+    }
+  } else {
+    cache.clear();
+  }
+}
+
 const SUBMODULOS = {
   dependentes: 'dependentes',
   afastamentos: 'afastamentos',
@@ -57,6 +67,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/historicoPPP`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -65,11 +76,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/historicoPPP/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarHistoricoPPP: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/historicoPPP/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // DEPENDENTES
@@ -92,6 +105,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/dependentes`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -100,11 +114,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/dependentes/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarDependente: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/dependentes/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // AFASTAMENTOS
@@ -126,6 +142,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/afastamentos`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -134,11 +151,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/afastamentos/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarAfastamento: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/afastamentos/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // VÍNCULOS
@@ -163,6 +182,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/vinculos`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -171,11 +191,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/vinculos/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarVinculo: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/vinculos/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // OCORRÊNCIAS DE VIOLÊNCIA
@@ -197,6 +219,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -205,11 +228,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/ocorrenciasViolencia/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarOcorrenciaViolencia: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/ocorrenciasViolencia/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // READAPTAÇÕES
@@ -231,6 +256,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/readaptacoes`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -239,11 +265,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/readaptacoes/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarReadaptacao: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/readaptacoes/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // PROCESSOS DE TRABALHO
@@ -265,6 +293,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/processosTrabalho`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -273,11 +302,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/processosTrabalho/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarProcessoTrabalho: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/processosTrabalho/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // RISCOS OCUPACIONAIS
@@ -299,6 +330,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/riscosOcupacionais`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -307,11 +339,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/riscosOcupacionais/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarRiscoOcupacional: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/riscosOcupacionais/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // EXAMES DE SAÚDE (ASO / S-2220)
@@ -340,6 +374,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/examesSaude`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -348,11 +383,13 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarExameSaude: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/examesSaude/${itemId}`);
+    clearCache(trabalhadorId);
   },
 
   // INTERNAÇÕES (SIH)
@@ -377,6 +414,7 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/internacoes`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
@@ -385,10 +423,12 @@ export const submoduloTrabalhadorService = {
       `/trabalhadores/${trabalhadorId}/internacoes/${itemId}`,
       data
     );
+    clearCache(trabalhadorId);
     return response.data;
   },
 
   deletarInternacao: async (trabalhadorId: string, itemId: string): Promise<void> => {
     await api.delete(`/trabalhadores/${trabalhadorId}/internacoes/${itemId}`);
+    clearCache(trabalhadorId);
   },
 };
