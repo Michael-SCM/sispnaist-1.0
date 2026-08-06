@@ -6,6 +6,7 @@ import { PdfService } from '../services/PdfService.js';
 import { logAction } from '../utils/auditLogger.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import config from '../config/config.js';
+import { verifyTrustedDeviceToken, generateTrustedDeviceToken } from '../utils/jwt.js';
 
 const pdfService = new PdfService();
 
@@ -54,6 +55,26 @@ const clearAuthCookies = (res: Response) => {
   res.clearCookie('refreshToken', cookieOptions);
 };
 
+const setTrustedDeviceCookie = (res: Response, userId: string) => {
+  const token = generateTrustedDeviceToken(userId);
+  res.cookie('trustedDevice', token, {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+  });
+};
+
+const clearTrustedDeviceCookie = (res: Response) => {
+  res.clearCookie('trustedDevice', {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'lax',
+    path: '/',
+  });
+};
+
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, verificationLink } = await authService.register(req.body);
 
@@ -79,8 +100,30 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const { email, senha } = req.body;
-  const result = await authService.login(email, senha);
+  const { email, senha, confiarDispositivo } = req.body;
+
+  // Verificar se existe cookie de dispositivo confiável válido
+  const trustedDeviceToken = req.cookies?.trustedDevice;
+  if (trustedDeviceToken) {
+    const decoded = verifyTrustedDeviceToken(trustedDeviceToken);
+    if (decoded) {
+      // Dispositivo confiável — bypass 2FA, login direto
+      const { user, accessToken, refreshToken } = await authService.loginByTrustedDevice(decoded.id);
+
+      setAuthCookies(res, accessToken, refreshToken);
+      const csrfToken = setCsrfCookie(res);
+
+      res.status(200).json({
+        status: 'success',
+        data: { user, accessToken, refreshToken, csrfToken },
+      });
+      return;
+    }
+    // Token inválido ou expirado — limpar cookie e prosseguir com login normal
+    clearTrustedDeviceCookie(res);
+  }
+
+  const result = await authService.login(email, senha, confiarDispositivo);
 
   // Login em 2 passos: senha válida, agora aguarda o código enviado por e-mail
   if (result.needs2FA) {
@@ -126,10 +169,15 @@ export const enviarCodigo2FA = asyncHandler(async (req: Request, res: Response) 
 
 export const verificar2FA = asyncHandler(async (req: Request, res: Response) => {
   const { preAuthToken, codigo } = req.body;
-  const { user, accessToken, refreshToken } = await authService.verificar2FA(preAuthToken, codigo);
+  const { user, accessToken, refreshToken, confiarDispositivo } = await authService.verificar2FA(preAuthToken, codigo);
 
   setAuthCookies(res, accessToken, refreshToken);
   const csrfToken = setCsrfCookie(res);
+
+  // Se o usuário optou por confiar no dispositivo, definir cookie de trusted device
+  if (confiarDispositivo && user._id) {
+    setTrustedDeviceCookie(res, user._id);
+  }
 
   res.status(200).json({
     status: 'success',
@@ -264,6 +312,7 @@ export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
   }
 
   clearAuthCookies(res);
+  clearTrustedDeviceCookie(res);
 
   res.status(200).json({
     status: 'success',
@@ -281,6 +330,7 @@ export const changePassword = asyncHandler(async (req: IAuthRequest, res: Respon
   await authService.changePassword(req.user.id, senhaAtual, novaSenha, codigo);
 
   clearAuthCookies(res);
+  clearTrustedDeviceCookie(res);
 
   res.status(200).json({
     status: 'success',
@@ -296,6 +346,7 @@ export const revokeAllSessions = asyncHandler(async (req: IAuthRequest, res: Res
 
   await authService.revokeAllSessions(req.user.id);
   clearAuthCookies(res);
+  clearTrustedDeviceCookie(res);
 
   res.status(200).json({
     status: 'success',

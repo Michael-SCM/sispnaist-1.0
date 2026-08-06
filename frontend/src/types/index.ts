@@ -309,6 +309,7 @@ export interface IAuthResponse {
   needs2FA?: boolean;
   preAuthToken?: string;
   doisFatoresHabilitado?: boolean;
+  confiarDispositivo?: boolean;
 }
 
 export interface IAcidente {

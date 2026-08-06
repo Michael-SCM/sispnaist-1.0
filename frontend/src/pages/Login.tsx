@@ -34,6 +34,7 @@ export const Login: React.FC = () => {
   const [needs2FA, setNeeds2FA] = React.useState(false);
   const [codigo, setCodigo] = React.useState('');
   const [isResending, setIsResending] = React.useState(false);
+  const [confiarDispositivo, setConfiarDispositivo] = React.useState(false);
   const statusRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -122,7 +123,7 @@ export const Login: React.FC = () => {
     statusRef.current?.focus();
 
     try {
-      const result = await authService.verificar2FA(token, codigo);
+      const result = await authService.verificar2FA(token, codigo, confiarDispositivo);
       if (!result.user || !result.accessToken || !result.refreshToken) {
         throw new Error('Resposta de verificação inválida.');
       }
@@ -167,6 +168,7 @@ export const Login: React.FC = () => {
     setNeeds2FA(false);
     setPreAuth(null);
     setCodigo('');
+    setConfiarDispositivo(false);
   };
 
   const emailErrorId = 'login-email-error';
@@ -294,6 +296,20 @@ export const Login: React.FC = () => {
                 placeholder="000000"
                 required
               />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="confiar-dispositivo"
+                type="checkbox"
+                checked={confiarDispositivo}
+                onChange={(e) => setConfiarDispositivo(e.target.checked)}
+                disabled={isLoading}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="confiar-dispositivo" className="text-sm text-gray-600 select-none">
+                Confiar neste dispositivo por 24 horas
+              </label>
             </div>
 
             <button

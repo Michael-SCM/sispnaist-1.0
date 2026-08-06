@@ -7,8 +7,8 @@ export const authService = {
     return response.data;
   },
 
-  login: async (email: string, senha: string): Promise<IAuthResponse> => {
-    const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha });
+  login: async (email: string, senha: string, confiarDispositivo?: boolean): Promise<IAuthResponse> => {
+    const response = await api.post<{ data: IAuthResponse }>('/auth/login', { email, senha, confiarDispositivo });
     return response.data.data;
   },
 
@@ -21,8 +21,8 @@ export const authService = {
     return response.data.data;
   },
 
-  verificar2FA: async (preAuthToken: string, codigo: string): Promise<IAuthResponse> => {
-    const response = await api.post<{ data: IAuthResponse }>('/auth/2fa/verificar', { preAuthToken, codigo });
+  verificar2FA: async (preAuthToken: string, codigo: string, confiarDispositivo?: boolean): Promise<IAuthResponse> => {
+    const response = await api.post<{ data: IAuthResponse }>('/auth/2fa/verificar', { preAuthToken, codigo, confiarDispositivo });
     return response.data.data;
   },
 

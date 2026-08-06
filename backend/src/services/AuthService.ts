@@ -1,5 +1,5 @@
 import User, { IUserDocument } from '../models/User.js';
-import { generateToken, generateRefreshToken, verifyRefreshToken, generate2FAToken, verify2FAToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken, generate2FAToken, verify2FAToken, generateTrustedDeviceToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
 import { sendResetPasswordEmail, sendVerificationEmail, send2FACodigoEmail, validateEmailDomain } from '../utils/emailService.js';
@@ -119,7 +119,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async login(email: string, password: string): Promise<LoginResult> {
+  async login(email: string, password: string, confiarDispositivo?: boolean): Promise<LoginResult> {
     const user = await User.findOne({ email }).select('+senha');
 
     if (!user) {
@@ -148,6 +148,7 @@ export class AuthService {
         id: user._id.toString(),
         email: user.email,
         perfil,
+        confiarDispositivo: confiarDispositivo === true,
       });
 
       return {
@@ -198,7 +199,7 @@ export class AuthService {
   /**
    * Passo 2 do login: valida o código e emite os tokens de sessão.
    */
-  async verificar2FA(preAuthToken: string, codigo: string): Promise<{ user: IUser; accessToken: string; refreshToken: string; doisFatoresHabilitado: boolean }> {
+  async verificar2FA(preAuthToken: string, codigo: string): Promise<{ user: IUser; accessToken: string; refreshToken: string; doisFatoresHabilitado: boolean; confiarDispositivo?: boolean }> {
     const payload = verify2FAToken(preAuthToken);
     if (!payload) {
       throw new AppError('Token temporário inválido ou expirado. Faça o login novamente.', 401);
@@ -216,7 +217,12 @@ export class AuthService {
     const userObj = user.toObject() as unknown as IUser;
     delete userObj.senha;
 
-    return { user: userObj, ...tokens, doisFatoresHabilitado: user.doisFatoresHabilitado === true };
+    return {
+      user: userObj,
+      ...tokens,
+      doisFatoresHabilitado: user.doisFatoresHabilitado === true,
+      confiarDispositivo: payload.confiarDispositivo,
+    };
   }
 
   /**
@@ -467,6 +473,27 @@ export class AuthService {
     user.refreshToken = undefined;
     user.refreshTokenExpires = undefined;
     await user.save();
+  }
+
+  /**
+   * Login direto via trusted device cookie (bypass 2FA).
+   */
+  async loginByTrustedDevice(userId: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
+    const user = await User.findById(userId).select('+senha');
+    if (!user) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    if (user.isVerified === false) {
+      throw new AppError('Conta não verificada', 401);
+    }
+
+    const tokens = await this.generateTokens(user);
+
+    const userObj = user.toObject() as unknown as IUser;
+    delete userObj.senha;
+
+    return { user: userObj, ...tokens };
   }
 
   async verifyEmail(token: string): Promise<void> {
