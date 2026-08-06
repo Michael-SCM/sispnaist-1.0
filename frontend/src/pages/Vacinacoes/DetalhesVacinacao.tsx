@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useVacinacaoStore } from '../../store/vacinacaoStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { vacinacaoService } from '../../services/vacinacaoService.js';
 import { IVacinacao } from '../../types/index.js';
 import {
@@ -21,6 +22,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const DetalhesVacinacao: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { id } = useParams<{ id: string }>();
   const { setCurrentVacinacao } = useVacinacaoStore();
 
@@ -98,13 +100,15 @@ export const DetalhesVacinacao: React.FC = () => {
               <p className="text-slate-500 font-medium">Protocolo: <span className="font-mono">{vacinacao._id}</span></p>
             </div>
           </div>
-          <Link
-            to={`/vacinacoes/${vacinacao._id}/editar`}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar Registro
-          </Link>
+          {user?.perfil !== 'trabalhador' && (
+            <Link
+              to={`/vacinacoes/${vacinacao._id}/editar`}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar Registro
+            </Link>
+          )}
         </div>
 
         {/* Quick Stats */}

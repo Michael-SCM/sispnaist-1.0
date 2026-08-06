@@ -159,15 +159,17 @@ export const Header: React.FC = React.memo(() => {
                       >
                         Vacinações
                       </Link>
-                      <Link
-                        to="/atos-municipais"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                        onClick={() => setRegistrosOpen(false)}
-                        role="menuitem"
-                        aria-current={isActive('/atos-municipais') ? 'page' : undefined}
-                      >
-                        Atos Municipais
-                      </Link>
+                      {user?.perfil !== 'trabalhador' && (
+                        <Link
+                          to="/atos-municipais"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          onClick={() => setRegistrosOpen(false)}
+                          role="menuitem"
+                          aria-current={isActive('/atos-municipais') ? 'page' : undefined}
+                        >
+                          Atos Municipais
+                        </Link>
+                      )}
                     </div>
                   )}
                 </div>
@@ -467,14 +469,16 @@ export const Header: React.FC = React.memo(() => {
               >
                 Vacinações
               </Link>
-              <Link
-                to="/atos-municipais"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-current={isActive('/atos-municipais') ? 'page' : undefined}
-              >
-                Atos Municipais
-              </Link>
+              {user?.perfil !== 'trabalhador' && (
+                <Link
+                  to="/atos-municipais"
+                  className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-current={isActive('/atos-municipais') ? 'page' : undefined}
+                >
+                  Atos Municipais
+                </Link>
+              )}
             </div>
 
             <Link

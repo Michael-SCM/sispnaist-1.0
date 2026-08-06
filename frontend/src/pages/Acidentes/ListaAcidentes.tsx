@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
 import { IAcidente } from '../../types/index.js';
 import { 
@@ -24,6 +25,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const ListaAcidentes: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const {
     acidentes,
     total,
@@ -139,13 +141,15 @@ export const ListaAcidentes: React.FC = () => {
               <Download size={18} />
               Exportar
             </button>
-            <button
-              onClick={() => navigate('/acidentes/novo')}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
-            >
-              <Plus size={20} />
-              Novo Acidente
-            </button>
+            {user?.perfil !== 'trabalhador' && (
+              <button
+                onClick={() => navigate('/acidentes/novo')}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+              >
+                <Plus size={20} />
+                Novo Acidente
+              </button>
+            )}
           </div>
         </div>
 
@@ -368,15 +372,17 @@ export const ListaAcidentes: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/acidentes/${acidente._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                          >
-                            <Edit size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/acidentes/${acidente._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
                           <button
                             onClick={(e) => handleDeletar(e, acidente)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

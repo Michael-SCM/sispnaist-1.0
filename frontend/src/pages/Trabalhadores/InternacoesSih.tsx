@@ -31,9 +31,11 @@ import {
   Download,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../store/authStore.js';
 
 export const InternacoesSih: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const user = useAuthStore((state) => state.user);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [dadosSih, setDadosSih] = useState<DadosSih | null>(null);
   const [consultando, setConsultando] = useState(false);
@@ -347,23 +349,25 @@ export const InternacoesSih: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-4 py-4 text-center">
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); handleImportarClick(int); }}
-                            disabled={jaImportada || importando === int.numeroAih}
-                            className={`p-2 rounded-xl transition-all ${
-                              jaImportada
-                                ? 'bg-emerald-50 text-emerald-500 cursor-not-allowed'
-                                : 'bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-90'
-                            }`}
-                            title={jaImportada ? 'Já importada' : 'Importar internação'}
-                          >
-                            {importando === int.numeroAih ? (
-                              <Loader2 size={16} className="animate-spin" />
-                            ) : (
-                              <Download size={16} />
-                            )}
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); handleImportarClick(int); }}
+                              disabled={jaImportada || importando === int.numeroAih}
+                              className={`p-2 rounded-xl transition-all ${
+                                jaImportada
+                                  ? 'bg-emerald-50 text-emerald-500 cursor-not-allowed'
+                                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100 active:scale-90'
+                              }`}
+                              title={jaImportada ? 'Já importada' : 'Importar internação'}
+                            >
+                              {importando === int.numeroAih ? (
+                                <Loader2 size={16} className="animate-spin" />
+                              ) : (
+                                <Download size={16} />
+                              )}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

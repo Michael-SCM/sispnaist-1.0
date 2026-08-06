@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useVacinacaoStore } from '../../store/vacinacaoStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { vacinacaoService } from '../../services/vacinacaoService.js';
 import {
   Syringe,
@@ -25,6 +26,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const ListaVacinacoes: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const {
     vacinacoes,
     page,
@@ -128,13 +130,15 @@ export const ListaVacinacoes: React.FC = () => {
               <Download size={18} />
               Exportar
             </button>
-            <button
-              onClick={() => navigate('/vacinacoes/novo')}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
-            >
-              <Plus size={20} />
-              Nova Vacinação
-            </button>
+            {user?.perfil !== 'trabalhador' && (
+              <button
+                onClick={() => navigate('/vacinacoes/novo')}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
+              >
+                <Plus size={20} />
+                Nova Vacinação
+              </button>
+            )}
           </div>
         </div>
 
@@ -292,15 +296,17 @@ export const ListaVacinacoes: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/vacinacoes/${v._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-                          >
-                            <Edit size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/vacinacoes/${v._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
                           <button
                             onClick={(e) => handleExcluir(e, v._id)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

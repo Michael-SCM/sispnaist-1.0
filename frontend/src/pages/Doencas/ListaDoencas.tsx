@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { doencaService } from '../../services/doencaService.js';
 import { IDoenca } from '../../types/index.js';
 import {
@@ -27,6 +28,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const ListaDoencas: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const {
     doencas,
     page,
@@ -129,13 +131,15 @@ export const ListaDoencas: React.FC = () => {
               <Download size={18} />
               Exportar
             </button>
-            <button
-              onClick={() => navigate('/doencas/novo')}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
-            >
-              <Plus size={20} />
-              Nova Doença
-            </button>
+            {user?.perfil !== 'trabalhador' && (
+              <button
+                onClick={() => navigate('/doencas/novo')}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
+              >
+                <Plus size={20} />
+                Nova Doença
+              </button>
+            )}
           </div>
         </div>
 
@@ -308,15 +312,17 @@ export const ListaDoencas: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/doencas/${d._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                          >
-                            <Edit size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/doencas/${d._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
                           <button
                             onClick={(e) => handleDeletar(e, d._id)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

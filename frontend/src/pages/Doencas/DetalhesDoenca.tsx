@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { doencaService } from '../../services/doencaService.js';
 import { IDoenca } from '../../types/index.js';
 import {
@@ -22,6 +23,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const DetalhesDoenca: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { id } = useParams<{ id: string }>();
   const { setCurrentDoenca } = useDoencaStore();
 
@@ -106,13 +108,15 @@ export const DetalhesDoenca: React.FC = () => {
               <p className="text-slate-500 font-medium">Protocolo: <span className="font-mono">{doenca._id}</span></p>
             </div>
           </div>
-          <Link
-            to={`/doencas/${doenca._id}/editar`}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar Registro
-          </Link>
+          {user?.perfil !== 'trabalhador' && (
+            <Link
+              to={`/doencas/${doenca._id}/editar`}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-rose-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar Registro
+            </Link>
+          )}
         </div>
 
         {/* Quick Stats */}

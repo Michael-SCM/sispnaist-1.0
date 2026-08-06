@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { IAcidente, IAcidentePopulated } from '../../types/index.js';
@@ -29,6 +30,7 @@ import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 
 export const DetalhesAcidente: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { id } = useParams<{ id: string }>();
   const { setCurrentAcidente } = useAcidenteStore();
 
@@ -126,13 +128,15 @@ export const DetalhesAcidente: React.FC = () => {
               <p className="text-slate-500 font-medium">Protocolo: <span className="font-mono">{acidente._id}</span></p>
             </div>
           </div>
-          <Link
-            to={`/acidentes/${acidente._id}/editar`}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar Registro
-          </Link>
+          {user?.perfil !== 'trabalhador' && (
+            <Link
+              to={`/acidentes/${acidente._id}/editar`}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar Registro
+            </Link>
+          )}
         </div>
 
         {/* Quick Stats */}
@@ -384,20 +388,24 @@ export const DetalhesAcidente: React.FC = () => {
                         >
                           Ver Detalhes
                         </button>
-                        <button
-                          onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
-                          className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
-                        >
-                          Editar
-                        </button>
+                        {user?.perfil !== 'trabalhador' && (
+                          <button
+                            onClick={() => navigate(`/acidentes/material-biologico/${fichaBiologica._id}/editar`)}
+                            className="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-xl text-xs font-bold transition-all"
+                          >
+                            Editar
+                          </button>
+                        )}
                       </>
                     ) : (
-                      <button
-                        onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
-                        className="px-4 py-1.5 bg-white text-emerald-700 rounded-xl text-xs font-bold transition-all shadow-sm"
-                      >
-                        Criar Ficha
-                      </button>
+                      user?.perfil !== 'trabalhador' ? (
+                        <button
+                          onClick={() => navigate('/acidentes/material-biologico/novo', { state: { acidenteId: acidente._id } })}
+                          className="px-4 py-1.5 bg-white text-emerald-700 rounded-xl text-xs font-bold transition-all shadow-sm"
+                        >
+                          Criar Ficha
+                        </button>
+                      ) : null
                     )}
                   </div>
                 </div>

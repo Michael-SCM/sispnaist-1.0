@@ -9,6 +9,7 @@ import {
   Plus, Edit, Trash2, ArrowLeft, Eye, Stethoscope, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 const tipoAsoLabel: Record<string, string> = {
   admissional: 'Admissional',
@@ -28,6 +29,7 @@ const resultadoColor = (res?: string) => {
 export const ListaExamesSaude: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [exames, setExames] = useState<ITrabalhadorExameSaude[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,13 +88,15 @@ export const ListaExamesSaude: React.FC = () => {
               )}
             </div>
           </div>
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/exames-saude/novo`)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Novo Exame
-          </button>
+          {user?.perfil !== 'trabalhador' && (
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/exames-saude/novo`)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Novo Exame
+            </button>
+          )}
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
@@ -156,20 +160,24 @@ export const ListaExamesSaude: React.FC = () => {
                           >
                             <Eye size={20} />
                           </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); navigate(`/trabalhadores/${id}/exames-saude/${exame._id}/editar`); }}
-                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit size={20} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDeletar(e, exame._id!)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); navigate(`/trabalhadores/${id}/exames-saude/${exame._id}/editar`); }}
+                              className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                              title="Editar"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => handleDeletar(e, exame._id!)}
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              title="Excluir"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

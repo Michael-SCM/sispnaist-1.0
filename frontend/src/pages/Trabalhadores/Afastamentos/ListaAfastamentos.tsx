@@ -18,10 +18,12 @@ import {
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 export const ListaAfastamentos: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [afastamentos, setAfastamentos] = useState<ITrabalhadorAfastamento[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,13 +84,15 @@ export const ListaAfastamentos: React.FC = () => {
               )}
             </div>
           </div>
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/afastamentos/novo`)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Novo Afastamento
-          </button>
+          {user?.perfil !== 'trabalhador' && (
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/afastamentos/novo`)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Novo Afastamento
+            </button>
+          )}
         </div>
 
         {/* List Content */}
@@ -172,23 +176,27 @@ export const ListaAfastamentos: React.FC = () => {
                           >
                             <Eye size={20} />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/trabalhadores/${id}/afastamentos/${afastamento._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit size={20} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDeletar(e, afastamento._id!)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/trabalhadores/${id}/afastamentos/${afastamento._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                              title="Editar"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => handleDeletar(e, afastamento._id!)}
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              title="Excluir"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

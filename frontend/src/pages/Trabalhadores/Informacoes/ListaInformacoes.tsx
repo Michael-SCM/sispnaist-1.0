@@ -12,6 +12,7 @@ import {
   Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby, AlertTriangle, Accessibility
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
   <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
@@ -35,6 +36,7 @@ const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
 export const ListaInformacoes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [informacoes, setInformacoes] = useState<ITrabalhadorInformacao[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,13 +119,15 @@ export const ListaInformacoes: React.FC = () => {
               <Stethoscope size={48} className="text-amber-600" />
             </div>
             <p className="text-lg font-medium text-slate-500">Nenhuma informação cadastrada ainda</p>
-            <button
-              onClick={() => navigate(`/trabalhadores/${id}/informacoes/novo`)}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95 text-lg"
-            >
-              <Plus size={24} />
-              Novas Informações
-            </button>
+            {user?.perfil !== 'trabalhador' && (
+              <button
+                onClick={() => navigate(`/trabalhadores/${id}/informacoes/novo`)}
+                className="flex items-center justify-center gap-2 px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95 text-lg"
+              >
+                <Plus size={24} />
+                Novas Informações
+              </button>
+            )}
           </div>
         ) : (
           /* Detalhamento completo - estilo DetalhesTrabalhador */
@@ -275,20 +279,24 @@ export const ListaInformacoes: React.FC = () => {
 
             {/* Actions */}
             <div className="flex justify-end gap-3">
-              <button
-                onClick={() => navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`)}
-                className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
-              >
-                <Edit size={20} />
-                Editar Informações
-              </button>
-              <button
-                onClick={() => handleDeletar(info._id!)}
-                className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-              >
-                <Trash2 size={20} />
-                Excluir
-              </button>
+              {user?.perfil !== 'trabalhador' && (
+                <button
+                  onClick={() => navigate(`/trabalhadores/${id}/informacoes/${info._id}/editar`)}
+                  className="flex items-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+                >
+                  <Edit size={20} />
+                  Editar Informações
+                </button>
+              )}
+              {user?.perfil !== 'trabalhador' && (
+                <button
+                  onClick={() => handleDeletar(info._id!)}
+                  className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+                >
+                  <Trash2 size={20} />
+                  Excluir
+                </button>
+              )}
             </div>
           </div>
         )}

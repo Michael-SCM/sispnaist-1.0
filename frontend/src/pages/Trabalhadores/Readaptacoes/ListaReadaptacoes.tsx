@@ -18,10 +18,12 @@ import {
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 export const ListaReadaptacoes: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [readaptacoes, setReadaptacoes] = useState<ITrabalhadorReadaptacao[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -82,13 +84,15 @@ export const ListaReadaptacoes: React.FC = () => {
               )}
             </div>
           </div>
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/readaptacoes/novo`)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Nova Readaptação
-          </button>
+          {user?.perfil !== 'trabalhador' && (
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/readaptacoes/novo`)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Nova Readaptação
+            </button>
+          )}
         </div>
 
         {/* List Content */}
@@ -177,23 +181,27 @@ export const ListaReadaptacoes: React.FC = () => {
                           >
                             <Eye size={20} />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/trabalhadores/${id}/readaptacoes/${readaptacao._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit size={20} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDeletar(e, readaptacao._id!)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/trabalhadores/${id}/readaptacoes/${readaptacao._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
+                              title="Editar"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => handleDeletar(e, readaptacao._id!)}
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              title="Excluir"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

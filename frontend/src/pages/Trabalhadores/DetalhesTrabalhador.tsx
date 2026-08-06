@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
 import {
@@ -42,6 +43,7 @@ import { InfoCard } from '../../components/InfoCard.js';
 export const DetalhesTrabalhador: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { setCurrentTrabalhador } = useTrabalhadorStore();
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,13 +107,15 @@ export const DetalhesTrabalhador: React.FC = () => {
               </p>
             </div>
           </div>
-          <Link
-            to={`/trabalhadores/${trabalhador._id}/editar`}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar Funcionário
-          </Link>
+          {user?.perfil !== 'trabalhador' && (
+            <Link
+              to={`/trabalhadores/${trabalhador._id}/editar`}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar Funcionário
+            </Link>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

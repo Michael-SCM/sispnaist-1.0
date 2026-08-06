@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useTrabalhadorStore } from '../../store/trabalhadorStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
 import { 
@@ -25,6 +26,7 @@ import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 
 export const ListaTrabalhadores: React.FC = () => {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const {
     trabalhadores,
     total,
@@ -126,13 +128,15 @@ export const ListaTrabalhadores: React.FC = () => {
               <Download size={18} />
               Exportar
             </button>
-            <button
-              onClick={() => navigate('/trabalhadores/novo')}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
-            >
-              <Plus size={20} />
-              Novo Trabalhador
-            </button>
+            {user?.perfil !== 'trabalhador' && (
+              <button
+                onClick={() => navigate('/trabalhadores/novo')}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
+              >
+                <Plus size={20} />
+                Novo Trabalhador
+              </button>
+            )}
           </div>
         </div>
 
@@ -309,15 +313,17 @@ export const ListaTrabalhadores: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/trabalhadores/${t._id}/editar`);
-                            }}
-                            className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
-                          >
-                            <Edit size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/trabalhadores/${t._id}/editar`);
+                              }}
+                              className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
                           <button
                             onClick={(e) => handleDeletar(e, t)}
                             className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

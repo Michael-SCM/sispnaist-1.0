@@ -30,6 +30,7 @@ import {
   Syringe,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../store/authStore.js';
 
 const tipoNotificacaoIcon: Record<string, React.ReactNode> = {
   'Acidente de Trabalho': <Shield size={16} className="text-red-500" />,
@@ -56,6 +57,7 @@ const evolucaoBadge: Record<string, string> = {
 export const NotificacoesSinan: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [dadosSinan, setDadosSinan] = useState<DadosSinan | null>(null);
   const [consultando, setConsultando] = useState(false);
@@ -339,14 +341,16 @@ export const NotificacoesSinan: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); handleImportar(notif); }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold transition-all border border-emerald-200"
-                        >
-                          <PlusCircle size={14} />
-                          Importar
-                        </button>
+                        {user?.perfil !== 'trabalhador' && (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleImportar(notif); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-xs font-bold transition-all border border-emerald-200"
+                          >
+                            <PlusCircle size={14} />
+                            Importar
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

@@ -15,10 +15,12 @@ import {
   Shield
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 export const ListaRiscosOcupacionais: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const [riscos, setRiscos] = useState<ITrabalhadorRiscoOcupacional[]>([]);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,13 +85,15 @@ export const ListaRiscosOcupacionais: React.FC = () => {
               )}
             </div>
           </div>
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/riscos-ocupacionais/novo`)}
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
-          >
-            <Plus size={20} />
-            Novo Risco
-          </button>
+          {user?.perfil !== 'trabalhador' && (
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/riscos-ocupacionais/novo`)}
+              className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-100 active:scale-95"
+            >
+              <Plus size={20} />
+              Novo Risco
+            </button>
+          )}
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
@@ -155,20 +159,24 @@ export const ListaRiscosOcupacionais: React.FC = () => {
                           >
                             <Eye size={20} />
                           </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); navigate(`/trabalhadores/${id}/riscos-ocupacionais/${risco._id}/editar`); }}
-                            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
-                            title="Editar"
-                          >
-                            <Edit size={20} />
-                          </button>
-                          <button
-                            onClick={(e) => handleDeletar(e, risco._id!)}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Excluir"
-                          >
-                            <Trash2 size={20} />
-                          </button>
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); navigate(`/trabalhadores/${id}/riscos-ocupacionais/${risco._id}/editar`); }}
+                              className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
+                              title="Editar"
+                            >
+                              <Edit size={20} />
+                            </button>
+                          )}
+                          {user?.perfil !== 'trabalhador' && (
+                            <button
+                              onClick={(e) => handleDeletar(e, risco._id!)}
+                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                              title="Excluir"
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
