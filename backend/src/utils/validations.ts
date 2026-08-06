@@ -68,6 +68,7 @@ export const loginSchema = Joi.object({
     .required(),
   senha: Joi.string()
     .required(),
+  confiarDispositivo: Joi.boolean().optional(),
 });
 
 export const forgotPasswordSchema = Joi.object({
@@ -358,6 +359,7 @@ export const verificar2FASchema = Joi.object({
       'string.pattern.base': 'O código deve conter 6 dígitos',
       'any.required': 'Código é obrigatório',
     }),
+  confiarDispositivo: Joi.boolean().optional(),
 });
 
 export const confirmar2FASchema = Joi.object({

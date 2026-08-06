@@ -59,8 +59,8 @@ const setTrustedDeviceCookie = (res: Response, userId: string) => {
   const token = generateTrustedDeviceToken(userId);
   res.cookie('trustedDevice', token, {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     path: '/',
     maxAge: 24 * 60 * 60 * 1000, // 24 horas
   });
@@ -69,8 +69,8 @@ const setTrustedDeviceCookie = (res: Response, userId: string) => {
 const clearTrustedDeviceCookie = (res: Response) => {
   res.clearCookie('trustedDevice', {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
     path: '/',
   });
 };
@@ -312,7 +312,6 @@ export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
   }
 
   clearAuthCookies(res);
-  clearTrustedDeviceCookie(res);
 
   res.status(200).json({
     status: 'success',
