@@ -8,10 +8,12 @@ import {
   Stethoscope, ArrowLeft, Edit, Trash2, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 export const DetalhesAfastamento: React.FC = () => {
   const { id, afastamentoId } = useParams<{ id: string; afastamentoId: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
   const [afastamento, setAfastamento] = useState<ITrabalhadorAfastamento | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -73,16 +75,18 @@ export const DetalhesAfastamento: React.FC = () => {
               <p className="text-slate-500 font-medium">{a.tipoAfastamento}</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => navigate(`/trabalhadores/${id}/afastamentos/${afastamentoId}/editar`)}
-              className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition-all active:scale-95">
-              <Edit size={18} /> Editar
-            </button>
-            <button onClick={handleDeletar}
-              className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl transition-all active:scale-95">
-              <Trash2 size={18} /> Excluir
-            </button>
-          </div>
+          {user?.perfil !== 'trabalhador' && (
+            <div className="flex gap-2">
+              <button onClick={() => navigate(`/trabalhadores/${id}/afastamentos/${afastamentoId}/editar`)}
+                className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-xl transition-all active:scale-95">
+                <Edit size={18} /> Editar
+              </button>
+              <button onClick={handleDeletar}
+                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-xl transition-all active:scale-95">
+                <Trash2 size={18} /> Excluir
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">

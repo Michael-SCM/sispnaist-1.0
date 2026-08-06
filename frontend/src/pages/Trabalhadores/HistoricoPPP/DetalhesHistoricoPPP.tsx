@@ -12,6 +12,7 @@ import {
   UserCheck, Shield, FileSpreadsheet, Stethoscope, Info, Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
   <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
@@ -37,6 +38,7 @@ const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') :
 export const DetalhesHistoricoPPP: React.FC = () => {
   const { id, pppId } = useParams<{ id: string; pppId: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
   const [registro, setRegistro] = useState<ITrabalhadorHistoricoPPP | null>(null);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -284,22 +286,24 @@ export const DetalhesHistoricoPPP: React.FC = () => {
         </div>
 
         {/* Ações */}
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/historico-ppp/${r._id}/editar`)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar PPP
-          </button>
-          <button
-            onClick={handleDeletar}
-            className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-          >
-            <Trash2 size={20} />
-            Excluir
-          </button>
-        </div>
+        {user?.perfil !== 'trabalhador' && (
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/historico-ppp/${r._id}/editar`)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar PPP
+            </button>
+            <button
+              onClick={handleDeletar}
+              className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+            >
+              <Trash2 size={20} />
+              Excluir
+            </button>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

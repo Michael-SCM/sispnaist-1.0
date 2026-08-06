@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { InfoCard } from '../../../components/InfoCard.js';
+import { useAuthStore } from '../../../store/authStore.js';
 
 const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
   <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
@@ -111,6 +112,7 @@ const renderItens = (grupo: any, neutroFields?: string[], subdimensao?: string) 
 export const DetalhesVinculo: React.FC = () => {
   const { id, vinculoId } = useParams<{ id: string; vinculoId: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
   const [vinculo, setVinculo] = useState<ITrabalhadorVinculo | null>(null);
   const [trabalhador, setTrabalhador] = useState<ITrabalhador | null>(null);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
@@ -309,22 +311,24 @@ export const DetalhesVinculo: React.FC = () => {
           </div>
         )}
 
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/vinculos/${v._id}/editar`)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
-          >
-            <Edit size={20} />
-            Editar Vínculo
-          </button>
-          <button
-            onClick={handleDeletar}
-            className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
-          >
-            <Trash2 size={20} />
-            Excluir
-          </button>
-        </div>
+        {user?.perfil !== 'trabalhador' && (
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/vinculos/${v._id}/editar`)}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95"
+            >
+              <Edit size={20} />
+              Editar Vínculo
+            </button>
+            <button
+              onClick={handleDeletar}
+              className="flex items-center gap-2 px-6 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold transition-all active:scale-95"
+            >
+              <Trash2 size={20} />
+              Excluir
+            </button>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

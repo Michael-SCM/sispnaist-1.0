@@ -120,8 +120,13 @@ export const FormRiscoOcupacional: React.FC = () => {
     }
   }, [formData.empresaId, unidades]);
 
+  const normalizarCategoria = (cat: string) => {
+    if (cat.includes('Acidente') || cat.includes('Mecânico') || cat.includes('Mecanico')) return 'Acidente';
+    return cat;
+  };
+
   const tiposFiltrados = formData.categoria
-    ? tiposRisco.filter(t => t.sigla === formData.categoria)
+    ? tiposRisco.filter(t => t.sigla === normalizarCategoria(formData.categoria))
     : tiposRisco;
 
   const carregarTrabalhador = async () => {

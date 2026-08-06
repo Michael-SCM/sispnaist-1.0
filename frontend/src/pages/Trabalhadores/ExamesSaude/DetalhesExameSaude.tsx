@@ -8,6 +8,7 @@ import {
   ArrowLeft, Edit, Stethoscope, Loader2, Calendar, User, FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/authStore.js';
 
 const tipoAsoLabel: Record<string, string> = {
   admissional: 'Admissional',
@@ -26,6 +27,7 @@ const resultadoLabel: Record<string, { label: string; color: string }> = {
 export const DetalhesExameSaude: React.FC = () => {
   const { id, exameId } = useParams<{ id: string; exameId: string }>();
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
   const [exame, setExame] = useState<ITrabalhadorExameSaude | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,13 +84,15 @@ export const DetalhesExameSaude: React.FC = () => {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => navigate(`/trabalhadores/${id}/exames-saude/${exameId}/editar`)}
-            className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
-          >
-            <Edit size={20} />
-            Editar
-          </button>
+          {user?.perfil !== 'trabalhador' && (
+            <button
+              onClick={() => navigate(`/trabalhadores/${id}/exames-saude/${exameId}/editar`)}
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
+            >
+              <Edit size={20} />
+              Editar
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
