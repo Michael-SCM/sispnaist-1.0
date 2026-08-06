@@ -107,20 +107,25 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   if (trustedDeviceToken) {
     const decoded = verifyTrustedDeviceToken(trustedDeviceToken);
     if (decoded) {
-      // Dispositivo confiável — bypass 2FA, login direto
-      const { user, accessToken, refreshToken } = await authService.loginByTrustedDevice(decoded.id);
+      // Verificar se o email/senha conferem com o usuário do cookie
+      const result = await authService.loginByTrustedDevice(decoded.id, email, senha);
+      if (result) {
+        // Dispositivo confiável + credenciais corretas — bypass 2FA
+        setAuthCookies(res, result.accessToken, result.refreshToken);
+        const csrfToken = setCsrfCookie(res);
 
-      setAuthCookies(res, accessToken, refreshToken);
-      const csrfToken = setCsrfCookie(res);
-
-      res.status(200).json({
-        status: 'success',
-        data: { user, accessToken, refreshToken, csrfToken },
-      });
-      return;
+        res.status(200).json({
+          status: 'success',
+          data: { user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken, csrfToken },
+        });
+        return;
+      }
+      // Credenciais não conferem com o cookie — limpar cookie e prosseguir login normal
+      clearTrustedDeviceCookie(res);
+    } else {
+      // Token inválido ou expirado — limpar cookie e prosseguir com login normal
+      clearTrustedDeviceCookie(res);
     }
-    // Token inválido ou expirado — limpar cookie e prosseguir com login normal
-    clearTrustedDeviceCookie(res);
   }
 
   const result = await authService.login(email, senha, confiarDispositivo);

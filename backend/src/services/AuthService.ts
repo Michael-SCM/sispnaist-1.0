@@ -477,12 +477,21 @@ export class AuthService {
 
   /**
    * Login direto via trusted device cookie (bypass 2FA).
+   * Valida email + senha; retorna null se não bater com o cookie.
    */
-  async loginByTrustedDevice(userId: string): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
-    const user = await User.findById(userId).select('+senha');
-    if (!user) {
-      throw new AppError('Usuário não encontrado', 404);
-    }
+  async loginByTrustedDevice(trustedUserId: string, email: string, password: string): Promise<{ user: IUser; accessToken: string; refreshToken: string } | null> {
+    const trustedUser = await User.findById(trustedUserId);
+    if (!trustedUser) return null;
+
+    // Verificar se o email informado pertence ao usuário do cookie
+    if (trustedUser.email !== email) return null;
+
+    // Verificar senha
+    const user = await User.findOne({ email }).select('+senha');
+    if (!user) return null;
+
+    const isPasswordValid = await (user as IUserDocument).comparePassword(password);
+    if (!isPasswordValid) return null;
 
     if (user.isVerified === false) {
       throw new AppError('Conta não verificada', 401);
