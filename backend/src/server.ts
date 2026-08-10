@@ -22,7 +22,7 @@ const sanitizeMongoUri = (uri: string): string => {
 const PORT = config.port;
 
 const server = app.listen(PORT, async () => {
-  await connectRedis();
+  const redisOk = await connectRedis();
   console.log(`
 ╔════════════════════════════════════════╗
 ║    SISPNAIST Backend Server Started    ║
@@ -32,7 +32,7 @@ const server = app.listen(PORT, async () => {
 🗄️  Database: ${sanitizeMongoUri(config.mongodbUri)}
 🌍 Environment: ${config.nodeEnv}
 🔐 CORS enabled for: ${config.corsOrigin}
-💾 Redis: ${config.redisUrl ? 'Conectado' : 'Desabilitado (use REDIS_URL para ativar)'}
+💾 Redis: ${redisOk ? 'Conectado' : 'Desabilitado'}
 
 API Documentation:
   POST   /api/auth/register    - Criar conta
