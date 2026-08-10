@@ -9,9 +9,9 @@ import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
 import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
 import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
 import HabilitacaoPnaist from '../models/HabilitacaoPnaist.js';
+import { getRedisClient } from '../config/redis.js';
 
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000;
+const REDIS_TTL = 300;
 
 export interface IKPIData {
   totalAcidentes: number;
@@ -78,6 +78,33 @@ export interface IAnalyticsService {
   obterUltimosAcidentes(limit?: number): Promise<any[]>;
   obterDadosDashboardAdmin(): Promise<any>;
   obterMonitoramentoClinico(): Promise<IMonitoramentoClinico>;
+  invalidateAll(): Promise<void>;
+}
+
+async function getCachedOrFetch<T>(key: string, ttl: number, fetchFn: () => Promise<T>): Promise<T> {
+  const redis = getRedisClient();
+  if (redis) {
+    try {
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached) as T;
+      }
+    } catch (err: any) {
+      console.error(`[AnalyticsCache] Erro ao ler "${key}":`, err.message);
+    }
+  }
+
+  const result = await fetchFn();
+
+  if (redis) {
+    try {
+      await redis.setex(key, ttl, JSON.stringify(result));
+    } catch (err: any) {
+      console.error(`[AnalyticsCache] Erro ao gravar "${key}":`, err.message);
+    }
+  }
+
+  return result;
 }
 
 export class AnalyticsService {
@@ -85,8 +112,9 @@ export class AnalyticsService {
    * Obtém KPIs gerais do sistema
    */
   async obterKPIs(): Promise<IKPIData> {
-    const trintaDias = new Date();
-    trintaDias.setDate(trintaDias.getDate() + 30);
+    return getCachedOrFetch<IKPIData>('analytics:kpis', REDIS_TTL, async () => {
+      const trintaDias = new Date();
+      trintaDias.setDate(trintaDias.getDate() + 30);
 
     const TrabalhadorAfastamento = (await import('../models/TrabalhadorAfastamento.js')).default;
 
@@ -443,14 +471,16 @@ export class AnalyticsService {
       acidentesSusPeriodoAnterior,
       percentualAumentoAcidentesSus
     };
+    });
   }
 
   /**
    * Obtém dados para gráficos de acidentes
    */
   async obterDadosAcidentes() {
-    const seisMesesAtras = new Date();
-    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
+    return getCachedOrFetch('analytics:acidentes', REDIS_TTL, async () => {
+      const seisMesesAtras = new Date();
+      seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
 
     // Executa as agregações em paralelo
     const [porTipoAgg, porStatusAgg, ultimosMesesAgg] = await Promise.all([
@@ -529,15 +559,17 @@ export class AnalyticsService {
       porStatus,
       ultimosMeses,
     };
+    });
   }
 
   /**
    * Obtém próximas vacinações (vencidas ou próximas de vencer)
    */
   async obterProximasVacinacoes(dias: number = 30) {
-    const hoje = new Date();
-    const limite = new Date();
-    limite.setDate(limite.getDate() + dias);
+    return getCachedOrFetch(`analytics:vacinacoes:${dias}`, 180, async () => {
+      const hoje = new Date();
+      const limite = new Date();
+      limite.setDate(limite.getDate() + dias);
 
     const vacinacoes = await Vacinacao.find({
       proximoDose: { $lte: limite },
@@ -564,26 +596,30 @@ export class AnalyticsService {
         diasRestantes: diffDias,
       };
     });
+    });
   }
 
   /**
    * Obtém últimos acidentes registrados
    */
   async obterUltimosAcidentes(limit: number = 5): Promise<any[]> {
-    const acidentes = await Acidente.find()
-      .populate('trabalhadorId', 'nome cpf empresa unidade')
-      .sort({ dataAcidente: -1 })
-      .limit(limit)
-      .lean();
+    return getCachedOrFetch(`analytics:ultimos-acidentes:${limit}`, 180, async () => {
+      const acidentes = await Acidente.find()
+        .populate('trabalhadorId', 'nome cpf empresa unidade')
+        .sort({ dataAcidente: -1 })
+        .limit(limit)
+        .lean();
 
-    return acidentes;
+      return acidentes;
+    });
   }
 
   /**
    * Obtém dados completos para dashboard admin
    */
   async obterDadosDashboardAdmin(): Promise<any> {
-    const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg, afastadosPorTipoAgg] = await Promise.all([
+    return getCachedOrFetch('analytics:dashboard-admin', REDIS_TTL, async () => {
+      const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg, afastadosPorTipoAgg] = await Promise.all([
       this.obterKPIs(),
       this.obterDadosAcidentes(),
       this.obterProximasVacinacoes(30),
@@ -740,6 +776,7 @@ export class AnalyticsService {
         ultimosAcidentes,
       },
     };
+    });
   }
 
   /**
@@ -788,13 +825,8 @@ export class AnalyticsService {
    * Obtém dados detalhados de monitoramento clínico
    */
   async obterMonitoramentoClinico(): Promise<IMonitoramentoClinico> {
-    const cacheKey = 'monitoramento_clinico';
-    const cached = cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return cached.data;
-    }
-
-    const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    return getCachedOrFetch<IMonitoramentoClinico>('analytics:monitoramento', REDIS_TTL, async () => {
+      const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
     const [
       totalTrabalhadores,
@@ -1002,9 +1034,23 @@ export class AnalyticsService {
       alertasCriticos,
     };
 
-    cache.set(cacheKey, { data: result, timestamp: Date.now() });
-
     return result;
+    });
+  }
+
+  async invalidateAll(): Promise<void> {
+    const redis = getRedisClient();
+    if (!redis) return;
+
+    try {
+      const keys = await redis.keys('analytics:*');
+      if (keys.length > 0) {
+        await redis.del(...keys);
+        console.log(`[AnalyticsCache] ${keys.length} chaves de analytics invalidadas.`);
+      }
+    } catch (err: any) {
+      console.error('[AnalyticsCache] Erro ao invalidar cache:', err.message);
+    }
   }
 
   private async obterIdsTrabalhadoresSus(): Promise<string[]> {

@@ -8,6 +8,7 @@ dns.setDefaultResultOrder('ipv4first');
 import mongoose from 'mongoose';
 import app from './app.js';
 import config from './config/config.js';
+import { connectRedis, disconnectRedis } from './config/redis.js';
 
 
 const sanitizeMongoUri = (uri: string): string => {
@@ -20,7 +21,8 @@ const sanitizeMongoUri = (uri: string): string => {
 
 const PORT = config.port;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
+  await connectRedis();
   console.log(`
 ╔════════════════════════════════════════╗
 ║    SISPNAIST Backend Server Started    ║
@@ -30,6 +32,7 @@ const server = app.listen(PORT, () => {
 🗄️  Database: ${sanitizeMongoUri(config.mongodbUri)}
 🌍 Environment: ${config.nodeEnv}
 🔐 CORS enabled for: ${config.corsOrigin}
+💾 Redis: ${config.redisUrl ? 'Conectado' : 'Desabilitado (use REDIS_URL para ativar)'}
 
 API Documentation:
   POST   /api/auth/register    - Criar conta
@@ -45,6 +48,8 @@ async function gracefulShutdown(signal: string) {
   server.close(() => {
     console.log('✓ HTTP server closed');
   });
+  await disconnectRedis();
+  console.log('✓ Redis disconnected');
   await mongoose.disconnect();
   console.log('✓ MongoDB disconnected');
   process.exit(0);

@@ -19,3 +19,5 @@ services:
         value: 7d
       - key: CORS_ORIGIN
         value: https://sispnaist-1-0.vercel.app,http://localhost:3000
+      - key: REDIS_URL
+        sync: false

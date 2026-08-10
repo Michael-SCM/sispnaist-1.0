@@ -64,6 +64,7 @@ const config = {
   msSinanApiUrl: process.env.MS_SINAN_API_URL || '',
   msSinanToken: process.env.MS_SINAN_TOKEN || '',
   msSinanApiKey: process.env.MS_SINAN_API_KEY || '',
+  redisUrl: process.env.REDIS_URL || '',
 };
 
 export default config;
