@@ -74,7 +74,7 @@ export const NotificacoesDropdown: React.FC = () => {
       </button>
       {open && (
         <div
-          className="absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
+          className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50"
           role="menu"
           aria-label="Notificações"
         >

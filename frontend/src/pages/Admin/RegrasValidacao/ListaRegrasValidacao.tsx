@@ -123,7 +123,7 @@ const ListaRegrasValidacao: React.FC = () => {
               <Gavel size={28} className="text-amber-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Regras de Validação</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Regras de Validação</h1>
               <p className="text-slate-500 font-medium">Gerencie regras de validação configuráveis por localidade</p>
             </div>
           </div>

@@ -194,7 +194,7 @@ export const FormVideoAula: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
                 {isEditing ? 'Editar Vídeo Aula' : 'Nova Vídeo Aula'}
               </h1>
               <p className="text-slate-500 font-medium">Preencha as informações do material de capacitação</p>

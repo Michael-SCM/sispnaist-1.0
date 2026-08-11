@@ -196,7 +196,7 @@ export const NotificacoesSinan: React.FC = () => {
             <ArrowLeft size={24} />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Notificações (SINAN)</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Notificações (SINAN)</h1>
             <p className="text-slate-500 font-medium">
               Consulta de notificações de agravos no SINAN — Ministério da Saúde
             </p>
@@ -392,10 +392,10 @@ export const NotificacoesSinan: React.FC = () => {
           onClick={() => setNotificacaoModal(null)}
         >
           <div
-            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+            <div className="flex items-center justify-between px-4 md:px-8 py-4 md:py-6 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-red-50 text-red-600 rounded-xl">
                   <Activity size={22} />
@@ -413,7 +413,7 @@ export const NotificacoesSinan: React.FC = () => {
               </button>
             </div>
 
-            <div className="p-8 space-y-7">
+            <div className="p-4 md:p-8 space-y-7 overflow-y-auto flex-1">
               <div className="bg-slate-50/50 rounded-2xl p-5">
                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Tipo e Agravo</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -96,7 +96,7 @@ export const DetalhesVacinacao: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Detalhes da Vacinação</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Detalhes da Vacinação</h1>
               <p className="text-slate-500 font-medium">Protocolo: <span className="font-mono">{vacinacao._id}</span></p>
             </div>
           </div>
@@ -147,11 +147,11 @@ export const DetalhesVacinacao: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Informações da Vacinação */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <Syringe size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações da Vacinação</h2>
               </div>
-              <div className="p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
                 {vacinacao.unidadeSaude && (
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Unidade de Saúde</p>
@@ -176,11 +176,11 @@ export const DetalhesVacinacao: React.FC = () => {
             {/* Certificado */}
             {vacinacao.certificado && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <FileText size={20} className="text-emerald-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Certificado</h2>
                 </div>
-                <div className="p-8">
+                <div className="p-4 md:p-8">
                   <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{vacinacao.certificado}</p>
                 </div>
               </div>
@@ -191,11 +191,11 @@ export const DetalhesVacinacao: React.FC = () => {
           <div className="space-y-6">
             {/* Trabalhador */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <User size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Trabalhador</h2>
               </div>
-              <div className="p-8 space-y-4">
+              <div className="p-4 md:p-8 space-y-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nome Completo</p>
                   <p className="font-bold text-slate-900">{getTrabalhadorNome()}</p>

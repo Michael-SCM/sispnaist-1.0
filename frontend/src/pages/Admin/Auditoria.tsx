@@ -127,7 +127,7 @@ export const Auditoria: React.FC = () => {
                 <div className="p-2 bg-slate-900 text-white rounded-xl shadow-lg">
                   <Shield size={20} />
                 </div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight text-gradient">Auditoria do Sistema</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight text-gradient">Auditoria do Sistema</h1>
               </div>
               <p className="text-slate-500 font-medium ml-1">Rastreamento global de atividades e segurança.</p>
             </div>
@@ -144,7 +144,7 @@ export const Auditoria: React.FC = () => {
         {/* Filters */}
         <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-xl">
           <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-4 p-2">
-            <div className="flex-1 min-w-[280px]">
+            <div className="flex-1 min-w-0 md:min-w-[280px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Módulo / Entidade</label>
               <div className="relative">
                 <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -171,7 +171,7 @@ export const Auditoria: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex-1 min-w-[280px]">
+            <div className="flex-1 min-w-0 md:min-w-[280px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Usuário</label>
               <div className="relative">
                 <UserCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -185,7 +185,7 @@ export const Auditoria: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-0 md:min-w-[200px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Tipo de Ação</label>
               <select 
                 value={acao}
@@ -201,7 +201,7 @@ export const Auditoria: React.FC = () => {
               </select>
             </div>
 
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-0 md:min-w-[200px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Data Início</label>
               <input 
                 type="date"
@@ -211,7 +211,7 @@ export const Auditoria: React.FC = () => {
               />
             </div>
 
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-0 md:min-w-[200px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Data Fim</label>
               <input 
                 type="date"

@@ -134,7 +134,7 @@ const ListaUnidades: React.FC = () => {
               <Home size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Unidades</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Unidades</h1>
               <p className="text-slate-500 font-medium">Gestão de locais físicos e departamentos</p>
             </div>
           </div>

@@ -365,7 +365,7 @@ export const FormInformacoes: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               {isEdicao ? 'Editar Informações' : 'Novas Informações'}
             </h1>
             {trabalhador && (

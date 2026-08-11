@@ -110,7 +110,7 @@ export const ListaDoencas: React.FC = () => {
               <HeartPulse size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Doenças Ocupacionais</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Doenças Ocupacionais</h1>
               <p className="text-slate-500 font-medium">Gestão de diagnósticos e monitoramento de saúde</p>
             </div>
           </div>
@@ -248,8 +248,8 @@ export const ListaDoencas: React.FC = () => {
         )}
 
         {/* List Content */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-x-auto">
+          <div className="min-w-[500px]">
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>

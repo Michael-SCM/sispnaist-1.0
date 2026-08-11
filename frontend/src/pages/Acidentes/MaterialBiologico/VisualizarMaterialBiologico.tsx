@@ -106,7 +106,7 @@ export const VisualizarMaterialBiologico: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Ficha Técnica</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Ficha Técnica</h1>
               <p className="text-slate-500 font-medium">Detalhes da exposição biológica</p>
             </div>
           </div>
@@ -130,11 +130,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
         {/* Worker Info Card */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
             <User size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Trabalhador</h2>
           </div>
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-emerald-100 text-emerald-700 rounded-2xl">
                 <User size={28} />
@@ -156,11 +156,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
         {/* Acidente Info Card */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
             <AlertTriangle size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Acidente de Origem</h2>
           </div>
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Data do Acidente</p>
@@ -188,11 +188,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
         {/* Exposicao Data Card */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
             <Shield size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da Exposição</h2>
           </div>
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Tipo de Exposição</p>
               <p className="text-lg font-bold text-slate-700">{ficha.tipoExposicao || 'N/A'}</p>
@@ -220,11 +220,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
         {/* Sorologia Card */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
             <Activity size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Sorologia e Conduta</h2>
           </div>
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Sorologia Paciente</p>
               <p className="text-lg font-bold text-slate-700">{ficha.sorologiaPaciente || 'N/A'}</p>
@@ -246,11 +246,11 @@ export const VisualizarMaterialBiologico: React.FC = () => {
 
         {/* Acompanhamento Card */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
             <Stethoscope size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Acompanhamento</h2>
           </div>
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Acompanhamento PrEP</p>
               <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold ${ficha.acompanhamentoPrEP ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>

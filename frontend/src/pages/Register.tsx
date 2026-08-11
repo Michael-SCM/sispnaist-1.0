@@ -165,8 +165,8 @@ export const Register: React.FC = () => {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-100">
       <DocumentTitle title="Cadastro" />
-      <div className="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">SISPNAIST</h1>
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-8 w-full max-w-md">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6 text-blue-600">SISPNAIST</h1>
 
         <form
           onSubmit={handleSubmit}

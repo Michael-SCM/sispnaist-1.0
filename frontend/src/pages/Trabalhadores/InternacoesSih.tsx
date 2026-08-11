@@ -207,7 +207,7 @@ export const InternacoesSih: React.FC = () => {
             <ArrowLeft size={24} />
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Internações (SIH)</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Internações (SIH)</h1>
             <p className="text-slate-500 font-medium">
               Consulta de internações hospitalares no SIH — Ministério da Saúde
             </p>
@@ -411,11 +411,11 @@ export const InternacoesSih: React.FC = () => {
           onClick={() => setInternacaoModal(null)}
         >
           <div
-            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto animate-in zoom-in-95 duration-200"
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100">
+            <div className="flex items-center justify-between px-4 md:px-8 py-4 md:py-6 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
                   <Hospital size={22} />
@@ -434,7 +434,7 @@ export const InternacoesSih: React.FC = () => {
             </div>
 
             {/* Body */}
-            <div className="p-8 space-y-7">
+            <div className="p-4 md:p-8 space-y-7 overflow-y-auto flex-1">
               {/* Hospital */}
               <div className="bg-slate-50/50 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">

@@ -160,7 +160,7 @@ export const EditarDoenca: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Editar Doença</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Editar Doença</h1>
             <p className="text-slate-500 font-medium">Atualização de acompanhamento clínico</p>
           </div>
         </div>
@@ -171,11 +171,11 @@ export const EditarDoenca: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               {/* Diagnóstico */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Stethoscope size={20} className="text-rose-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados do Diagnóstico</h2>
                 </div>
-                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
                       <Fingerprint size={14} /> Trabalhador (CPF)
@@ -222,11 +222,11 @@ export const EditarDoenca: React.FC = () => {
 
               {/* Relato Clínico */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <FileText size={20} className="text-rose-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Evolução Clínica</h2>
                 </div>
-                <div className="p-8">
+                <div className="p-4 md:p-8">
                   <textarea
                     name="relatoClinico"
                     value={formData.relatoClinico}
@@ -242,11 +242,11 @@ export const EditarDoenca: React.FC = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Info size={20} className="text-rose-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Status</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Profissional Responsável</label>
                     <div className="relative">

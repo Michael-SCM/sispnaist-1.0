@@ -134,7 +134,7 @@ export const ListaVideoAulas: React.FC = () => {
               <Video size={36} className="text-blue-200" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Capacitação & Treinamento</h1>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">Capacitação & Treinamento</h1>
               <p className="text-blue-200 font-medium opacity-90">Plataforma de vídeo aulas interativas</p>
             </div>
           </div>

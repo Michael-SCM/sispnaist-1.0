@@ -109,7 +109,7 @@ export const ListaVacinacoes: React.FC = () => {
               <Syringe size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Vacinações</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Vacinações</h1>
               <p className="text-slate-500 font-medium">Controle de imunização e doses preventivas</p>
             </div>
           </div>
@@ -226,8 +226,8 @@ export const ListaVacinacoes: React.FC = () => {
         )}
 
         {/* List Content */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-x-auto">
+          <div className="min-w-[500px]">
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 border-b border-slate-100">
                 <tr>

@@ -138,7 +138,7 @@ export const ListaMaterialBiologico: React.FC = () => {
               <Dna size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Material Biológico</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Material Biológico</h1>
               <p className="text-slate-500 font-medium">Acompanhamento de acidentes com risco biológico</p>
             </div>
           </div>

@@ -375,7 +375,7 @@ export const NovoAcidente: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Novo Acidente</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Novo Acidente</h1>
             <p className="text-slate-500 font-medium">Registre uma nova ocorrência de trabalho</p>
           </div>
         </div>
@@ -386,11 +386,11 @@ export const NovoAcidente: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
               {/* Identificação do Trabalhador */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <User size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Identificação do Trabalhador</h2>
                 </div>
-                <div className="p-8 space-y-4">
+                <div className="p-4 md:p-8 space-y-4">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">CPF do Trabalhador <span className="text-red-500">*</span></label>
                     <input
@@ -426,11 +426,11 @@ export const NovoAcidente: React.FC = () => {
 
               {/* Dados da Ocorrência */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <AlertTriangle size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da Ocorrência</h2>
                 </div>
-                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Data do Acidente <span className="text-red-500">*</span></label>
                     <input
@@ -564,11 +564,11 @@ export const NovoAcidente: React.FC = () => {
 
               {/* Local e Lesões */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <MapPin size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Local & Consequências</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-bold text-slate-600 mb-2">Local do Acidente <span className="text-red-500">*</span></label>
@@ -609,11 +609,11 @@ export const NovoAcidente: React.FC = () => {
 
               {/* Atendimento Médico */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Stethoscope size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Atendimento Médico</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -695,11 +695,11 @@ export const NovoAcidente: React.FC = () => {
 
               {/* Dados da CAT / e-Social (S-2210) */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <ShieldAlert size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da CAT / e-Social (S-2210)</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
@@ -792,11 +792,11 @@ export const NovoAcidente: React.FC = () => {
 
               {/* Outros Campos */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <ShieldAlert size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações Adicionais</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <label className="flex items-center gap-3 cursor-pointer group p-3 bg-blue-50 rounded-xl">
                       <input
@@ -869,11 +869,11 @@ export const NovoAcidente: React.FC = () => {
             {/* Sidebar */}
             <div className="space-y-6">
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Info size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Status & Comunicação</h2>
                 </div>
-                <div className="p-8 space-y-6">
+                <div className="p-4 md:p-8 space-y-6">
                   <div>
                     <label className="block text-sm font-bold text-slate-600 mb-2">Status Inicial</label>
                     <select

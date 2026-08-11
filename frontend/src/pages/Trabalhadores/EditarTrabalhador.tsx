@@ -456,7 +456,7 @@ export const EditarTrabalhador: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Editar Trabalhador</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Editar Trabalhador</h1>
             <p className="text-slate-500 font-medium">Atualize as informações do funcionário no sistema</p>
           </div>
         </div>

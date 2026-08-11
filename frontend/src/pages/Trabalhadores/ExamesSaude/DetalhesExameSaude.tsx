@@ -77,7 +77,7 @@ export const DetalhesExameSaude: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{tipoAsoLabel[exame.tipoAso] || exame.tipoAso}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{tipoAsoLabel[exame.tipoAso] || exame.tipoAso}</h1>
               <p className="text-slate-500 font-medium">
                 ASO {exame.numeroAso ? `#${exame.numeroAso}` : ''}
                 {exame.dataAso && ` — ${new Date(exame.dataAso).toLocaleDateString('pt-BR')}`}

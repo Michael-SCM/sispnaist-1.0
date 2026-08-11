@@ -8,7 +8,7 @@ export const PoliticaPrivacidade: React.FC = () => {
       <DocumentTitle title="Política de Privacidade" />
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <Link to="/register" className="text-blue-600 hover:text-blue-700 text-sm font-medium">&larr; Voltar</Link>
-        <h1 className="text-3xl font-bold text-slate-900 mt-4 mb-6">Política de Privacidade</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mt-4 mb-6">Política de Privacidade</h1>
 
         <div className="prose prose-slate max-w-none space-y-4 text-sm text-slate-600">
           <p><strong>Última atualização:</strong> Junho de 2026 | <strong>Versão:</strong> 1.0</p>

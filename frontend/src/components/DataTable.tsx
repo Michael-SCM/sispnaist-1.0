@@ -129,7 +129,7 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
                             e.stopPropagation();
                             action.onClick(row);
                           }}
-                          className={`px-2 py-1 rounded text-xs font-medium transition ${
+                          className={`px-3 py-1.5 rounded text-xs font-medium transition min-h-[36px] ${
                             action.variant === 'danger'
                               ? 'bg-red-100 text-red-700 hover:bg-red-200'
                               : action.variant === 'secondary'
@@ -178,7 +178,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
   );
 
   return (
-    <nav className="flex items-center gap-2 mt-4" aria-label="Navegação de páginas">
+    <nav className="flex flex-wrap items-center gap-2 mt-4" aria-label="Navegação de páginas">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
@@ -188,7 +188,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
         Anterior
       </button>
 
-      <div className="flex gap-1" role="list" aria-label="Números de página">
+      <div className="flex gap-1 flex-wrap" role="list" aria-label="Números de página">
         {visiblePages[0] > 1 && (
           <>
             <button
@@ -244,7 +244,7 @@ export const Pagination: React.FC<PaginationProps> = React.memo(({
         Próxima
       </button>
 
-      <span className="text-sm text-gray-600 ml-4" aria-live="polite" aria-atomic="true">
+      <span className="text-sm text-gray-600 ml-4 hidden sm:inline" aria-live="polite" aria-atomic="true">
         Página {currentPage} de {totalPages}
       </span>
     </nav>

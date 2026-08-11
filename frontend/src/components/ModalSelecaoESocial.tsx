@@ -32,7 +32,7 @@ export function ModalSelecaoESocial<T>({
         className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-r from-amber-600 to-orange-700 p-5 text-white relative shrink-0">
+        <div className="bg-gradient-to-r from-amber-600 to-orange-700 p-4 md:p-5 text-white relative shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors"

@@ -107,7 +107,7 @@ export const ListaTrabalhadores: React.FC = () => {
               <Users size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Trabalhadores</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Trabalhadores</h1>
               <p className="text-slate-500 font-medium">Gestão de funcionários e registros laborais</p>
             </div>
           </div>

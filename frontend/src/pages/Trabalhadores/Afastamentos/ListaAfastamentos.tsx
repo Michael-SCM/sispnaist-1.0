@@ -76,7 +76,7 @@ export const ListaAfastamentos: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Afastamentos</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Afastamentos</h1>
               {trabalhador && (
                 <p className="text-slate-500 font-medium">
                   Trabalhador: <span className="text-slate-900 font-bold">{trabalhador.nome}</span>

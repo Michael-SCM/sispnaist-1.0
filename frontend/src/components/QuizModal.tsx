@@ -86,7 +86,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questoes, totalQuestoes, o
         onClick={(e) => e.stopPropagation()}
       >
         {/* Fixed Header */}
-        <div className="bg-gradient-to-r from-amber-600 to-orange-700 p-5 text-white relative shrink-0">
+        <div className="bg-gradient-to-r from-amber-600 to-orange-700 p-4 md:p-5 text-white relative shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors"
@@ -109,7 +109,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questoes, totalQuestoes, o
         <div className="flex-1 overflow-y-auto">
           {/* Intro Step */}
           {passo === 'intro' && (
-            <div className="p-6 space-y-5">
+            <div className="p-4 md:p-6 space-y-5">
               <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
                 <h3 className="font-bold text-amber-900 mb-3">Instruções</h3>
                 <ul className="space-y-2 text-amber-700 text-sm">
@@ -142,7 +142,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questoes, totalQuestoes, o
 
           {/* Quiz Step */}
           {passo === 'quiz' && (
-            <div className="p-6 space-y-5">
+            <div className="p-4 md:p-6 space-y-5">
               {/* Progress + Question numbers */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questoes, totalQuestoes, o
                     <button
                       key={index}
                       onClick={() => irParaQuestao(index)}
-                      className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                      className={`w-9 h-9 rounded-lg text-xs font-bold transition-all ${
                         index === questaoAtual
                           ? 'bg-amber-500 text-white shadow-md'
                           : respostas[index] >= 0
@@ -245,7 +245,7 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questoes, totalQuestoes, o
 
           {/* Result Step */}
           {passo === 'resultado' && resultado && (
-            <div className="p-6 space-y-5">
+            <div className="p-4 md:p-6 space-y-5">
               {/* Score Summary */}
               <div className={`rounded-2xl p-6 text-center border-2 ${
                 resultado.aprovado

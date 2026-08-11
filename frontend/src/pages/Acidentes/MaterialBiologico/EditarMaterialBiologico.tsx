@@ -128,7 +128,7 @@ export const EditarMaterialBiologico: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Editar Ficha Técnica</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Editar Ficha Técnica</h1>
             <p className="text-slate-500 font-medium">Atualização de dados clínicos de exposição biológica</p>
           </div>
         </div>
@@ -136,11 +136,11 @@ export const EditarMaterialBiologico: React.FC = () => {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <section className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
                 <AlertTriangle size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Acidente de Origem</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 <label className="block text-sm font-bold text-slate-600 mb-2">Acidente Vinculado <span className="text-red-500">*</span></label>
                 <select name="acidenteId" value={getAcidenteIdValue()} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-emerald-700">
                   <option value="">Selecione um acidente...</option>
@@ -154,11 +154,11 @@ export const EditarMaterialBiologico: React.FC = () => {
             </section>
 
             <section className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
                 <Shield size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da Exposição</h2>
               </div>
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-sm font-bold text-slate-600">Tipo de Exposição <span className="text-red-500">*</span></label>
                   <select name="tipoExposicao" value={formData.tipoExposicao} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
@@ -191,11 +191,11 @@ export const EditarMaterialBiologico: React.FC = () => {
             </section>
 
             <section className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
                 <Activity size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Sorologia e Conduta</h2>
               </div>
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2"><label className="text-sm font-bold text-slate-600">Sorologia Paciente <span className="text-red-500">*</span></label>
                   <select name="sorologiaPaciente" value={formData.sorologiaPaciente} onChange={handleChange} className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                     <option value="">Selecione...</option>
@@ -214,11 +214,11 @@ export const EditarMaterialBiologico: React.FC = () => {
 
           <div className="space-y-6">
             <section className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-50/50 border-b border-emerald-100 flex items-center gap-2">
                 <Stethoscope size={20} className="text-emerald-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Acompanhamento</h2>
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-4 md:p-8 space-y-6">
                 <div className="flex items-center gap-3">
                   <input type="checkbox" name="acompanhamentoPrEP" checked={formData.acompanhamentoPrEP} onChange={handleChange} className="w-5 h-5 text-emerald-600 rounded-lg" />
                   <label className="text-sm font-bold text-slate-600">Acompanhamento PrEP?</label>

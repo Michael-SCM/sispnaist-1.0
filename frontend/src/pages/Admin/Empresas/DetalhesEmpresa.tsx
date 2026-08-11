@@ -69,7 +69,7 @@ export const DetalhesEmpresa: React.FC = () => {
             </button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{empresa.razaoSocial}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{empresa.razaoSocial}</h1>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${empresa.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
                   {empresa.ativo ? 'Ativa' : 'Inativa'}
                 </span>

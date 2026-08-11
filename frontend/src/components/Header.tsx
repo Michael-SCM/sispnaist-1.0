@@ -393,7 +393,7 @@ export const Header: React.FC = React.memo(() => {
           >
             <Link
               to="/video-aulas"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isActive('/video-aulas') ? 'page' : undefined}
             >
@@ -401,7 +401,7 @@ export const Header: React.FC = React.memo(() => {
             </Link>
             <Link
               to="/transparencia"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isActive('/transparencia') ? 'page' : undefined}
             >
@@ -409,7 +409,7 @@ export const Header: React.FC = React.memo(() => {
             </Link>
             <Link
               to="/meus-certificados"
-              className="block w-full max-w-full py-2 hover:text-amber-200 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              className="block w-full max-w-full py-3 hover:text-amber-200 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isActive('/meus-certificados') ? 'page' : undefined}
             >
@@ -418,7 +418,7 @@ export const Header: React.FC = React.memo(() => {
             {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
               <Link
                 to="/dashboard"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive('/dashboard') ? 'page' : undefined}
               >
@@ -428,7 +428,7 @@ export const Header: React.FC = React.memo(() => {
             {(user?.perfil === 'admin' || user?.perfil === 'gestor') && (
               <Link
                 to="/monitoramento"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive('/monitoramento') ? 'page' : undefined}
               >
@@ -447,7 +447,7 @@ export const Header: React.FC = React.memo(() => {
               </Link>
               <Link
                 to="/acidentes"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive('/acidentes') ? 'page' : undefined}
               >
@@ -455,7 +455,7 @@ export const Header: React.FC = React.memo(() => {
               </Link>
               <Link
                 to="/doencas"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive('/doencas') ? 'page' : undefined}
               >
@@ -463,7 +463,7 @@ export const Header: React.FC = React.memo(() => {
               </Link>
               <Link
                 to="/vacinacoes"
-                className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-current={isActive('/vacinacoes') ? 'page' : undefined}
               >
@@ -472,7 +472,7 @@ export const Header: React.FC = React.memo(() => {
               {user?.perfil !== 'trabalhador' && (
                 <Link
                   to="/atos-municipais"
-                  className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/atos-municipais') ? 'page' : undefined}
                 >
@@ -483,7 +483,7 @@ export const Header: React.FC = React.memo(() => {
 
             <Link
               to="/minha-conta"
-              className="block w-full max-w-full py-2 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
+              className="block w-full max-w-full py-3 hover:text-blue-100 transition overflow-hidden text-ellipsis whitespace-nowrap"
               onClick={() => setMobileMenuOpen(false)}
               aria-current={isActive('/minha-conta') ? 'page' : undefined}
             >
@@ -495,7 +495,7 @@ export const Header: React.FC = React.memo(() => {
                 <p className="text-xs text-amber-300 uppercase tracking-wider px-1 pb-1 font-semibold">Administração</p>
                 <Link
                   to="/admin/empresas"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/empresas') ? 'page' : undefined}
                 >
@@ -503,7 +503,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/unidades"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/unidades') ? 'page' : undefined}
                 >
@@ -511,7 +511,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/usuarios"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/usuarios') ? 'page' : undefined}
                 >
@@ -519,7 +519,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/auditoria"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/auditoria') ? 'page' : undefined}
                 >
@@ -527,7 +527,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/parametros-uf"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/parametros-uf') ? 'page' : undefined}
                 >
@@ -535,7 +535,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/indicadores"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/indicadores') ? 'page' : undefined}
                 >
@@ -543,7 +543,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/regras-validacao"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/regras-validacao') ? 'page' : undefined}
                 >
@@ -551,7 +551,7 @@ export const Header: React.FC = React.memo(() => {
                 </Link>
                 <Link
                   to="/admin/habilitacao-pnaist"
-                  className="block w-full max-w-full py-2 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+                  className="block w-full max-w-full py-3 hover:text-amber-200 transition font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-current={isActive('/admin/habilitacao-pnaist') ? 'page' : undefined}
                 >
@@ -560,13 +560,13 @@ export const Header: React.FC = React.memo(() => {
               </div>
             )}
             <div className="pt-4 border-t border-blue-500">
-              <div className="py-2 text-sm" aria-label={`Usuário: ${user?.nome ?? ''}`}>{user?.nome ?? ''}</div>
+              <div className="py-3 text-sm" aria-label={`Usuário: ${user?.nome ?? ''}`}>{user?.nome ?? ''}</div>
               <button
                 onClick={() => {
                   handleLogout();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg transition text-left"
+                className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 rounded-lg transition text-left"
                 aria-label="Sair do sistema"
               >
                 Sair

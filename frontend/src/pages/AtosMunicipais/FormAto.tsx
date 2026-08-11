@@ -98,7 +98,7 @@ const FormAto: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               {isEditing ? 'Editar Ato Municipal' : 'Novo Ato Municipal'}
             </h1>
             <p className="text-slate-500 font-medium">Preencha as informações legais do marco regulatório</p>

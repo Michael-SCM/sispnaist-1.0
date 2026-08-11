@@ -97,13 +97,13 @@ const HabilitacaoPnaist: React.FC = () => {
         <div className="flex items-center gap-4">
           <ShieldCheck size={28} className="text-emerald-600" />
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Habilitação PNAIST</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Habilitação PNAIST</h1>
             <p className="text-slate-500 font-medium">Gerencie quais municípios estão habilitados para a Política Nacional de Saúde do Trabalhador do SUS</p>
           </div>
         </div>
 
         {!loading && (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl border border-slate-200 p-5">
               <p className="text-sm text-slate-500 font-medium">Total de Municípios</p>
               <p className="text-3xl font-black text-slate-900">{stats.total}</p>

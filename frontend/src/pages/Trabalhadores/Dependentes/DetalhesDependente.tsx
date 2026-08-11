@@ -71,7 +71,7 @@ export const DetalhesDependente: React.FC = () => {
               <ArrowLeft size={24} />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Detalhes do Dependente</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Detalhes do Dependente</h1>
               <p className="text-slate-500 font-medium">{d.nome}</p>
             </div>
           </div>

@@ -65,7 +65,7 @@ export const ForgotPassword: React.FC = () => {
       <DocumentTitle title="Recuperar Senha" />
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-600 mb-2">Esqueceu a senha?</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">Esqueceu a senha?</h2>
           <p className="text-slate-500 font-medium">Informe seus dados para recuperar o acesso</p>
         </div>
 

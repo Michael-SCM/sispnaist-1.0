@@ -62,7 +62,7 @@ export const MeusCertificados: React.FC = () => {
               <Award size={36} className="text-amber-200" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-white mb-1">Meus Certificados</h1>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-1">Meus Certificados</h1>
               <p className="text-amber-200 font-medium opacity-90">
                 {certificados.length} certificado{certificados.length !== 1 ? 's' : ''} emitido{certificados.length !== 1 ? 's' : ''}
               </p>

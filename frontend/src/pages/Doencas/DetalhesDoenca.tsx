@@ -98,7 +98,7 @@ export const DetalhesDoenca: React.FC = () => {
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Detalhes da Doença</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Detalhes da Doença</h1>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                   doenca.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
                 }`}>
@@ -145,7 +145,7 @@ export const DetalhesDoenca: React.FC = () => {
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nome da Doença</p>
-              <p className="text-xl font-bold text-slate-900 truncate max-w-[150px]">{doenca.nomeDoenca}</p>
+              <p className="text-xl font-bold text-slate-900 break-words">{doenca.nomeDoenca}</p>
             </div>
           </div>
         </div>
@@ -155,11 +155,11 @@ export const DetalhesDoenca: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Relato Clínico */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <FileText size={20} className="text-rose-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Relato Clínico</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-wrap">
                   {doenca.relatoClinico || 'Nenhum relato clínico registrado.'}
                 </p>
@@ -168,11 +168,11 @@ export const DetalhesDoenca: React.FC = () => {
 
             {/* Informações da Doença */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <HeartPulse size={20} className="text-rose-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações da Doença</h2>
               </div>
-              <div className="p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
                 {doenca.profissionalSaude && (
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Profissional de Saúde</p>
@@ -203,11 +203,11 @@ export const DetalhesDoenca: React.FC = () => {
           <div className="space-y-6">
             {/* Trabalhador */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <User size={20} className="text-rose-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Trabalhador</h2>
               </div>
-              <div className="p-8 space-y-4">
+              <div className="p-4 md:p-8 space-y-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nome Completo</p>
                   <p className="font-bold text-slate-900">{getTrabalhadorNome()}</p>
@@ -221,11 +221,11 @@ export const DetalhesDoenca: React.FC = () => {
 
             {/* Status */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <AlertCircle size={20} className="text-rose-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Status</h2>
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-4 md:p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-slate-600">Situação</span>
                   <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase ${doenca.ativo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>

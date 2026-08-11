@@ -87,7 +87,7 @@ const ListaAtos: React.FC = () => {
               <Gavel size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Atos Municipais</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Atos Municipais</h1>
               <p className="text-slate-500 font-medium">Legislação e marcos regulatórios de inovação</p>
             </div>
           </div>
@@ -103,7 +103,7 @@ const ListaAtos: React.FC = () => {
         {/* Filters */}
         <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-xl">
           <form onSubmit={handleSearch} className="flex flex-wrap items-end gap-4 p-2">
-            <div className="flex-1 min-w-[240px]">
+            <div className="flex-1 min-w-0 md:min-w-[240px]">
               <label className="block text-sm font-bold text-slate-600 mb-2 pl-1">Cidade</label>
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />

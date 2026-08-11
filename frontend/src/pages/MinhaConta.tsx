@@ -179,18 +179,18 @@ export const MinhaConta: React.FC = () => {
             <User size={28} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Minha Conta</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Minha Conta</h1>
             <p className="text-slate-500 font-medium">{user?.email}</p>
           </div>
         </div>
 
         {/* Segurança e Senha */}
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
             <ShieldCheck size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Segurança e Senha</h2>
           </div>
-          <div className="p-8 space-y-6">
+          <div className="p-4 md:p-8 space-y-6">
             {/* Autenticação de dois fatores */}
             <div className="rounded-2xl border border-slate-100 p-5 bg-slate-50/50 space-y-4">
               <div className="flex items-center justify-between gap-4">
@@ -391,11 +391,11 @@ export const MinhaConta: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
             <CheckCircle size={20} className="text-emerald-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Consentimento LGPD</h2>
           </div>
-          <div className="p-8 space-y-4">
+          <div className="p-4 md:p-8 space-y-4">
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
               <div>
                 <p className="text-sm font-bold text-slate-700">Consentimento para tratamento de dados</p>
@@ -413,11 +413,11 @@ export const MinhaConta: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
             <Download size={20} className="text-blue-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Exportar Dados</h2>
           </div>
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             <p className="text-sm text-slate-600 mb-4">
               Baixe todos os seus dados cadastrais em formato PDF. Este arquivo contém todas as informações que o sistema possui sobre você.
             </p>
@@ -433,11 +433,11 @@ export const MinhaConta: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-3xl border border-red-100 shadow-xl overflow-hidden">
-          <div className="px-8 py-5 bg-red-50/50 border-b border-red-100 flex items-center gap-2">
+          <div className="px-4 md:px-8 py-4 md:py-5 bg-red-50/50 border-b border-red-100 flex items-center gap-2">
             <AlertTriangle size={20} className="text-red-600" />
             <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Excluir Conta</h2>
           </div>
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             <p className="text-sm text-slate-600 mb-4">
               Solicite a anonimização dos seus dados. Seus dados cadastrais serão removidos permanentemente. Esta ação não pode ser desfeita.
             </p>

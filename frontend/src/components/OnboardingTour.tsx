@@ -88,11 +88,11 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onClose }) => {
       aria-label="Tour guiado de capacitação"
     >
       <div
-        className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-300"
+        className="bg-white rounded-3xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with gradient */}
-        <div className={`bg-gradient-to-r ${passo.cor} p-8 text-white relative`}>
+        <div className={`bg-gradient-to-r ${passo.cor} p-4 md:p-8 text-white relative shrink-0`}>
           <button
             onClick={handleFechar}
             className="absolute top-4 right-4 p-1.5 bg-white/20 hover:bg-white/30 rounded-xl transition-colors"
@@ -131,7 +131,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({ onClose }) => {
         </div>
 
         {/* Body */}
-        <div className="p-8">
+        <div className="p-4 md:p-8 overflow-y-auto flex-1">
           <p className="text-slate-600 leading-relaxed text-lg">
             {passo.descricao}
           </p>

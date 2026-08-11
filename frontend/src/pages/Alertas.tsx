@@ -344,7 +344,7 @@ const Alertas: React.FC = () => {
 
         {/* Filtros */}
         <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-wrap gap-4 items-end">
-          <div className="flex flex-col gap-1 min-w-[180px]">
+          <div className="flex flex-col gap-1 min-w-0 md:min-w-[180px]">
             <label className="text-xs font-semibold text-slate-500 uppercase">Tipo</label>
             <select
               value={filtroTipo}
@@ -357,7 +357,7 @@ const Alertas: React.FC = () => {
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1 min-w-[150px]">
+          <div className="flex flex-col gap-1 min-w-0 md:min-w-[150px]">
             <label className="text-xs font-semibold text-slate-500 uppercase">Status</label>
             <select
               value={filtroStatus}
@@ -370,7 +370,7 @@ const Alertas: React.FC = () => {
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1 min-w-[150px]">
+          <div className="flex flex-col gap-1 min-w-0 md:min-w-[150px]">
             <label className="text-xs font-semibold text-slate-500 uppercase">Nível</label>
             <select
               value={filtroNivel}
@@ -526,7 +526,7 @@ const Alertas: React.FC = () => {
       {regrasModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="fixed inset-0 bg-black/40" onClick={() => setRegrasModal(false)} aria-hidden="true" />
-          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg p-4 md:p-8 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-slate-800 mb-6">
               {regraEdicao ? 'Editar Regra' : 'Nova Regra'}
             </h3>
@@ -540,7 +540,7 @@ const Alertas: React.FC = () => {
                   placeholder="Ex.: Pico de acidentes"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Tipo</label>
                   <select
@@ -566,7 +566,7 @@ const Alertas: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Parâmetro</label>
                   <select
@@ -601,7 +601,7 @@ const Alertas: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-500 uppercase block mb-1">Janela (dias)</label>
                   <input

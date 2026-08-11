@@ -4,11 +4,18 @@
 @tailwind utilities;
 
 /* Global Styles */
-html, body, #root {
+html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
 }
 
 /* Focus indicator for all interactive elements */

@@ -116,7 +116,7 @@ export const DetalhesAcidente: React.FC = () => {
             </button>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Detalhes do Acidente</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Detalhes do Acidente</h1>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                   acidente.status === 'Aberto' ? 'bg-amber-100 text-amber-700' :
                   acidente.status === 'Em Análise' ? 'bg-blue-100 text-blue-700' :
@@ -166,7 +166,7 @@ export const DetalhesAcidente: React.FC = () => {
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-slate-400">Localização</p>
-              <p className="text-xl font-bold text-slate-900 truncate max-w-[150px]">{acidente.local || 'Não informado'}</p>
+              <p className="text-xl font-bold text-slate-900 break-words">{acidente.local || 'Não informado'}</p>
             </div>
           </div>
         </div>
@@ -176,11 +176,11 @@ export const DetalhesAcidente: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Ocorrência */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <FileText size={20} className="text-amber-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Relato do Acidente</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 <p className="text-slate-600 leading-relaxed text-lg whitespace-pre-wrap">
                   {acidente.descricao}
                 </p>
@@ -189,11 +189,11 @@ export const DetalhesAcidente: React.FC = () => {
 
             {/* Informações do Acidente */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <AlertTriangle size={20} className="text-amber-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações do Acidente</h2>
               </div>
-              <div className="p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 gap-6">
                 {acidente.dataNotificacao && (
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data da Notificação</p>
@@ -226,7 +226,7 @@ export const DetalhesAcidente: React.FC = () => {
                 )}
               </div>
               {acidente.descricaoTrauma && (
-                <div className="px-8 pb-8">
+                <div className="px-4 md:px-8 pb-4 md:pb-8">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Descrição do Trauma</p>
                   <p className="text-slate-600 leading-relaxed bg-slate-50 rounded-xl p-4">{acidente.descricaoTrauma}</p>
                 </div>
@@ -236,11 +236,11 @@ export const DetalhesAcidente: React.FC = () => {
             {/* Atendimento Médico */}
             {acidente.atendimentoMedico && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Info size={20} className="text-blue-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Atendimento Médico</h2>
                 </div>
-                <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                   {acidente.dataAtendimento && (
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data do Atendimento</p>
@@ -261,7 +261,7 @@ export const DetalhesAcidente: React.FC = () => {
                   )}
                 </div>
                 {acidente.internamento && (
-                  <div className="px-8 pb-8">
+                  <div className="px-4 md:px-8 pb-4 md:pb-8">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-xl text-sm font-bold border border-orange-100">
                       Internamento: {acidente.duracaoInternamento ? `${acidente.duracaoInternamento} horas` : 'Sim'}
                     </div>
@@ -273,11 +273,11 @@ export const DetalhesAcidente: React.FC = () => {
             {/* Dados da CAT / e-Social (S-2210) */}
             {acidente.catNas && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-red-50 border-b border-red-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-red-50 border-b border-red-100 flex items-center gap-2">
                   <ShieldAlert size={20} className="text-red-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados da CAT / e-Social (S-2210)</h2>
                 </div>
-                <div className="p-8">
+                <div className="p-4 md:p-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {acidente.catNumero && (
                       <div>
@@ -323,11 +323,11 @@ export const DetalhesAcidente: React.FC = () => {
             {/* Informações Adicionais */}
             {(acidente.registroPolicial || acidente.encaminhamentoJuntaMedica || acidente.afastamento || acidente.outrosTrabalhadoresAtingidos) && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <ShieldAlert size={20} className="text-amber-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Informações Adicionais</h2>
                 </div>
-                <div className="p-8">
+                <div className="p-4 md:p-8">
                   <div className="flex flex-wrap gap-3">
                     {acidente.registroPolicial && (
                       <span className="px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-bold border border-blue-100">Registro Policial</span>
@@ -350,11 +350,11 @@ export const DetalhesAcidente: React.FC = () => {
 
             {/* Lesões */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <AlertTriangle size={20} className="text-amber-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Lesões Identificadas</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 {acidente.lesoes && acidente.lesoes.length > 0 ? (
                   <div className="flex flex-wrap gap-3">
                     {acidente.lesoes.map((lesao, index) => (
@@ -374,7 +374,7 @@ export const DetalhesAcidente: React.FC = () => {
             {/* Card de Material Biológico (Integrado) */}
             {acidente.tipoAcidente === 'Acidente com Material Biológico' && (
               <div className="bg-white rounded-3xl border border-emerald-100 shadow-xl overflow-hidden animate-in zoom-in-95 duration-300">
-                <div className="px-8 py-5 bg-emerald-600 border-b border-emerald-500 flex items-center justify-between text-white">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-emerald-600 border-b border-emerald-500 flex items-center justify-between text-white">
                   <div className="flex items-center gap-2">
                     <Dna size={20} />
                     <h2 className="font-bold uppercase text-sm tracking-wider">Dados Clínicos de Exposição</h2>
@@ -410,7 +410,7 @@ export const DetalhesAcidente: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="p-8">
+                <div className="p-4 md:p-8">
                   {isLoadingFicha ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="animate-spin text-emerald-600" />
@@ -478,11 +478,11 @@ export const DetalhesAcidente: React.FC = () => {
           <div className="space-y-6">
             {/* Trabalhador */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <User size={20} className="text-amber-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Trabalhador</h2>
               </div>
-              <div className="p-8 space-y-4">
+              <div className="p-4 md:p-8 space-y-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-400">Nome Completo</p>
                   <p className="font-bold text-slate-900">{getTrabalhadorNome()}</p>
@@ -496,11 +496,11 @@ export const DetalhesAcidente: React.FC = () => {
 
             {/* Comunicação */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <Info size={20} className="text-amber-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Comunicação</h2>
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-4 md:p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-bold text-slate-600">Comunicado?</span>
                   <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase ${acidente.comunicado ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>

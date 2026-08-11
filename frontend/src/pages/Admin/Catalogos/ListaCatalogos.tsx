@@ -44,7 +44,7 @@ const ListaCatalogos: React.FC = () => {
             <Settings size={28} />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Tabelas de Referência</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Tabelas de Referência</h1>
             <p className="text-slate-500 font-medium">Gerencie os catálogos e taxonomias do sistema</p>
           </div>
         </div>

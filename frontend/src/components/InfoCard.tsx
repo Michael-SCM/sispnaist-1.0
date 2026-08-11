@@ -14,7 +14,7 @@ export const InfoCard: React.FC<InfoCardProps> = React.memo(({ label, value, ico
     </div>
     <div>
       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-      <p className="text-sm font-bold text-slate-700">{value ?? '-'}</p>
+      <p className="text-sm font-bold text-slate-700 break-words">{value ?? '-'}</p>
     </div>
   </div>
 ));

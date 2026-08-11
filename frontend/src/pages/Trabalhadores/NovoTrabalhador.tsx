@@ -351,7 +351,7 @@ export const NovoTrabalhador: React.FC = () => {
   };
 
   const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
-    <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+    <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
       <Icon size={20} className="text-blue-600" />
       <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">{title}</h2>
     </div>
@@ -417,7 +417,7 @@ export const NovoTrabalhador: React.FC = () => {
             <ArrowLeft size={24} />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Novo Trabalhador</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Novo Trabalhador</h1>
             <p className="text-slate-500 font-medium">Cadastre um novo funcionário no sistema</p>
           </div>
         </div>
@@ -427,7 +427,7 @@ export const NovoTrabalhador: React.FC = () => {
           {/* ═══════════ INFORMAÇÕES GERAIS ═══════════ */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={User} title="Informações Gerais" />
-            <div className="p-8 space-y-6">
+            <div className="p-4 md:p-8 space-y-6">
               {/* CPF + Buscar CADSUS + Nome + Nome Social + Nome da Mãe */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div className="md:col-span-2">
@@ -497,7 +497,7 @@ export const NovoTrabalhador: React.FC = () => {
                 <input type="email" name="email" value={formData.email || ''} onChange={handleChange} className={inputCls} placeholder="email@exemplo.com" />
               </div>
               {/* Sexo, Gênero, Raça, Etnia, Escolaridade, Estado Civil */}
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
                 {renderSelect('sexo', 'Sexo *', sexos, formData.sexo || '')}
                 <div>
                   <label className={labelCls}>Gênero <span className="text-red-500">*</span></label>
@@ -561,7 +561,7 @@ export const NovoTrabalhador: React.FC = () => {
           {/* ═══════════ ENDEREÇO ═══════════ */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={MapPin} title="Endereço Residencial" />
-            <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
                 <AutocompleteCidade
                   label="Cidade"
@@ -593,7 +593,7 @@ export const NovoTrabalhador: React.FC = () => {
           {/* ═══════════ VÍNCULO EMPREGATÍCIO ═══════════ */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={Briefcase} title="Vínculo Empregatício" />
-            <div className="p-8 space-y-6">
+            <div className="p-4 md:p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className={labelCls}>Empresa <span className="text-red-500">*</span></label>
@@ -692,7 +692,7 @@ export const NovoTrabalhador: React.FC = () => {
           {/* ═══════════ SITUAÇÕES ═══════════ */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
             <SectionHeader icon={AlertTriangle} title="Situações" />
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderCheckDate('aposentadoria', 'Se aposentou?', 'historico.dataAposentadoria', formData.historico?.dataAposentadoria || '')}
               {renderCheckDate('obito', 'Foi a óbito?', 'historico.dataObito', formData.historico?.dataObito || '')}
               {renderCheckDate('remocao', 'Foi removido?', 'historico.dataRemocao', formData.historico?.dataRemocao || '',

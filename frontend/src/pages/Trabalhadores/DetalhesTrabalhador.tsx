@@ -94,7 +94,7 @@ export const DetalhesTrabalhador: React.FC = () => {
             </button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{trabalhador.nome}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight break-words">{trabalhador.nome}</h1>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                   trabalhador.vinculo?.situacao === 'Ativo' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
                 }`}>
@@ -123,11 +123,11 @@ export const DetalhesTrabalhador: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Dados Cadastrais */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <User size={20} className="text-blue-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados Cadastrais</h2>
               </div>
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Nome da Mãe" value={trabalhador.nomeMae} icon={Users2} color="text-pink-500" />
                 {trabalhador.nomeSocial && <InfoCard label="Nome Social" value={trabalhador.nomeSocial} icon={User} color="text-violet-500" />}
                 <InfoCard label="Nascimento" value={trabalhador.dataNascimento ? new Date(trabalhador.dataNascimento).toLocaleDateString('pt-BR') : '-'} icon={Calendar} color="text-blue-500" />
@@ -146,7 +146,7 @@ export const DetalhesTrabalhador: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Neurodivergências</p>
-                      <p className="text-sm font-bold text-slate-700">{trabalhador.neurodivergencias.join(', ')}</p>
+                      <p className="text-sm font-bold text-slate-700 break-words">{trabalhador.neurodivergencias.join(', ')}</p>
                     </div>
                   </div>
                 )}
@@ -155,11 +155,11 @@ export const DetalhesTrabalhador: React.FC = () => {
 
             {/* Trabalho e Vínculo */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <Briefcase size={20} className="text-blue-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Trabalho & Vínculo</h2>
               </div>
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <InfoCard label="Cargo" value={trabalhador.trabalho?.cargo} icon={Briefcase} color="text-blue-600" />
                 <InfoCard label="Função" value={trabalhador.trabalho?.funcao} icon={Briefcase} color="text-indigo-600" />
                 <InfoCard label="Setor" value={trabalhador.trabalho?.setor} icon={Building} color="text-slate-600" />
@@ -177,11 +177,11 @@ export const DetalhesTrabalhador: React.FC = () => {
             {/* Dados de Saúde */}
             {(trabalhador.tipoSanguineo || (trabalhador.deficiencia && trabalhador.deficiencia.tipo)) && (
               <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-                <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+                <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                   <Heart size={20} className="text-rose-600" />
                   <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Dados de Saúde</h2>
                 </div>
-                <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <InfoCard label="Tipo Sanguíneo" value={trabalhador.tipoSanguineo} icon={Heart} color="text-rose-500" />
                   {trabalhador.deficiencia?.tipo && (
                     <>
@@ -195,20 +195,20 @@ export const DetalhesTrabalhador: React.FC = () => {
 
             {/* Endereço */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <MapPin size={20} className="text-blue-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Localização</h2>
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-100">
                   <div className="p-3 bg-white rounded-2xl shadow-sm text-blue-600">
                     <MapPin size={24} />
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-slate-700">
+                    <p className="text-lg font-bold text-slate-700 break-words">
                       {trabalhador.endereco?.logradouro}, {trabalhador.endereco?.numero}
                     </p>
-                    <p className="text-slate-500 font-medium">
+                    <p className="text-slate-500 font-medium break-words">
                       {trabalhador.endereco?.bairro} • {trabalhador.endereco?.cidade} - {trabalhador.endereco?.estado}
                     </p>
                     <p className="mt-2 text-xs font-black uppercase tracking-widest text-blue-600">CEP: {trabalhador.endereco?.cep || '-'}</p>
@@ -222,11 +222,11 @@ export const DetalhesTrabalhador: React.FC = () => {
           <div className="space-y-6">
             {/* Contatos */}
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
-              <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
+              <div className="px-4 md:px-8 py-4 md:py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
                 <Info size={20} className="text-blue-600" />
                 <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">Contatos</h2>
               </div>
-              <div className="p-8 space-y-4">
+              <div className="p-4 md:p-8 space-y-4">
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                   <div className="p-2 bg-white rounded-lg text-blue-600 shadow-sm">
                     <Mail size={16} />

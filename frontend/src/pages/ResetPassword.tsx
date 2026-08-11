@@ -53,7 +53,7 @@ export const ResetPassword: React.FC = () => {
       <DocumentTitle title="Redefinir Senha" />
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-600 mb-2">Nova Senha</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">Nova Senha</h2>
           <p className="text-slate-500 font-medium">Crie uma senha forte e segura</p>
         </div>
 
