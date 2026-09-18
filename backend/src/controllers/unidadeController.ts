@@ -4,19 +4,28 @@ import unidadeService from '../services/UnidadeService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { getPaginationParams } from '../utils/pagination.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope } from '../utils/scope.js';
+import { assertCanReadUnit, assertCanReadCompany } from '../services/AuthorizationService.js';
 
 /**
  * @desc    Listar unidades com paginação e filtros
  * @route   GET /api/unidades
- * @access  Private/Admin
+ * @access  Private/Admin/Gestor
  */
 export const getUnidades = asyncHandler(async (req: Request, res: Response) => {
   const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+  const scope = await buildUserScope((req as IAuthRequest).user!);
   
-  const filtros = {
+  const filtros: any = {
     nome: req.query.nome as string,
     empresaId: req.query.empresaId as string,
   };
+
+  // Gestor: filtrar apenas unidades da sua empresa
+  if (scope.perfil === 'gestor' && scope.empresaScope) {
+    filtros.empresaId = scope.empresaScope;
+  }
 
   const result = await unidadeService.listar(page, limit, filtros);
 
@@ -29,10 +38,15 @@ export const getUnidades = asyncHandler(async (req: Request, res: Response) => {
 /**
  * @desc    Obter uma única unidade
  * @route   GET /api/unidades/:id
- * @access  Private/Admin
+ * @access  Private/Admin/Gestor
  */
 export const getUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  // Verificação centralizada de escopo anti-IDOR (retorna 404, não 403)
+  await assertCanReadUnit(scope, id);
+
   const unidade = await unidadeService.obter(id);
 
   res.status(200).json({
@@ -64,6 +78,9 @@ export const createUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const updateUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  await assertCanReadUnit(scope, id);
+
   const unidadeAntiga = await unidadeService.obter(id);
   const unidadeNova = await unidadeService.atualizar(id, req.body);
 
@@ -84,6 +101,9 @@ export const updateUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const deleteUnidade = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  await assertCanReadUnit(scope, id);
+
   const unidade = await unidadeService.obter(id);
 
   await logAction(req, 'DELETE', 'Unidade', id, unidade);
@@ -103,6 +123,11 @@ export const deleteUnidade = asyncHandler(async (req: Request, res: Response) =>
  */
 export const getUnidadesPorEmpresa = asyncHandler(async (req: Request, res: Response) => {
   const { empresaId } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  // Verificação centralizada de escopo anti-IDOR
+  await assertCanReadCompany(scope, empresaId);
+
   const unidades = await unidadeService.listarPorEmpresa(empresaId);
 
   res.status(200).json({

@@ -111,8 +111,11 @@ export class AnalyticsService {
   /**
    * Obtém KPIs gerais do sistema
    */
-  async obterKPIs(): Promise<IKPIData> {
-    return getCachedOrFetch<IKPIData>('analytics:kpis', REDIS_TTL, async () => {
+  async obterKPIs(empresaScope?: string): Promise<IKPIData> {
+    const cacheKey = empresaScope ? `analytics:kpis:${empresaScope}` : 'analytics:kpis';
+    return getCachedOrFetch<IKPIData>(cacheKey, REDIS_TTL, async () => {
+    const empresaFilter = empresaScope ? { empresa: empresaScope } : {};
+    const trabalhadorEmpresaFilter = empresaScope ? { empresa: empresaScope } : {};
       const trintaDias = new Date();
       trintaDias.setDate(trintaDias.getDate() + 30);
 
@@ -148,7 +151,7 @@ export class AnalyticsService {
       Acidente.countDocuments({ status: 'Aberto' }),
       Acidente.countDocuments({ status: 'Em Análise' }),
       Acidente.countDocuments({ status: 'Fechado' }),
-      Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo' }),
+      Trabalhador.countDocuments({ 'vinculo.situacao': 'Ativo', ...trabalhadorEmpresaFilter }),
       Doenca.countDocuments(),
       Doenca.countDocuments({ ativo: true }),
       Vacinacao.countDocuments(),
@@ -477,8 +480,9 @@ export class AnalyticsService {
   /**
    * Obtém dados para gráficos de acidentes
    */
-  async obterDadosAcidentes() {
-    return getCachedOrFetch('analytics:acidentes', REDIS_TTL, async () => {
+  async obterDadosAcidentes(empresaScope?: string) {
+    const cacheKey = empresaScope ? `analytics:acidentes:${empresaScope}` : 'analytics:acidentes';
+    return getCachedOrFetch(cacheKey, REDIS_TTL, async () => {
       const seisMesesAtras = new Date();
       seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
 
@@ -565,8 +569,9 @@ export class AnalyticsService {
   /**
    * Obtém próximas vacinações (vencidas ou próximas de vencer)
    */
-  async obterProximasVacinacoes(dias: number = 30) {
-    return getCachedOrFetch(`analytics:vacinacoes:${dias}`, 180, async () => {
+  async obterProximasVacinacoes(dias: number = 30, empresaScope?: string) {
+    const cacheKey = empresaScope ? `analytics:vacinacoes:${dias}:${empresaScope}` : `analytics:vacinacoes:${dias}`;
+    return getCachedOrFetch(cacheKey, 180, async () => {
       const hoje = new Date();
       const limite = new Date();
       limite.setDate(limite.getDate() + dias);
@@ -602,8 +607,9 @@ export class AnalyticsService {
   /**
    * Obtém últimos acidentes registrados
    */
-  async obterUltimosAcidentes(limit: number = 5): Promise<any[]> {
-    return getCachedOrFetch(`analytics:ultimos-acidentes:${limit}`, 180, async () => {
+  async obterUltimosAcidentes(limit: number = 5, empresaScope?: string): Promise<any[]> {
+    const cacheKey = empresaScope ? `analytics:ultimos-acidentes:${limit}:${empresaScope}` : `analytics:ultimos-acidentes:${limit}`;
+    return getCachedOrFetch(cacheKey, 180, async () => {
       const acidentes = await Acidente.find()
         .populate('trabalhadorId', 'nome cpf empresa unidade')
         .sort({ dataAcidente: -1 })
@@ -617,13 +623,14 @@ export class AnalyticsService {
   /**
    * Obtém dados completos para dashboard admin
    */
-  async obterDadosDashboardAdmin(): Promise<any> {
-    return getCachedOrFetch('analytics:dashboard-admin', REDIS_TTL, async () => {
+  async obterDadosDashboardAdmin(empresaScope?: string): Promise<any> {
+    const cacheKey = empresaScope ? `analytics:dashboard-admin:${empresaScope}` : 'analytics:dashboard-admin';
+    return getCachedOrFetch(cacheKey, REDIS_TTL, async () => {
       const [kpis, dadosAcidentes, proximasVacinacoes, ultimosAcidentes, trabalhadoresPorEmpresa, distribuicaoVinculosRaw, totalTrabalhadores, deficienciaPorTipoAgg, afastadosPorTipoAgg] = await Promise.all([
-      this.obterKPIs(),
-      this.obterDadosAcidentes(),
-      this.obterProximasVacinacoes(30),
-      this.obterUltimosAcidentes(5),
+      this.obterKPIs(empresaScope),
+      this.obterDadosAcidentes(empresaScope),
+      this.obterProximasVacinacoes(30, empresaScope),
+      this.obterUltimosAcidentes(5, empresaScope),
       Trabalhador.aggregate([
         {
           $match: {
@@ -824,8 +831,9 @@ export class AnalyticsService {
   /**
    * Obtém dados detalhados de monitoramento clínico
    */
-  async obterMonitoramentoClinico(): Promise<IMonitoramentoClinico> {
-    return getCachedOrFetch<IMonitoramentoClinico>('analytics:monitoramento', REDIS_TTL, async () => {
+  async obterMonitoramentoClinico(empresaScope?: string): Promise<IMonitoramentoClinico> {
+    const cacheKey = empresaScope ? `analytics:monitoramento:${empresaScope}` : 'analytics:monitoramento';
+    return getCachedOrFetch<IMonitoramentoClinico>(cacheKey, REDIS_TTL, async () => {
       const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
     const [

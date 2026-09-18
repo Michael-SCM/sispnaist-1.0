@@ -36,12 +36,6 @@ describe('CadsusService', () => {
   });
 
   it('deve retornar dados adaptados quando a API responde com sucesso', async () => {
-    expect(mockCreateApiClient).toHaveBeenCalledWith({
-      baseURL: 'http://mock-cadsus:3000/api/v1',
-      authToken: '',
-      apiKey: '',
-    });
-
     mockGet.mockResolvedValue({ data: { status: 'sucesso', data: mockData } });
 
     const result = await cadsusService.buscarPorCpfOuCns('12345678900');

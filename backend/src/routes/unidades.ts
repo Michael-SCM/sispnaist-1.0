@@ -1,6 +1,6 @@
 import express from 'express';
 import * as unidadeController from '../controllers/unidadeController.js';
-import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
+import { authMiddleware, adminMiddleware, adminOuGestorMiddleware } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validation.js';
 import { unidadeSchema, unidadeUpdateSchema } from '../utils/validations.js';
 
@@ -32,13 +32,15 @@ router.get('/ativas', async (req, res) => {
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
 
-// Rota pública para usuários autenticados (usada em dropdowns de cadastro)
+// Rota para usuários autenticados (usada em dropdowns de cadastro)
 router.get('/empresa/:empresaId', unidadeController.getUnidadesPorEmpresa);
 
-// Rotas restritas a Admin
-router.get('/', adminMiddleware, unidadeController.getUnidades);
+// Leitura: admin e gestor (gestor vê apenas unidades da sua empresa via controller)
+router.get('/', adminOuGestorMiddleware, unidadeController.getUnidades);
+router.get('/:id', adminOuGestorMiddleware, unidadeController.getUnidade);
+
+// Escrita: apenas admin
 router.post('/', adminMiddleware, validateRequest(unidadeSchema), unidadeController.createUnidade);
-router.get('/:id', adminMiddleware, unidadeController.getUnidade);
 router.put('/:id', adminMiddleware, validateRequest(unidadeUpdateSchema), unidadeController.updateUnidade);
 router.delete('/:id', adminMiddleware, unidadeController.deleteUnidade);
 

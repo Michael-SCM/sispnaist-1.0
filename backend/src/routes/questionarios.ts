@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import questionarioController from '../controllers/questionarioController';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth';
 import { validateRequest, validateObjectId } from '../middleware/validation';
 import Joi from 'joi';
 
@@ -56,15 +56,18 @@ const questionarioItemUpdateSchema = Joi.object({
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
 
+// Leitura: qualquer autenticado
 router.get('/', questionarioController.listar);
 router.get('/:id', validateObjectId('id'), questionarioController.obter);
-router.post('/', validateRequest(questionarioSchema), questionarioController.criar);
-router.put('/:id', validateObjectId('id'), validateRequest(questionarioUpdateSchema), questionarioController.atualizar);
-router.delete('/:id', validateObjectId('id'), questionarioController.deletar);
 
-// Rotas de itens do questionário
-router.post('/:id/itens', validateObjectId('id'), validateRequest(questionarioItemSchema), questionarioController.criarItem);
-router.put('/:id/itens/:itemId', validateObjectId('id', 'itemId'), validateRequest(questionarioItemUpdateSchema), questionarioController.atualizarItem);
-router.delete('/:id/itens/:itemId', validateObjectId('id', 'itemId'), questionarioController.deletarItem);
+// Escrita: apenas admin/gestor
+router.post('/', adminOuGestorMiddleware, validateRequest(questionarioSchema), questionarioController.criar);
+router.put('/:id', adminOuGestorMiddleware, validateObjectId('id'), validateRequest(questionarioUpdateSchema), questionarioController.atualizar);
+router.delete('/:id', adminOuGestorMiddleware, validateObjectId('id'), questionarioController.deletar);
+
+// Rotas de itens do questionário: apenas admin/gestor
+router.post('/:id/itens', adminOuGestorMiddleware, validateObjectId('id'), validateRequest(questionarioItemSchema), questionarioController.criarItem);
+router.put('/:id/itens/:itemId', adminOuGestorMiddleware, validateObjectId('id', 'itemId'), validateRequest(questionarioItemUpdateSchema), questionarioController.atualizarItem);
+router.delete('/:id/itens/:itemId', adminOuGestorMiddleware, validateObjectId('id', 'itemId'), questionarioController.deletarItem);
 
 export default router;

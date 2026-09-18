@@ -1,9 +1,13 @@
+jest.mock('dotenv', () => ({ default: { config: jest.fn() }, config: jest.fn() }));
+
 describe('config', () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
     jest.resetModules();
     process.env = { ...OLD_ENV, JWT_SECRET: 'test-secret', MONGODB_URI: 'mongodb://localhost:27017/test' };
+    delete process.env.PORT;
+    delete process.env.JWT_EXPIRE;
   });
 
   afterAll(() => {

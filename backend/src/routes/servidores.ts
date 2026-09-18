@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import servidorFuncionarioController from '../controllers/servidorFuncionarioController';
-import { authMiddleware } from '../middleware/auth';
+import { authMiddleware, adminOuGestorMiddleware } from '../middleware/auth';
 import { validateRequest, validateObjectId } from '../middleware/validation';
 import Joi from 'joi';
 
@@ -41,10 +41,10 @@ const servidorUpdateSchema = Joi.object({
 // Todas as rotas requerem autenticação
 router.use(authMiddleware);
 
-router.get('/', servidorFuncionarioController.listar);
+router.get('/', adminOuGestorMiddleware, servidorFuncionarioController.listar);
 router.get('/:id', validateObjectId('id'), servidorFuncionarioController.obter);
-router.post('/', validateRequest(servidorSchema), servidorFuncionarioController.criar);
-router.put('/:id', validateObjectId('id'), validateRequest(servidorUpdateSchema), servidorFuncionarioController.atualizar);
-router.delete('/:id', validateObjectId('id'), servidorFuncionarioController.deletar);
+router.post('/', adminOuGestorMiddleware, validateRequest(servidorSchema), servidorFuncionarioController.criar);
+router.put('/:id', validateObjectId('id'), adminOuGestorMiddleware, validateRequest(servidorUpdateSchema), servidorFuncionarioController.atualizar);
+router.delete('/:id', validateObjectId('id'), adminOuGestorMiddleware, servidorFuncionarioController.deletar);
 
 export default router;

@@ -9,12 +9,17 @@ import { toCPFMaskedOrDigits } from '../utils/cpf.js';
 import mongoose from 'mongoose';
 import { escapeRegex, safeDate, safeString } from '../utils/sanitize.js';
 import { logExport } from '../utils/auditLogger.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope, scopeFilterByTrabalhador, scopeFilterDirect } from '../utils/scope.js';
 
 class ExportController {
 
   async exportarAcidentesCSV(req: Request, res: Response, next: NextFunction) {
     try {
-      const acidentes = await Acidente.find()
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const scopeFilter = await scopeFilterByTrabalhador(scope);
+
+      const acidentes = await Acidente.find(scopeFilter)
         .populate('trabalhadorId', 'nome cpf')
         .lean();
 
@@ -42,7 +47,10 @@ class ExportController {
 
   async exportarTrabalhadoresCSV(req: Request, res: Response, next: NextFunction) {
     try {
-      const trabalhadores = await Trabalhador.find().lean();
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const scopeFilter = scopeFilterDirect(scope, true, true);
+
+      const trabalhadores = await Trabalhador.find(scopeFilter).lean();
 
       const fields = ['nome', 'cpf', 'email', 'dataNascimento', 'sexo', 'empresa', 'unidade'];
       const json2csv = new Parser({ fields });
@@ -60,12 +68,21 @@ class ExportController {
 
   async exportarMaterialBiologicoCSV(req: Request, res: Response, next: NextFunction) {
     try {
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const scopeFilter = await scopeFilterByTrabalhador(scope);
+
       const fichas = await MaterialBiologico.find()
         .populate({
           path: 'acidenteId',
+          match: scopeFilter.trabalhadorId ? { trabalhadorId: scopeFilter.trabalhadorId } : {},
           populate: { path: 'trabalhadorId', select: 'nome cpf' }
         })
         .lean();
+
+      // Filtrar fichas cujo acidenteId não corresponde ao scope (populate com match retorna null)
+      const fichasFiltradas = scopeFilter.trabalhadorId
+        ? fichas.filter((f: any) => f.acidenteId != null)
+        : fichas;
 
       const fields = [
         { label: 'Trabalhador', value: 'acidenteId.trabalhadorId.nome' },
@@ -80,9 +97,9 @@ class ExportController {
       ];
 
       const json2csv = new Parser({ fields });
-      const csv = json2csv.parse(fichas);
+      const csv = json2csv.parse(fichasFiltradas);
 
-      logExport(req, 'MaterialBiologico', 'csv', { totalRegistros: fichas.length }).catch(() => {});
+      logExport(req, 'MaterialBiologico', 'csv', { totalRegistros: fichasFiltradas.length }).catch(() => {});
 
       res.header('Content-Type', 'text/csv');
       res.attachment('material_biologico_sispnaist.csv');
@@ -92,13 +109,12 @@ class ExportController {
     }
   }
 
-  /**
-   * Exporta trabalhadores em formato PDF corporativo
-   * Usa streaming direto para res para não estourar memória
-   */
   async exportarTrabalhadoresPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const filtros: Record<string, any> = {};
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const baseFilter = scopeFilterDirect(scope, true, true);
+
+      const filtros: Record<string, any> = { ...baseFilter };
 
       if (req.query.nome && typeof req.query.nome === 'string') {
         filtros.nome = { $regex: escapeRegex(req.query.nome), $options: 'i' };
@@ -120,12 +136,12 @@ class ExportController {
     }
   }
 
-  /**
-   * Exporta acidentes em formato PDF corporativo
-   */
   async exportarAcidentesPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const filtros: Record<string, any> = {};
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const baseFilter = await scopeFilterByTrabalhador(scope);
+
+      const filtros: Record<string, any> = { ...baseFilter };
 
       if (req.query.status && typeof req.query.status === 'string') filtros.status = req.query.status;
       if (req.query.tipoAcidente && typeof req.query.tipoAcidente === 'string') filtros.tipoAcidente = req.query.tipoAcidente;
@@ -156,12 +172,12 @@ class ExportController {
     }
   }
 
-  /**
-   * Exporta doenças em formato PDF corporativo
-   */
   async exportarDoencasPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const filtros: Record<string, any> = {};
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const baseFilter = await scopeFilterByTrabalhador(scope);
+
+      const filtros: Record<string, any> = { ...baseFilter };
 
       if (req.query.ativo !== undefined) filtros.ativo = req.query.ativo === 'true';
       if (req.query.nomeDoenca && typeof req.query.nomeDoenca === 'string') {
@@ -195,12 +211,12 @@ class ExportController {
     }
   }
 
-  /**
-   * Exporta vacinações em formato PDF corporativo
-   */
   async exportarVacinacoesPDF(req: Request, res: Response, next: NextFunction) {
     try {
-      const filtros: Record<string, any> = {};
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+      const baseFilter = await scopeFilterByTrabalhador(scope);
+
+      const filtros: Record<string, any> = { ...baseFilter };
 
       if (req.query.vacina && typeof req.query.vacina === 'string') {
         filtros.vacina = { $regex: escapeRegex(req.query.vacina), $options: 'i' };
@@ -224,9 +240,6 @@ class ExportController {
     }
   }
 
-  /**
-   * Exporta monitoramento clínico em formato PDF corporativo
-   */
   async exportarMonitoramentoPDF(req: Request, res: Response, next: NextFunction) {
     try {
       const monitoramento = await analyticsService.obterMonitoramentoClinico();

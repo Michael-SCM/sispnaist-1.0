@@ -6,8 +6,9 @@ import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
-import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
+import { buildUserScope } from '../utils/scope.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
+import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker } from '../services/AuthorizationService.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   if (req.user?.perfil === 'trabalhador') {
@@ -25,16 +26,15 @@ export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Respon
 });
 
 export const obterVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
+  const scope = await buildUserScope(req.user!);
   const vacinacao = await vacinacaoService.obter(req.params.id);
 
   if (!vacinacao) {
     throw new AppError('Vacinação não encontrada', 404);
   }
 
-  const recordTrabalhadorId = (vacinacao.trabalhadorId && (vacinacao.trabalhadorId as any)._id)
-    ? (vacinacao.trabalhadorId as any)._id.toString()
-    : vacinacao.trabalhadorId.toString();
-  await exigirProprioTrabalhador(req, recordTrabalhadorId);
+  // Verificação centralizada de escopo anti-IDOR
+  await assertCanReadHealthRecord(scope, vacinacao, 'Vacinação');
 
   res.status(200).json({
     status: 'success',
@@ -46,10 +46,34 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
   const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
   const { vacina, trabalhadorId, cartaoSus } = req.query;
   let targetTrabalhadorId = trabalhadorId as string;
+  const scope = await buildUserScope(req.user!);
+
+  // Gestor: forçar filtro por trabalhadores da empresa
+  if (scope.perfil === 'gestor' && scope.empresaScope) {
+    const trabalhadores = await Trabalhador.find({ empresa: scope.empresaScope }).select('_id').lean();
+    const ids = trabalhadores.map((t: any) => t._id.toString());
+    if (ids.length === 0) {
+      targetTrabalhadorId = '000000000000000000000000';
+    } else if (ids.length === 1) {
+      targetTrabalhadorId = ids[0];
+    } else {
+      const result = await vacinacaoService.listar({
+        page,
+        limit,
+        vacina: vacina as string,
+        trabalhadorIds: ids,
+        cartaoSus: cartaoSus as string,
+      });
+      return res.status(200).json({
+        status: 'success',
+        data: result,
+      });
+    }
+  }
 
   // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
-  if (req.user?.perfil === 'trabalhador') {
-    const ids = await obterIdsTrabalhadorPorCpf(req.user.cpf);
+  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+    const ids = await obterIdsTrabalhadorPorCpf(req.user!.cpf);
     const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
     if (idsValidos.length > 1) {
       const result = await vacinacaoService.listar({
@@ -68,12 +92,9 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
   }
 
   // Normaliza CPF recebido no filtro: remove máscara (.,-) se vier mascarado
-  // (o service tenta resolver CPF -> ObjectId)
   if (typeof targetTrabalhadorId === 'string' && targetTrabalhadorId.trim()) {
-    // Se o filtro parece CPF mascarado, remove caracteres não numéricos
     if (targetTrabalhadorId.includes('.') || targetTrabalhadorId.includes('-')) {
       targetTrabalhadorId = targetTrabalhadorId.replace(/\D/g, '');
-      // Reaplica máscara esperada no banco: XXX.XXX.XXX-XX
       if (targetTrabalhadorId.length === 11) {
         targetTrabalhadorId = `${targetTrabalhadorId.slice(0, 3)}.${targetTrabalhadorId.slice(3, 6)}.${targetTrabalhadorId.slice(6, 9)}-${targetTrabalhadorId.slice(9, 11)}`;
       }
@@ -95,11 +116,16 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
 });
 
 export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  if (req.user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para atualizar registros de vacinação', 403);
+  const scope = await buildUserScope(req.user!);
+  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
+
+  if (!vacinacaoAntiga) {
+    throw new AppError('Vacinação não encontrada', 404);
   }
 
-  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
+  // Verificação centralizada de escopo anti-IDOR para gerenciamento
+  await assertCanManageHealthRecord(scope, vacinacaoAntiga, 'Vacinação');
+
   const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
 
   const mudancas = compararDados(vacinacaoAntiga, vacinacao);
@@ -112,11 +138,16 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
 });
 
 export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  if (req.user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para deletar registros de vacinação', 403);
+  const scope = await buildUserScope(req.user!);
+  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
+
+  if (!vacinacaoAntiga) {
+    throw new AppError('Vacinação não encontrada', 404);
   }
 
-  const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
+  // Verificação centralizada de escopo anti-IDOR para gerenciamento
+  await assertCanManageHealthRecord(scope, vacinacaoAntiga, 'Vacinação');
+
   await vacinacaoService.deletar(req.params.id);
 
   await logAction(req, 'DELETE', 'Vacinacao', req.params.id, vacinacaoAntiga);
@@ -128,14 +159,10 @@ export const obterVacinacoesPorTrabalhador = asyncHandler(
   async (req: IAuthRequest, res: Response) => {
     const { trabalhadorId } = req.params;
     const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+    const scope = await buildUserScope(req.user!);
 
-    // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
-    if (req.user?.perfil === 'trabalhador') {
-      const trabalhador = await Trabalhador.findOne({ cpf: req.user.cpf });
-      if (!trabalhador || trabalhador._id.toString() !== trabalhadorId) {
-        throw new AppError('Sem permissão para acessar estes dados', 403);
-      }
-    }
+    // Verificação centralizada de escopo anti-IDOR
+    await assertCanReadWorker(scope, trabalhadorId);
 
     const result = await vacinacaoService.obterPorTrabalhador(trabalhadorId, page, limit);
 

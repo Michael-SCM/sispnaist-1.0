@@ -15,7 +15,6 @@ class PreferenciaController {
       let preferencia = await PreferenciaUsuario.findOne({ usuarioId: (req.user as any).id });
 
       if (!preferencia) {
-        // Cria preferências padrão se não existir
         preferencia = await PreferenciaUsuario.create({
           usuarioId: (req.user as any).id
         });
@@ -57,8 +56,13 @@ class PreferenciaController {
   }
 
   // GET /api/preferencias/usuario/:usuarioId - Obter preferências de outro usuário (admin)
-  async obter(req: Request, res: Response, next: NextFunction) {
+  async obter(req: IAuthRequest, res: Response, next: NextFunction) {
     try {
+      // Apenas admin pode ver preferências de outros usuários
+      if ((req as any).user?.perfil !== 'admin') {
+        throw new AppError('Sem permissão para acessar preferências de outros usuários', 403);
+      }
+
       const { usuarioId } = req.params;
 
       const preferencia = await PreferenciaUsuario.findOne({ usuarioId });
@@ -74,8 +78,13 @@ class PreferenciaController {
   }
 
   // PUT /api/preferencias/usuario/:usuarioId - Atualizar preferências de outro usuário (admin)
-  async atualizar(req: Request, res: Response, next: NextFunction) {
+  async atualizar(req: IAuthRequest, res: Response, next: NextFunction) {
     try {
+      // Apenas admin pode atualizar preferências de outros usuários
+      if ((req as any).user?.perfil !== 'admin') {
+        throw new AppError('Sem permissão para atualizar preferências de outros usuários', 403);
+      }
+
       const { usuarioId } = req.params;
 
       const preferenciasAntiga = await PreferenciaUsuario.findOne({ usuarioId });

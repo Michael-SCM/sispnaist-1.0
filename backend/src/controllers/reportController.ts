@@ -3,6 +3,8 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope, scopeFilterByTrabalhador } from '../utils/scope.js';
 
 /**
  * Gera relatório em formato JSON (base para PDF/XLS)
@@ -10,8 +12,10 @@ import Vacinacao from '../models/Vacinacao.js';
  */
 export const gerarRelatorioAcidentes = asyncHandler(async (req: Request, res: Response) => {
   const { dataInicio, dataFim, tipoAcidente, status } = req.query;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const scopeFilter = await scopeFilterByTrabalhador(scope);
 
-  const query: any = {};
+  const query: any = { ...scopeFilter };
 
   if (dataInicio || dataFim) {
     query.dataAcidente = {};
@@ -63,7 +67,10 @@ export const gerarRelatorioAcidentes = asyncHandler(async (req: Request, res: Re
  * GET /api/reports/vacinacoes?format=json
  */
 export const gerarRelatorioVacinacoes = asyncHandler(async (req: Request, res: Response) => {
-  const vacinacoes = await Vacinacao.find()
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const scopeFilter = await scopeFilterByTrabalhador(scope);
+
+  const vacinacoes = await Vacinacao.find(scopeFilter)
     .populate('trabalhadorId', 'nome cpf email')
     .sort({ dataVacinacao: -1 })
     .lean();
@@ -92,7 +99,10 @@ export const gerarRelatorioVacinacoes = asyncHandler(async (req: Request, res: R
  * GET /api/reports/doencas?format=json
  */
 export const gerarRelatorioDoencas = asyncHandler(async (req: Request, res: Response) => {
-  const doencas = await Doenca.find()
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const scopeFilter = await scopeFilterByTrabalhador(scope);
+
+  const doencas = await Doenca.find(scopeFilter)
     .populate('trabalhadorId', 'nome cpf email')
     .sort({ dataInicio: -1 })
     .lean();

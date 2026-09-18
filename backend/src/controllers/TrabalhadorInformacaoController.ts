@@ -3,17 +3,26 @@ import TrabalhadorInformacaoService from '../services/TrabalhadorInformacaoServi
 import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope, verificarEscopoTrabalhador } from '../utils/scope.js';
 
 class TrabalhadorInformacaoController {
   // GET /api/trabalhadores/:id/informacoes - Listar informações de um trabalhador
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
-      if ((req as any).user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-        if (!trabalhador || id !== trabalhador._id.toString()) {
+      // Verificar escopo
+      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+        if (!scope.trabalhadorIds.includes(id)) {
+          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
+        }
+      }
+
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
           throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
         }
       }
@@ -35,11 +44,18 @@ class TrabalhadorInformacaoController {
   async obter(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
+      const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
-      if ((req as any).user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-        if (!trabalhador || id !== trabalhador._id.toString()) {
+      // Verificar escopo
+      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+        if (!scope.trabalhadorIds.includes(id)) {
+          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
+        }
+      }
+
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
           throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
         }
       }
@@ -65,6 +81,16 @@ class TrabalhadorInformacaoController {
         throw new AppError('Sem permissão para criar informações de trabalhadores', 403);
       }
 
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para criar informações neste trabalhador', 403);
+        }
+      }
+
       const dados = req.body;
 
       const informacao = await TrabalhadorInformacaoService.criar({
@@ -85,6 +111,16 @@ class TrabalhadorInformacaoController {
 
       if ((req as any).user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para atualizar informações de trabalhadores', 403);
+      }
+
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para atualizar informações neste trabalhador', 403);
+        }
       }
 
       const dados = req.body;
@@ -108,6 +144,16 @@ class TrabalhadorInformacaoController {
 
       if ((req as any).user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para deletar informações de trabalhadores', 403);
+      }
+
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para deletar informações neste trabalhador', 403);
+        }
       }
 
       const existe = await TrabalhadorInformacaoService.obterPorId(infoId);

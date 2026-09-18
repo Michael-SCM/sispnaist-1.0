@@ -264,10 +264,16 @@ export const listarCertificados = asyncHandler(async (req: IAuthRequest, res: Re
 
 export const obterCertificado = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const { id } = req.params;
+  const usuarioId = (req.user as any).id;
 
   const certificado = await Certificado.findById(id);
   if (!certificado) {
     throw new AppError('Certificado não encontrado', 404);
+  }
+
+  // Apenas o próprio usuário ou admin pode ver o certificado
+  if (certificado.usuarioId.toString() !== usuarioId && req.user?.perfil !== 'admin') {
+    throw new AppError('Sem permissão para acessar este certificado', 403);
   }
 
   return res.status(200).json(certificado);

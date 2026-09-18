@@ -4,26 +4,29 @@ import analyticsService from '../services/AnalyticsService.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
+import { buildUserScope, scopeFilterByTrabalhador } from '../utils/scope.js';
 
 /**
  * GET /api/analytics/kpis
- * Obtém KPIs gerais do sistema
+ * Obtém KPIs gerais do sistema (escopo: admin=vê tudo, gestor=vê empresa)
  */
 export const obterKPIs = asyncHandler(async (req: Request, res: Response) => {
-  const kpis = await analyticsService.obterKPIs();
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const dados = await analyticsService.obterKPIs(scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',
-    data: { kpis },
+    data: { kpis: dados },
   });
 });
 
 /**
  * GET /api/analytics/acidentes
- * Obtém dados para gráficos de acidentes
+ * Obtém dados para gráficos de acidentes (escopo por empresa)
  */
 export const obterDadosAcidentes = asyncHandler(async (req: Request, res: Response) => {
-  const dados = await analyticsService.obterDadosAcidentes();
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const dados = await analyticsService.obterDadosAcidentes(scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',
@@ -33,11 +36,12 @@ export const obterDadosAcidentes = asyncHandler(async (req: Request, res: Respon
 
 /**
  * GET /api/analytics/vacinacoes/proximas
- * Obtém próximas vacinações (vencidas ou próximas de vencer)
+ * Obtém próximas vacinações (escopo por empresa)
  */
 export const obterProximasVacinacoes = asyncHandler(async (req: Request, res: Response) => {
   const dias = parseInt(req.query.dias as string) || 30;
-  const vacinacoes = await analyticsService.obterProximasVacinacoes(dias);
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const vacinacoes = await analyticsService.obterProximasVacinacoes(dias, scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',
@@ -47,11 +51,12 @@ export const obterProximasVacinacoes = asyncHandler(async (req: Request, res: Re
 
 /**
  * GET /api/analytics/acidentes/ultimos
- * Obtém últimos acidentes registrados
+ * Obtém últimos acidentes registrados (escopo por empresa)
  */
 export const obterUltimosAcidentes = asyncHandler(async (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 5;
-  const acidentes = await analyticsService.obterUltimosAcidentes(limit);
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const acidentes = await analyticsService.obterUltimosAcidentes(limit, scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',
@@ -61,10 +66,11 @@ export const obterUltimosAcidentes = asyncHandler(async (req: Request, res: Resp
 
 /**
  * GET /api/analytics/dashboard
- * Obtém dados completos para dashboard admin
+ * Obtém dados completos para dashboard admin (escopo por empresa)
  */
 export const obterDashboardAdmin = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  const dados = await analyticsService.obterDadosDashboardAdmin();
+  const scope = await buildUserScope(req.user!);
+  const dados = await analyticsService.obterDadosDashboardAdmin(scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',
@@ -107,10 +113,11 @@ export const obterDashboardTrabalhador = asyncHandler(async (req: IAuthRequest, 
 
 /**
  * GET /api/analytics/monitoramento
- * Obtém dados de inteligência em saúde e monitoramento clínico
+ * Obtém dados de inteligência em saúde e monitoramento clínico (escopo por empresa)
  */
 export const obterMonitoramento = asyncHandler(async (req: Request, res: Response) => {
-  const monitoramento = await analyticsService.obterMonitoramentoClinico();
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+  const monitoramento = await analyticsService.obterMonitoramentoClinico(scope.empresaScope || undefined);
 
   res.status(200).json({
     status: 'success',

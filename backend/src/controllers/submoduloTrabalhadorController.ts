@@ -13,11 +13,11 @@ import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope, verificarEscopoTrabalhador } from '../utils/scope.js';
 
 /**
  * Controller unificado para todos os submódulos do trabalhador.
- * Equivalente aos módulos: trabalhador_dependentes, trabalhador_afastamento,
- * trabalhador_ocorrencia_violencia, trabalhador_readaptacao, trabalhador_processo_trabalho
  */
 
 // Mapeamento de submódulos para models
@@ -40,11 +40,18 @@ class SubmoduloTrabalhadorController {
     try {
       const { id, submodulo } = req.params;
       const { ativo } = req.query;
+      const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
-      if ((req as any).user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-        if (!trabalhador || id !== trabalhador._id.toString()) {
+      // Verificar escopo
+      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+        if (!scope.trabalhadorIds.includes(id)) {
+          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        }
+      }
+
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
           throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
         }
       }
@@ -79,11 +86,18 @@ class SubmoduloTrabalhadorController {
   async obter(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo, itemId } = req.params;
+      const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Se o usuário logado for trabalhador, ele só pode acessar os seus próprios dados
-      if ((req as any).user?.perfil === 'trabalhador') {
-        const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-        if (!trabalhador || id !== trabalhador._id.toString()) {
+      // Verificar escopo
+      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+        if (!scope.trabalhadorIds.includes(id)) {
+          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
+        }
+      }
+
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
           throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
         }
       }
@@ -112,6 +126,16 @@ class SubmoduloTrabalhadorController {
 
       if ((req as any).user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para cadastrar registros em submódulos de trabalhadores', 403);
+      }
+
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para criar registros neste trabalhador', 403);
+        }
       }
 
       const Model = SUBMODULO_MODELS[submodulo];
@@ -148,6 +172,16 @@ class SubmoduloTrabalhadorController {
 
       if ((req as any).user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para atualizar registros em submódulos de trabalhadores', 403);
+      }
+
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para atualizar registros neste trabalhador', 403);
+        }
       }
 
       const Model = SUBMODULO_MODELS[submodulo];
@@ -194,6 +228,16 @@ class SubmoduloTrabalhadorController {
 
       if ((req as any).user?.perfil === 'trabalhador') {
         throw new AppError('Sem permissão para deletar registros em submódulos de trabalhadores', 403);
+      }
+
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
+      // Gestor: verificar se o trabalhador pertence à empresa
+      if (scope.perfil === 'gestor') {
+        const owns = await verificarEscopoTrabalhador(scope, id);
+        if (!owns) {
+          throw new AppError('Sem permissão para deletar registros neste trabalhador', 403);
+        }
       }
 
       const Model = SUBMODULO_MODELS[submodulo];

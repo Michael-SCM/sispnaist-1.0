@@ -6,8 +6,10 @@ import { AppError } from '../middleware/errorHandler.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 import { notificarSinanParaTrabalhador } from '../utils/notificarSinan.js';
-import { exigirProprioTrabalhador } from '../utils/exigirProprioTrabalhador.js';
+import { IAuthRequest } from '../middleware/auth.js';
+import { buildUserScope } from '../utils/scope.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
+import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker } from '../services/AuthorizationService.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
   if ((req as any).user?.perfil === 'trabalhador') {
@@ -33,16 +35,15 @@ export const criar = asyncHandler(async (req: Request, res: Response) => {
 
 export const obter = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
   const acidente = await acidenteService.obter(id);
 
   if (!acidente) {
     throw new AppError('Acidente não encontrado', 404);
   }
 
-  const recordTrabalhadorId = (acidente.trabalhadorId && (acidente.trabalhadorId as any)._id)
-    ? (acidente.trabalhadorId as any)._id.toString()
-    : acidente.trabalhadorId.toString();
-  await exigirProprioTrabalhador(req, recordTrabalhadorId);
+  // Verificação centralizada de escopo anti-IDOR (retorna 404 para não revelar existência)
+  await assertCanReadHealthRecord(scope, acidente, 'Acidente');
 
   res.status(200).json({
     status: 'success',
@@ -52,6 +53,7 @@ export const obter = asyncHandler(async (req: Request, res: Response) => {
 
 export const listar = asyncHandler(async (req: Request, res: Response) => {
   const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+  const scope = await buildUserScope((req as IAuthRequest).user!);
 
   const filtros: any = {
     tipoAcidente: req.query.tipoAcidente as string | undefined,
@@ -64,8 +66,22 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     cartaoSus: req.query.cartaoSus as string | undefined,
   };
 
-    // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
-  if ((req as any).user?.perfil === 'trabalhador') {
+  // Gestor: forçar filtro por trabalhadores da empresa
+  if (scope.perfil === 'gestor' && scope.empresaScope) {
+    const trabalhadores = await Trabalhador.find({ empresa: scope.empresaScope }).select('_id').lean();
+    const ids = trabalhadores.map((t: any) => t._id.toString());
+    if (ids.length === 0) {
+      filtros.trabalhadorId = '000000000000000000000000';
+    } else if (ids.length === 1) {
+      filtros.trabalhadorId = ids[0];
+    } else {
+      filtros.trabalhadorIds = ids;
+      delete filtros.trabalhadorId;
+    }
+  }
+
+  // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
+  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
     const ids = await obterIdsTrabalhadorPorCpf((req as any).user.cpf);
     const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
     if (idsValidos.length > 1) {
@@ -94,16 +110,16 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para atualizar acidentes', 403);
-  }
-
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
   const acidenteAntigo = await acidenteService.obter(id);
   
   if (!acidenteAntigo) {
     throw new AppError('Acidente não encontrado', 404);
   }
+
+  // Verificação centralizada de escopo anti-IDOR para gerenciamento
+  await assertCanManageHealthRecord(scope, acidenteAntigo, 'Acidente');
   
   const acidente = await acidenteService.atualizar(id, req.body);
 
@@ -117,16 +133,16 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para deletar acidentes', 403);
-  }
-
   const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
   const acidenteAntigo = await acidenteService.obter(id);
   
   if (!acidenteAntigo) {
     throw new AppError('Acidente não encontrado', 404);
   }
+
+  // Verificação centralizada de escopo anti-IDOR para gerenciamento
+  await assertCanManageHealthRecord(scope, acidenteAntigo, 'Acidente');
   
   await acidenteService.deletar(id);
 
@@ -138,14 +154,10 @@ export const deletar = asyncHandler(async (req: Request, res: Response) => {
 export const obterPorTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { trabalhadorId } = req.params;
   const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 10 });
+  const scope = await buildUserScope((req as IAuthRequest).user!);
 
-  // Se o usuário logado for trabalhador, ele só pode acessar seus próprios dados
-  if ((req as any).user?.perfil === 'trabalhador') {
-    const trabalhador = await Trabalhador.findOne({ cpf: (req as any).user.cpf });
-    if (!trabalhador || trabalhador._id.toString() !== trabalhadorId) {
-      throw new AppError('Sem permissão para acessar estes dados', 403);
-    }
-  }
+  // Verificação centralizada de escopo anti-IDOR
+  await assertCanReadWorker(scope, trabalhadorId);
 
   const { acidentes, total } = await acidenteService.obterPorTrabalhador(
     trabalhadorId,

@@ -1,6 +1,6 @@
 import express from 'express';
 import * as empresaController from '../controllers/empresaController.js';
-import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
+import { authMiddleware, adminMiddleware, adminOuGestorMiddleware } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validation.js';
 import { empresaSchema, empresaUpdateSchema } from '../utils/validations.js';
 
@@ -29,17 +29,19 @@ router.get('/ativas', async (req, res) => {
   }
 });
 
-// Todas as rotas de empresas requerem autenticação de Admin
+// Todas as rotas de empresas requerem autenticação
 router.use(authMiddleware);
 
-// Rota pública para usuários autenticados (usada em dropdowns de cadastro)
+// Rota para usuários autenticados (usada em dropdowns de cadastro)
 router.get('/unidade/:unidadeId', empresaController.getEmpresaPorUnidade);
 
-router.use(adminMiddleware);
-router.get('/', empresaController.getEmpresas);
-router.post('/', validateRequest(empresaSchema), empresaController.createEmpresa);
-router.get('/:id', empresaController.getEmpresa);
-router.put('/:id', validateRequest(empresaUpdateSchema), empresaController.updateEmpresa);
-router.delete('/:id', empresaController.deleteEmpresa);
+// Leitura: admin e gestor (gestor vê apenas sua empresa via controller)
+router.get('/', adminOuGestorMiddleware, empresaController.getEmpresas);
+router.get('/:id', adminOuGestorMiddleware, empresaController.getEmpresa);
+
+// Escrita: apenas admin
+router.post('/', adminMiddleware, validateRequest(empresaSchema), empresaController.createEmpresa);
+router.put('/:id', adminMiddleware, validateRequest(empresaUpdateSchema), empresaController.updateEmpresa);
+router.delete('/:id', adminMiddleware, empresaController.deleteEmpresa);
 
 export default router;

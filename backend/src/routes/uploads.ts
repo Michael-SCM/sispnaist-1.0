@@ -1,35 +1,84 @@
 import { Router } from 'express';
 import multer from 'multer';
-import uploadController from '../controllers/uploadController';
-import { authMiddleware } from '../middleware/auth';
+import path from 'path';
+import fs from 'fs';
+import rateLimit from 'express-rate-limit';
+import uploadController from '../controllers/uploadController.js';
+import { authMiddleware, adminMiddleware, adminOuGestorMiddleware } from '../middleware/auth.js';
+import { validateObjectId } from '../middleware/validation.js';
 import config from '../config/config.js';
+import { sanitizeAndValidateExtension } from '../utils/fileValidation.js';
 
 const router = Router();
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: config.maxFileSize || 10485760 // 10MB default
+// Diretório temporário isolado para upload via diskStorage
+const TEMP_DIR = path.resolve(process.cwd(), config.uploadDir || './uploads', 'tmp');
+if (!fs.existsSync(TEMP_DIR)) {
+  fs.mkdirSync(TEMP_DIR, { recursive: true, mode: 0o700 });
+}
+
+// Rate limit estrito para uploads (máximo 30 uploads a cada 15 minutos por usuário/IP)
+const uploadRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: {
+    status: 'error',
+    message: 'Muitas requisições de upload. Por favor, aguarde alguns minutos.',
   },
-  fileFilter: function (req, file, cb) {
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|xls|xlsx|csv|txt/;
-    const mimetype = allowedTypes.test(file.mimetype);
-    if (mimetype) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Tipo de arquivo não permitido'));
-    }
-  }
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Todas as rotas requerem autenticação
+// Configuração do multer com diskStorage (evita consumir RAM em arquivos grandes)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, TEMP_DIR);
+  },
+  filename: function (req, file, cb) {
+    // Nome temporário aleatório antes da validação profunda de magic bytes
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, `tmp-${uniqueSuffix}.part`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: config.maxFileSize || 10485760, // 10MB default
+    files: 1, // apenas 1 arquivo por requisição
+  },
+  fileFilter: function (req, file, cb) {
+    try {
+      // Validação preliminar estrita de extensão (whitelist: pdf, jpg, jpeg, png)
+      sanitizeAndValidateExtension(file.originalname);
+      cb(null, true);
+    } catch (err: any) {
+      cb(err);
+    }
+  },
+});
+
+// Download via URL assinada temporária (não requer header Authorization porque o token assinado carrega autenticação/expiração)
+router.get('/download-signed', uploadController.downloadAssinado);
+
+// Todas as demais rotas requerem autenticação
 router.use(authMiddleware);
 
-router.get('/', uploadController.listar);
-router.get('/:id', uploadController.obter);
-router.post('/', upload.single('file'), uploadController.criar);
-router.get('/:id/download', uploadController.download);
-router.get('/:id/view', uploadController.visualizar);
-router.delete('/:id', uploadController.deletar);
+// Leitura de uploads: admin/gestor
+router.get('/', adminOuGestorMiddleware, uploadController.listar);
+router.get('/:id', validateObjectId('id'), uploadController.obter);
+
+// Geração de URL assinada temporária (15 min) para download seguro
+router.get('/:id/signed-url', validateObjectId('id'), adminOuGestorMiddleware, uploadController.gerarUrlAssinada);
+
+// Upload: admin/gestor (com rate limiter e diskStorage)
+router.post('/', adminOuGestorMiddleware, uploadRateLimiter, upload.single('file'), uploadController.criar);
+
+// Download/visualizar direto: admin/gestor
+router.get('/:id/download', validateObjectId('id'), adminOuGestorMiddleware, uploadController.download);
+router.get('/:id/view', validateObjectId('id'), adminOuGestorMiddleware, uploadController.visualizar);
+
+// Delete: apenas admin
+router.delete('/:id', validateObjectId('id'), adminMiddleware, uploadController.deletar);
 
 export default router;
