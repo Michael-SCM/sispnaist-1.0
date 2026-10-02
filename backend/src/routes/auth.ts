@@ -2,7 +2,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/authController.js';
 import { validateRequest } from '../middleware/validation.js';
-import { authMiddleware } from '../middleware/auth.js';
+import { authMiddleware, authMiddlewareOpcional } from '../middleware/auth.js';
 import { registerSchema, loginSchema, updateProfileSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema, refreshTokenSchema, changePasswordSchema, enviarCodigo2FASchema, verificar2FASchema, confirmar2FASchema, desabilitar2FASchema } from '../utils/validations.js';
 
 const router = express.Router();
@@ -126,7 +126,9 @@ router.post(
 router.post('/revoke-sessions', authMiddleware, authController.revokeAllSessions);
 
 router.post('/refresh-token', refreshLimiter, validateRequest(refreshTokenSchema), authController.refreshToken);
-router.post('/logout', authController.logout);
+  // Opcional: popula req.user com token válido (revoga sessão + registra
+  // LOGOUT) sem nunca responder 401 — ver authMiddlewareOpcional.
+  router.post('/logout', authMiddlewareOpcional, authController.logout);
 
 // LGPD
 router.post('/consent', authMiddleware, authController.registerConsent);

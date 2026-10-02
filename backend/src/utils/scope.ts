@@ -86,6 +86,23 @@ export async function buildUserScope(user: {
     }
   }
 
+  // Perfil saude: pode receber empresa e unidade diretamente no usuário
+  if (user.perfil === 'saude') {
+    if (!scope.empresaScope && user.empresa) {
+      scope.empresaScope = user.empresa;
+    }
+    if (!scope.unidadeScope && user.unidade) {
+      scope.unidadeScope = user.unidade;
+    }
+  }
+
+  if (scope.empresaScope && !scope.empresaDoc) {
+    scope.empresaDoc = await Empresa.findById(scope.empresaScope).lean();
+  }
+  if (scope.unidadeScope && !scope.unidadeDoc) {
+    scope.unidadeDoc = await Unidade.findById(scope.unidadeScope).lean();
+  }
+
   return scope;
 }
 
@@ -103,6 +120,11 @@ export function scopeFilterDirect(
   if (scope.perfil === 'admin') return {};
 
   if (scope.perfil === 'gestor') {
+    // Fail-closed: gestor sem empresa válida não pode acessar dados
+    if (!scope.empresaScope) {
+      return { _id: null };
+    }
+
     const filtro: Record<string, any> = {};
     if (modelHasEmpresa && scope.empresaScope) {
       filtro.empresa = scope.empresaScope;
@@ -130,7 +152,7 @@ export async function scopeFilterByTrabalhador(
 ): Promise<Record<string, any>> {
   if (scope.perfil === 'admin') return {};
 
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  if (scope.perfil === 'trabalhador') {
     if (scope.trabalhadorIds.length === 0) {
       return { trabalhadorId: null };
     }
@@ -140,19 +162,35 @@ export async function scopeFilterByTrabalhador(
     return { trabalhadorId: { $in: scope.trabalhadorIds } };
   }
 
-  // gestor: buscar trabalhadores da empresa
-  if (scope.empresaScope) {
-    const trabalhadores = await Trabalhador.find({ empresa: scope.empresaScope })
-      .select('_id')
-      .lean();
-    const ids = trabalhadores.map((t: any) => t._id.toString());
-    if (ids.length === 0) {
-      return { trabalhadorId: null };
+  // gestor / saude: buscar trabalhadores da empresa/unidade
+  if (scope.perfil === 'gestor' || scope.perfil === 'saude') {
+    if (scope.empresaScope) {
+      const query: any = { empresa: scope.empresaScope };
+      if (scope.unidadeScope) {
+        query.unidade = scope.unidadeScope;
+      }
+      const trabalhadores = await Trabalhador.find(query)
+        .select('_id')
+        .lean();
+      const ids = trabalhadores.map((t: any) => t._id.toString());
+      if (ids.length === 0) {
+        return { trabalhadorId: null };
+      }
+      if (ids.length === 1) {
+        return { trabalhadorId: ids[0] };
+      }
+      return { trabalhadorId: { $in: ids } };
     }
-    if (ids.length === 1) {
-      return { trabalhadorId: ids[0] };
+
+    // Se saude sem empresaScope mas tem trabalhadorIds próprios
+    if (scope.perfil === 'saude' && scope.trabalhadorIds.length > 0) {
+      if (scope.trabalhadorIds.length === 1) {
+        return { trabalhadorId: scope.trabalhadorIds[0] };
+      }
+      return { trabalhadorId: { $in: scope.trabalhadorIds } };
     }
-    return { trabalhadorId: { $in: ids } };
+
+    return { trabalhadorId: null };
   }
 
   return { trabalhadorId: null };
@@ -168,17 +206,39 @@ export async function verificarEscopoTrabalhador(
 ): Promise<boolean> {
   if (scope.perfil === 'admin') return true;
 
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  if (scope.perfil === 'trabalhador') {
     return scope.trabalhadorIds.includes(trabalhadorId);
   }
 
-  // gestor: verificar se o trabalhador pertence à empresa
+  // saude: se tem empresaScope, verifica empresa/unidade; senão verifica IDs próprios
+  if (scope.perfil === 'saude') {
+    if (scope.empresaScope) {
+      const trabalhador = await Trabalhador.findById(trabalhadorId)
+        .select('empresa unidade')
+        .lean();
+      if (!trabalhador) return false;
+      const mesmaEmpresa = (trabalhador as any).empresa?.toString() === scope.empresaScope;
+      if (!mesmaEmpresa) return false;
+      if (scope.unidadeScope && (trabalhador as any).unidade) {
+        return (trabalhador as any).unidade?.toString() === scope.unidadeScope;
+      }
+      return true;
+    }
+    return scope.trabalhadorIds.includes(trabalhadorId);
+  }
+
+  // gestor: verificar se o trabalhador pertence à empresa e unidade (se informada)
   if (scope.empresaScope) {
     const trabalhador = await Trabalhador.findById(trabalhadorId)
-      .select('empresa')
+      .select('empresa unidade')
       .lean();
     if (!trabalhador) return false;
-    return (trabalhador as any).empresa?.toString() === scope.empresaScope;
+    const mesmaEmpresa = (trabalhador as any).empresa?.toString() === scope.empresaScope;
+    if (!mesmaEmpresa) return false;
+    if (scope.unidadeScope && (trabalhador as any).unidade) {
+      return (trabalhador as any).unidade?.toString() === scope.unidadeScope;
+    }
+    return true;
   }
 
   return false;

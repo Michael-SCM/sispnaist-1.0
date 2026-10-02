@@ -447,13 +447,21 @@ curl -X GET http://localhost:5000/api/audit/stats \
    - Gráficos com Chart.js
    - Cards de KPIs
 
-5. **Retenção de Dados**
-   - Política de limpeza de logs antigos
-   - Backup automático
+5. **Retenção de Dados** — ✅ implementado (desabilitado por padrão)
+   - `AUDIT_RETENTION_DAYS` (default `0` = nunca excluir) + cron
+     `AUDIT_RETENTION_CRON` + trava `AUDIT_RETENTION_DRY_RUN`
+   - CLI: `npm run audit:prune` (dry-run; exige `--confirmar` para executar)
+   - A exclusão usa o driver nativo (fora dos hooks de imutabilidade) e gera
+     um evento de auditoria do próprio ato de exclusão
+   - Prazos exigem validação de privacidade/jurídico — ver
+     `backend/src/config/auditPolicy.ts`
+   - Backup/offline: `npm run audit:export` (JSONL fora do banco)
 
-6. **Login/Logout Tracking**
-   - Registrar LOGIN/LOGOUT automático
-   - Histórico de sessões
+6. **Login/Logout Tracking** — ✅ implementado
+   - `LOGIN` registrado em: senha, 2FA concluído, dispositivo confiável e
+     **falha** (`resultado: 'falha'`, sem e-mail/credencial no evento)
+   - `LOGOUT` registrado em `authController.logout`
+   - Nunca grava e-mail, senha ou código 2FA no evento
 
 ---
 
@@ -474,11 +482,21 @@ curl -X GET http://localhost:5000/api/audit/stats \
    db.audit_logs.createIndex({ "dataCriacao": -1 })
    ```
 
-3. **TTL (Time To Live):**
-   Considere adicionar expiração de logs:
+3. **TTL (Time To Live) — NÃO implementado (divergência corrigida):**
+   A sugestão original era criar um índice TTL de 90 dias:
    ```javascript
-   db.audit_logs.createIndex({ "dataCriacao": 1 }, { expireAfterSeconds: 7776000 }) // 90 dias
+   db.audit_logs.createIndex({ "dataCriacao": 1 }, { expireAfterSeconds: 7776000 })
    ```
+   **Nenhum índice TTL existe em `audit_logs`** e a retenção automática está
+   **desabilitada por padrão**. O comportamento real é:
+   - Exclusão explícita via `AUDIT_RETENTION_DAYS` / `npm run audit:prune` /
+     cron `auditRetentionScheduler` — não via TTL do MongoDB.
+   - Default `0` = os logs são mantidos até decisão formal de
+     privacidade/jurídico (ver `backend/src/config/auditPolicy.ts`).
+   - Habilitar um prazo (inclusive os 90 dias sugeridos) **antes** da validação
+     jurídica pode apagar trilha que a defesa trabalhista ainda precisa.
+   - Verifique a cadeia com `npm run audit:verify` e a política atual em
+     `GET /api/audit/policy` (admin).
 
 ### 🔄 Sincronização com Existentes
 

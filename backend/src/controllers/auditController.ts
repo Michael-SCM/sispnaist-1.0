@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import auditService from '../services/AuditService.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { obterPoliticaRetencao } from '../config/auditPolicy.js';
+import { obterEstatisticasAudit } from '../utils/auditLogger.js';
+import { obterEstatisticasAuditRead } from '../middleware/auditRead.js';
 
 /**
  * GET /api/audit/logs
@@ -45,5 +48,35 @@ export const obterEstatisticas = asyncHandler(async (req: Request, res: Response
   res.status(200).json({
     status: 'success',
     data: result
+  });
+});
+
+/**
+ * GET /api/audit/integrity
+ * Confere a cadeia de hash dos logs (rastreabilidade).
+ */
+export const verificarIntegridade = asyncHandler(async (req: Request, res: Response) => {
+  const relatorio = await auditService.verificarIntegridadeCadeia();
+
+  res.status(relatorio.quebras > 0 ? 206 : 200).json({
+    status: relatorio.quebras > 0 ? 'partial-content' : 'success',
+    data: relatorio,
+  });
+});
+
+/**
+ * GET /api/audit/policy
+ * Política de retenção REALMENTE implementada + estatísticas da trilha.
+ * Serve para confrontar documentação x comportamento do sistema.
+ */
+export const obterPolitica = asyncHandler(async (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    data: {
+      politica: obterPoliticaRetencao(),
+      gravacao: obterEstatisticasAudit(),
+      leitura: obterEstatisticasAuditRead(),
+      aviso: 'Não constitui parecer jurídico. Prazos exigem validação de privacidade/jurídico.',
+    },
   });
 });

@@ -7,11 +7,31 @@ import { IAuthRequest } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { buildUserScope } from '../utils/scope.js';
 import Acidente from '../models/Acidente.js';
-import { assertCanReadWorker, assertCanManageHealthRecord } from '../services/AuthorizationService.js';
+import { assertCanReadWorker, assertCanManageHealthRecord, assertCanWriteHealthRecord } from '../services/AuthorizationService.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para criar fichas de material biológico', 403);
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
+  const { acidenteId } = req.body;
+  if (!acidenteId) {
+    throw new AppError('Acidente é obrigatório', 400);
+  }
+
+  // Validação centralizada do trabalhador-alvo do acidente integrando escopo (anti-IDOR)
+  if (scope.perfil !== 'admin') {
+    const acidente = await Acidente.findById(acidenteId).select('trabalhadorId').lean();
+    if (!acidente) {
+      throw new AppError('Acidente não encontrado', 404);
+    }
+    const trabalhadorId = (acidente as any).trabalhadorId?.toString();
+    if (!trabalhadorId) {
+      throw new AppError('Trabalhador não vinculado ao acidente', 400);
+    }
+    await assertCanWriteHealthRecord(scope, trabalhadorId, 'Material Biológico');
   }
 
   const ficha = await materialBiologicoService.criar(req.body);
@@ -101,6 +121,11 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   const fichaAntiga = await materialBiologicoService.obter(id);
 
   if (!fichaAntiga) {
@@ -116,7 +141,12 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
     }
   }
 
-  const ficha = await materialBiologicoService.atualizar(id, req.body);
+  // Prevenir transferir ficha para outro acidente
+  const dadosAtualizacao = { ...req.body };
+  delete dadosAtualizacao.acidenteId;
+  delete dadosAtualizacao._id;
+
+  const ficha = await materialBiologicoService.atualizar(id, dadosAtualizacao);
 
   const mudancas = compararDados(fichaAntiga, ficha);
   await logAction(req, 'UPDATE', 'MaterialBiologico', id, mudancas);
@@ -128,12 +158,27 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para deletar fichas de material biológico', 403);
+  const { id } = req.params;
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
   }
 
-  const { id } = req.params;
   const fichaAntiga = await materialBiologicoService.obter(id);
+  if (!fichaAntiga) {
+    throw new AppError('Ficha não encontrada', 404);
+  }
+
+  // Verificação centralizada de escopo anti-IDOR via acidente vinculado
+  if (scope.perfil !== 'admin' && (fichaAntiga as any).acidenteId) {
+    const acidente = await Acidente.findById((fichaAntiga as any).acidenteId).select('trabalhadorId').lean();
+    const trabalhadorId = (acidente as any)?.trabalhadorId?.toString() ?? null;
+    if (trabalhadorId) {
+      await assertCanManageHealthRecord(scope, { trabalhadorId }, 'Ficha de Material Biológico');
+    }
+  }
+
   await materialBiologicoService.deletar(id);
 
   await logAction(req, 'DELETE', 'MaterialBiologico', id, fichaAntiga);

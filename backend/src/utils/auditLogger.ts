@@ -1,36 +1,107 @@
-import AuditLog from '../models/AuditLog.js';
-import { AcaoAudit } from '../models/AuditLog.js';
 import { Request } from 'express';
+import AuditLog, { AcaoAudit, ResultadoAudit } from '../models/AuditLog.js';
+import { criarComCadeia, obterEstatisticasFila } from './auditChain.js';
+import { redigirDetalhes } from './auditRedaction.js';
+
+/**
+ * Registro central de auditoria.
+ *
+ * O que é gravado por evento:
+ *   acao, entidade, entidadeId, resultado, camposAlterados (NOMES),
+ *   detalhes (redigidos), ip, userAgent, sensivel + cadeia de hash.
+ *
+ * O que NUNCA é gravado:
+ *   CPF, e-mail, telefone, endereço, credenciais/tokens e conteúdo clínico.
+ *   A redação é feita por `redigirDetalhes()` — lista permitida de campos
+ *   + lista bloqueada + máscara de valor — e vale para TODAS as chamadas,
+ *   inclusive as que recebem um documento Mongoose inteiro.
+ *
+ * Falhas de gravação não bloqueiam a operação de negócio, mas também não são
+ * silenciosas: são registradas em console.error e contadas em
+ * `obterEstatisticasAudit()`. Defina AUDIT_STRICT=true para que a falha
+ * propague e interrompa a operação.
+ */
+
+let falhasAuditoria = 0;
+let sucessosAuditoria = 0;
+
+export function obterEstatisticasAudit(): {
+  sucessos: number;
+  falhas: number;
+  fila: { escritas: number; falhas: number };
+} {
+  return {
+    sucessos: sucessosAuditoria,
+    falhas: falhasAuditoria,
+    fila: obterEstatisticasFila(),
+  };
+}
+
+export interface OpcoesLog {
+  sensivel?: boolean;
+  /** Resultado da operação. Padrão: 'sucesso'. */
+  resultado?: ResultadoAudit;
+  /** Nomes de campo alterados; se omitidos, extraídos de `detalhes.camposMudados`. */
+  camposAlterados?: string[];
+  /** Resumo curto não-identificante a gravar em `detalhes.resumo`. */
+  resumo?: string;
+  /**
+   * Usuário responsável. Usado quando `req.user` ainda não existe — por
+   * exemplo, no LOGIN (falha ou sucesso) antes do middleware de auth.
+   */
+  usuarioId?: string;
+}
+
+/**
+ * Chaves cujo conteúdo NUNCA deve ir para o log, mesmo quando vierem embutidas
+ * em um objeto de comparação. Removidas antes da redação (segunda camada).
+ */
+const CHAVES_REMOVIDAS_ANTES_DA_REDACAO = new Set([
+  'mudancas', // {antes, depois} de cada campo — só os nomes interessam
+  'data',
+  'buffer',
+  'corpo',
+  'body',
+  'payload',
+  'arquivo',
+  'files',
+  'file',
+]);
+
+function prepararDetalhes(detalhes: unknown): { detalhes: Record<string, any>; campos: string[] } {
+  if (detalhes === null || detalhes === undefined) {
+    return { detalhes: {}, campos: [] };
+  }
+
+  const bruto: any =
+    typeof (detalhes as any)?.toObject === 'function'
+      ? (detalhes as any).toObject({ flattenObjectIds: true, depopulate: true })
+      : typeof detalhes === 'object'
+        ? { ...(detalhes as any) }
+        : { valor: detalhes };
+
+  // Nomes de campo alterados saem da comparação e viram um campo dedicado.
+  const campos: string[] = Array.isArray(bruto.camposMudados)
+    ? bruto.camposMudados.filter((c: unknown) => typeof c === 'string').slice(0, 60)
+    : [];
+  delete bruto.camposMudados;
+
+  // Remove estruturas com valores antes/depois e buffers antes de qualquer coisa.
+  for (const chave of CHAVES_REMOVIDAS_ANTES_DA_REDACAO) {
+    if (chave in bruto) delete bruto[chave];
+  }
+
+  return { detalhes: redigirDetalhes(bruto), campos };
+}
 
 /**
  * Registra uma ação no audit log com dados estruturados.
  *
- * Exemplo de CREATE:
- *   await logAction(req, 'CREATE', 'Empresa', empresa._id, {
- *     razaoSocial: empresa.razaoSocial,
- *     cnpj: empresa.cnpj
- *   });
- *
- * Exemplo de UPDATE com comparação:
- *   const mudancas = compararDados(empresaAntiga, empresaNova);
- *   await logAction(req, 'UPDATE', 'Empresa', id, mudancas);
- *
- * Exemplo de DELETE (capture antes de deletar!):
- *   const dados = await Empresa.findById(id);
- *   await logAction(req, 'DELETE', 'Empresa', id, {
- *     razaoSocial: dados.razaoSocial,
- *     cnpj: dados.cnpj
- *   });
- *
- * Exemplo de READ (acesso a dados sensíveis):
- *   await logAction(req, 'READ', 'TrabalhadorExameSaude', itemId, {
- *     trabalhadorId, tipoAso: exame.tipoAso, resultado: exame.resultado
- *   }, { sensivel: true });
- *
- * Exemplo de EXPORT:
- *   await logAction(req, 'EXPORT', 'Acidente', 'csv', {
- *     filtros, totalRegistros: acidentes.length
- *   }, { sensivel: true });
+ * Exemplos:
+ *   await logAction(req, 'CREATE', 'Empresa', id, { razaoSocial, cnpj });
+ *   await logAction(req, 'UPDATE', 'Empresa', id, compararDados(antes, depois));
+ *   await logAction(req, 'READ', 'TrabalhadorExameSaude', id, {}, { sensivel: true });
+ *   await logAction(req, 'LOGIN', 'User', userId, {}, { resultado: 'falha' });
  */
 export const logAction = async (
   req: Request | any,
@@ -38,36 +109,66 @@ export const logAction = async (
   entidade: string,
   entidadeId: string,
   detalhes?: Record<string, any>,
-  opcoes?: { sensivel?: boolean }
+  opcoes?: OpcoesLog
 ) => {
-  try {
-    const usuarioId = req.user?.id || req.user?._id || req.body?.usuarioId || 'system';
-    const ip = (req.ip || req.connection?.remoteAddress || '0.0.0.0').replace('::ffff:', '');
-    const userAgent = req.get('User-Agent') || 'Unknown';
+  const { detalhes: detalhesRedigidos, campos } = prepararDetalhes(detalhes);
+  const camposAlterados = opcoes?.camposAlterados?.slice(0, 60) ?? campos;
 
-    await AuditLog.create({
-      usuarioId,
+  const usuarioId =
+    opcoes?.usuarioId ||
+    req?.user?.id ||
+    req?.user?._id ||
+    req?.body?.usuarioId;
+  const ip = String(req?.ip || req?.connection?.remoteAddress || '0.0.0.0').replace('::ffff:', '');
+  const userAgent = String(req?.get?.('User-Agent') || req?.userAgent || 'Unknown').slice(0, 300);
+
+  const registro: any = {
+    usuarioId,
+    acao,
+    entidade,
+    entidadeId: String(entidadeId),
+    resultado: opcoes?.resultado ?? 'sucesso',
+    detalhes: detalhesRedigidos,
+    ip,
+    userAgent,
+    sensivel: opcoes?.sensivel ?? false,
+  };
+
+  if (camposAlterados.length > 0) {
+    registro.camposAlterados = camposAlterados;
+  }
+  if (opcoes?.resumo) {
+    registro.detalhes = { ...registro.detalhes, resumo: opcoes.resumo };
+  }
+
+  try {
+    await criarComCadeia(registro);
+    sucessosAuditoria++;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(
+        `[AUDIT] ${acao} - ${entidade}:${registro.entidadeId} (${registro.resultado}) by ${
+          usuarioId || 'system'
+        }${opcoes?.sensivel ? ' (SENSÍVEL)' : ''}`
+      );
+    }
+  } catch (error: any) {
+    falhasAuditoria++;
+    // Falha visível: uma trilha de auditoria com buracos silenciosos é inútil.
+    console.error('[AUDIT] FALHA ao gravar evento de auditoria', {
       acao,
       entidade,
-      entidadeId,
-      detalhes: detalhes ? sanitizeDetails(detalhes) : undefined,
-      ip,
-      userAgent,
-      sensivel: opcoes?.sensivel ?? false,
+      entidadeId: registro.entidadeId,
+      motivo: error?.message,
+      falhasAcumuladas: falhasAuditoria,
     });
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[AUDIT] ${acao} - ${entidade}:${entidadeId} by ${usuarioId}${opcoes?.sensivel ? ' (SENSÍVEL)' : ''}`);
+    if (process.env.AUDIT_STRICT === 'true') {
+      throw error;
     }
-  } catch (error) {
-    console.error('Erro ao salvar log de auditoria:', error);
   }
 };
 
-/**
- * Atalho para logar acesso (READ) a dados sensíveis.
- * Usado pelo middleware auditRead e em controllers que acessam dados de saúde.
- */
+/** Atalho para logar acesso (READ) a dados sensíveis. */
 export const logReadSensivel = async (
   req: Request | any,
   entidade: string,
@@ -77,9 +178,7 @@ export const logReadSensivel = async (
   return logAction(req, 'READ', entidade, entidadeId, detalhes, { sensivel: true });
 };
 
-/**
- * Atalho para logar exportação de dados sensíveis.
- */
+/** Atalho para logar exportação de dados sensíveis. */
 export const logExport = async (
   req: Request | any,
   entidade: string,
@@ -90,94 +189,55 @@ export const logExport = async (
 };
 
 /**
- * Para UPDATE: Cria objeto com antes/depois automático
+ * Compara dois documentos e devolve APENAS os nomes dos campos alterados.
  *
- * Retorna:
- * {
- *   resumo: "3 campo(s) alterado(s)",
- *   camposMudados: ["nome", "email", "status"],
- *   mudancas: {
- *     nome: { antes: "João", depois: "João Silva" },
- *     email: { antes: "joao@old.com", depois: "joao@new.com" },
- *     status: { antes: "ativo", depois: "inativo" }
- *   }
- * }
+ * Os valores (antes/depois) são deliberadamente descartados aqui: o audit log
+ * precisa dizer O QUE mudou, não reproduzir CPF, endereço ou relato clínico.
  */
 export const compararDados = (
   datosAntigosRaw: Record<string, any>,
   datosNovosRaw: Record<string, any>
-): Record<string, any> => {
-  const datosAntigos = typeof datosAntigosRaw?.toObject === 'function' ? datosAntigosRaw.toObject() : JSON.parse(JSON.stringify(datosAntigosRaw || {}));
-  const datosNovos = typeof datosNovosRaw?.toObject === 'function' ? datosNovosRaw.toObject() : JSON.parse(JSON.stringify(datosNovosRaw || {}));
+): { resumo: string; camposMudados: string[] } => {
+  const dadosAntigos =
+    typeof datosAntigosRaw?.toObject === 'function'
+      ? datosAntigosRaw.toObject()
+      : JSON.parse(JSON.stringify(datosAntigosRaw || {}));
+  const dadosNovos =
+    typeof datosNovosRaw?.toObject === 'function'
+      ? datosNovosRaw.toObject()
+      : JSON.parse(JSON.stringify(datosNovosRaw || {}));
 
-  const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt'];
-
-  const mudancas: Record<string, any> = {};
+  const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt', 'dataCriacao', 'dataAtualizacao'];
   const camposMudados: string[] = [];
 
-  for (const campo in datosNovos) {
-    if (ignoreFields.includes(campo)) continue;
-
-    if (JSON.stringify(datosAntigos[campo]) !== JSON.stringify(datosNovos[campo])) {
-      mudancas[campo] = {
-        antes: datosAntigos[campo] !== undefined ? datosAntigos[campo] : null,
-        depois: datosNovos[campo]
-      };
+  const registrar = (campo: string) => {
+    if (!camposMudados.includes(campo) && !ignoreFields.includes(campo)) {
       camposMudados.push(campo);
+    }
+  };
+
+  for (const campo in dadosNovos) {
+    if (ignoreFields.includes(campo)) continue;
+    if (JSON.stringify(dadosAntigos[campo]) !== JSON.stringify(dadosNovos[campo])) {
+      registrar(campo);
     }
   }
 
-  for (const campo in datosAntigos) {
+  for (const campo in dadosAntigos) {
     if (ignoreFields.includes(campo)) continue;
-
-    if (!(campo in datosNovos) && datosAntigos[campo] !== undefined && datosAntigos[campo] !== null) {
-      mudancas[campo] = {
-        antes: datosAntigos[campo],
-        depois: null
-      };
-      if (!camposMudados.includes(campo)) {
-        camposMudados.push(campo);
-      }
-    }
+    if (!(campo in dadosNovos)) registrar(campo);
   }
 
   return {
     resumo: `${camposMudados.length} campo(s) alterado(s)`,
     camposMudados,
-    mudancas
   };
 };
 
-/**
- * Remove dados sensíveis e campos internos do Mongoose antes de registrar
- */
-function sanitizeDetails(dataRaw: Record<string, any>): Record<string, any> {
-  if (!dataRaw) return {};
-
-  const data = typeof dataRaw?.toObject === 'function' ? dataRaw.toObject() : dataRaw;
-  const sensitiveFields = ['senha', 'password', 'token', 'secret', 'apiKey', 'refreshToken'];
-  const ignoreFields = ['_id', '__v', 'createdAt', 'updatedAt'];
-
-  const sanitized = JSON.parse(JSON.stringify(data));
-
-  const removeSensitive = (obj: any) => {
-    for (const field of sensitiveFields) {
-      if (field in obj) {
-        delete obj[field];
-      }
-    }
-    for (const field of ignoreFields) {
-      if (field in obj) {
-        delete obj[field];
-      }
-    }
-    for (const key in obj) {
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
-        removeSensitive(obj[key]);
-      }
-    }
-  };
-
-  removeSensitive(sanitized);
-  return sanitized;
+/** Zera contadores (usado em testes). */
+export function resetarEstatisticasAudit(): void {
+  falhasAuditoria = 0;
+  sucessosAuditoria = 0;
 }
+
+export { AuditLog };

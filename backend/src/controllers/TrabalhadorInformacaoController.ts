@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import TrabalhadorInformacaoService from '../services/TrabalhadorInformacaoService';
-import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
 import { IAuthRequest } from '../middleware/auth.js';
-import { buildUserScope, verificarEscopoTrabalhador } from '../utils/scope.js';
+import { buildUserScope } from '../utils/scope.js';
+import { assertCanReadWorker, assertCanWriteHealthRecord } from '../services/AuthorizationService.js';
 
 class TrabalhadorInformacaoController {
   // GET /api/trabalhadores/:id/informacoes - Listar informações de um trabalhador
@@ -13,19 +13,8 @@ class TrabalhadorInformacaoController {
       const { id } = req.params;
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Verificar escopo
-      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-        if (!scope.trabalhadorIds.includes(id)) {
-          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
-        }
-      }
-
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
-        }
-      }
+      // Validação centralizada de escopo anti-IDOR
+      await assertCanReadWorker(scope, id);
 
       const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 100 });
       const result = await TrabalhadorInformacaoService.listarPorTrabalhador(id, page, limit);
@@ -46,19 +35,8 @@ class TrabalhadorInformacaoController {
       const { id, infoId } = req.params;
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Verificar escopo
-      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-        if (!scope.trabalhadorIds.includes(id)) {
-          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
-        }
-      }
-
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para acessar as informações deste trabalhador', 403);
-        }
-      }
+      // Validação centralizada de escopo anti-IDOR
+      await assertCanReadWorker(scope, id);
 
       const informacao = await TrabalhadorInformacaoService.obterPorId(infoId);
 
@@ -76,22 +54,18 @@ class TrabalhadorInformacaoController {
   async criar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para criar informações de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para criar informações neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
 
-      const dados = req.body;
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, 'InformacaoTrabalhador');
+
+      const dados = { ...req.body };
+      delete dados.trabalhadorId;
+      delete dados._id;
 
       const informacao = await TrabalhadorInformacaoService.criar({
         ...dados,
@@ -108,22 +82,18 @@ class TrabalhadorInformacaoController {
   async atualizar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para atualizar informações de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para atualizar informações neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
 
-      const dados = req.body;
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, 'InformacaoTrabalhador');
+
+      const dados = { ...req.body };
+      delete dados.trabalhadorId;
+      delete dados._id;
 
       const informacao = await TrabalhadorInformacaoService.atualizar(infoId, dados);
 
@@ -141,20 +111,14 @@ class TrabalhadorInformacaoController {
   async deletar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, infoId } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para deletar informações de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para deletar informações neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
+
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, 'InformacaoTrabalhador');
 
       const existe = await TrabalhadorInformacaoService.obterPorId(infoId);
       if (!existe || existe.trabalhadorId.toString() !== id) {

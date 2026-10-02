@@ -1,0 +1,110 @@
+﻿services:
+  - type: web
+    name: sispatnaist-backend
+    env: node
+    region: us-east-1
+    plan: free
+    branch: main
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    # ---------------------------------------------------------------------------
+    # AVISO DE STORAGE: O plano gratuito do Render usa filesystem EFEMERO.
+    # Arquivos salvos localmente SERAO PERDIDOS a cada deploy ou reinicio,
+    # enquanto os documentos permanecem no Atlas — ficando referencias orfas.
+    # Verifique com:  npm run uploads:integrity
+    #
+    # Para persistencia duravel, configure STORAGE_BACKEND=s3 e as variaveis
+    # STORAGE_S3_* abaixo. Opcoes S3-compativel:
+    #   - Cloudflare R2 (gratuito ate 10 GB, sem egress fees)
+    #   - Backblaze B2 (gratuito ate 10 GB)
+    #   - AWS S3 (pago por uso)
+    #   - MinIO self-hosted
+    # NAO altere o provedor sem uma decisao explicita de custo/contrato.
+    # Ao escolher, habilite: bucket PRIVADO, versionamento, replicacao e
+    # bucket key (SSE). O backend ja envia ServerSideEncryption=AES256.
+    #
+    # BACKUP:
+    #   - MongoDB Atlas: verifique o plano. M0 (free) NAO inclui backup automatico;
+    #     PITR exige M10+. Contrate ou exporte periodicamente com mongodump.
+    #   - Arquivos: com STORAGE_BACKEND=s3, ative versionamento/replicacao do bucket.
+    #     Com disk, nao ha backup possivel (filesystem efemero).
+    # ---------------------------------------------------------------------------
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: CORS_ORIGIN
+        value: https://sispnaist-1-0.vercel.app,http://localhost:3000
+      - key: REDIS_URL
+        sync: false
+      # --- Storage backend: 'disk' (efemero, nao recomendado) ou 's3' (duravel) ---
+      - key: STORAGE_BACKEND
+        value: disk
+      # --- Configuracao S3-compativel (preencha ao migrar para s3) ---
+      - key: STORAGE_S3_BUCKET
+        sync: false
+      - key: STORAGE_S3_REGION
+        value: auto
+      - key: STORAGE_S3_ENDPOINT
+        sync: false
+      - key: STORAGE_S3_ACCESS_KEY_ID
+        sync: false
+      - key: STORAGE_S3_SECRET_ACCESS_KEY
+        sync: false
+      # --- Limites de upload (bytes; default: 5242880 = 5 MB) ---
+      - key: MAX_FILE_SIZE
+        value: "5242880"
+      # --- Timeout total do envio do arquivo (ms; default: 30000 = 30 s) ---
+      - key: UPLOAD_TIMEOUT_MS
+        value: "30000"
+      # --- Diretorio de upload local (apenas para backend disk) ---
+      - key: UPLOAD_DIR
+        value: ./uploads
+      # --- Criptografia em repouso AES-256-GCM para o backend disk ---
+      # 32 bytes em hex (64 caracteres). Gerar: openssl rand -hex 32
+      # PERDER A CHAVE TORNA OS ARQUIVOS CIFRADOS IRRECUPERAVEIS.
+      # NUNCA versione este valor: deixe sync: false e cadastre no painel.
+      - key: UPLOAD_ENCRYPTION_KEY
+        sync: false
+      # --- Retencao de uploads (0 = desabilitado; habilitar exige decisao legal) ---
+      # NR-1/GRO exige guarda de documentos de saude ocupacional por ate 20 anos.
+      # Antes de alterar, valide com o responsavel tecnico/ juridico.
+      - key: UPLOAD_RETENTION_DAYS
+        value: "0"
+      - key: UPLOAD_RETENTION_CRON
+        value: "0 3 * * *"
+      # Seguranca extra: "1" simula a retencao sem apagar nada.
+      # Só troque para "0" depois de validar o relatorio de dry-run.
+      - key: UPLOAD_RETENTION_DRY_RUN
+        value: "1"
+      # --- Trilha de auditoria (audit_logs) ---
+      # DIVERGENCIA: Doc/AUDITORIA_IMPLEMENTACAO.md sugere TTL de 90 dias
+      # (indice expireAfterSeconds). Esse indice NAO existe e a retencao
+      # fica DESABILITADA por padrao (0 dias). Alterar exige validacao de
+      # privacidade/juridico: veja backend/src/config/auditPolicy.ts.
+      - key: AUDIT_RETENTION_DAYS
+        value: "0"
+      - key: AUDIT_RETENTION_CRON
+        value: "0 4 * * *"
+      # "1" = simula sem excluir. Necessario tambem do --confirmar no CLI.
+      - key: AUDIT_RETENTION_DRY_RUN
+        value: "1"
+      # "true" = falha ao gravar auditoria interrompe a operacao (auditoria
+      # rigida). Mantenha "false" para nao bloquear fluxo de negocio.
+      - key: AUDIT_STRICT
+        value: "false"
+      # "true" = o middleware de leitura sensivel AGUARDA a gravacao antes de
+      # liberar a requisicao (garante trilha completa, custa latencia).
+      - key: AUDIT_READ_AWAIT
+        value: "false"
+      # Destino do dump offline (npm run audit:export). Com filesystem
+      # efemero do Render free o arquivo some no proximo deploy: exporte
+      # para um bucket/objeto ou baixe via CI.
+      - key: AUDIT_EXPORT_DIR
+        value: ./audit-exports

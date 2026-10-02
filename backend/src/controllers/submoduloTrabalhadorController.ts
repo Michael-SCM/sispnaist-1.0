@@ -14,7 +14,8 @@ import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { IAuthRequest } from '../middleware/auth.js';
-import { buildUserScope, verificarEscopoTrabalhador } from '../utils/scope.js';
+import { buildUserScope } from '../utils/scope.js';
+import { assertCanReadWorker, assertCanWriteHealthRecord } from '../services/AuthorizationService.js';
 
 /**
  * Controller unificado para todos os submódulos do trabalhador.
@@ -42,19 +43,8 @@ class SubmoduloTrabalhadorController {
       const { ativo } = req.query;
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Verificar escopo
-      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-        if (!scope.trabalhadorIds.includes(id)) {
-          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
-        }
-      }
-
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
-        }
-      }
+      // Validação de escopo centralizada anti-IDOR
+      await assertCanReadWorker(scope, id);
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
@@ -88,19 +78,8 @@ class SubmoduloTrabalhadorController {
       const { id, submodulo, itemId } = req.params;
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Verificar escopo
-      if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-        if (!scope.trabalhadorIds.includes(id)) {
-          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
-        }
-      }
-
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para acessar os dados deste trabalhador', 403);
-        }
-      }
+      // Validação de escopo centralizada anti-IDOR
+      await assertCanReadWorker(scope, id);
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
@@ -123,20 +102,14 @@ class SubmoduloTrabalhadorController {
   async criar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para cadastrar registros em submódulos de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para criar registros neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
+
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, submodulo);
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
@@ -153,6 +126,9 @@ class SubmoduloTrabalhadorController {
           dados[key] = req.body[key];
         }
       }
+
+      delete dados.trabalhadorId;
+      delete dados._id;
 
       const item = await Model.create({ ...dados, trabalhadorId: id });
 
@@ -169,20 +145,14 @@ class SubmoduloTrabalhadorController {
   async atualizar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo, itemId } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para atualizar registros em submódulos de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para atualizar registros neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
+
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, submodulo);
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {
@@ -199,6 +169,9 @@ class SubmoduloTrabalhadorController {
           dados[key] = req.body[key];
         }
       }
+
+      delete dados.trabalhadorId;
+      delete dados._id;
 
       const itemAntigo = await Model.findOne({ _id: itemId, trabalhadorId: id });
       if (!itemAntigo) {
@@ -225,20 +198,14 @@ class SubmoduloTrabalhadorController {
   async deletar(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, submodulo, itemId } = req.params;
-
-      if ((req as any).user?.perfil === 'trabalhador') {
-        throw new AppError('Sem permissão para deletar registros em submódulos de trabalhadores', 403);
-      }
-
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      // Gestor: verificar se o trabalhador pertence à empresa
-      if (scope.perfil === 'gestor') {
-        const owns = await verificarEscopoTrabalhador(scope, id);
-        if (!owns) {
-          throw new AppError('Sem permissão para deletar registros neste trabalhador', 403);
-        }
+      if (scope.perfil === 'trabalhador') {
+        throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
       }
+
+      // Validação de escopo multiempresa e trabalhador-alvo
+      await assertCanWriteHealthRecord(scope, id, submodulo);
 
       const Model = SUBMODULO_MODELS[submodulo];
       if (!Model) {

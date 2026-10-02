@@ -18,20 +18,48 @@ import {
 import { logAction } from '../utils/auditLogger.js';
 
 class UploadController {
-  // GET /api/uploads - Listar uploads
+  // GET /api/uploads - Listar uploads filtrados por empresa (fail-closed)
   async listar(req: Request, res: Response, next: NextFunction) {
     try {
       const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
       const { entidade, entidadeId } = req.query;
 
+      // Filtro de escopo por empresa (fail-closed para gestor/saude sem empresa)
+      const scope = await buildUserScope((req as IAuthRequest).user!);
+
       const filtro: any = {};
       if (entidade) filtro.entidade = entidade;
       if (entidadeId) filtro.entidadeId = entidadeId;
 
+      if (scope.perfil === 'admin') {
+        // Admin: sem restrição de empresa
+      } else if (scope.empresaScope) {
+        // gestor/saude: só uploads da própria empresa
+        filtro.empresa = scope.empresaScope;
+      } else {
+        // gestor/saude sem empresa válida: filtro impossível (fail-closed)
+        filtro._id = null;
+      }
+
       const [uploads, total] = await Promise.all([
-        ArquivoUpload.find(filtro).select('-data').sort({ dataCriacao: -1 }).skip(skip).limit(limit).lean(),
+        ArquivoUpload.find(filtro)
+          .select('-data -caminhoArquivo')
+          .sort({ dataCriacao: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
         ArquivoUpload.countDocuments(filtro),
       ]);
+
+      // Auditoria de LISTAGEM de metadados (distinta do audit de download de arquivo)
+      await logAction(req, 'READ', 'ArquivoUpload', 'listagem', {
+        total,
+        page,
+        limit,
+        filtros: Object.fromEntries(
+          Object.entries(filtro).map(([k, v]) => [k, String(v)])
+        ),
+      });
 
       return res.status(200).json({
         data: uploads,
@@ -51,7 +79,7 @@ class UploadController {
       const { id } = req.params;
       const scope = await buildUserScope((req as IAuthRequest).user!);
 
-      const upload = await ArquivoUpload.findById(id).select('-data');
+      const upload = await ArquivoUpload.findById(id).select('-data -caminhoArquivo');
 
       if (!upload) {
         throw new AppError('Upload não encontrado ou acesso negado', 404);
@@ -120,19 +148,25 @@ class UploadController {
       // 7. Cálculo de checksum SHA-256 para integridade
       const checksumSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
 
-      // 8. Persistência em storage privado isolado (sem manter no MongoDB)
-      const caminhoArquivo = await storageService.persistFile(tempPath, nomeArmazenado);
-
       // Sanitizar nome original para apresentação segura (sem caminhos ou caracteres de injeção)
       const nomeOriginalSeguro = path.basename(file.originalname).replace(/[\r\n"']/g, '');
 
-      // 9. Criação do documento no banco
+      // 8. Persistência em storage privado isolado
+      const caminhoArquivo = await storageService.persistFile(tempPath, nomeArmazenado, {
+        mimeType: verifiedMime,
+        nomeOriginalSeguro,
+        empresaId: scope.empresaScope,
+      });
+
+      // 9. Criação do documento no banco — inclui campo empresa para filtro fail-closed
       const upload = await ArquivoUpload.create({
         entidade,
         entidadeId,
+        empresa: scope.empresaScope,
         nomeOriginal: nomeOriginalSeguro,
         nomeArmazenado,
         caminhoArquivo,
+        storageBackend: process.env.STORAGE_BACKEND || 'disk',
         checksumSha256,
         mimeType: verifiedMime,
         tamanho: file.size,
@@ -180,7 +214,10 @@ class UploadController {
 
       // Remoção do arquivo físico no storage privado
       if (upload.nomeArmazenado) {
-        await storageService.removeFile(upload.nomeArmazenado);
+        await storageService.removeFile(
+          upload.caminhoArquivo || upload.nomeArmazenado,
+          upload.storageBackend,
+        );
       }
 
       await upload.deleteOne();
@@ -205,7 +242,7 @@ class UploadController {
       const user = (req as IAuthRequest).user!;
       const scope = await buildUserScope(user);
 
-      const upload = await ArquivoUpload.findById(id).select('-data');
+      const upload = await ArquivoUpload.findById(id).select('-data -caminhoArquivo').lean();
 
       if (!upload) {
         throw new AppError('Upload não encontrado ou acesso negado', 404);
@@ -214,15 +251,36 @@ class UploadController {
       // Verificação de escopo
       await assertCanReadUpload(scope, { entidade: upload.entidade, entidadeId: upload.entidadeId.toString() });
 
-      const token = storageService.generateSignedDownloadToken(id, user.id, 15);
-      const downloadUrl = `/api/uploads/download-signed?token=${token}`;
+      const expiresInMinutes = 15;
+      // Se backend S3, gera URL pré-assinada nativa (offload de banda)
+      // Se backend disco, gera token HMAC interno
+      const s3Key = upload.storageBackend === 's3' ? (upload.caminhoArquivo ?? undefined) : undefined;
+      const downloadToken = await storageService.generatePresignedUrl(
+        id, user.id, expiresInMinutes, s3Key
+      );
+
+      // Auditoria: emissão de link temporário (eventodistinto do download efetivo)
+      await logAction(req, 'READ', 'ArquivoUpload', id, {
+        evento: 'gerar-url-assinada',
+        entidade: upload.entidade,
+        entidadeId: upload.entidadeId,
+        validadeSegundos: expiresInMinutes * 60,
+        storageBackend: upload.storageBackend || 'disk',
+      });
+
+      // Para S3: downloadToken já é a URL completa; para disco: montar rota interna
+      const isS3Url = downloadToken.startsWith('http');
+      const downloadUrl = isS3Url
+        ? downloadToken
+        : `/api/uploads/download-signed?token=${downloadToken}`;
 
       return res.status(200).json({
         status: 'success',
         data: {
           downloadUrl,
-          expiresInSeconds: 15 * 60,
+          expiresInSeconds: expiresInMinutes * 60,
           nomeOriginal: upload.nomeOriginal,
+          storageBackend: upload.storageBackend || 'disk',
         },
       });
     } catch (error) {
@@ -239,12 +297,26 @@ class UploadController {
         throw new AppError('Token de download assinado obrigatório', 400);
       }
 
-      const { fileId } = storageService.verifySignedDownloadToken(token);
+      const { fileId, userId } = storageService.verifySignedDownloadToken(token);
 
       const upload = await ArquivoUpload.findById(fileId);
       if (!upload) {
         throw new AppError('Arquivo não encontrado', 404);
       }
+
+      // Auditoria do download por link assinado (sem sessão JWT, identidade vem do token)
+      await logAction(
+        { user: { id: userId }, ip: req.ip, get: (h: string) => req.get(h) },
+        'READ',
+        'ArquivoUpload',
+        fileId,
+        {
+          evento: 'download-url-assinada',
+          entidade: upload.entidade,
+          entidadeId: upload.entidadeId,
+          nomeOriginal: upload.nomeOriginal,
+        }
+      );
 
       this.enviarArquivoResposta(res, upload, 'attachment');
     } catch (error) {
@@ -267,10 +339,14 @@ class UploadController {
       // Verificação centralizada de escopo anti-IDOR
       await assertCanReadUpload(scope, { entidade: upload.entidade, entidadeId: upload.entidadeId.toString() });
 
-      // Registro de auditoria
+      // Auditoria de download do arquivo (distinta da listagem de metadados)
       await logAction(req, 'READ', 'ArquivoUpload', id, {
+        evento: 'download',
         entidade: upload.entidade,
+        entidadeId: upload.entidadeId,
         nomeOriginal: upload.nomeOriginal,
+        mimeType: upload.mimeType,
+        tamanho: upload.tamanho,
       });
 
       this.enviarArquivoResposta(res, upload, 'attachment');
@@ -294,6 +370,15 @@ class UploadController {
       // Verificação centralizada de escopo anti-IDOR
       await assertCanReadUpload(scope, { entidade: upload.entidade, entidadeId: upload.entidadeId.toString() });
 
+      // Auditoria de visualização inline (entrega de conteúdo, auditada por conta própria)
+      await logAction(req, 'READ', 'ArquivoUpload', id, {
+        evento: 'visualizar-inline',
+        entidade: upload.entidade,
+        entidadeId: upload.entidadeId,
+        nomeOriginal: upload.nomeOriginal,
+        mimeType: upload.mimeType,
+      });
+
       this.enviarArquivoResposta(res, upload, 'inline');
     } catch (error) {
       next(error);
@@ -302,8 +387,9 @@ class UploadController {
 
   /**
    * Envia o arquivo por streaming a partir do storage privado com cabeçalhos de segurança estritos.
+   * Suporta backends 'disk' e 's3'.
    */
-  private enviarArquivoResposta(res: Response, upload: any, disposition: 'attachment' | 'inline') {
+  private async enviarArquivoResposta(res: Response, upload: any, disposition: 'attachment' | 'inline') {
     const nomeSeguro = upload.nomeOriginal.replace(/[\r\n"']/g, '');
 
     // Headers de proteção contra ataques baseados em downloads e MIME sniffing
@@ -313,21 +399,18 @@ class UploadController {
     res.setHeader('Content-Security-Policy', "default-src 'none'");
     res.setHeader('Cache-Control', 'private, max-age=300');
 
-    // 1. Tentar servir via stream do storage privado
-    const filePath = upload.caminhoArquivo || storageService.resolveFilePath(upload.nomeArmazenado);
-    if (filePath && fs.existsSync(filePath)) {
-      const readStream = fs.createReadStream(filePath);
-      readStream.pipe(res);
-      return;
+    try {
+      // Streaming via StorageService (suporta disco e S3)
+      const fileStream = await storageService.getFileStream(upload);
+      fileStream.pipe(res);
+    } catch (err: any) {
+      // Compatibilidade com arquivos legados gravados em memória/banco
+      if (upload.data && upload.data.length > 0) {
+        res.send(upload.data);
+        return;
+      }
+      throw err;
     }
-
-    // 2. Compatibilidade com arquivos legados gravados em memória/banco
-    if (upload.data && upload.data.length > 0) {
-      res.send(upload.data);
-      return;
-    }
-
-    throw new AppError('Arquivo físico não encontrado no armazenamento seguro', 404);
   }
 }
 

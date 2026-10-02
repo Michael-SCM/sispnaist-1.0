@@ -56,7 +56,26 @@ export async function assertCanReadWorker(
     return;
   }
 
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  if (scope.perfil === 'trabalhador') {
+    if (!scope.trabalhadorIds.includes(trabalhadorId)) {
+      notFound('Trabalhador');
+    }
+    const exists = await Trabalhador.exists({ _id: trabalhadorId });
+    if (!exists) notFound('Trabalhador');
+    return;
+  }
+
+  if (scope.perfil === 'saude') {
+    if (scope.empresaScope) {
+      const t = await Trabalhador.findById(trabalhadorId).select('empresa unidade').lean();
+      if (!t || (t as any).empresa?.toString() !== scope.empresaScope) {
+        notFound('Trabalhador');
+      }
+      if (scope.unidadeScope && (t as any).unidade?.toString() !== scope.unidadeScope) {
+        notFound('Trabalhador');
+      }
+      return;
+    }
     if (!scope.trabalhadorIds.includes(trabalhadorId)) {
       notFound('Trabalhador');
     }
@@ -67,8 +86,11 @@ export async function assertCanReadWorker(
 
   if (scope.perfil === 'gestor') {
     if (!scope.empresaScope) notFound('Trabalhador');
-    const t = await Trabalhador.findById(trabalhadorId).select('empresa').lean();
+    const t = await Trabalhador.findById(trabalhadorId).select('empresa unidade').lean();
     if (!t || (t as any).empresa?.toString() !== scope.empresaScope) {
+      notFound('Trabalhador');
+    }
+    if (scope.unidadeScope && (t as any).unidade?.toString() !== scope.unidadeScope) {
       notFound('Trabalhador');
     }
     return;
@@ -79,7 +101,7 @@ export async function assertCanReadWorker(
 
 /**
  * Verifica se o usuário autenticado pode **gerenciar** (criar/editar/deletar)
- * dados de um trabalhador. Trabalhadores e perfil 'saude' não têm permissão.
+ * dados cadastrais de um trabalhador. Trabalhadores e perfil 'saude' não têm permissão.
  *
  * @throws AppError(403) para trabalhador/saude
  * @throws AppError(404) se gestor não tiver acesso
@@ -90,20 +112,74 @@ export async function assertCanManageWorker(
 ): Promise<void> {
   if (scope.perfil === 'admin') return;
 
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-    throw new AppError('Sem permissão para gerenciar este registro', 403);
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
+  if (scope.perfil === 'saude') {
+    throw new AppError('Sem permissão para gerenciar cadastro de trabalhador', 403);
   }
 
   if (scope.perfil === 'gestor') {
     if (!scope.empresaScope) notFound('Trabalhador');
-    const t = await Trabalhador.findById(trabalhadorId).select('empresa').lean();
+    const t = await Trabalhador.findById(trabalhadorId).select('empresa unidade').lean();
     if (!t || (t as any).empresa?.toString() !== scope.empresaScope) {
+      notFound('Trabalhador');
+    }
+    if (scope.unidadeScope && (t as any).unidade?.toString() !== scope.unidadeScope) {
       notFound('Trabalhador');
     }
     return;
   }
 
   notFound('Trabalhador');
+}
+
+/**
+ * Verifica se o usuário autenticado pode CRIAR ou REGISTRAR dados de saúde
+ * (acidente, doença, vacinação, submódulos) para um trabalhador específico.
+ *
+ * - admin: permitido se trabalhador existir
+ * - trabalhador: PROIBIDO (lança 403: 'A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita')
+ * - gestor / saude: permitido apenas se o trabalhador pertencer à empresa/unidade do escopo
+ *
+ * @throws AppError(403) para trabalhador ou gestor/saude sem empresa válida
+ * @throws AppError(404) se trabalhador não existir ou pertencer a outra empresa
+ */
+export async function assertCanWriteHealthRecord(
+  scope: UserScope,
+  trabalhadorId: string,
+  entidade: string = 'Registro de saúde'
+): Promise<void> {
+  if (!trabalhadorId || !mongoose.isValidObjectId(trabalhadorId)) {
+    notFound('Trabalhador');
+  }
+
+  if (scope.perfil === 'admin') {
+    const exists = await Trabalhador.exists({ _id: trabalhadorId });
+    if (!exists) notFound('Trabalhador');
+    return;
+  }
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
+  if (scope.perfil === 'gestor' || scope.perfil === 'saude') {
+    if (!scope.empresaScope) {
+      throw new AppError('Acesso não autorizado: perfil sem empresa vinculada', 403);
+    }
+    const t = await Trabalhador.findById(trabalhadorId).select('empresa unidade').lean();
+    if (!t || (t as any).empresa?.toString() !== scope.empresaScope) {
+      notFound('Trabalhador');
+    }
+    if (scope.unidadeScope && (t as any).unidade?.toString() !== scope.unidadeScope) {
+      notFound('Trabalhador');
+    }
+    return;
+  }
+
+  throw new AppError('Sem permissão para realizar esta operação', 403);
 }
 
 // ---------------------------------------------------------------------------
@@ -145,11 +221,11 @@ export async function assertCanReadHealthRecord(
 }
 
 /**
- * Verifica se o usuário pode **gerenciar** (criar/editar/deletar) um registro
+ * Verifica se o usuário pode **gerenciar** (editar/deletar) um registro
  * de saúde do trabalhador.
  *
- * @throws AppError(403) para trabalhador/saude
- * @throws AppError(404) se gestor não tiver acesso
+ * @throws AppError(403) para trabalhador
+ * @throws AppError(404) se gestor/saude não tiver acesso ao trabalhador vinculado
  */
 export async function assertCanManageHealthRecord(
   scope: UserScope,
@@ -158,15 +234,15 @@ export async function assertCanManageHealthRecord(
 ): Promise<void> {
   if (scope.perfil === 'admin') return;
 
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
-    throw new AppError('Sem permissão para gerenciar este registro', 403);
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
   }
 
   const trabalhadorId = resolveWorkerIdFromRecord(record);
   if (!trabalhadorId) notFound(entidade);
 
-  // Reutiliza assertCanReadWorker — gestor sem acesso recebe 404
-  await assertCanReadWorker(scope, trabalhadorId);
+  // Valida escopo do trabalhador-alvo no servidor com filtro no banco
+  await assertCanWriteHealthRecord(scope, trabalhadorId, entidade);
 }
 
 // ---------------------------------------------------------------------------
@@ -360,6 +436,7 @@ async function resolveHealthModel(entidade: string): Promise<any | null> {
 export default {
   assertCanReadWorker,
   assertCanManageWorker,
+  assertCanWriteHealthRecord,
   assertCanReadHealthRecord,
   assertCanManageHealthRecord,
   assertCanReadCompany,

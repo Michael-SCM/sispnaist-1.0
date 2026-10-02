@@ -26,13 +26,20 @@ export const getTrabalhadores = asyncHandler(async (req: Request, res: Response)
     setor: req.query.setor as string,
   };
 
-  // Aplicar escopo: gestor vê apenas trabalhadores da sua empresa
-  if (scope.perfil === 'gestor' && scope.empresaScope) {
-    filtros.empresa = scope.empresaScope;
+  // Gestor ou Saúde com escopo: filtrar pela sua empresa/unidade
+  if (scope.perfil === 'gestor' || (scope.perfil === 'saude' && scope.empresaScope)) {
+    if (!scope.empresaScope) {
+      filtros._id = null;
+    } else {
+      filtros.empresa = scope.empresaScope;
+      if (scope.unidadeScope) {
+        filtros.unidade = scope.unidadeScope;
+      }
+    }
   }
 
-  // Se o usuário logado for trabalhador, força o filtro por seu próprio CPF
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  // Trabalhador (ou saúde sem empresa): apenas próprio CPF
+  if (scope.perfil === 'trabalhador' || (scope.perfil === 'saude' && !scope.empresaScope)) {
     filtros.cpf = (req as any).user.cpf;
   }
 
@@ -93,11 +100,27 @@ export const getTrabalhadorCompleto = asyncHandler(async (req: Request, res: Res
 /**
  * @desc    Criar novo trabalhador
  * @route   POST /api/trabalhadores
- * @access  Private/Admin/Saude
+ * @access  Private/Admin/Gestor/Saude
  */
 export const createTrabalhador = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para cadastrar trabalhadores', 403);
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
+  // Gestor ou Saúde: restrito obrigatoriamente à sua empresa
+  if (scope.perfil === 'gestor' || scope.perfil === 'saude') {
+    if (!scope.empresaScope) {
+      throw new AppError('Acesso não autorizado: perfil sem empresa vinculada', 403);
+    }
+    if (req.body.empresa && req.body.empresa.toString() !== scope.empresaScope) {
+      throw new AppError('Não é permitido cadastrar trabalhador para outra empresa', 403);
+    }
+    req.body.empresa = scope.empresaScope;
+    if (scope.unidadeScope) {
+      req.body.unidade = scope.unidadeScope;
+    }
   }
 
   try {
@@ -120,14 +143,23 @@ export const createTrabalhador = asyncHandler(async (req: Request, res: Response
 /**
  * @desc    Atualizar trabalhador
  * @route   PUT /api/trabalhadores/:id
- * @access  Private/Admin/Saude
+ * @access  Private/Admin/Gestor
  */
 export const updateTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const scope = await buildUserScope((req as IAuthRequest).user!);
 
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   // Verificação centralizada de escopo anti-IDOR para gerenciamento
   await assertCanManageWorker(scope, id);
+
+  // Gestor não pode transferir o trabalhador para outra empresa
+  if (scope.perfil === 'gestor') {
+    delete req.body.empresa;
+  }
 
   const trabalhadorAntigo = await trabalhadorService.obter(id);
   const trabalhadorNovo = await trabalhadorService.atualizar(id, req.body);
@@ -145,11 +177,15 @@ export const updateTrabalhador = asyncHandler(async (req: Request, res: Response
 /**
  * @desc    Deletar trabalhador
  * @route   DELETE /api/trabalhadores/:id
- * @access  Private/Admin
+ * @access  Private/Admin/Gestor
  */
 export const deleteTrabalhador = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
 
   // Verificação centralizada de escopo anti-IDOR para gerenciamento
   await assertCanManageWorker(scope, id);

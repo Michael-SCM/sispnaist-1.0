@@ -1,5 +1,9 @@
 backend/.env
 backend/dist/
+# Armazenamento privado de uploads (temp + arquivos) - nunca versionar
+backend/uploads/
+# Dump offline da trilha de auditoria (contém eventos completos) - nunca versionar
+backend/audit-exports/
 frontend/.env
 frontend/.env.local
 frontend/dist/

@@ -69,13 +69,13 @@ describe('scopeFilterDirect - Filtro para modelos com campo empresa/unidade', ()
       expect(filtro).toEqual({ empresa: EMPRESA_A, unidade: UNIDADE_A });
     });
 
-    it('NÃO deve filtrar por empresa quando empresaScope é null', () => {
+    it('deve retornar filtro impossível (_id: null) para gestor sem empresaScope (fail-closed)', () => {
       const scope = makeScope({
         perfil: 'gestor',
         empresaScope: null,
       });
       const filtro = scopeFilterDirect(scope, true);
-      expect(filtro).toEqual({});
+      expect(filtro).toEqual({ _id: null });
     });
   });
 

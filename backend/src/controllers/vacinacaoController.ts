@@ -8,14 +8,24 @@ import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
 import { buildUserScope } from '../utils/scope.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
-import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker } from '../services/AuthorizationService.js';
+import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker, assertCanWriteHealthRecord } from '../services/AuthorizationService.js';
 
 export const criarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  if (req.user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para criar registros de vacinação', 403);
+  const scope = await buildUserScope(req.user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
   }
 
-  const vacinacao = await vacinacaoService.criar(req.body);
+  const { trabalhadorId } = req.body;
+  if (!trabalhadorId) {
+    throw new AppError('Trabalhador é obrigatório', 400);
+  }
+
+  // Validação centralizada do trabalhador-alvo integrando escopo (anti-IDOR)
+  await assertCanWriteHealthRecord(scope, trabalhadorId, 'Vacinação');
+
+  const vacinacao = await vacinacaoService.criar({ ...req.body, trabalhadorId });
 
   await logAction(req, 'CREATE', 'Vacinacao', vacinacao._id!.toString(), vacinacao);
 
@@ -48,31 +58,37 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
   let targetTrabalhadorId = trabalhadorId as string;
   const scope = await buildUserScope(req.user!);
 
-  // Gestor: forçar filtro por trabalhadores da empresa
-  if (scope.perfil === 'gestor' && scope.empresaScope) {
-    const trabalhadores = await Trabalhador.find({ empresa: scope.empresaScope }).select('_id').lean();
-    const ids = trabalhadores.map((t: any) => t._id.toString());
-    if (ids.length === 0) {
+  // Gestor ou Saúde com escopo: forçar filtro por trabalhadores da empresa/unidade
+  if (scope.perfil === 'gestor' || (scope.perfil === 'saude' && scope.empresaScope)) {
+    if (!scope.empresaScope) {
       targetTrabalhadorId = '000000000000000000000000';
-    } else if (ids.length === 1) {
-      targetTrabalhadorId = ids[0];
     } else {
-      const result = await vacinacaoService.listar({
-        page,
-        limit,
-        vacina: vacina as string,
-        trabalhadorIds: ids,
-        cartaoSus: cartaoSus as string,
-      });
-      return res.status(200).json({
-        status: 'success',
-        data: result,
-      });
+      const queryTrab: any = { empresa: scope.empresaScope };
+      if (scope.unidadeScope) queryTrab.unidade = scope.unidadeScope;
+      const trabalhadores = await Trabalhador.find(queryTrab).select('_id').lean();
+      const ids = trabalhadores.map((t: any) => t._id.toString());
+      if (ids.length === 0) {
+        targetTrabalhadorId = '000000000000000000000000';
+      } else if (ids.length === 1) {
+        targetTrabalhadorId = ids[0];
+      } else {
+        const result = await vacinacaoService.listar({
+          page,
+          limit,
+          vacina: vacina as string,
+          trabalhadorIds: ids,
+          cartaoSus: cartaoSus as string,
+        });
+        return res.status(200).json({
+          status: 'success',
+          data: result,
+        });
+      }
     }
   }
 
-  // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  // Trabalhador (ou saúde sem empresa): apenas próprios registros
+  if (scope.perfil === 'trabalhador' || (scope.perfil === 'saude' && !scope.empresaScope)) {
     const ids = await obterIdsTrabalhadorPorCpf(req.user!.cpf);
     const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
     if (idsValidos.length > 1) {
@@ -117,6 +133,11 @@ export const listarVacinacoes = asyncHandler(async (req: IAuthRequest, res: Resp
 
 export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const scope = await buildUserScope(req.user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
 
   if (!vacinacaoAntiga) {
@@ -126,7 +147,12 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
   // Verificação centralizada de escopo anti-IDOR para gerenciamento
   await assertCanManageHealthRecord(scope, vacinacaoAntiga, 'Vacinação');
 
-  const vacinacao = await vacinacaoService.atualizar(req.params.id, req.body);
+  // Não permitir transferir vacinação para outro trabalhador
+  const dadosAtualizacao = { ...req.body };
+  delete dadosAtualizacao.trabalhadorId;
+  delete dadosAtualizacao._id;
+
+  const vacinacao = await vacinacaoService.atualizar(req.params.id, dadosAtualizacao);
 
   const mudancas = compararDados(vacinacaoAntiga, vacinacao);
   await logAction(req, 'UPDATE', 'Vacinacao', req.params.id, mudancas);
@@ -139,6 +165,11 @@ export const atualizarVacinacao = asyncHandler(async (req: IAuthRequest, res: Re
 
 export const deletarVacinacao = asyncHandler(async (req: IAuthRequest, res: Response) => {
   const scope = await buildUserScope(req.user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   const vacinacaoAntiga = await vacinacaoService.obter(req.params.id);
 
   if (!vacinacaoAntiga) {

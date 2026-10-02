@@ -30,9 +30,15 @@ interface AuditLog {
   acao: string;
   entidade: string;
   entidadeId: string;
+  /** sucesso | falha | negado */
+  resultado?: string;
+  /** Somente NOMES dos campos alterados (nunca valores) */
+  camposAlterados?: string[];
   detalhes: any;
   ip: string;
-  createdAt: string;
+  /** O backend expõe `dataCriacao`; `createdAt` fica como fallback. */
+  dataCriacao?: string;
+  createdAt?: string;
 }
 
 export const Auditoria: React.FC = () => {
@@ -105,8 +111,27 @@ export const Auditoria: React.FC = () => {
       case 'UPDATE': return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'DELETE': return 'bg-rose-100 text-rose-700 border-rose-200';
       case 'LOGIN': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+      case 'LOGOUT': return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'READ': return 'bg-sky-100 text-sky-700 border-sky-200';
+      case 'EXPORT': return 'bg-violet-100 text-violet-700 border-violet-200';
       default: return 'bg-slate-100 text-slate-600 border-slate-200';
     }
+  };
+
+  const getResultadoBadge = (resultado?: string) => {
+    switch (resultado) {
+      case 'sucesso': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+      case 'falha': return 'bg-rose-100 text-rose-700 border-rose-200';
+      case 'negado': return 'bg-amber-100 text-amber-700 border-amber-200';
+      default: return 'bg-slate-100 text-slate-600 border-slate-200';
+    }
+  };
+
+  const dataDoLog = (log: AuditLog): Date | null => {
+    const bruto = log.dataCriacao || log.createdAt;
+    if (!bruto) return null;
+    const d = new Date(bruto);
+    return isNaN(d.getTime()) ? null : d;
   };
 
   return (
@@ -198,6 +223,8 @@ export const Auditoria: React.FC = () => {
                 <option value="DELETE">Deletar</option>
                 <option value="LOGIN">Login</option>
                 <option value="LOGOUT">Logout</option>
+                <option value="READ">Leitura</option>
+                <option value="EXPORT">Exportação</option>
               </select>
             </div>
 
@@ -262,10 +289,10 @@ export const Auditoria: React.FC = () => {
                           </div>
                           <div>
                             <span className="font-bold text-slate-700 block text-sm">
-                              {format(new Date(log.createdAt), 'dd/MM/yyyy')}
+                              {dataDoLog(log) ? format(dataDoLog(log)!, 'dd/MM/yyyy') : '—'}
                             </span>
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                              {format(new Date(log.createdAt), 'HH:mm:ss')}
+                              {dataDoLog(log) ? format(dataDoLog(log)!, 'HH:mm:ss') : '—'}
                             </span>
                           </div>
                         </div>
@@ -279,9 +306,16 @@ export const Auditoria: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${getBadgeColor(log.acao)}`}>
-                          {log.acao}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${getBadgeColor(log.acao)}`}>
+                            {log.acao}
+                          </span>
+                          {log.resultado && log.resultado !== 'sucesso' && (
+                            <span className={`px-2 py-1 rounded-full text-[9px] font-black border uppercase ${getResultadoBadge(log.resultado)}`}>
+                              {log.resultado}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex items-center gap-2">
@@ -463,6 +497,29 @@ export const Auditoria: React.FC = () => {
                   <div className="space-y-1">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">IP</span>
                     <p className="font-mono text-xs sm:text-sm text-slate-500 break-all">{selectedLog.ip || 'Não registrado'}</p>
+                  </div>
+                </div>
+
+                {/* Resultado + campos alterados (nomes apenas, sem valores) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Resultado</span>
+                    <p>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black border uppercase ${getResultadoBadge(selectedLog.resultado)}`}>
+                        {selectedLog.resultado || 'sucesso'}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Campos alterados</span>
+                    <p className="font-bold text-slate-700 break-words text-sm">
+                      {selectedLog.camposAlterados && selectedLog.camposAlterados.length > 0
+                        ? selectedLog.camposAlterados.join(', ')
+                        : '—'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      Somente nomes de campo. Valores nunca são registrados.
+                    </p>
                   </div>
                 </div>
 

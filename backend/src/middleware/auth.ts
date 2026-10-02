@@ -63,6 +63,65 @@ export const authMiddleware = async (req: IAuthRequest, res: Response, next: Nex
   }
 };
 
+/**
+ * Popula `req.user` quando há token VÁLIDO e nunca escreve resposta de erro.
+ *
+ * Usado em `/auth/logout`: a rota hoje é pública (sem authMiddleware), e o
+ * interceptor do frontend trata 401 em `/auth/logout` como "sessão expirada"
+ * (toast + redirect). Torná-la obrigatória mudaria o comportamento visível.
+ * Com esta variante o fluxo continua idêntico quando não há token, mas com
+ * token válido o controller consegue revogar a sessão e registrar o LOGOUT.
+ */
+export const authMiddlewareOpcional = async (
+  req: IAuthRequest,
+  _res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const token =
+      req.headers.authorization?.split(' ')[1] || req.cookies?.token || (req.query.token as string);
+
+    if (!token) {
+      next();
+      return;
+    }
+
+    const decoded = jwt.verify(token, config.jwtSecret) as any;
+    if (!decoded || typeof decoded !== 'object') {
+      next();
+      return;
+    }
+
+    const user = await User.findById(decoded.id).select('ativo tokenVersion empresa unidade').lean();
+    if (!user || !user.ativo) {
+      next();
+      return;
+    }
+
+    if (
+      decoded.tokenVersion !== undefined &&
+      user.tokenVersion !== undefined &&
+      decoded.tokenVersion < user.tokenVersion
+    ) {
+      next();
+      return;
+    }
+
+    req.user = {
+      id: decoded.id || '',
+      cpf: decoded.cpf || '',
+      email: decoded.email || '',
+      perfil: decoded.perfil || '',
+      empresa: user.empresa ? String(user.empresa) : undefined,
+      unidade: user.unidade ? String(user.unidade) : undefined,
+    };
+    next();
+  } catch {
+    // Token ausente/inválido/expirado: comportamento anterior da rota.
+    next();
+  }
+};
+
 export const authorize = (...roles: string[]) => {
   return (req: IAuthRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {

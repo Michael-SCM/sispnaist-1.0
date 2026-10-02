@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import {
   assertCanReadWorker,
   assertCanManageWorker,
+  assertCanWriteHealthRecord,
   assertCanReadHealthRecord,
   assertCanManageHealthRecord,
   assertCanReadCompany,
@@ -127,6 +128,92 @@ describe('AuthorizationService — IDOR & Scope Protection', () => {
       await expect(
         assertCanManageHealthRecord(scope, { trabalhadorId: WORKER_1 }, 'Acidente')
       ).rejects.toMatchObject({ statusCode: 403 });
+    });
+  });
+
+  describe('assertCanWriteHealthRecord — Escritas de Registros de Saúde & Multiempresa', () => {
+    it('trabalhador: lança 403 com mensagem explícita ao tentar escrever registro', async () => {
+      const scope = makeScope({ perfil: 'trabalhador', trabalhadorIds: [WORKER_1] });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).rejects.toMatchObject({
+        statusCode: 403,
+        message: 'A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita',
+      });
+    });
+
+    it('gestor: permite registrar para trabalhador da mesma empresa', async () => {
+      (Trabalhador.findById as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ _id: WORKER_1, empresa: EMPRESA_1 }),
+        }),
+      });
+      const scope = makeScope({ perfil: 'gestor', empresaScope: EMPRESA_1 });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).resolves.toBeUndefined();
+    });
+
+    it('gestor: lança 404 ao tentar registrar para trabalhador de outra empresa (anti-IDOR)', async () => {
+      (Trabalhador.findById as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ _id: WORKER_2, empresa: EMPRESA_2 }),
+        }),
+      });
+      const scope = makeScope({ perfil: 'gestor', empresaScope: EMPRESA_1 });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_2, 'Acidente')).rejects.toMatchObject({
+        statusCode: 404,
+      });
+    });
+
+    it('gestor: lança 403 se não tiver empresaScope (fail-closed)', async () => {
+      const scope = makeScope({ perfil: 'gestor', empresaScope: null });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).rejects.toMatchObject({
+        statusCode: 403,
+      });
+    });
+
+    it('gestor com unidadeScope: lança 404 se trabalhador for de outra unidade', async () => {
+      (Trabalhador.findById as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ _id: WORKER_1, empresa: EMPRESA_1, unidade: UNIDADE_2 }),
+        }),
+      });
+      const scope = makeScope({ perfil: 'gestor', empresaScope: EMPRESA_1, unidadeScope: UNIDADE_1 });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).rejects.toMatchObject({
+        statusCode: 404,
+      });
+    });
+
+    it('saude: permite registrar para trabalhador da mesma empresa do escopo', async () => {
+      (Trabalhador.findById as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ _id: WORKER_1, empresa: EMPRESA_1 }),
+        }),
+      });
+      const scope = makeScope({ perfil: 'saude', empresaScope: EMPRESA_1 });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).resolves.toBeUndefined();
+    });
+
+    it('saude: lança 404 ao tentar registrar para trabalhador fora da empresa do escopo', async () => {
+      (Trabalhador.findById as jest.Mock).mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          lean: jest.fn().mockResolvedValue({ _id: WORKER_2, empresa: EMPRESA_2 }),
+        }),
+      });
+      const scope = makeScope({ perfil: 'saude', empresaScope: EMPRESA_1 });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_2, 'Acidente')).rejects.toMatchObject({
+        statusCode: 404,
+      });
+    });
+
+    it('saude: lança 403 se não tiver empresa vinculada (não pode ignorar escopo)', async () => {
+      const scope = makeScope({ perfil: 'saude', empresaScope: null });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).rejects.toMatchObject({
+        statusCode: 403,
+      });
+    });
+
+    it('admin: permite registrar se trabalhador existe', async () => {
+      (Trabalhador.exists as jest.Mock).mockResolvedValue(true);
+      const scope = makeScope({ perfil: 'admin' });
+      await expect(assertCanWriteHealthRecord(scope, WORKER_1, 'Acidente')).resolves.toBeUndefined();
     });
   });
 

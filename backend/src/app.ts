@@ -52,6 +52,8 @@ import { seedCatalogos } from './utils/seedCatalogos.js';
 import { seedRegrasValidacao } from './utils/seedRegrasValidacao.js';
 import { seedAlertasRegras } from './utils/seedAlertasRegras.js';
 import { initAlertScheduler } from './services/alertaScheduler.js';
+import { initUploadMaintenanceScheduler } from './services/uploadRetentionScheduler.js';
+import { initAuditRetentionScheduler } from './services/auditRetentionScheduler.js';
 
 const app = express();
 
@@ -146,6 +148,8 @@ connectDB().then(() => {
     seedRegrasValidacao();
     seedAlertasRegras();
     initAlertScheduler();
+    initUploadMaintenanceScheduler();
+    initAuditRetentionScheduler();
   }
 });
 

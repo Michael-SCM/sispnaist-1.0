@@ -14,7 +14,11 @@
     "seed:trabalhadores": "npx tsx src/scripts/seedTrabalhadores.ts",
     "seed:acidentes": "npx tsx src/scripts/seedAcidentesDoencasVacinacoes.ts",
     "seed:atosMunicipais": "npx tsx src/scripts/seedAtosMunicipais.ts",
-    "seed": "npm run seed:catalogos && npm run seed:trabalhadores && npm run seed:acidentes && npm run seed:atosMunicipais"
+    "seed": "npm run seed:catalogos && npm run seed:trabalhadores && npm run seed:acidentes && npm run seed:atosMunicipais",
+      "uploads:integrity": "tsx src/scripts/verificarIntegridadeUploads.ts",
+      "audit:verify": "tsx src/scripts/verificarIntegridadeAudit.ts",
+      "audit:prune": "tsx src/scripts/reterLogsAudit.ts",
+      "audit:export": "tsx src/scripts/exportarLogsAudit.ts"
   },
   "keywords": [
     "express",
@@ -25,6 +29,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1145.0",
+    "@aws-sdk/s3-request-presigner": "^3.1145.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
     "@types/json2csv": "^5.0.7",
@@ -48,7 +54,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongo-sanitize": "^1.1.0",
     "mongoose": "^8.0.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.4.0",
     "node-cron": "^4.6.0",
     "nodemailer": "^8.0.7",
     "pdfkit": "^0.18.0",

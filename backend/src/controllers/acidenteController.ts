@@ -9,14 +9,25 @@ import { notificarSinanParaTrabalhador } from '../utils/notificarSinan.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import { buildUserScope } from '../utils/scope.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
-import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker } from '../services/AuthorizationService.js';
+import { assertCanReadHealthRecord, assertCanManageHealthRecord, assertCanReadWorker, assertCanWriteHealthRecord } from '../services/AuthorizationService.js';
 
 export const criar = asyncHandler(async (req: Request, res: Response) => {
-  if ((req as any).user?.perfil === 'trabalhador') {
-    throw new AppError('Sem permissão para criar acidentes', 403);
+  const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
   }
 
-  const acidente = await acidenteService.criar(req.body);
+  const { trabalhadorId } = req.body;
+  if (!trabalhadorId) {
+    throw new AppError('Trabalhador é obrigatório', 400);
+  }
+
+  // Validação centralizada do trabalhador-alvo integrando escopo (anti-IDOR)
+  await assertCanWriteHealthRecord(scope, trabalhadorId, 'Acidente');
+
+  const dados = { ...req.body, trabalhadorId };
+  const acidente = await acidenteService.criar(dados);
 
   await logAction(req, 'CREATE', 'Acidente', acidente._id!.toString(), acidente);
 
@@ -66,22 +77,28 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     cartaoSus: req.query.cartaoSus as string | undefined,
   };
 
-  // Gestor: forçar filtro por trabalhadores da empresa
-  if (scope.perfil === 'gestor' && scope.empresaScope) {
-    const trabalhadores = await Trabalhador.find({ empresa: scope.empresaScope }).select('_id').lean();
-    const ids = trabalhadores.map((t: any) => t._id.toString());
-    if (ids.length === 0) {
+  // Gestor ou Saúde com escopo: forçar filtro por trabalhadores da empresa/unidade
+  if (scope.perfil === 'gestor' || (scope.perfil === 'saude' && scope.empresaScope)) {
+    if (!scope.empresaScope) {
       filtros.trabalhadorId = '000000000000000000000000';
-    } else if (ids.length === 1) {
-      filtros.trabalhadorId = ids[0];
     } else {
-      filtros.trabalhadorIds = ids;
-      delete filtros.trabalhadorId;
+      const queryTrab: any = { empresa: scope.empresaScope };
+      if (scope.unidadeScope) queryTrab.unidade = scope.unidadeScope;
+      const trabalhadores = await Trabalhador.find(queryTrab).select('_id').lean();
+      const ids = trabalhadores.map((t: any) => t._id.toString());
+      if (ids.length === 0) {
+        filtros.trabalhadorId = '000000000000000000000000';
+      } else if (ids.length === 1) {
+        filtros.trabalhadorId = ids[0];
+      } else {
+        filtros.trabalhadorIds = ids;
+        delete filtros.trabalhadorId;
+      }
     }
   }
 
-  // Se o usuário logado for trabalhador, força o filtro por seu próprio ID de trabalhador
-  if (scope.perfil === 'trabalhador' || scope.perfil === 'saude') {
+  // Trabalhador (ou saúde sem empresa): apenas próprios registros
+  if (scope.perfil === 'trabalhador' || (scope.perfil === 'saude' && !scope.empresaScope)) {
     const ids = await obterIdsTrabalhadorPorCpf((req as any).user.cpf);
     const idsValidos = [ids.trabalhadorId, ids.userId].filter(Boolean) as string[];
     if (idsValidos.length > 1) {
@@ -112,6 +129,11 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
 export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   const acidenteAntigo = await acidenteService.obter(id);
   
   if (!acidenteAntigo) {
@@ -121,7 +143,12 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
   // Verificação centralizada de escopo anti-IDOR para gerenciamento
   await assertCanManageHealthRecord(scope, acidenteAntigo, 'Acidente');
   
-  const acidente = await acidenteService.atualizar(id, req.body);
+  // Não permitir transferir o acidente para outro trabalhador
+  const dadosAtualizacao = { ...req.body };
+  delete dadosAtualizacao.trabalhadorId;
+  delete dadosAtualizacao._id;
+
+  const acidente = await acidenteService.atualizar(id, dadosAtualizacao);
 
   const mudancas = compararDados(acidenteAntigo, acidente);
   await logAction(req, 'UPDATE', 'Acidente', id, mudancas);
@@ -135,6 +162,11 @@ export const atualizar = asyncHandler(async (req: Request, res: Response) => {
 export const deletar = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const scope = await buildUserScope((req as IAuthRequest).user!);
+
+  if (scope.perfil === 'trabalhador') {
+    throw new AppError('A pessoa trabalhadora não pode editar o próprio histórico sem permissão explícita', 403);
+  }
+
   const acidenteAntigo = await acidenteService.obter(id);
   
   if (!acidenteAntigo) {

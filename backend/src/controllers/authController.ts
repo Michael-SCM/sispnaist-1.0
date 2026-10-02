@@ -79,11 +79,11 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const { user, verificationLink } = await authService.register(req.body);
 
   req.body.usuarioId = user._id;
+  // Sem nome/e-mail/CPF: a redação centra a proteção, mas a chamada também não
+  // deve receber PII desnecessário.
   await logAction(req, 'CREATE', 'User', user._id!.toString(), {
-    nome: user.nome,
-    email: user.email,
-    cpf: user.cpf,
     perfil: user.perfil,
+    emailVerificado: false,
   });
 
   const response: any = {
@@ -102,59 +102,90 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, senha, confiarDispositivo } = req.body;
 
-  // Verificar se existe cookie de dispositivo confiável válido
-  const trustedDeviceToken = req.cookies?.trustedDevice;
-  if (trustedDeviceToken) {
-    const decoded = verifyTrustedDeviceToken(trustedDeviceToken);
-    if (decoded) {
-      // Verificar se o email/senha conferem com o usuário do cookie
-      const result = await authService.loginByTrustedDevice(decoded.id, email, senha);
-      if (result) {
-        // Dispositivo confiável + credenciais corretas — bypass 2FA
-        setAuthCookies(res, result.accessToken, result.refreshToken);
-        const csrfToken = setCsrfCookie(res);
+  // Uma vez autenticado, um erro posterior (inclusive de auditoria com
+  // AUDIT_STRICT) NÃO pode ser registrado como tentativa de login falha.
+  let autenticado = false;
 
-        res.status(200).json({
-          status: 'success',
-          data: { user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken, csrfToken },
-        });
-        return;
+  try {
+    // Verificar se existe cookie de dispositivo confiável válido
+    const trustedDeviceToken = req.cookies?.trustedDevice;
+    if (trustedDeviceToken) {
+      const decoded = verifyTrustedDeviceToken(trustedDeviceToken);
+      if (decoded) {
+        // Verificar se o email/senha conferem com o usuário do cookie
+        const result = await authService.loginByTrustedDevice(decoded.id, email, senha);
+        if (result) {
+          // Dispositivo confiável + credenciais corretas — bypass 2FA
+          setAuthCookies(res, result.accessToken, result.refreshToken);
+          const csrfToken = setCsrfCookie(res);
+
+          autenticado = true;
+          await logAction(req, 'LOGIN', 'User', String(result.user._id), {
+            metodo: 'dispositivo-confiavel',
+          }, { usuarioId: String(result.user._id), resumo: 'login via dispositivo confiável' });
+
+          res.status(200).json({
+            status: 'success',
+            data: { user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken, csrfToken },
+          });
+          return;
+        }
+        // Credenciais não conferem com o cookie — limpar cookie e prosseguir login normal
+        clearTrustedDeviceCookie(res);
+      } else {
+        // Token inválido ou expirado — limpar cookie e prosseguir com login normal
+        clearTrustedDeviceCookie(res);
       }
-      // Credenciais não conferem com o cookie — limpar cookie e prosseguir login normal
-      clearTrustedDeviceCookie(res);
-    } else {
-      // Token inválido ou expirado — limpar cookie e prosseguir com login normal
-      clearTrustedDeviceCookie(res);
     }
-  }
 
-  const result = await authService.login(email, senha, confiarDispositivo);
+    const result = await authService.login(email, senha, confiarDispositivo);
 
-  // Login em 2 passos: senha válida, agora aguarda o código enviado por e-mail
-  if (result.needs2FA) {
+    // Login em 2 passos: senha válida, agora aguarda o código enviado por e-mail
+    if (result.needs2FA) {
+      autenticado = true;
+      await logAction(req, 'LOGIN', 'User', 'aguardando-2fa', {
+        metodo: 'senha',
+        etapa: 'aguardando-codigo-2fa',
+      }, { resultado: 'sucesso', resumo: 'senha válida, aguardando código 2FA' });
+
+      res.status(200).json({
+        status: 'success',
+        data: {
+          needs2FA: true,
+          preAuthToken: result.preAuthToken,
+          doisFatoresHabilitado: result.doisFatoresHabilitado,
+        },
+      });
+      return;
+    }
+
+    setAuthCookies(res, result.accessToken!, result.refreshToken!);
+    const csrfToken = setCsrfCookie(res);
+
+    autenticado = true;
+    await logAction(req, 'LOGIN', 'User', String(result.user._id), {
+      metodo: 'senha',
+    }, { usuarioId: String(result.user._id), resumo: 'login concluído' });
+
     res.status(200).json({
       status: 'success',
       data: {
-        needs2FA: true,
-        preAuthToken: result.preAuthToken,
-        doisFatoresHabilitado: result.doisFatoresHabilitado,
+        user: result.user,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+        csrfToken,
       },
     });
-    return;
+  } catch (error: any) {
+    if (autenticado) throw error;
+    // Tentativa de acesso: rastreio de falha de autenticação sem gravar
+    // e-mail, credencial ou token no payload.
+    await logAction(req, 'LOGIN', 'User', 'tentativa-falha', {
+      motivo: error?.message,
+      status: error?.status ?? 500,
+    }, { resultado: 'falha', resumo: 'tentativa de login rejeitada' });
+    throw error;
   }
-
-  setAuthCookies(res, result.accessToken!, result.refreshToken!);
-  const csrfToken = setCsrfCookie(res);
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-      csrfToken,
-    },
-  });
 });
 
 export const enviarCodigo2FA = asyncHandler(async (req: Request, res: Response) => {
@@ -174,7 +205,22 @@ export const enviarCodigo2FA = asyncHandler(async (req: Request, res: Response) 
 
 export const verificar2FA = asyncHandler(async (req: Request, res: Response) => {
   const { preAuthToken, codigo, confiarDispositivo } = req.body;
-  const { user, accessToken, refreshToken } = await authService.verificar2FA(preAuthToken, codigo);
+
+  let user: any;
+  let accessToken: string;
+  let refreshToken: string;
+
+  try {
+    ({ user, accessToken, refreshToken } = await authService.verificar2FA(preAuthToken, codigo));
+  } catch (error: any) {
+    // Nunca grava o código informado — apenas o motivo da rejeição.
+    await logAction(req, 'LOGIN', 'User', 'tentativa-falha', {
+      metodo: '2fa',
+      motivo: error?.message,
+      status: error?.status ?? 500,
+    }, { resultado: 'falha', resumo: 'verificação 2FA rejeitada' });
+    throw error;
+  }
 
   setAuthCookies(res, accessToken, refreshToken);
   const csrfToken = setCsrfCookie(res);
@@ -183,6 +229,11 @@ export const verificar2FA = asyncHandler(async (req: Request, res: Response) => 
   if (confiarDispositivo && user._id) {
     setTrustedDeviceCookie(res, user._id);
   }
+
+  await logAction(req, 'LOGIN', 'User', String(user._id), {
+    metodo: '2fa',
+    dispositivoConfiavel: Boolean(confiarDispositivo),
+  }, { usuarioId: String(user._id), resumo: 'login concluído com 2FA' });
 
   res.status(200).json({
     status: 'success',
@@ -312,11 +363,21 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
 });
 
 export const logout = asyncHandler(async (req: IAuthRequest, res: Response) => {
-  if (req.user) {
-    await authService.logout(req.user.id);
+  const usuarioId = req.user?.id;
+
+  if (usuarioId) {
+    await authService.logout(usuarioId);
   }
 
+  // Cookies limpos antes da auditoria: mesmo com AUDIT_STRICT, a sessão já
+  // deve estar encerrada se a gravação do evento falhar.
   clearAuthCookies(res);
+
+  if (usuarioId) {
+    await logAction(req, 'LOGOUT', 'User', usuarioId, {
+      metodo: 'sessao',
+    }, { usuarioId, resumo: 'sessão encerrada' });
+  }
 
   res.status(200).json({
     status: 'success',
@@ -414,13 +475,14 @@ export const deleteAccount = asyncHandler(async (req: IAuthRequest, res: Respons
   }
 
   await authService.deleteAccount(req.user.id);
+  clearAuthCookies(res);
 
   await logAction(req, 'DELETE', 'User', req.user.id, {
-    motivo: req.body.motivo,
-    dataSolicitacao: new Date().toISOString(),
+    // Texto livre digitado pelo titular: NUNCA vai para o log — pode conter
+    // CPF, e-mail ou qualquer outro dado. Registra-se apenas o fato.
+    motivo: 'solicitado-pelo-titular',
+    temMotivoInformado: Boolean(String(req.body.motivo ?? '').trim()),
   });
-
-  clearAuthCookies(res);
 
   res.status(200).json({
     status: 'success',

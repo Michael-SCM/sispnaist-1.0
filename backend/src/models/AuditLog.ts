@@ -1,7 +1,16 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import crypto from 'crypto';
+import { calcularHashRegistro, GENESIS } from '../utils/auditHash.js';
 
-export type AcaoAudit = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'READ' | 'EXPORT';
+export type AcaoAudit =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'READ'
+  | 'EXPORT';
+
+export type ResultadoAudit = 'sucesso' | 'falha' | 'negado';
 
 export interface IAuditLog {
   _id?: string;
@@ -9,26 +18,23 @@ export interface IAuditLog {
   acao: AcaoAudit;
   entidade: string;
   entidadeId: string;
+  /** Resultado da operação — sucesso | falha | negado. */
+  resultado?: ResultadoAudit;
+  /** Somente NOMES de campo alterados; nunca valores. */
+  camposAlterados?: string[];
+  /** Metadados redigidos (sem PII/credenciais/dados clínicos). */
   detalhes?: Record<string, any>;
   ip?: string;
   userAgent?: string;
   sensivel?: boolean;
+  /** Hash do registro anterior (encadeamento). */
   hashAnterior?: string;
+  /** Hash sha256 deste registro incluindo hashAnterior. */
+  hash?: string;
   dataCriacao?: Date;
 }
 
 export interface IAuditLogDocument extends Omit<IAuditLog, '_id'>, Document {}
-
-function calcularHash(doc: any): string {
-  const payload = JSON.stringify({
-    usuarioId: doc.usuarioId?.toString?.() || doc.usuarioId,
-    acao: doc.acao,
-    entidade: doc.entidade,
-    entidadeId: doc.entidadeId,
-    createdAt: doc.dataCriacao?.toISOString?.() || doc.dataCriacao,
-  });
-  return crypto.createHash('sha256').update(payload).digest('hex').slice(0, 16);
-}
 
 const AuditLogSchema = new Schema<IAuditLogDocument>(
   {
@@ -52,6 +58,15 @@ const AuditLogSchema = new Schema<IAuditLogDocument>(
       required: true,
       index: true,
     },
+    resultado: {
+      type: String,
+      enum: ['sucesso', 'falha', 'negado'],
+      default: 'sucesso',
+    },
+    camposAlterados: {
+      type: [String],
+      default: undefined,
+    },
     detalhes: {
       type: Schema.Types.Mixed,
     },
@@ -69,22 +84,35 @@ const AuditLogSchema = new Schema<IAuditLogDocument>(
     hashAnterior: {
       type: String,
     },
+    hash: {
+      type: String,
+    },
   },
   {
     collection: 'audit_logs',
-    timestamps: { createdAt: 'dataCriacao', updatedAt: 'dataAtualizacao' },
+    timestamps: { createdAt: 'dataCriacao', updatedAt: false },
+    minimize: false,
   }
 );
 
-// Imutabilidade: bloquear updateMany, updateOne, findOneAndUpdate, findOneAndReplace
-const operacoesMutacao = ['updateMany', 'updateOne', 'findOneAndUpdate', 'findOneAndReplace', 'replaceOne'] as const;
+// ---------------------------------------------------------------------------
+// Imutabilidade: a aplicação não pode alterar nem apagar logs por acidente.
+// A exclusão por retenção é feita deliberadamente pelo driver nativo
+// (`mongoose.connection.db.collection('audit_logs').deleteMany`), fora dos hooks.
+// ---------------------------------------------------------------------------
+const operacoesMutacao = [
+  'updateMany',
+  'updateOne',
+  'findOneAndUpdate',
+  'findOneAndReplace',
+  'replaceOne',
+] as const;
 for (const op of operacoesMutacao) {
   AuditLogSchema.pre(op as any, function () {
     throw new Error('Audit logs são imutáveis — operação de escrita bloqueada.');
   });
 }
 
-// Imutabilidade: bloquear deleteMany, deleteOne, findOneAndDelete
 const operacoesDelete = ['deleteMany', 'deleteOne', 'findOneAndDelete'] as const;
 for (const op of operacoesDelete) {
   AuditLogSchema.pre(op as any, function () {
@@ -92,22 +120,54 @@ for (const op of operacoesDelete) {
   });
 }
 
-// Gerar hash de cadeia após save
-AuditLogSchema.post('save', function (doc) {
+// ---------------------------------------------------------------------------
+// Encadeamento: calcula ANTES da inserção para que nenhum registro seja
+// gravado sem hash. Exige que o registro anterior seja lido — por isso as
+// escritas são serializadas em `auditChain.criarComCadeia`.
+// ---------------------------------------------------------------------------
+AuditLogSchema.pre('save', async function (next) {
   try {
-    const hash = calcularHash(doc);
-    doc.set('hashAnterior', hash, { silent: true });
-    (doc.collection as any).updateOne({ _id: doc._id }, { $set: { hashAnterior: hash } }).catch(() => {});
-  } catch {
-    // Ignorar erros de hash — não deve interromper a operação principal
+    if (!this.isNew) {
+      return next();
+    }
+
+    if (!this.dataCriacao) {
+      this.set('dataCriacao' as any, new Date(), { silent: true } as any);
+    }
+
+    const Modelo = mongoose.model<IAuditLogDocument>('AuditLog');
+    const anterior = await Modelo.findOne(
+      { _id: { $ne: this._id } },
+      { hash: 1 }
+    )
+      .sort({ dataCriacao: -1, _id: -1 })
+      .lean();
+
+    const hashAnterior = (anterior as any)?.hash ?? GENESIS;
+
+    // Round-trip JSON: o hash é calculado sobre o que VAI para o banco —
+    // um `undefined` em memória que o Mongoose descarta mudaria o hash lido
+    // depois e geraria quebra falsa na verificação.
+    const plano = JSON.parse(JSON.stringify(this.toObject({ depopulate: true })));
+    const hash = calcularHashRegistro(plano, hashAnterior);
+
+    this.set('hashAnterior', hashAnterior);
+    this.set('hash', hash);
+
+    return next();
+  } catch (err) {
+    return next(err as Error);
   }
 });
 
-// Index composto para queries eficientes
-AuditLogSchema.index({ entidade: 1, createdAt: -1 });
-AuditLogSchema.index({ usuarioId: 1, createdAt: -1 });
+// ---------------------------------------------------------------------------
+// Índices (nota: o campo de tempo é `dataCriacao`, não `createdAt`)
+// ---------------------------------------------------------------------------
+AuditLogSchema.index({ entidade: 1, dataCriacao: -1 });
+AuditLogSchema.index({ usuarioId: 1, dataCriacao: -1 });
 AuditLogSchema.index({ acao: 1 });
-AuditLogSchema.index({ sensivel: 1, createdAt: -1 });
-AuditLogSchema.index({ acao: 1, sensivel: 1, createdAt: -1 });
+AuditLogSchema.index({ sensivel: 1, dataCriacao: -1 });
+AuditLogSchema.index({ acao: 1, sensivel: 1, dataCriacao: -1 });
+AuditLogSchema.index({ dataCriacao: 1 });
 
 export default mongoose.model<IAuditLogDocument>('AuditLog', AuditLogSchema);
