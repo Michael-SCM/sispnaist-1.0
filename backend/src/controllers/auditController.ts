@@ -11,7 +11,7 @@ import { obterEstatisticasAuditRead } from '../middleware/auditRead.js';
  * Listagem de logs com filtros
  */
 export const obterLogs = asyncHandler(async (req: Request, res: Response) => {
-  const { page, limit, skip } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
+  const { page, limit } = getPaginationParams(req.query as any, { page: 1, limit: 20 });
   const { usuarioId, entidade, acao, dataInicio, dataFim, sensivel } = req.query;
 
   const result = await auditService.obterLogs(

@@ -1,3 +1,31 @@
+/**
+ * Referência de trabalhador retornada pela API.
+ * A API devolve o ObjectId como string ou o documento populado, dependendo do endpoint.
+ */
+export interface ITrabalhadorRef {
+  _id?: string;
+  nome?: string;
+  cpf?: string;
+  email?: string;
+  empresa?: string;
+  unidade?: string;
+}
+
+/** Referência populável: id puro ou objeto populado pela API */
+export type RefTrabalhador = string | ITrabalhadorRef;
+
+/** Extrai o id de uma referência id | objeto populado */
+export const refId = (ref: string | { _id?: string } | undefined | null): string | undefined =>
+  typeof ref === 'string' ? ref : ref?._id;
+
+/** Extrai o nome de uma referência id | objeto populado */
+export const refNome = (ref: string | { nome?: string } | undefined | null): string | undefined =>
+  typeof ref === 'object' && ref !== null ? ref.nome : undefined;
+
+/** Extrai o CPF de uma referência id | objeto populado */
+export const refCpf = (ref: string | { cpf?: string } | undefined | null): string | undefined =>
+  typeof ref === 'object' && ref !== null ? ref.cpf : undefined;
+
 export interface ITrabalhadorAfastamento {
   _id?: string;
   trabalhadorId: string;
@@ -7,6 +35,9 @@ export interface ITrabalhadorAfastamento {
   dataInicio: string;
   dataFim?: string;
   dataRetorno?: string;
+  dataPericia?: string;
+  desfecho?: string;
+  tempoAfastamento?: string;
   laudoMedico?: string;
   observacoes?: string;
   ativo?: boolean;
@@ -178,9 +209,23 @@ export interface ITrabalhadorOcorrenciaViolencia {
 export interface ITrabalhadorReadaptacao {
   _id?: string;
   trabalhadorId: string;
-  dataInicio: string;
-  dataFim?: string;
-  motivo?: string;
+  dataReadaptacao: string;
+  motivo: string;
+  cid?: string;
+  mudancaSetor?: boolean;
+  setorOrigem: string;
+  setorReadaptacao: string;
+  mudancaFuncao?: boolean;
+  funcaoAnterior: string;
+  funcaoNova: string;
+  tempoReadaptacao: string;
+  restricao: string;
+  novasAtribuicoes: string;
+  acompanhamento: string;
+  grauSatisfacao: string;
+  laudoMedico?: string;
+  dataRetorno?: string;
+  observacoes?: string;
   ativo?: boolean;
   dataCriacao?: string;
   dataAtualizacao?: string;
@@ -317,7 +362,7 @@ export interface IAcidente {
   dataAcidente: string;
   horario?: string;
   horarioAposInicioJornada?: string;
-  trabalhadorId: string;
+  trabalhadorId: RefTrabalhador;
   tipoAcidente: string;
   tipoTrauma?: string;
   agenteCausador?: string;
@@ -359,7 +404,7 @@ export interface IDoenca {
   _id?: string;
   dataInicio: string;
   dataFim?: string;
-  trabalhadorId: string;
+  trabalhadorId: RefTrabalhador;
   codigoDoenca: string;
   nomeDoenca: string;
   relacaoTrabalho?: string;
@@ -372,66 +417,21 @@ export interface IDoenca {
 
 export interface IVacinacao {
   _id?: string;
-  trabalhadorId: string;
+  trabalhadorId: RefTrabalhador;
   vacina: string;
   dataVacinacao: string;
   proximoDose?: string;
   unidadeSaude?: string;
   profissional?: string;
+  lote?: string;
   certificado?: string;
   dataCriacao?: string;
   dataAtualizacao?: string;
 }
 
-export interface IAcidentePopulated {
-  _id?: string;
-  dataAcidente: string;
-  horario?: string;
-  horarioAposInicioJornada?: string;
-  tipoAcidente: string;
-  tipoTrauma?: string;
-  agenteCausador?: string;
-  parteCorpo?: string;
-  descricao: string;
-  descricaoTrauma?: string;
-  local?: string;
-  lesoes?: string[];
-  feriado?: boolean;
-  comunicado?: boolean;
-  dataComunicacao?: string;
-  dataNotificacao?: string;
-  atendimentoMedico?: boolean;
-  dataAtendimento?: string;
-  horaAtendimento?: string;
-  unidadeAtendimento?: string;
-  internamento?: boolean;
-  duracaoInternamento?: number;
-  catNas?: boolean;
-  // e-Social S-2210 (CAT)
-  catNumero?: string;
-  catDataEmissao?: string;
-  catTipo?: 'inicial' | 'reabertura' | 'comunicacao';
-  emitenteCat?: 'empregador' | 'trabalhador' | 'sindico' | 'medico';
-  cidLesao?: string;
-  dataObito?: string;
-
-  registroPolicial?: boolean;
-  encaminhamentoJuntaMedica?: boolean;
-  afastamento?: boolean;
-  outrosTrabalhadoresAtingidos?: boolean;
-  quantidadeTrabalhadoresAtingidos?: number;
-  status?: 'Aberto' | 'Em Análise' | 'Fechado';
-  dataCriacao?: string;
-  dataAtualizacao?: string;
+export interface IAcidentePopulated extends Omit<IAcidente, 'trabalhadorId'> {
   // Populated fields
-  trabalhadorId?: {
-    _id?: string;
-    nome?: string;
-    cpf?: string;
-    email?: string;
-    empresa?: string;
-    unidade?: string;
-  };
+  trabalhadorId?: ITrabalhadorRef;
 }
 
 export interface IMaterialBiologico {
@@ -474,7 +474,8 @@ export interface IEmpresa {
 export interface IUnidade {
   _id?: string;
   nome: string;
-  empresaId: string;
+  empresaId: string | IEmpresa;
+  tipo?: string;
   endereco?: IEndereco;
   gestor?: string;
   esferaAdministrativa?: string;
@@ -523,6 +524,7 @@ export interface ITrabalhador {
   // Dados Pessoais/Diversos
   sexo?: string;
   genero?: string;
+  tipoSanguineo?: string;
   insalubridadePericulosidade?: string;
   neurodivergencias?: string[];
   raca?: string;
@@ -590,6 +592,72 @@ export interface IPreferenciaUsuario {
   dashboardPadrao?: string;
   itensPorPagina?: number;
   ocultarAlertaOrientacao?: boolean;
+}
+
+export interface IQuestionario {
+  _id?: string;
+  nome: string;
+  descricao?: string;
+  tipo: string;
+  ativo?: boolean;
+  dataInicio?: string;
+  dataFim?: string;
+  criadoPor?: string;
+  itens?: IQuestionarioItem[];
+}
+
+export interface IQuestionarioItem {
+  _id?: string;
+  questionarioId: string;
+  pergunta: string;
+  tipoResposta: 'texto' | 'unica' | 'multipla' | 'escala' | 'data';
+  obrigatorio?: boolean;
+  ordem?: number;
+  alternativas?: { valor: string; texto: string; pontuacao?: number }[];
+  ativo?: boolean;
+}
+
+/** Questionário com os itens já resolvidos (endpoint de detalhe) */
+export interface IQuestionarioComItens extends IQuestionario {
+  itens: IQuestionarioItem[];
+}
+
+export interface IPadraoEmail {
+  _id?: string;
+  nome: string;
+  assunto: string;
+  conteudo: string;
+  categoria?: string;
+  variaveis?: string[];
+  ativo?: boolean;
+}
+
+export interface IParametro {
+  _id?: string;
+  chave: string;
+  valor: string;
+  descricao?: string;
+  categoria?: string;
+  tipo: string;
+  ativo?: boolean;
+}
+
+export interface IServidorFuncionario {
+  _id?: string;
+  trabalhadorId: string;
+  matriculaFuncional: string;
+  dataPosse: string;
+  dataExercicio: string;
+  regimeJuridico?: string;
+  cargoEfetivo?: string;
+  cargoComissionado?: string;
+  lotacao?: string;
+  situacaoFuncional?: string;
+  atoNomeacao?: string;
+  dataNomeacao?: string;
+  dataAposentadoria?: string;
+  observacoes?: string;
+  ativo?: boolean;
 }
 
 export interface IArquivoUpload {

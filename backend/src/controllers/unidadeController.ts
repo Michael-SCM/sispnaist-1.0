@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import unidadeService from '../services/UnidadeService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
-import { AppError } from '../middleware/errorHandler.js';
 import { getPaginationParams } from '../utils/pagination.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import { buildUserScope } from '../utils/scope.js';

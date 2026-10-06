@@ -6,7 +6,7 @@ import { Plus, Edit, Trash2, Home, MapPin, Building2, Search, Eye } from 'lucide
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
-import { IUnidade, IEmpresa } from '../../../types/index.js';
+import { IUnidade, IEmpresa, refId } from '../../../types/index.js';
 
 const LIMIT = 10;
 
@@ -49,7 +49,8 @@ const ListaUnidades: React.FC = () => {
     if (e.key === 'Enter') carregar(1);
   };
 
-  const handleDelete = async (id: string, nome: string) => {
+  const handleDelete = async (id: string | undefined, nome: string) => {
+    if (!id) return;
     if (window.confirm(`Tem certeza que deseja excluir a unidade "${nome}"?`)) {
       try {
         await unidadeService.deletar(id);
@@ -61,9 +62,9 @@ const ListaUnidades: React.FC = () => {
     }
   };
 
-  const getEmpresaNome = (empresaId: any) => {
-    if (!empresaId) return 'Empresa não encontrada';
-    const id = typeof empresaId === 'object' && empresaId !== null ? empresaId._id : empresaId;
+  const getEmpresaNome = (empresaId: string | IEmpresa | undefined) => {
+    const id = refId(empresaId);
+    if (!id) return 'Empresa não encontrada';
     const empresa = empresas.find(e => e._id === id);
     return empresa ? empresa.razaoSocial : 'Empresa não encontrada';
   };

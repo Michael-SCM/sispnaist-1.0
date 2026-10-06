@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
-import { informacaoService, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
+import { informacaoService, normalizarAnexos, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
 import { uploadService } from '../../../services/uploadService.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import { ITrabalhador } from '../../../types/index.js';
@@ -12,19 +12,14 @@ import {
   Save,
   AlertCircle,
   Heart,
-  Activity,
   Wine,
-  Cigarette,
-  Zap,
   Stethoscope,
-  Pill,
   ClipboardList,
   FileUp,
   Download,
   Trash2,
   Loader2,
   Baby,
-  Calendar,
   Accessibility
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -233,7 +228,7 @@ export const FormInformacoes: React.FC = () => {
             realizados: info.exames?.[0]?.realizados || '',
             resultados: info.exames?.[0]?.resultados || '',
             periodicidade: info.exames?.[0]?.periodicidade || '',
-            anexos: info.exames?.[0]?.anexos?.map(a => ({ id: a.id || a, nome: a.nome || a })) || [],
+            anexos: normalizarAnexos(info.exames?.[0]?.anexos),
           },
           observacoes: info.observacoes || '',
         });
@@ -321,12 +316,12 @@ export const FormInformacoes: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const payload = { ...formData, exames: [formData.exames] };
+      const payload: Partial<ITrabalhadorInformacao> = { ...formData, exames: [formData.exames] };
       if (isEdicao && infoId) {
-        await informacaoService.atualizar(id!, infoId, payload as any);
+        await informacaoService.atualizar(id!, infoId, payload);
         toast.success('Informações atualizadas com sucesso!');
       } else {
-        await informacaoService.criar(id!, payload as any);
+        await informacaoService.criar(id!, payload);
         toast.success('Informações salvas com sucesso!');
       }
       navigate(`/trabalhadores/${id}/informacoes`);

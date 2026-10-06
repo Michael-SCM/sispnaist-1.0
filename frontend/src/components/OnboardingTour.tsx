@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GraduationCap, PlayCircle, ClipboardCheck, Award, ArrowRight, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 const STORAGE_KEY = 'sispnaist_onboarding_visto';
 
 interface TourStep {
-  icon: React.ComponentType<{ size?: number }>;
+  icon: LucideIcon;
   titulo: string;
   descricao: string;
   cor: string;

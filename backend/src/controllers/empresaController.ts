@@ -4,7 +4,6 @@ import empresaService from '../services/EmpresaService.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams } from '../utils/pagination.js';
 import { IAuthRequest } from '../middleware/auth.js';
-import { AppError } from '../middleware/errorHandler.js';
 import { buildUserScope } from '../utils/scope.js';
 import { assertCanReadCompany, assertCanManageCompany, assertCanReadUnit } from '../services/AuthorizationService.js';
 

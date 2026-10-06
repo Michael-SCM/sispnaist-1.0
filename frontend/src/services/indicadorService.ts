@@ -1,5 +1,5 @@
 import api from './api';
-import type { IIndicador, IMetricaDisponivel, IFormulaIndicador } from '../types/indicadores.js';
+import type { IIndicador, IMetricaDisponivel } from '../types/indicadores.js';
 
 export interface IIndicadorListResponse {
   data: IIndicador[];

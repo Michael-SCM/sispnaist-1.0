@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -7,12 +7,9 @@ import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorDependente, ITrabalhador } from '../../../types/index.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import { 
-  Users2, 
   ArrowLeft, 
   Save, 
   User, 
-  Fingerprint, 
-  Calendar, 
   Heart, 
   Info,
   CheckCircle2,

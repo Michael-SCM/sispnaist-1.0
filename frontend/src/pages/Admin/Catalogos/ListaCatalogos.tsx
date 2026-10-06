@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../../services/api.js';
-import { Settings, ChevronRight, Database, Search, ArrowRight } from 'lucide-react';
+import { Settings, Database, ArrowRight } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';

@@ -1,5 +1,5 @@
 import api from './api.js';
-import { IQuestionario } from '../types/index.js';
+import { IQuestionario, IQuestionarioComItens, IQuestionarioItem } from '../types/index.js';
 
 interface ListarQuestionariosResponse {
   data: IQuestionario[];
@@ -27,8 +27,8 @@ export const questionarioService = {
     return response.data.data;
   },
 
-  obter: async (id: string): Promise<IQuestionario & { itens: any[] }> => {
-    const response = await api.get<{ data: IQuestionario & { itens: any[] } }>(`/questionarios/${id}`);
+  obter: async (id: string): Promise<IQuestionarioComItens> => {
+    const response = await api.get<{ data: IQuestionarioComItens }>(`/questionarios/${id}`);
     return response.data.data;
   },
 
@@ -47,13 +47,13 @@ export const questionarioService = {
   },
 
   // Itens do questionário
-  criarItem: async (questionarioId: string, data: any): Promise<any> => {
-    const response = await api.post<{ data: any }>(`/questionarios/${questionarioId}/itens`, data);
+  criarItem: async (questionarioId: string, data: Partial<IQuestionarioItem>): Promise<IQuestionarioItem> => {
+    const response = await api.post<{ data: IQuestionarioItem }>(`/questionarios/${questionarioId}/itens`, data);
     return response.data.data;
   },
 
-  atualizarItem: async (questionarioId: string, itemId: string, data: any): Promise<any> => {
-    const response = await api.put<{ data: any }>(`/questionarios/${questionarioId}/itens/${itemId}`, data);
+  atualizarItem: async (questionarioId: string, itemId: string, data: Partial<IQuestionarioItem>): Promise<IQuestionarioItem> => {
+    const response = await api.put<{ data: IQuestionarioItem }>(`/questionarios/${questionarioId}/itens/${itemId}`, data);
     return response.data.data;
   },
 

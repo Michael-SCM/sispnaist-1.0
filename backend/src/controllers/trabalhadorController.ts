@@ -6,7 +6,6 @@ import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams } from '../utils/pagination.js';
 import { IAuthRequest } from '../middleware/auth.js';
 import { buildUserScope } from '../utils/scope.js';
-import Trabalhador from '../models/Trabalhador.js';
 import { assertCanReadWorker, assertCanManageWorker } from '../services/AuthorizationService.js';
 
 /**

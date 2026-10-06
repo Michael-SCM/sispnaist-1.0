@@ -4,7 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { doencaService } from '../../services/doencaService.js';
-import { IDoenca } from '../../types/index.js';
+import { refNome, refCpf } from '../../types/index.js';
 import {
   HeartPulse,
   Plus,
@@ -16,7 +16,6 @@ import {
   Stethoscope,
   Activity,
   ChevronRight,
-  ClipboardList,
   Download
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -86,8 +85,9 @@ export const ListaDoencas: React.FC = () => {
     clearFiltros();
   };
 
-  const handleDeletar = async (e: React.MouseEvent, id: string) => {
+  const handleDeletar = async (e: React.MouseEvent, id: string | undefined) => {
     e.stopPropagation();
+    if (!id) return;
     if (confirm('Tem certeza que deseja deletar esta doença?')) {
       try {
         await doencaService.deletar(id);
@@ -298,8 +298,8 @@ export const ListaDoencas: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-600">{(d.trabalhadorId as any)?.nome || 'Não informado'}</span>
-                          <span className="text-[10px] font-mono text-slate-400">{(d.trabalhadorId as any)?.cpf || '-'}</span>
+                          <span className="text-sm font-bold text-slate-600">{refNome(d.trabalhadorId) || 'Não informado'}</span>
+                          <span className="text-[10px] font-mono text-slate-400">{refCpf(d.trabalhadorId) || '-'}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6">

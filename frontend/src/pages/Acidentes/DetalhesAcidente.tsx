@@ -4,7 +4,6 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
-import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { IAcidente, IAcidentePopulated } from '../../types/index.js';
 import { 
   AlertTriangle, 
@@ -15,13 +14,10 @@ import {
   MapPin, 
   FileText, 
   Clock, 
-  CheckCircle2, 
   Info,
-  ChevronRight,
   ShieldAlert,
   Loader2,
-  Dna,
-  PlusCircle
+  Dna
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { materialBiologicoService } from '../../services/materialBiologicoService.js';

@@ -12,8 +12,7 @@ import {
   Trash2,
   Calendar,
   ArrowLeft,
-  Eye,
-  Briefcase
+  Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../../store/authStore.js';

@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import analyticsService from '../services/AnalyticsService.js';
 import { IAuthRequest } from '../middleware/auth.js';
-import Trabalhador from '../models/Trabalhador.js';
 import { obterIdsTrabalhadorPorCpf } from '../utils/obterIdsTrabalhadorPorCpf.js';
-import { buildUserScope, scopeFilterByTrabalhador } from '../utils/scope.js';
+import { buildUserScope } from '../utils/scope.js';
 
 /**
  * GET /api/analytics/kpis

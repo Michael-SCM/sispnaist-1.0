@@ -17,8 +17,7 @@ import {
   Download,
   ChevronRight,
   Briefcase,
-  Building,
-  Mail
+  Building
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { exportTrabalhadores } from '../../services/exportService.js';

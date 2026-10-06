@@ -24,7 +24,7 @@ export const registerSchema = Joi.object({
   senha: Joi.string()
     .min(8)
     .max(20)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/)
     .required()
     .messages({
       'string.min': 'Senha deve ter pelo menos 8 caracteres',
@@ -89,7 +89,7 @@ export const resetPasswordSchema = Joi.object({
   novaSenha: Joi.string()
     .min(8)
     .max(128)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/)
     .required()
     .messages({
       'string.min': 'A nova senha deve ter pelo menos 8 caracteres',
@@ -394,7 +394,7 @@ export const changePasswordSchema = Joi.object({
   novaSenha: Joi.string()
     .min(8)
     .max(128)
-    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/)
     .required()
     .messages({
       'string.min': 'A nova senha deve ter pelo menos 8 caracteres',

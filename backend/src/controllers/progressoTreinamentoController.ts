@@ -77,7 +77,7 @@ export const iniciarQuiz = asyncHandler(async (req: IAuthRequest, res: Response)
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
+  const progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
   if (!progresso || !progresso.assistido) {
     throw new AppError('Assista ao vídeo antes de iniciar o quiz', 400);
   }
@@ -206,7 +206,7 @@ export const emitirCertificado = asyncHandler(async (req: IAuthRequest, res: Res
   const usuarioId = (req.user as any).id;
   const { videoAulaId } = req.params;
 
-  let progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
+  const progresso = await ProgressoTreinamento.findOne({ usuarioId, videoAulaId });
   if (!progresso || !progresso.quizAprovado) {
     throw new AppError('Você precisa ser aprovado no quiz para emitir o certificado', 400);
   }

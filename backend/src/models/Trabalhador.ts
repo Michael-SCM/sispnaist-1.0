@@ -53,7 +53,7 @@ const TrabalhadorSchema = new Schema<ITrabalhadorDocument>(
       required: [true, 'Email é obrigatório'],
       trim: true,
       lowercase: true,
-      match: [/^[\w\.-]+@[\w\.-]+\.\w+$/, 'Email inválido'],
+      match: [/^[\w.-]+@[\w.-]+\.\w+$/, 'Email inválido'],
     },
     dataNascimento: {
       type: Date,

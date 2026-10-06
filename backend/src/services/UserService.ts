@@ -1,4 +1,4 @@
-import User, { IUserDocument } from '../models/User.js';
+import User from '../models/User.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
 import { escapeRegex } from '../utils/sanitize.js';

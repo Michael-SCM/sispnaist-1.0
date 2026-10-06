@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -10,7 +10,6 @@ import {
   ShieldAlert,
   ArrowLeft,
   Save,
-  Calendar,
   FileText,
   Info,
   CheckCircle2,
@@ -206,7 +205,7 @@ export const FormOcorrenciaViolencia: React.FC = () => {
       setIsLoading(true);
 
       const dados: Partial<ITrabalhadorOcorrenciaViolencia> = {
-        dataOcorrencia: formData.dataOcorrencia ? new Date(formData.dataOcorrencia) : undefined,
+        dataOcorrencia: formData.dataOcorrencia || undefined,
         localOcorrencia: formData.localOcorrencia,
         tipoViolencia: formData.tipoViolencia,
         isAssedio: formData.isAssedio,

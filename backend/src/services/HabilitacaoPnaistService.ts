@@ -1,5 +1,4 @@
 import HabilitacaoPnaist, { IHabilitacaoPnaist } from '../models/HabilitacaoPnaist.js';
-import { AppError } from '../middleware/errorHandler.js';
 
 class HabilitacaoPnaistService {
   async listar(page = 1, limit = 50, filtros?: { uf?: string; ativo?: boolean }) {

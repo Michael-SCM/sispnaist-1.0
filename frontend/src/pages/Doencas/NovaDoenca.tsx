@@ -8,16 +8,13 @@ import { maskCPF, unmaskCPF } from '../../utils/cpfMask.js';
 
 import { useAuthStore } from '../../store/authStore.js';
 import { 
-  HeartPulse, 
   ArrowLeft, 
   Save, 
   Stethoscope, 
-  Calendar, 
   FileText, 
   User, 
   Info,
-  CheckCircle2,
-  AlertCircle
+  CheckCircle2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';

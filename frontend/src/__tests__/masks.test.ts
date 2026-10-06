@@ -1,28 +1,9 @@
 /**
- * Testes unitários para utilitários de máscaras
+ * Testes unitários para utilitários de máscaras e validações brasileiras
  */
 
-import { describe, it, expect } from '@jest/globals';
-
-// Mock das funções de máscara (seriam importadas do utils/masks.ts)
-const formatCPF = (value: string): string => {
-  const numbers = value.replace(/\D/g, '').slice(0, 11);
-  if (numbers.length <= 3) return numbers;
-  if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-  if (numbers.length <= 9) {
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-  }
-  return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9)}`;
-};
-
-const formatTelefone = (value: string): string => {
-  const numbers = value.replace(/\D/g, '').slice(0, 11);
-  if (numbers.length <= 2) return numbers;
-  if (numbers.length <= 7) {
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-  }
-  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
-};
+import { describe, it, expect } from 'vitest';
+import { formatCPF, formatTelefone, validateCPF } from '../utils/masks.js';
 
 describe('Máscaras - Formatação', () => {
   describe('formatCPF', () => {
@@ -68,33 +49,14 @@ describe('Máscaras - Formatação', () => {
 
 describe('Validações', () => {
   describe('validateCPF', () => {
-    const validateCPF = (cpf: string): boolean => {
-      const numbers = cpf.replace(/\D/g, '');
-      if (numbers.length !== 11) return false;
-      if (/^(\d)\1+$/.test(numbers)) return false;
-      
-      let sum = 0;
-      for (let i = 0; i < 9; i++) {
-        sum += parseInt(numbers[i]) * (10 - i);
-      }
-      let remainder = (sum * 10) % 11;
-      if (remainder === 10) remainder = 0;
-      if (remainder !== parseInt(numbers[9])) return false;
-      
-      sum = 0;
-      for (let i = 0; i < 10; i++) {
-        sum += parseInt(numbers[i]) * (11 - i);
-      }
-      remainder = (sum * 10) % 11;
-      if (remainder === 10) remainder = 0;
-      if (remainder !== parseInt(numbers[10])) return false;
-      
-      return true;
-    };
+    it('deve aceitar CPF com dígito verificador correto', () => {
+      expect(validateCPF('529.982.247-25')).toBe(true);
+      expect(validateCPF('12345678909')).toBe(true);
+    });
 
-    it('deve validar CPF válido', () => {
-      expect(validateCPF('123.456.789-09')).toBe(false); // CPF inválido mas formato correto
-      expect(validateCPF('11111111111')).toBe(false); // Dígitos repetidos
+    it('deve rejeitar CPF com dígito verificador incorreto', () => {
+      expect(validateCPF('123.456.789-00')).toBe(false); // dígito verificador errado
+      expect(validateCPF('11111111111')).toBe(false); // dígitos repetidos
     });
 
     it('deve rejeitar CPF com tamanho incorreto', () => {

@@ -27,7 +27,7 @@ interface IAnalyticsStore {
   limparErro: () => void;
 }
 
-export const useAnalyticsStore = create<IAnalyticsStore>((set, get) => ({
+export const useAnalyticsStore = create<IAnalyticsStore>((set, _get) => ({
   // Initial state
   kpis: null,
   dadosAcidentes: null,

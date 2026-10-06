@@ -4,15 +4,12 @@ import { MainLayout } from '../../../layouts/MainLayout.js';
 import { materialBiologicoService } from '../../../services/materialBiologicoService.js';
 import { acidenteService } from '../../../services/acidenteService.js';
 import { catalogoService } from '../../../services/catalogoService.js';
-import { IMaterialBiologico, IAcidente, ICatalogoItem } from '../../../types/index.js';
+import { IMaterialBiologico, IAcidente, ICatalogoItem, refId } from '../../../types/index.js';
 import { 
-  Dna, 
   ArrowLeft, 
   Save, 
-  Info,
   Shield,
   Activity,
-  UserCheck,
   Calendar,
   AlertTriangle,
   Stethoscope
@@ -152,7 +149,7 @@ export const NovoMaterialBiologico: React.FC = () => {
                 <select
                   required
                   name="acidenteId"
-                  value={formData.acidenteId}
+                  value={refId(formData.acidenteId) ?? ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 bg-slate-50 border-transparent rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-emerald-700"
                 >

@@ -7,7 +7,6 @@ import { useAuthStore } from '../../store/authStore.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../types/index.js';
 import {
-  Users,
   ArrowLeft,
   Edit,
   User,
@@ -18,7 +17,6 @@ import {
   Fingerprint,
   Building,
   Calendar,
-  CheckCircle2,
   Heart,
   Loader2,
   Phone,

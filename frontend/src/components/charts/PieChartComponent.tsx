@@ -53,7 +53,7 @@ export const PieChartComponent: React.FC<IPieChartProps> = ({
             cx="50%"
             cy="50%"
             labelLine={true}
-            label={({ name, value, cx: pieCx, cy: pieCy, midAngle, innerRadius, outerRadius: pieOuterRadius }) => {
+            label={({ name, value, cx: _pieCx, cy: _pieCy, midAngle: _midAngle, innerRadius: _innerRadius, outerRadius: _pieOuterRadius }) => {
               const percent = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
               
               // Abreviar nomes muito longos

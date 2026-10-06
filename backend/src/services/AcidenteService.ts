@@ -26,7 +26,7 @@ export class AcidenteService {
   }
 
   async obter(id: string): Promise<IAcidente> {
-    let acidente = await Acidente.findById(id)
+    const acidente = await Acidente.findById(id)
       .populate('trabalhadorId', 'nome cpf email empresa unidade')
       .lean();
 

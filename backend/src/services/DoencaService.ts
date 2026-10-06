@@ -1,4 +1,4 @@
-import Doenca, { IDoencaDocument } from '../models/Doenca.js';
+import Doenca from '../models/Doenca.js';
 import Trabalhador from '../models/Trabalhador.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IDoenca } from '../types/index.js';

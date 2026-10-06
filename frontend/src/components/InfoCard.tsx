@@ -1,9 +1,10 @@
 import React from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 interface InfoCardProps {
   label: string;
   value?: string | number | null;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: LucideIcon;
   color: string;
 }
 

@@ -6,7 +6,7 @@ import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalha
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorExameSaude, ITrabalhador } from '../../../types/index.js';
 import {
-  Plus, Edit, Trash2, ArrowLeft, Eye, Stethoscope, Loader2
+  Plus, Edit, Trash2, ArrowLeft, Eye, Stethoscope
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../../store/authStore.js';

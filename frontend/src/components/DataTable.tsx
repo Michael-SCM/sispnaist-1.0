@@ -58,8 +58,6 @@ const DataTableInner = React.forwardRef<HTMLDivElement, DataTableProps<any>>(
       );
     }
 
-    const sortDirection = sortBy && sortOrder === 'asc' ? 'ascending' : 'descending';
-
     return (
       <div ref={ref} className="w-full overflow-x-auto">
         <table className="w-full text-sm text-gray-700" role="table" aria-label={ariaLabel}>

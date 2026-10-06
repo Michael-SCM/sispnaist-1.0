@@ -41,7 +41,6 @@ function eventoSerializado(registro: any): string {
 // ---------------------------------------------------------------------------
 const CPF = '529.982.247-25';
 const CPF_SEM_MASCARA = '52998224725';
-const ENDERECO = 'Rua das Acácias, 123, Centro, Belo Horizonte - MG, CEP 30140-075';
 const RELATO =
   'Paciente relata dor irradiada no braço esquerdo após esforço repetitivo; suspeita de tendinite.';
 const TOKEN =

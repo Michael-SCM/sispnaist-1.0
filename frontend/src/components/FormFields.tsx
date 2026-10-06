@@ -332,7 +332,7 @@ interface CPFInputProps {
   help?: string;
 }
 
-export const CPFInput: React.FC<CPFInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
+export const CPFInput: React.FC<CPFInputProps> = ({ label, name, value, onChange, placeholder: _placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCPF(e.target.value);
     const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
@@ -378,7 +378,7 @@ interface CNPJInputProps {
   help?: string;
 }
 
-export const CNPJInput: React.FC<CNPJInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
+export const CNPJInput: React.FC<CNPJInputProps> = ({ label, name, value, onChange, placeholder: _placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCNPJ(e.target.value);
     const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
@@ -424,7 +424,7 @@ interface TelefoneInputProps {
   help?: string;
 }
 
-export const TelefoneInput: React.FC<TelefoneInputProps> = ({ label, name, value, onChange, placeholder, error, required, disabled, help }) => {
+export const TelefoneInput: React.FC<TelefoneInputProps> = ({ label, name, value, onChange, placeholder: _placeholder, error, required, disabled, help }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatTelefone(e.target.value);
     const syntheticEvent = { ...e, target: { ...e.target, name, value: formatted } };
@@ -471,7 +471,7 @@ interface CEPInputProps {
   help?: string;
 }
 
-export const CEPInput: React.FC<CEPInputProps> = ({ label, name, value, onChange, onCEPFound, placeholder, error, required, disabled, help }) => {
+export const CEPInput: React.FC<CEPInputProps> = ({ label, name, value, onChange, onCEPFound, placeholder: _placeholder, error, required, disabled, help }) => {
   const [loading, setLoading] = React.useState(false);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

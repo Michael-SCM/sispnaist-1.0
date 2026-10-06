@@ -2,7 +2,6 @@ import PDFDocument from 'pdfkit';
 import { Response } from 'express';
 import Trabalhador from '../models/Trabalhador.js';
 import Empresa from '../models/Empresa.js';
-import Unidade from '../models/Unidade.js';
 import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
@@ -131,8 +130,6 @@ export class PdfService {
 
     // Rastrear posição Y atual e página
     let yPos = this.MARGEM_TOPO;
-    let paginaAtual = 1;
-    const totalPaginas = doc.bufferedPageRange().count || 1;
 
     // ========== CABEÇALHO (primeira página) ==========
     yPos = this.renderizarCabecalho(doc, dataEmissao);
@@ -150,13 +147,9 @@ export class PdfService {
         // Callback: adicionar nova página
         doc.addPage();
         yPos = this.MARGEM_TOPO + 30;
-        paginaAtual++;
         return yPos;
       }
     );
-
-    // Atualizar total de páginas após renderização
-    const totalAposRender = doc.bufferedPageRange().count;
 
     // ========== RODAPÉ (em todas as páginas) ==========
     this.renderizarRodape(doc);
@@ -312,7 +305,7 @@ export class PdfService {
     trabalhadores: TrabalhadorData[],
     empresaMap: Map<string, EmpresaData>,
     yInicio: number,
-    onNovaPagina: () => number
+    _onNovaPagina: () => number
   ): number {
     const x = this.MARGEM_ESQUERDA;
     let y = yInicio;
@@ -607,7 +600,7 @@ export class PdfService {
     yPos = this.renderizarIntroducaoAcidentes(doc, acidentes.length, yPos);
 
     // ========== TABELA ==========
-    yPos = this.renderizarTabelaAcidentes(doc, acidentes, yPos);
+    this.renderizarTabelaAcidentes(doc, acidentes, yPos);
 
     // ========== RODAPÉ ==========
     this.renderizarRodape(doc);
@@ -944,7 +937,7 @@ export class PdfService {
     yPos = this.renderizarIntroducaoDoencas(doc, doencas.length, yPos);
 
     // ========== TABELA ==========
-    yPos = this.renderizarTabelaDoencas(doc, doencas, yPos);
+    this.renderizarTabelaDoencas(doc, doencas, yPos);
 
     // ========== RODAPÉ ==========
     this.renderizarRodape(doc);
@@ -1272,7 +1265,7 @@ export class PdfService {
     yPos = this.renderizarIntroducaoVacinacoes(doc, vacinacoes.length, yPos);
 
     // ========== TABELA ==========
-    yPos = this.renderizarTabelaVacinacoes(doc, vacinacoes, yPos);
+    this.renderizarTabelaVacinacoes(doc, vacinacoes, yPos);
 
     // ========== RODAPÉ ==========
     this.renderizarRodape(doc);
@@ -1597,7 +1590,7 @@ export class PdfService {
     yPos = this.renderizarTabelaAbsenteismo(doc, dados.absenteismo.porMes, yPos);
 
     // ========== ALERTAS CRÍTICOS ==========
-    yPos = this.renderizarAlertasCriticos(doc, dados.alertasCriticos, yPos);
+    this.renderizarAlertasCriticos(doc, dados.alertasCriticos, yPos);
 
     // ========== RODAPÉ ==========
     this.renderizarRodape(doc);
@@ -2042,7 +2035,6 @@ export class PdfService {
     const PH = doc.page.height;  // 595.28
     const CX = PW / 2;           // centro X
     const TW = PW - 100;         // largura do texto (741)
-    const LW = 200;              // largura linha decorativa
 
     // Bordas decorativas
     doc.rect(20, 20, PW - 40, PH - 40).lineWidth(2).stroke('#d97706');

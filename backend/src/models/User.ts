@@ -37,7 +37,7 @@ const UserSchema = new Schema<IUserDocument>(
       required: [true, 'Email é obrigatório'],
       unique: true,
       lowercase: true,
-      match: /^[\w\.-]+@[\w\.-]+\.\w+$/,
+      match: /^[\w.-]+@[\w.-]+\.\w+$/,
     },
     senha: {
       type: String,

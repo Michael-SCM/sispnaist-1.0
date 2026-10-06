@@ -14,7 +14,6 @@ import {
   Calendar, 
   Download,
   ChevronRight,
-  Clock,
   User,
   AlertCircle
 } from 'lucide-react';

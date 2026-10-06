@@ -12,17 +12,12 @@ import {
   ArrowLeft,
   Save,
   User,
-  Calendar,
   MapPin,
-  FileText,
   Info,
-  Clock,
   CheckCircle2,
   X,
   Stethoscope,
   ShieldAlert,
-  Heart,
-  Building,
   Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';

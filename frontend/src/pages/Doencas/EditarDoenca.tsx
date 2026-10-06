@@ -3,13 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { useDoencaStore } from '../../store/doencaStore.js';
 import { doencaService } from '../../services/doencaService.js';
-import { IDoenca } from '../../types/index.js';
 import { 
-  HeartPulse, 
   ArrowLeft, 
   Save, 
   Stethoscope, 
-  Calendar, 
   FileText, 
   User, 
   Info,

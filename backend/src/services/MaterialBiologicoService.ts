@@ -1,4 +1,4 @@
-import MaterialBiologico, { IMaterialBiologicoDocument } from '../models/MaterialBiologico.js';
+import MaterialBiologico from '../models/MaterialBiologico.js';
 import Acidente from '../models/Acidente.js';
 import Trabalhador from '../models/Trabalhador.js';
 import User from '../models/User.js';

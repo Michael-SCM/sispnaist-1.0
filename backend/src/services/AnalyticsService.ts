@@ -2,12 +2,9 @@ import Acidente from '../models/Acidente.js';
 import Doenca from '../models/Doenca.js';
 import Vacinacao from '../models/Vacinacao.js';
 import Trabalhador from '../models/Trabalhador.js';
-import TrabalhadorVinculo from '../models/TrabalhadorVinculo.js';
-import Empresa from '../models/Empresa.js';
 import Unidade from '../models/Unidade.js';
 import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
 import TrabalhadorAfastamento from '../models/TrabalhadorAfastamento.js';
-import AtoMunicipalInovacao from '../models/AtoMunicipalInovacao.js';
 import HabilitacaoPnaist from '../models/HabilitacaoPnaist.js';
 import { getRedisClient } from '../config/redis.js';
 
@@ -114,7 +111,6 @@ export class AnalyticsService {
   async obterKPIs(empresaScope?: string): Promise<IKPIData> {
     const cacheKey = empresaScope ? `analytics:kpis:${empresaScope}` : 'analytics:kpis';
     return getCachedOrFetch<IKPIData>(cacheKey, REDIS_TTL, async () => {
-    const empresaFilter = empresaScope ? { empresa: empresaScope } : {};
     const trabalhadorEmpresaFilter = empresaScope ? { empresa: empresaScope } : {};
       const trintaDias = new Date();
       trintaDias.setDate(trintaDias.getDate() + 30);

@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 const FormEmpresa: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { empresaAtual, fetchEmpresa, createEmpresa, updateEmpresa, loading, error, limparErro } = useEmpresaStore();
+  const { empresaAtual, fetchEmpresa, createEmpresa, updateEmpresa, loading, limparErro } = useEmpresaStore();
 
   const [formData, setFormData] = useState({
     razaoSocial: '',

@@ -34,12 +34,12 @@ export const password = (msg?: string): ValidationRule => {
     if (!/[A-Z]/.test(value)) return msg || 'Deve conter letra maiúscula';
     if (!/[a-z]/.test(value)) return msg || 'Deve conter letra minúscula';
     if (!/\d/.test(value)) return msg || 'Deve conter número';
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) return msg || 'Deve conter caractere especial';
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(value)) return msg || 'Deve conter caractere especial';
     return undefined;
   };
 };
 
-export const matchField = (compareValue: () => string, fieldName: string): ValidationRule => {
+export const matchField = (compareValue: () => string, _fieldName: string): ValidationRule => {
   return (value: string) =>
     value !== compareValue() ? `As senhas não conferem` : undefined;
 };

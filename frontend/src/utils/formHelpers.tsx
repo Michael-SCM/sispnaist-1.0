@@ -1,7 +1,6 @@
 /**
  * Utilitários compartilhados para páginas de formulários
  */
-import React from 'react';
 /**
  * Extrai CPF de um objeto trabalhador
  */

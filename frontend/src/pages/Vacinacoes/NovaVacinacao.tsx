@@ -7,13 +7,10 @@ import {
   Syringe, 
   ArrowLeft, 
   Save, 
-  Calendar, 
   Building2, 
   UserCircle, 
   FileText, 
-  Info,
   CheckCircle2,
-  AlertCircle,
   Fingerprint
 } from 'lucide-react';
 import toast from 'react-hot-toast';

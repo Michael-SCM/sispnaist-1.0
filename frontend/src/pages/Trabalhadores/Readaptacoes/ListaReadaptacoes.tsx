@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -12,9 +12,6 @@ import {
   Trash2,
   Calendar,
   ArrowLeft,
-  ChevronRight,
-  Activity,
-  FileText,
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -152,8 +149,8 @@ export const ListaReadaptacoes: React.FC = () => {
                           <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-black uppercase w-fit">
                             CID: {readaptacao.cid || 'N/A'}
                           </span>
-                          {readaptacao.atividadeAtual && (
-                            <span className="text-xs text-slate-400 max-w-[200px] truncate">Atual: {readaptacao.atividadeAtual}</span>
+                          {readaptacao.novasAtribuicoes && (
+                            <span className="text-xs text-slate-400 max-w-[200px] truncate">Atual: {readaptacao.novasAtribuicoes}</span>
                           )}
                         </div>
                       </td>

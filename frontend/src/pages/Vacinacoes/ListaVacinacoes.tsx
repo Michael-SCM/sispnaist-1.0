@@ -4,6 +4,7 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useVacinacaoStore } from '../../store/vacinacaoStore.js';
 import { useAuthStore } from '../../store/authStore.js';
 import { vacinacaoService } from '../../services/vacinacaoService.js';
+import { refNome, refCpf } from '../../types/index.js';
 import {
   Syringe,
   Plus,
@@ -12,8 +13,6 @@ import {
   Search,
   Filter,
   Calendar,
-  Building2,
-  UserCircle,
   ChevronRight,
   ShieldCheck,
   Download
@@ -79,8 +78,9 @@ export const ListaVacinacoes: React.FC = () => {
     carregarVacinacoes();
   }, [page, filtros]);
 
-  const handleExcluir = async (e: React.MouseEvent, id: string) => {
+  const handleExcluir = async (e: React.MouseEvent, id: string | undefined) => {
     e.stopPropagation();
+    if (!id) return;
     if (confirm('Tem certeza que deseja excluir esta vacinação?')) {
       try {
         await vacinacaoService.deletar(id);
@@ -276,8 +276,8 @@ export const ListaVacinacoes: React.FC = () => {
                       </td>
                       <td className="px-8 py-6 hidden md:table-cell">
                         <div className="flex flex-col">
-                          <span className="text-sm font-bold text-slate-600">{(v.trabalhadorId as any)?.nome || 'Não informado'}</span>
-                          <span className="text-[10px] font-mono text-slate-400">{(v.trabalhadorId as any)?.cpf || '-'}</span>
+                          <span className="text-sm font-bold text-slate-600">{refNome(v.trabalhadorId) || 'Não informado'}</span>
+                          <span className="text-[10px] font-mono text-slate-400">{refCpf(v.trabalhadorId) || '-'}</span>
                         </div>
                       </td>
                       <td className="px-8 py-6">

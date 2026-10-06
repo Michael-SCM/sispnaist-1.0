@@ -15,7 +15,6 @@ import {
   Trash2, 
   Search, 
   Video,
-  Clock,
   Eye,
   Tag,
   CheckCircle2,
@@ -34,7 +33,6 @@ export const ListaVideoAulas: React.FC = () => {
   
   const {
     videoAulas,
-    total,
     page,
     pages,
     isLoading,
@@ -48,7 +46,7 @@ export const ListaVideoAulas: React.FC = () => {
   const [categoria, setCategoria] = useState('');
   const [progressos, setProgressos] = useState<Map<string, IProgressoTreinamento>>(new Map());
   const [progressoCarregado, setProgressoCarregado] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [, setShowOnboarding] = useState(false);
 
   const carregarVideoAulas = async (pageNumber: number = 1) => {
     try {

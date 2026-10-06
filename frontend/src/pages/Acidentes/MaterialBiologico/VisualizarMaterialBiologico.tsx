@@ -4,8 +4,8 @@ import { MainLayout } from '../../../layouts/MainLayout.js';
 import { materialBiologicoService } from '../../../services/materialBiologicoService.js';
 import { IMaterialBiologico, IAcidentePopulated } from '../../../types/index.js';
 import {
-  Dna, ArrowLeft, Edit, Trash2, Shield, Activity, Calendar,
-  AlertTriangle, Stethoscope, User, Clock, AlertCircle
+  ArrowLeft, Edit, Trash2, Shield, Activity,
+  AlertTriangle, Stethoscope, User, Clock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';

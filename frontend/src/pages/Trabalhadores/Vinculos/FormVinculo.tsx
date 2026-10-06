@@ -9,7 +9,7 @@ import unidadeService from '../../../services/unidadeService.js';
 import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade, IAvaliacaoAmbienteTrabalho } from '../../../types/index.js';
 import { useCatalogo } from '../../../hooks/useCatalogo.js';
 import {
-  ArrowLeft, Save, Briefcase, Building, Calendar, Clock, DollarSign, Info, Loader2,
+  ArrowLeft, Save, Briefcase, DollarSign, Info, Loader2,
   AlertTriangle, Shield, HeartHandshake
 } from 'lucide-react';
 import toast from 'react-hot-toast';

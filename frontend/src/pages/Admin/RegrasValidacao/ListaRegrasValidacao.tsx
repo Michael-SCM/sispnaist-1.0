@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { regraValidacaoService, IRegraValidacao } from '../../../services/regraValidacaoService.js';
-import { Plus, Edit, Trash2, Gavel, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Gavel } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';

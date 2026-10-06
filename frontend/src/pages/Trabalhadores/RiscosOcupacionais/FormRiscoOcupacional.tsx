@@ -298,9 +298,9 @@ export const FormRiscoOcupacional: React.FC = () => {
         tecnicaMedicao: formData.tecnicaMedicao || undefined,
         resultadoMedicao: formData.resultadoMedicao || undefined,
         limiteTolerancia: formData.limiteTolerancia || undefined,
-        dataInicioExposicao: formData.dataInicioExposicao ? new Date(formData.dataInicioExposicao) : undefined,
-        dataFimExposicao: formData.dataFimExposicao ? new Date(formData.dataFimExposicao) : undefined,
-        dataAvaliacao: formData.dataAvaliacao ? new Date(formData.dataAvaliacao) : undefined,
+        dataInicioExposicao: formData.dataInicioExposicao || undefined,
+        dataFimExposicao: formData.dataFimExposicao || undefined,
+        dataAvaliacao: formData.dataAvaliacao || undefined,
         avaliador: formData.avaliador,
         ativo: formData.ativo,
       };

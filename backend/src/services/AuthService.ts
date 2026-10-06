@@ -1,5 +1,5 @@
 import User, { IUserDocument } from '../models/User.js';
-import { generateToken, generateRefreshToken, verifyRefreshToken, generate2FAToken, verify2FAToken, generateTrustedDeviceToken } from '../utils/jwt.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken, generate2FAToken, verify2FAToken } from '../utils/jwt.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUser } from '../types/index.js';
 import { sendResetPasswordEmail, sendVerificationEmail, send2FACodigoEmail, validateEmailDomain } from '../utils/emailService.js';

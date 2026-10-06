@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../services/api.js';
 import { useEmpresaStore } from '../../../store/empresaStore.js';
 import { useUnidadeStore } from '../../../store/unidadeStore.js';
-import { ArrowLeft, Save, User, Shield, Building2, MapPin, Mail, Key } from 'lucide-react';
+import { ArrowLeft, Save, User, Shield, Building2, Mail, Key } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';

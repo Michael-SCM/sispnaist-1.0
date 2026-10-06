@@ -59,7 +59,7 @@ export const DetalhesReadaptacao: React.FC = () => {
     );
   }
 
-  const r = readaptacao as any;
+  const r = readaptacao;
 
   return (
     <MainLayout>
@@ -108,12 +108,12 @@ export const DetalhesReadaptacao: React.FC = () => {
               <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">{r.motivo || 'Não informado'}</p>
             </div>
             <div className="md:col-span-2">
-              <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Atividade Anterior</span>
-              <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">{r.atividadeAnterior || 'Não informada'}</p>
+              <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Função Anterior</span>
+              <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">{r.funcaoAnterior || 'Não informada'}</p>
             </div>
             <div className="md:col-span-2">
-              <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Atividade Atual Recomendada</span>
-              <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">{r.atividadeAtual || 'Não informada'}</p>
+              <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Novas Atribuições</span>
+              <p className="text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100/50 mt-1 whitespace-pre-line text-sm">{r.novasAtribuicoes || 'Não informada'}</p>
             </div>
             <div>
               <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Previsão de Retorno</span>

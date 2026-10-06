@@ -4,9 +4,9 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { videoAulaService } from '../../services/videoAulaService.js';
 import { quizService } from '../../services/quizService.js';
-import { IVideoAula, IQuiz, IQuestao } from '../../types/index.js';
+import { IVideoAula, IQuestao } from '../../types/index.js';
 import { TextInput, Select, TextArea } from '../../components/FormFields';
-import { ArrowLeft, Save, Video, PlayCircle, ClipboardCheck, Plus, Trash2, GripVertical } from 'lucide-react';
+import { ArrowLeft, Save, Video, PlayCircle, ClipboardCheck, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CINCO_OPCOES = ['A', 'B', 'C', 'D', 'E'];
@@ -178,8 +178,6 @@ export const FormVideoAula: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  const totalLetras = CINCO_OPCOES.length;
 
   return (
     <MainLayout>

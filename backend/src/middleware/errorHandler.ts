@@ -27,7 +27,7 @@ function genericResponse(res: Response, statusCode: number, genericMsg: string, 
   });
 }
 
-export const errorHandler = (err: Error | AppError, req: Request, res: Response, next: NextFunction): void => {
+export const errorHandler = (err: Error | AppError, req: Request, res: Response, _next: NextFunction): void => {
   // AppError intencional
   if (err instanceof AppError) {
     const isServerError = err.statusCode >= 500;

@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import CatalogoService from '../services/CatalogoService';
-import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
-import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
+import { getPaginationParams } from '../utils/pagination.js';
 
 class CatalogoController {
   /**

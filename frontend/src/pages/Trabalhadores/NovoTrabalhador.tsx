@@ -7,8 +7,6 @@ import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { cadsusService } from '../../services/cadsusService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
-import { useEmpresaStore } from '../../store/empresaStore.js';
-import { useUnidadeStore } from '../../store/unidadeStore.js';
 
 const empresaIdToString = (v: any): string => {
   if (!v) return '';
@@ -22,8 +20,8 @@ import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import { AutocompleteCidade } from '../../components/AutocompleteCidade.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
-  Building, Calendar, Heart, Shield, Clock, AlertTriangle,
-  Phone, CreditCard, BookOpen, Brain, Search, Loader2
+  AlertTriangle,
+  Brain, Search, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { maskCPF } from '../../utils/cpfMask.js';
@@ -37,8 +35,6 @@ const checkboxRowCls = "flex items-center gap-3 py-2";
 export const NovoTrabalhador: React.FC = () => {
   const navigate = useNavigate();
   const { adicionarTrabalhador } = useTrabalhadorStore();
-  const { fetchEmpresaPorUnidade } = useEmpresaStore();
-  const { fetchUnidadesFiltradas } = useUnidadeStore();
   const [isLoading, setIsLoading] = useState(false);
   const [consultandoCadsus, setConsultandoCadsus] = useState(false);
   const [empresas, setEmpresas] = useState<IEmpresa[]>([]);
@@ -104,7 +100,8 @@ export const NovoTrabalhador: React.FC = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    let { name, value } = e.target as { name: string; value: string };
+    const { name } = e.target as { name: string; value: string };
+    let { value } = e.target as { name: string; value: string };
 
 
     // Máscara de CPF

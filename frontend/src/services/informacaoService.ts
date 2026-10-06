@@ -12,6 +12,24 @@ export interface IExame {
   anexos: IAnexo[];
 }
 
+/**
+ * Normaliza anexos vindos do backend. Dados antigos podem vir como string
+ * (apenas o id), então a união é aceita aqui e convertida para `IAnexo`,
+ * sem expor `any` nas telas.
+ */
+export const normalizarAnexos = (
+  anexos?: Array<string | IAnexo> | null
+): IAnexo[] => {
+  const lista = anexos ?? [];
+  return lista
+    .map((anexo): IAnexo | undefined => {
+      if (!anexo) return undefined;
+      if (typeof anexo === 'string') return { id: anexo, nome: anexo };
+      return { id: anexo.id, nome: anexo.nome || anexo.id };
+    })
+    .filter((anexo): anexo is IAnexo => anexo !== undefined);
+};
+
 export interface ITrabalhadorInformacao {
   _id?: string;
   trabalhadorId: string;

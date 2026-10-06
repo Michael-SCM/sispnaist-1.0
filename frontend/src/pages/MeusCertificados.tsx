@@ -4,7 +4,7 @@ import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import { treinamentoService } from '../services/treinamentoService.js';
 import { ICertificado } from '../types/index.js';
 import { CertificadoCard } from '../components/CertificadoCard.js';
-import { Award, ExternalLink, X, FileText, Download, Hash, User, Calendar, Target, Loader2 } from 'lucide-react';
+import { Award, X, FileText, Download, Hash, Calendar, Target, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const MeusCertificados: React.FC = () => {

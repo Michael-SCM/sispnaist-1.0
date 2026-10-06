@@ -6,7 +6,7 @@ import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalha
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import empresaService from '../../../services/empresaService.js';
 import unidadeService from '../../../services/unidadeService.js';
-import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade, IAvaliacaoAmbienteTrabalho } from '../../../types/index.js';
+import { ITrabalhadorVinculo, ITrabalhador, IEmpresa, IUnidade } from '../../../types/index.js';
 import {
   ArrowLeft, Edit, Trash2, Building, MapPin, Briefcase, CreditCard,
   UserCheck, Clock, Calendar, Flag, Home,
@@ -48,7 +48,7 @@ const ICONS: Record<string, any> = {
 
 const formatDate = (d?: string) => d ? new Date(d).toLocaleDateString('pt-BR') : null;
 
-const renderDetalhes = (val: any, subdimensao: string, campo: string) => {
+const renderDetalhes = (val: any, subdimensao: string, _campo: string) => {
   const detalhes: string[] = [];
   if (subdimensao === 'riscosOcupacionais') {
     if (val?.intensidade) detalhes.push(`Intensidade: ${val.intensidade}`);

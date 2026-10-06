@@ -250,7 +250,6 @@ async function seedAcidentesDoencasVacinacoes() {
     for (let i = 0; i < trabalhadores.length; i++) {
       const trabalhador = trabalhadores[i];
       const seedRand = mulberry32(i * 7919 + 12347);
-      const dateOffset = i * 7; // cada trabalhador com datas ligeiramente diferentes
 
       try {
         if (i % 50 === 0) {
@@ -270,7 +269,6 @@ async function seedAcidentesDoencasVacinacoes() {
             : new Date(now - (730 + Math.floor(seedRand() * 365)) * 86400000);
         const isAtiva = seedRand() > 0.35;
 
-        const relacaoOptions = ['comum', 'ocupacional', 'acidente'] as const;
         const relacaoRand = seedRand();
         const relacaoTrabalho = relacaoRand < 0.50 ? 'comum' : relacaoRand < 0.80 ? 'ocupacional' : 'acidente';
 

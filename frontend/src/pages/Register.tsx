@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useForm } from '../hooks/useForm.js';
 import { authService } from '../services/authService.js';
-import { useAuthStore } from '../store/authStore.js';
 import { DocumentTitle } from '../hooks/useDocumentTitle.js';
 import {
   required,

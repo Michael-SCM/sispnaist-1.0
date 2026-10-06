@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { ICatalogoItem } from '../../../types/index.js';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -11,7 +10,6 @@ import {
   RefreshCcw,
   ArrowLeft,
   Save,
-  Calendar,
   FileText,
   Info,
   CheckCircle2,
@@ -116,16 +114,16 @@ export const FormReadaptacao: React.FC = () => {
           dataReadaptacao: readaptacao.dataReadaptacao ? readaptacao.dataReadaptacao.split('T')[0] : '',
           motivo: readaptacao.motivo || '',
           cid: readaptacao.cid || '',
-          mudancaSetor: (readaptacao as any).mudancaSetor || false,
-          setorOrigem: (readaptacao as any).setorOrigem || '',
-          setorReadaptacao: (readaptacao as any).setorReadaptacao || '',
-          mudancaFuncao: (readaptacao as any).mudancaFuncao || false,
-          funcaoAnterior: (readaptacao as any).funcaoAnterior || '',
-          funcaoNova: (readaptacao as any).funcaoNova || '',
-          restricao: (readaptacao as any).restricao || '',
-          novasAtribuicoes: (readaptacao as any).novasAtribuicoes || '',
-          acompanhamento: normalizeString((readaptacao as any).acompanhamento),
-          grauSatisfacao: normalizeString((readaptacao as any).grauSatisfacao),
+          mudancaSetor: readaptacao.mudancaSetor || false,
+          setorOrigem: readaptacao.setorOrigem || '',
+          setorReadaptacao: readaptacao.setorReadaptacao || '',
+          mudancaFuncao: readaptacao.mudancaFuncao || false,
+          funcaoAnterior: readaptacao.funcaoAnterior || '',
+          funcaoNova: readaptacao.funcaoNova || '',
+          restricao: readaptacao.restricao || '',
+          novasAtribuicoes: readaptacao.novasAtribuicoes || '',
+          acompanhamento: normalizeString(readaptacao.acompanhamento),
+          grauSatisfacao: normalizeString(readaptacao.grauSatisfacao),
 
           laudoMedico: readaptacao.laudoMedico || '',
           tempoReadaptacao: readaptacao.tempoReadaptacao || '',
@@ -192,8 +190,8 @@ export const FormReadaptacao: React.FC = () => {
         ...formData,
         acompanhamento: normalizeString(formData.acompanhamento),
         grauSatisfacao: normalizeString(formData.grauSatisfacao),
-        dataReadaptacao: formData.dataReadaptacao ? new Date(formData.dataReadaptacao) : undefined,
-        dataRetorno: formData.dataRetorno ? new Date(formData.dataRetorno) : undefined,
+        dataReadaptacao: formData.dataReadaptacao || undefined,
+        dataRetorno: formData.dataRetorno || undefined,
       };
 
       if (isEdicao) {

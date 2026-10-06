@@ -5,12 +5,13 @@ import { useEmpresaStore } from '../../../store/empresaStore.js';
 import { ArrowLeft, Save, Home, MapPin, Building2, Info } from 'lucide-react';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
+import { refId } from '../../../types/index.js';
 import toast from 'react-hot-toast';
 
 const FormUnidade: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { unidadeAtual, fetchUnidade, createUnidade, updateUnidade, loading, error, limparErro } = useUnidadeStore();
+  const { unidadeAtual, fetchUnidade, createUnidade, updateUnidade, loading, limparErro } = useUnidadeStore();
   const { empresas, fetchEmpresas } = useEmpresaStore();
 
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const FormUnidade: React.FC = () => {
     if (id && unidadeAtual) {
       setFormData({
         nome: unidadeAtual.nome || '',
-        empresaId: typeof unidadeAtual.empresaId === 'object' && unidadeAtual.empresaId !== null ? unidadeAtual.empresaId._id : unidadeAtual.empresaId || '',
+        empresaId: refId(unidadeAtual.empresaId) ?? '',
         tipo: unidadeAtual.tipo || 'Própria',
         esferaAdministrativa: unidadeAtual.esferaAdministrativa || 'municipal',
         possuiPgr: unidadeAtual.possuiPgr ?? false,

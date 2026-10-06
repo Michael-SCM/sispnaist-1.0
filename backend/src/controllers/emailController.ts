@@ -99,7 +99,7 @@ class EmailController {
   }
 
   // POST /api/emails/enviar - Enviar email (placeholder - requer Nodemailer/SendGrid)
-  async enviar(req: Request, res: Response, next: NextFunction) {
+  async enviar(req: Request, res: Response, _next: NextFunction) {
     // TODO: Implementar envio real de email com Nodemailer ou SendGrid
     return res.status(501).json({
       mensagem: 'Funcionalidade de envio de email ainda não implementada. Requer configuração de Nodemailer/SendGrid.'

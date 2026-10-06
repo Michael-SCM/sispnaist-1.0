@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import RegraValidacao, { IRegraValidacao } from '../models/RegraValidacao';
+import RegraValidacao from '../models/RegraValidacao';
 import { AppError } from '../middleware/errorHandler';
 import { logAction, compararDados } from '../utils/auditLogger.js';
 import { getPaginationParams, getPaginationResult } from '../utils/pagination.js';
@@ -21,16 +21,6 @@ const CAMPOS_POR_ENTIDADE: Record<string, string[]> = {
     'telefone', 'cnae', 'porte'],
   unidade: ['nome', 'gestor', 'email', 'telefone', 'tipo']
 };
-
-const TIPOS_VALIDACAO = ['obrigatorio', 'regex', 'min', 'max', 'enum', 'lengthMin', 'lengthMax', 'personalizado'] as const;
-
-function isRegraVigente(regra: IRegraValidacao): boolean {
-  const agora = new Date();
-  if (!regra.ativo) return false;
-  if (regra.dataInicioVigencia && new Date(regra.dataInicioVigencia) > agora) return false;
-  if (regra.dataFimVigencia && new Date(regra.dataFimVigencia) < agora) return false;
-  return true;
-}
 
 function getValorCampo(dados: any, campo: string): any {
   const partes = campo.split('.');

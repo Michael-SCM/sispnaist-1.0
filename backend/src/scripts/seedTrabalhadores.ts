@@ -430,23 +430,14 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
     return list.length > 0 ? list : fallback;
   };
 
-  const sexos = getOptions('sexo', ['Masculino', 'Feminino']);
-  const generos = getOptions('genero', ['Mulher cisgênero', 'Homem cisgênero', 'Não-binário', 'Outro']);
-  const racas = getOptions('racaCor', ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena']);
-  const escolaridades = getOptions('escolaridade', ['Fundamental Completo', 'Médio Completo', 'Superior Completo', 'Pós-graduação']);
-  const estadosCivis = getOptions('estadoCivil', ['Solteiro(a)', 'Casado(a)', 'Divorciado(a)', 'Viúvo(a)', 'União Estável']);
-  const tiposSanguineos = getOptions('tipoSanguineo', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']);
   const deficienciaTipos = getOptions('tipoDeficiencia', ['Física', 'Visual', 'Auditiva', 'Intelectual', 'Múltipla', 'Psicossocial']);
   const deficienciaTempos = getOptions('tempoDeficiencia', ['Congênita', 'Adquirida', 'Temporária', 'Permanente']);
   const deficienciaGraus = getOptions('grauDeficiencia', ['Leve', 'Moderada', 'Severa', 'Profunda']);
   const vinculoTipos = getOptions('tipoVinculo', ['Efetivo', 'CLT', 'Estágio', 'Temporário', 'Terceirizado', 'Comissionado']);
   const turnos = getOptions('turnoTrabalho', ['Diurno', 'Noturno', 'Misto', 'Plantão 12h', 'Plantão 24h']);
-  const jornadas = getOptions('jornadaTrabalho', ['20 horas semanais', '30 horas semanais', '40 horas semanais', '44 horas semanais']);
-  const situacoes = getOptions('situacaoTrabalho', ['Ativo', 'Afastado', 'Desligado', 'Aposentado']);
   const funcoes = getOptions('funcao', ['Médico(a)', 'Enfermeiro(a)', 'Técnico(a) de Enfermagem', 'Administrativo', 'Serviços Gerais']);
   const afastamentoTipos = getOptions('tipoAfastamento', ['Doença', 'Acidente de trabalho', 'Licença maternidade', 'Licença para tratamento']);
   const afastamentoMotivos = getOptions('motivoAfastamento', ['Doença comum', 'Doença profissional', 'COVID-19', 'Cirurgia', 'Acidente']);
-  const parentescos = getOptions('parentesco', ['Cônjuge', 'Filho(a)', 'Enteado(a)', 'Mãe', 'Pai']);
   const violenciaTipos = getOptions('tipoViolencia', ['Física', 'Psicológica/Moral', 'Sexual', 'Outro']);
   const violenciaSexuais = getOptions('tipoViolenciaSexual', ['Não se aplica', 'Assédio Sexual']);
   const violenciaMotivos = getOptions('motivoViolencia', ['Conflito no trabalho', 'Discriminação', 'Retaliação', 'Outro']);
@@ -486,7 +477,6 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
   const vinculosToInsert: any[] = [];
   const vacinacoesToInsert: any[] = [];
   const doencasToInsert: any[] = [];
-  const acidentesToInsert: any[] = [];
   const materiaisBiologicosToInsert: any[] = [];
   const riscosOcupacionaisToInsert: any[] = [];
   const historicoPPPToInsert: any[] = [];
@@ -519,7 +509,7 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
     const dataNascimento = new Date(birthYear, birthMonth - 1, birthDay);
 
     // Data de entrada: entre 1 e 25 anos atrás (nunca antes dos 14 anos)
-    const anosServico = 1 + Math.floor(rand() * Math.min(idadeAnos - 14, 25));
+    const _anosServico = 1 + Math.floor(rand() * Math.min(idadeAnos - 14, 25));
     const entradaYear = birthYear + 14 + Math.floor(rand() * Math.max(1, idadeAnos - 14 - 1));
     const entradaMonth = 1 + Math.floor(rand() * 12);
     const entradaDay = 1 + Math.floor(rand() * 28);
@@ -933,7 +923,6 @@ export async function seedTrabalhadores(targetCount: number = 1500) {
       }
       doencasUsadas.push(doencaInfo.nomeDoenca);
 
-      const relacaoOptions = ['comum', 'ocupacional', 'acidente'] as const;
       const relacaoRand = rand();
       const relacaoTrabalho = relacaoRand < 0.50 ? 'comum' : relacaoRand < 0.80 ? 'ocupacional' : 'acidente';
 

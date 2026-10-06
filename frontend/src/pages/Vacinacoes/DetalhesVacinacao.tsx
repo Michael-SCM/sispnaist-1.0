@@ -14,8 +14,7 @@ import {
   FileText,
   Clock,
   Loader2,
-  ShieldCheck,
-  PlusCircle
+  ShieldCheck
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';

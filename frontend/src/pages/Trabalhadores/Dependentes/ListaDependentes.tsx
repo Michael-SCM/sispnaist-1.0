@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
@@ -13,10 +13,6 @@ import {
   Calendar, 
   ArrowLeft, 
   Fingerprint, 
-  Heart,
-  ChevronRight,
-  ShieldCheck,
-  UserCheck,
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';

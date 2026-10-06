@@ -4,27 +4,23 @@ import { MainLayout } from '../../layouts/MainLayout.js';
 import { useAcidenteStore } from '../../store/acidenteStore.js';
 import { acidenteService } from '../../services/acidenteService.js';
 import { trabalhadorService } from '../../services/trabalhadorService.js';
-import { IAcidente } from '../../types/index.js';
 import {
   AlertTriangle,
   ArrowLeft,
   Save,
   User,
-  Calendar,
   MapPin,
   Info,
-  Clock,
   CheckCircle2,
   X,
   Loader2,
   Stethoscope,
   ShieldAlert,
-  Building,
   Search
 } from 'lucide-react';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import toast from 'react-hot-toast';
-import { maskCPF, unmaskCPF } from '../../utils/cpfMask';
+import { maskCPF } from '../../utils/cpfMask';
 import { esocialService, EsocialS2210 } from '../../services/esocialService.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { ModalSelecaoESocial } from '../../components/ModalSelecaoESocial.js';
@@ -118,15 +114,6 @@ export const EditarAcidente: React.FC = () => {
           return `${year}-${month}-${day}`;
         };
 
-        const extrairCPF = (trabalhador: any): string => {
-          if (!trabalhador) return '';
-          if (typeof trabalhador === 'string') return trabalhador;
-          if (typeof trabalhador === 'object') {
-            return trabalhador.cpf || trabalhador.login || '';
-          }
-          return '';
-        };
-
         const garantirArrayLesoes = (lesoes: any): string[] => {
           if (!lesoes) return [];
           if (Array.isArray(lesoes)) return lesoes.map((l: any) => (typeof l === 'string' ? l : String(l))).filter(Boolean);
@@ -210,11 +197,16 @@ export const EditarAcidente: React.FC = () => {
               setTrabalhadorNome(t.nome);
               // Atualizar o trabalhadorId no form para o CPF (mais amigável)
               setFormData(prev => prev ? { ...prev, trabalhadorId: t.cpf || identificador } : null);
-            } else if (typeof acidente.trabalhadorId === 'object' && acidente.trabalhadorId !== null && acidente.trabalhadorId.nome) {
+            } else {
               // Fallback para o que veio populado do backend
-              setTrabalhadorNome(acidente.trabalhadorId.nome);
-              if (acidente.trabalhadorId.cpf) {
-                setFormData(prev => prev ? { ...prev, trabalhadorId: acidente.trabalhadorId.cpf } : null);
+              const populado = typeof acidente.trabalhadorId === 'object' ? acidente.trabalhadorId : undefined;
+              const nomePopulado = populado?.nome;
+              if (nomePopulado) {
+                setTrabalhadorNome(nomePopulado);
+                const cpfPopulado = populado?.cpf;
+                if (cpfPopulado) {
+                  setFormData(prev => prev ? { ...prev, trabalhadorId: cpfPopulado } : null);
+                }
               }
             }
           } catch (err) {

@@ -117,7 +117,7 @@ export const CAMPOS_PERMITIDOS = new Set<string>([
 export function normalizarChave(chave: string): string {
   return String(chave)
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/[_\-.\/:]+/g, ' ')
+    .replace(/[_\-.:/]+/g, ' ')
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '');

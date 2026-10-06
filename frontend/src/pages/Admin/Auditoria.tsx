@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Shield, 
-  Search, 
-  Clock, 
-  User, 
   Terminal,
   Filter,
   Eye,
   ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
   Activity,
   UserCheck,
   Calendar

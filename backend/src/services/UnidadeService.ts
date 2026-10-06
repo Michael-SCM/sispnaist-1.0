@@ -1,4 +1,4 @@
-import Unidade, { IUnidadeDocument } from '../models/Unidade.js';
+import Unidade from '../models/Unidade.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IUnidade } from '../types/index.js';
 import { escapeRegex } from '../utils/sanitize.js';

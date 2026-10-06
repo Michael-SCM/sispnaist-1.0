@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useAuthStore } from '../store/authStore.js';
 import { preferenciaService } from '../services/preferenciaService.js';
 
 export const AlertaOrientacaoMobile: React.FC = () => {
-  const user = useAuthStore((state) => state.user);
   const [aberto, setAberto] = useState(false);
   const [naoMostrar, setNaoMostrar] = useState(false);
   const [carregando, setCarregando] = useState(true);

@@ -310,7 +310,7 @@ export class AlertaService {
   /**
    * Cria um alerta ou atualiza um alerta ativo já existente (deduplicação).
    */
-  private async criarOuAtualizarAlerta(dados: IDadosNovoAlerta, regra: IAlertaRegra): Promise<IAlerta> {
+  private async criarOuAtualizarAlerta(dados: IDadosNovoAlerta, _regra: IAlertaRegra): Promise<IAlerta> {
     const filtroExistente: any = {
       tipo: dados.tipo,
       status: { $in: ['ativa', 'reagindo'] },

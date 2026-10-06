@@ -25,21 +25,6 @@ function clearCache(trabalhadorId?: string) {
   }
 }
 
-const SUBMODULOS = {
-  dependentes: 'dependentes',
-  afastamentos: 'afastamentos',
-  ocorrenciasViolencia: 'ocorrenciasViolencia',
-  readaptacoes: 'readaptacoes',
-  processosTrabalho: 'processosTrabalho',
-  vinculos: 'vinculos',
-  historicoPPP: 'historicoPPP'
-} as const;
-
-const SUBMODULOS_CRUD = {
-  examesSaude: 'examesSaude',
-  internacoes: 'internacoes',
-} as const;
-
 export const submoduloTrabalhadorService = {
   // HISTÓRICO LABORAL / PPP
   obterHistoricoPPP: async (trabalhadorId: string, itemId: string): Promise<ITrabalhadorHistoricoPPP> => {

@@ -185,8 +185,8 @@ export const FormExameSaude: React.FC = () => {
       setIsLoading(true);
       const dados: Partial<ITrabalhadorExameSaude> = {
         numeroAso: formData.numeroAso || undefined,
-        dataAso: formData.dataAso ? new Date(formData.dataAso) : new Date(),
-        dataValidadeAso: formData.dataValidadeAso ? new Date(formData.dataValidadeAso) : undefined,
+        dataAso: formData.dataAso || new Date().toISOString(),
+        dataValidadeAso: formData.dataValidadeAso || undefined,
         tipoAso: formData.tipoAso as any,
         medicoNome: formData.medicoNome,
         medicoCRM: formData.medicoCRM,

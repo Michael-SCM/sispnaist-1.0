@@ -199,7 +199,7 @@ export const VideoPlayer: React.FC = () => {
     const initPlayer = () => {
       if (destroyInit || !playerContainerRef.current) return;
       try {
-        const newPlayer = new (window as any).YT.Player(playerContainerRef.current, {
+        new (window as any).YT.Player(playerContainerRef.current, {
           height: '100%',
           width: '100%',
           videoId,

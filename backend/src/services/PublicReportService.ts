@@ -42,7 +42,7 @@ export class PublicReportService {
       totalTrabalhadores,
       totalAcidentes,
       acidentesAbertos,
-      acidentesEmAnalise,
+      _acidentesEmAnalise,
       acidentesFechados,
       totalDoencas,
       doencasAtivas,

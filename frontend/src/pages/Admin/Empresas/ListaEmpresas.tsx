@@ -45,7 +45,8 @@ const ListaEmpresas: React.FC = () => {
     if (e.key === 'Enter') carregar(1);
   };
 
-  const handleDelete = async (id: string, nome: string) => {
+  const handleDelete = async (id: string | undefined, nome: string) => {
+    if (!id) return;
     if (window.confirm(`Tem certeza que deseja excluir a empresa "${nome}"?`)) {
       try {
         await empresaService.deletar(id);

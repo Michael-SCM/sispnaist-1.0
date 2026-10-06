@@ -1,9 +1,9 @@
 import { create } from 'zustand';
-import { IQuestionario } from '../types';
+import { IQuestionario, IQuestionarioComItens } from '../types';
 
 interface QuestionarioStore {
   questionarios: IQuestionario[];
-  currentQuestionario: (IQuestionario & { itens: any[] }) | null;
+  currentQuestionario: IQuestionarioComItens | null;
   total: number;
   page: number;
   limit: number;
@@ -12,7 +12,7 @@ interface QuestionarioStore {
   error: string | null;
 
   setQuestionarios: (questionarios: IQuestionario[]) => void;
-  setCurrentQuestionario: (questionario: (IQuestionario & { itens: any[] }) | null) => void;
+  setCurrentQuestionario: (questionario: IQuestionarioComItens | null) => void;
   setPage: (page: number) => void;
   setIsLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;

@@ -149,7 +149,7 @@ export async function assertCanManageWorker(
 export async function assertCanWriteHealthRecord(
   scope: UserScope,
   trabalhadorId: string,
-  entidade: string = 'Registro de saúde'
+  _entidade: string = 'Registro de saúde'
 ): Promise<void> {
   if (!trabalhadorId || !mongoose.isValidObjectId(trabalhadorId)) {
     notFound('Trabalhador');

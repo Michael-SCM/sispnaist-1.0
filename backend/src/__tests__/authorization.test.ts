@@ -13,7 +13,7 @@
  * - trabalhador B: acesso apenas aos seus próprios registros
  */
 
-import { scopeFilterDirect, scopeFilterByTrabalhador, verificarEscopoTrabalhador, verificarEscopoEmpresa, verificarEscopoUnidade } from '../utils/scope.js';
+import { scopeFilterDirect, scopeFilterByTrabalhador, verificarEscopoTrabalhador, verificarEscopoEmpresa } from '../utils/scope.js';
 import type { UserScope } from '../utils/scope.js';
 import mongoose from 'mongoose';
 

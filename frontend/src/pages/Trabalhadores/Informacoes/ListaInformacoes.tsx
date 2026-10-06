@@ -2,31 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
-import { informacaoService, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
+import { informacaoService, normalizarAnexos, ITrabalhadorInformacao } from '../../../services/informacaoService.js';
 import { uploadService } from '../../../services/uploadService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhador } from '../../../types/index.js';
+import { InfoCard } from '../../../components/InfoCard.js';
 import {
   Plus, Edit, Trash2, ArrowLeft, Heart, Pill, AlertCircle, Wine, Cigarette,
   Zap, ClipboardList, Download, Loader2, Stethoscope, FileText,
   Droplet, Activity, Calendar, Eye, FileUp, User, Users, Baby, AlertTriangle, Accessibility
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../../store/authStore.js';
 
-const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
-  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
-    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
-      <Icon size={18} />
-    </div>
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-      <p className="text-sm font-bold text-slate-700">{value ?? '-'}</p>
-    </div>
-  </div>
-);
-
-const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
+const SectionHeader = ({ icon: Icon, title }: { icon: LucideIcon; title: string }) => (
   <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
     <Icon size={20} className="text-amber-600" />
     <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">{title}</h2>
@@ -234,27 +224,23 @@ export const ListaInformacoes: React.FC = () => {
                   <InfoCard label="Periodicidade" value={info.exames?.[0]?.periodicidade} icon={Calendar} color="text-teal-500" />
                 </div>
                 {(() => {
-                  const anexos = info.exames?.[0]?.anexos;
-                  if (!anexos?.length) return null;
+                  const anexos = normalizarAnexos(info.exames?.[0]?.anexos);
+                  if (!anexos.length) return null;
                   return (
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Anexos</p>
                       <div className="flex flex-wrap gap-2">
-                        {anexos.map((a: any) => {
-                          const id = a.id || a;
-                          const nome = a.nome || a;
-                          return (
-                            <button
-                              key={id}
-                              onClick={() => uploadService.visualizar(id)}
-                              className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl border border-teal-200 transition-all text-sm font-medium"
-                            >
-                              <FileUp size={14} />
-                              <span className="truncate max-w-[200px]">{nome}</span>
-                              <Download size={14} />
-                            </button>
-                          );
-                        })}
+                        {anexos.map((a) => (
+                          <button
+                            key={a.id}
+                            onClick={() => uploadService.visualizar(a.id)}
+                            className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-xl border border-teal-200 transition-all text-sm font-medium"
+                          >
+                            <FileUp size={14} />
+                            <span className="truncate max-w-[200px]">{a.nome}</span>
+                            <Download size={14} />
+                          </button>
+                        ))}
                       </div>
                     </div>
                   );

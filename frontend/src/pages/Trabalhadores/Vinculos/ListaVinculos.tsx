@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalhadorService.js';
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { ITrabalhadorVinculo, ITrabalhador } from '../../../types/index.js';
 import { 
-  ClipboardList, 
   Plus, 
   Edit, 
   Trash2, 
@@ -14,8 +13,6 @@ import {
   ArrowLeft, 
   Building,
   Calendar,
-  ChevronRight,
-  ShieldCheck,
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';

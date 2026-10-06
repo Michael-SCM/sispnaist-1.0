@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Shield,
-  Users,
   AlertTriangle,
-  HeartPulse,
-  Syringe,
-  Activity,
-  TrendingUp,
-  BarChart3,
-  Download,
 } from 'lucide-react';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { publicReportService, IRelatorioConformidade } from '../../services/publicReportService';

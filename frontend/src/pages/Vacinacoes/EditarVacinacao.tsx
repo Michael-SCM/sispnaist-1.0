@@ -7,11 +7,9 @@ import {
   Syringe, 
   ArrowLeft, 
   Save, 
-  Calendar, 
   Building2, 
   UserCircle, 
   FileText, 
-  Info,
   CheckCircle2,
   Loader2,
   Fingerprint

@@ -22,8 +22,6 @@ import {
   X,
   Hash,
   Building2,
-  Clock,
-  User,
   Stethoscope,
   Tag,
   CreditCard,
@@ -46,9 +44,9 @@ export const InternacoesSih: React.FC = () => {
   const [filtro30Dias, setFiltro30Dias] = useState(true);
   const [importando, setImportando] = useState<string | null>(null);
   const [internacoesImportadas, setInternacoesImportadas] = useState<Set<string>>(new Set());
-  const [modalImportarItens, setModalImportarItens] = useState<Internacao[]>([]);
+  const [modalImportarItens] = useState<Internacao[]>([]);
   const [modalImportarAberto, setModalImportarAberto] = useState(false);
-  const [carregandoImportadas, setCarregandoImportadas] = useState(true);
+  const [, setCarregandoImportadas] = useState(true);
 
   useEffect(() => {
     const carregar = async () => {

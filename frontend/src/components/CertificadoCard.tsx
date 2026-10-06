@@ -1,5 +1,5 @@
 import React from 'react';
-import { Award, Download, Calendar, User, Hash, ExternalLink } from 'lucide-react';
+import { Award, Calendar, User, Hash, ExternalLink } from 'lucide-react';
 import { ICertificado } from '../types';
 
 interface CertificadoCardProps {

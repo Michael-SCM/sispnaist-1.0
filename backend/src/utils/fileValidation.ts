@@ -100,7 +100,7 @@ export function sanitizeAndValidateExtension(originalName: string): AllowedExten
   }
 
   // Prevenir Directory Traversal no nome do arquivo
-  const cleanBase = originalName.replace(/[\/\\]/g, '');
+  const cleanBase = originalName.replace(/[/\\]/g, '');
   const parts = cleanBase.split('.');
   if (parts.length < 2) {
     throw new AppError('O arquivo deve possuir uma extensão válida (.pdf, .jpg, .png)', 400);

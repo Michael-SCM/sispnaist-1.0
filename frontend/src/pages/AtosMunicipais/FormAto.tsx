@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Save, 
-  Search, 
   MapPin, 
   FileText, 
   Globe,
@@ -11,7 +10,6 @@ import {
   Gavel
 } from 'lucide-react';
 import atosService, { AtoMunicipalInovacao } from '../../services/atosService';
-import enderecoService, { Bairro, Logradouro } from '../../services/enderecoService';
 import { MainLayout } from '../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../hooks/useDocumentTitle.js';
 import toast from 'react-hot-toast';
@@ -38,11 +36,6 @@ const FormAto: React.FC = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  
-  // States for Address Search
-  const [bairros, setBairros] = useState<Bairro[]>([]);
-  const [logradouros, setLogradouros] = useState<Logradouro[]>([]);
-  const [termoBairro, setTermoBairro] = useState('');
 
   useEffect(() => {
     if (isEditing) {

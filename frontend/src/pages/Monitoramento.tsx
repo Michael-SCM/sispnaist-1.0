@@ -15,8 +15,6 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import monitoramentoService, { MonitoramentoData } from '../services/monitoramentoService';
 import { exportMonitoramento } from '../services/exportService';
-import { KPICard } from '../components/KPICard';
-import { BarChartComponent } from '../components/charts';
 import { AbsenteismoChart } from '../components/charts/AbsenteismoChart';
 import toast from 'react-hot-toast';
 

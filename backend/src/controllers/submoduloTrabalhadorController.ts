@@ -9,7 +9,6 @@ import TrabalhadorHistoricoPPP from '../models/TrabalhadorHistoricoPPP';
 import TrabalhadorRiscoOcupacional from '../models/TrabalhadorRiscoOcupacional';
 import TrabalhadorExameSaude from '../models/TrabalhadorExameSaude';
 import TrabalhadorInternacao from '../models/TrabalhadorInternacao';
-import Trabalhador from '../models/Trabalhador';
 import { AppError } from '../middleware/errorHandler';
 import { getPaginationParams } from '../utils/pagination.js';
 import { logAction, compararDados } from '../utils/auditLogger.js';

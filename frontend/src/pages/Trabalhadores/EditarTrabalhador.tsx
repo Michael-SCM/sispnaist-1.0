@@ -7,14 +7,12 @@ import { trabalhadorService } from '../../services/trabalhadorService.js';
 import { cadsusService } from '../../services/cadsusService.js';
 import empresaService from '../../services/empresaService.js';
 import unidadeService from '../../services/unidadeService.js';
-import { useEmpresaStore } from '../../store/empresaStore.js';
-import { useUnidadeStore } from '../../store/unidadeStore.js';
 import { useCatalogo } from '../../hooks/useCatalogo.js';
 import { ITrabalhador, IEmpresa, IUnidade } from '../../types/index.js';
 import { AutocompleteCidade } from '../../components/AutocompleteCidade.js';
 import {
   ArrowLeft, Save, User, MapPin, Briefcase, Mail,
-  Building, AlertTriangle, Loader2, Phone, Brain, Search
+  AlertTriangle, Loader2, Brain, Search
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -34,8 +32,6 @@ export const EditarTrabalhador: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { atualizarTrabalhador } = useTrabalhadorStore();
-  const { fetchEmpresaPorUnidade } = useEmpresaStore();
-  const { fetchUnidadesFiltradas } = useUnidadeStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [consultandoCadsus, setConsultandoCadsus] = useState(false);
@@ -110,7 +106,7 @@ export const EditarTrabalhador: React.FC = () => {
           posse: !!t.trabalho?.dataPosse,
           terceirizado: !!t.trabalho?.empresaTerceirizada,
           residente: !!t.trabalho?.residente,
-          aporentadoria: !!t.historico?.dataAposentadoria,
+          aposentadoria: !!t.historico?.dataAposentadoria,
           obito: !!t.historico?.dataObito,
           remocao: !!t.historico?.dataRemocao,
           retorno: !!t.historico?.dataRetorno,
@@ -129,7 +125,8 @@ export const EditarTrabalhador: React.FC = () => {
   }, [id, navigate, unidades]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    let { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
 
     // Máscara de CPF
     if (name === 'cpf') {

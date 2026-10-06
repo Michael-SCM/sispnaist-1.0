@@ -107,7 +107,7 @@ class QuestionarioController {
         throw new AppError('Questionário não encontrado', 404);
       }
 
-      const resultado = await Promise.all([
+      await Promise.all([
         Questionario.updateOne({ _id: id }, { ativo: false }),
         QuestionarioItem.updateMany({ questionarioId: id }, { ativo: false })
       ]);

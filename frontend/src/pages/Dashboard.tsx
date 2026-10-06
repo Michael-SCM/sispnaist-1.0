@@ -29,7 +29,6 @@ const {
     dashboardAdmin,
     dashboardTrabalhador,
     isLoading,
-    carregarDadosAcidentes,
     carregarDashboardAdmin,
     carregarDashboardTrabalhador,
   } = useAnalyticsStore();

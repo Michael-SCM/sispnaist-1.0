@@ -6,12 +6,10 @@ import { acidenteService } from '../../../services/acidenteService.js';
 import { catalogoService } from '../../../services/catalogoService.js';
 import { IMaterialBiologico, IAcidente, ICatalogoItem, IAcidentePopulated } from '../../../types/index.js';
 import { 
-  Dna, 
   ArrowLeft, 
   Save, 
   Shield,
   Activity,
-  Calendar,
   AlertTriangle,
   Stethoscope
 } from 'lucide-react';

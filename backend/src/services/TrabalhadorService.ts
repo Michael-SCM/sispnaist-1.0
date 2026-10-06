@@ -1,4 +1,4 @@
-import Trabalhador, { ITrabalhadorDocument } from '../models/Trabalhador.js';
+import Trabalhador from '../models/Trabalhador.js';
 import TrabalhadorVinculo from '../models/TrabalhadorVinculo.js';
 import TrabalhadorInformacao from '../models/TrabalhadorInformacao.js';
 import TrabalhadorDependente from '../models/TrabalhadorDependente.js';

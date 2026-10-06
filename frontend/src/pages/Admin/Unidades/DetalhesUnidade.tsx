@@ -4,7 +4,7 @@ import { MainLayout } from '../../../layouts/MainLayout.js';
 import { DocumentTitle } from '../../../hooks/useDocumentTitle.js';
 import unidadeService from '../../../services/unidadeService.js';
 import empresaService from '../../../services/empresaService.js';
-import { IUnidade, IEmpresa } from '../../../types/index.js';
+import { IUnidade, IEmpresa, refId } from '../../../types/index.js';
 import {
   Home,
   ArrowLeft,
@@ -36,11 +36,13 @@ export const DetalhesUnidade: React.FC = () => {
         setUnidade(u);
 
         if (u.empresaId) {
-          const empId = typeof u.empresaId === 'object' && u.empresaId !== null ? u.empresaId._id : u.empresaId;
-          try {
-            const empData = await empresaService.obter(empId);
-            setEmpresa(empData.data?.empresa || empData);
-          } catch {}
+          const empId = refId(u.empresaId);
+          if (empId) {
+            try {
+              const empData = await empresaService.obter(empId);
+              setEmpresa(empData.data?.empresa || empData);
+            } catch {}
+          }
         }
       } catch (error) {
         navigate('/admin/unidades');
@@ -66,7 +68,7 @@ export const DetalhesUnidade: React.FC = () => {
   if (!unidade) return null;
 
   const empresaNome = empresa?.razaoSocial
-    || (typeof unidade.empresaId === 'object' && unidade.empresaId !== null ? (unidade.empresaId as any).razaoSocial : null)
+    || (typeof unidade.empresaId === 'object' ? unidade.empresaId.razaoSocial : undefined)
     || 'Não informada';
 
   return (

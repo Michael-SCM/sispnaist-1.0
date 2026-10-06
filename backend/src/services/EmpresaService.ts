@@ -1,4 +1,4 @@
-import Empresa, { IEmpresaDocument } from '../models/Empresa.js';
+import Empresa from '../models/Empresa.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { IEmpresa } from '../types/index.js';
 import Unidade from '../models/Unidade.js';

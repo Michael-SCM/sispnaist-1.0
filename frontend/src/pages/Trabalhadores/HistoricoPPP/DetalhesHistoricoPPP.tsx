@@ -6,27 +6,17 @@ import { submoduloTrabalhadorService } from '../../../services/submoduloTrabalha
 import { trabalhadorService } from '../../../services/trabalhadorService.js';
 import { uploadService } from '../../../services/uploadService.js';
 import { ITrabalhadorHistoricoPPP, ITrabalhador } from '../../../types/index.js';
+import { InfoCard } from '../../../components/InfoCard.js';
 import {
   ArrowLeft, Edit, Trash2, Building, Briefcase, Calendar, FileText,
   Loader2, CheckCircle, XCircle, AlertTriangle, Wind, Droplets, Activity,
   UserCheck, Shield, FileSpreadsheet, Stethoscope, Info, Download
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../../store/authStore.js';
 
-const InfoCard = ({ label, value, icon: Icon, color }: { label: string; value?: string | number | null; icon: any; color: string }) => (
-  <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
-    <div className={`p-2 ${color} bg-white rounded-xl shadow-sm`}>
-      <Icon size={18} />
-    </div>
-    <div>
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
-      <p className="text-sm font-bold text-slate-700">{value ?? '-'}</p>
-    </div>
-  </div>
-);
-
-const SectionHeader = ({ icon: Icon, title }: { icon: any; title: string }) => (
+const SectionHeader = ({ icon: Icon, title }: { icon: LucideIcon; title: string }) => (
   <div className="px-8 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-2">
     <Icon size={20} className="text-blue-600" />
     <h2 className="font-bold text-slate-700 uppercase text-sm tracking-wider">{title}</h2>
